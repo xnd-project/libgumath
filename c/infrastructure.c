@@ -262,6 +262,8 @@ PyGUFunc_FromFuncAndDataAndSignature(PyUFuncGenericFunction *func, void **data,
 {
     PyUFuncObject *ufunc;
 
+    import_array();
+    import_ufunc();
     if (nin + nout > NPY_MAXARGS) {
         PyErr_Format(PyExc_ValueError,
                      "Cannot construct a ufunc with more than %d operands "
