@@ -1,2 +1,2 @@
 # gumath
-Python library wrapping libgufunc and supporting generalized universal functions which can be easily pipelined and overloaded with Numba
+C library supporting a general dispatch mechanism for general memory containers as well as a specific implementation for NumPy-like containers of a composable, generalized function concept.
