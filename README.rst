@@ -1,4 +1,11 @@
-# gumath
+
+libgumath
+=========
+
 C library supporting a general dispatch mechanism for general memory containers as well as a specific implementation for NumPy-like containers of a composable, generalized function concept.
 
-Includes a Python wrapper.
+
+gumath
+======
+
+Python wrapper for libgumath.
