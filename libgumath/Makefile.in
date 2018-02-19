@@ -1,0 +1,78 @@
+
+# ==============================================================================
+#                          Unix Makefile for libxnd
+# ==============================================================================
+
+
+LIBSTATIC = @LIBSTATIC@
+LIBNAME = @LIBNAME@
+LIBSONAME = @LIBSONAME@
+LIBSHARED = @LIBSHARED@
+
+CC = @CC@
+LD = @LD@
+AR = @AR@
+RANLIB = @RANLIB@
+
+GM_INCLUDES = @CONFIGURE_INCLUDES@
+
+CONFIGURE_CFLAGS = @CONFIGURE_CFLAGS@
+GM_CFLAGS = $(strip -I$(GM_INCLUDES) $(CONFIGURE_CFLAGS) $(CFLAGS))
+GM_CFLAGS_SHARED = $(GM_CFLAGS) -fPIC
+
+CONFIGURE_LDFLAGS = @CONFIGURE_LDFLAGS@
+GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
+
+
+default: $(LIBSTATIC) $(LIBSHARED)
+
+
+OBJS = apply.o kernels.o
+
+SHARED_OBJS = .objs/apply.o .objs/kernels.o
+
+
+$(LIBSTATIC): Makefile $(OBJS)
+	$(AR) rc $(LIBSTATIC) $(OBJS)
+	$(RANLIB) $(LIBSTATIC)
+
+$(LIBSHARED): Makefile $(SHARED_OBJS)
+	$(LD) $(GM_LDFLAGS) -o $(LIBSHARED) $(SHARED_OBJS)
+	ln -sf $(LIBSHARED) $(LIBNAME)
+	ln -sf $(LIBSHARED) $(LIBSONAME)
+
+apply.o:\
+Makefile apply.c gumath.h
+	$(CC) $(GM_CFLAGS) -c apply.c
+
+.objs/apply.o:\
+Makefile apply.c gumath.h
+	$(CC) $(GM_CFLAGS_SHARED) -c apply.c -o .objs/apply.o
+
+kernels.o:\
+Makefile kernels.c gumath.h
+	$(CC) $(GM_CFLAGS) -c kernels.c
+
+.objs/kernels.o:\
+Makefile kernels.c gumath.h
+	$(CC) $(GM_CFLAGS_SHARED) -c kernels.c -o .objs/kernels.o
+
+
+# Coverage
+coverage:\
+Makefile clean runtest
+	./tests/runtest
+	for file in *.c; do gcov -l "$$file" > /dev/null 2>&1; done
+
+FORCE:
+
+clean: FORCE
+	rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
+	rm -f $(LIBSTATIC) $(LIBSHARED) $(LIBSONAME) $(LIBNAME) gumath.h
+	cd .objs && rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
+
+distclean: clean
+	rm -f Makefile
+
+
+
