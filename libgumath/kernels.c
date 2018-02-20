@@ -41,20 +41,31 @@
 #include "gumath.h"
 
 
+gm_kernel_t empty_kernel =
+ { .sig = NULL,
+   .C = NULL,
+   .Fortran = NULL,
+   .Strided = NULL,
+   .Xnd = NULL };
+
+
 /****************************************************************************/
 /*                              Example kernels                             */
 /****************************************************************************/
 
-static inline void
-gm_sin_c_d_d(xnd_ndarray_t stack[], int64_t n)
+static void
+gm_sin_c_d_d(xnd_ndarray_t stack[])
 {
     const xnd_ndarray_t *src = &stack[0];
     xnd_ndarray_t *dst = &stack[1];
     const double *s = (const double *)src->ptr;
     double *d = (double *)dst->ptr;
-    int64_t i;
+    int64_t i, n;
 
-    for (i = 0; i < n-3; i += 4) {
+    assert(src->ndim <= 1 && dst->ndim == src->ndim);
+    n = src->shape[0];
+
+    for (i = 0; i < n; i += 4) {
         d[i] = sin(s[i]);
         d[i+1] = sin(s[i+1]);
         d[i+2] = sin(s[i+2]);
@@ -66,18 +77,49 @@ gm_sin_c_d_d(xnd_ndarray_t stack[], int64_t n)
     }
 }
 
-static inline void
-gm_sin_strided_d_d(xnd_ndarray_t stack[], int64_t n)
+static void
+gm_sin_strided_d_d(xnd_ndarray_t stack[])
 {
     const xnd_ndarray_t *src = &stack[0];
     xnd_ndarray_t *dst = &stack[1];
     const double *s = (const double *)src->ptr;
     double *d = (double *)dst->ptr;
-    int64_t i;
+    int64_t i, n;
+
+    assert(src->ndim <= 1 && dst->ndim == src->ndim);
+    n = src->shape[0];
 
     for (i = 0; i < n; i++) {
         d[i] = sin(s[i]);
         s += src->strides[0];
         d += dst->strides[0];
     }
+}
+
+/****************************************************************************/
+/*                               Example init                               */
+/****************************************************************************/
+
+int
+gm_sin_init(ndt_context_t *ctx)
+{
+    gm_kernel_t kernel = empty_kernel;
+
+    if (gm_add_func("sin", ctx) < 0) {
+        return -1;
+    }
+
+    kernel.sig = ndt_from_string("Dims... * float64 -> Dims... * float64", ctx);
+    if (kernel.sig == NULL) {
+        return -1;
+    }
+
+    kernel.C = gm_sin_c_d_d;
+    kernel.Strided = gm_sin_strided_d_d;
+
+    if (gm_add_kernel("sin", kernel, ctx) < 0) {
+        return -1;
+    }
+
+    return 0;
 }

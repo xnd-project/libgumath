@@ -104,22 +104,22 @@ apply_kernel(const gm_kernel_t *f, xnd_t stack[], ndt_context_t *ctx)
         if (as_ndarray(op, stack, n, ctx) < 0) {
             return -1;
         }
-        f->C(op, ctx);
+        f->C(op);
     }
     else if (f->Fortran && all_f_contiguous(stack, n)) {
         if (as_ndarray(op, stack, n, ctx) < 0) {
             return -1;
         }
-        f->Fortran(op, ctx);
+        f->Fortran(op);
     }
     else if (f->Strided && all_ndarray(stack, n)) {
         if (as_ndarray(op, stack, n, ctx) < 0) {
             return -1;
         }
-        f->Strided(op, ctx);
+        f->Strided(op);
     }
     else if (f->Xnd) {
-        f->Xnd(stack, ctx);
+        f->Xnd(stack);
     }
     else {
         ndt_err_format(ctx, NDT_RuntimeError, "could not find kernel");
@@ -185,7 +185,7 @@ map_rec(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
 }
 
 /* Select a kernel from a multimethod. */
-static inline const gm_kernel_t *
+static const gm_kernel_t *
 select(ndt_t *out[], int *nout,
        int *outer_dims,
        const gm_func_t *f,
@@ -199,7 +199,7 @@ select(ndt_t *out[], int *nout,
         in[i] = (ndt_t *)stack[sp+i].type;
     }
 
-    for (i = 0; i < f->size; i++) {
+    for (i = 0; i < f->nkernels; i++) {
         const gm_kernel_t *kernel = &f->kernels[i];
         *nout = ndt_typecheck(out, outer_dims, kernel->sig, in, nin, ctx);
         if (*nout >= 0) {
@@ -210,7 +210,7 @@ select(ndt_t *out[], int *nout,
     return NULL;
 }
 
-static inline int
+int
 map(const gm_func_t *f, xnd_t stack[], int sp, int nin, ndt_context_t *ctx)
 {
     const gm_kernel_t *kernel;
