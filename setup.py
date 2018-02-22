@@ -134,16 +134,16 @@ def ndtypes_ext():
         extra_link_args = []
         runtime_library_dirs = []
 
-        # if BUILD_ALL:
-        #    from distutils.msvc9compiler import MSVCCompiler
-        #    MSVCCompiler().initialize()
-        #    os.chdir("vcbuild")
-        #    os.environ['LIBS'] = os.path.normpath(LIBS)
-        #    if ARCH == "64bit":
-        #          os.system("vcbuild64.bat")
-        #    else:
-        #          os.system("vcbuild32.bat")
-        #    os.chdir("..")
+        if BUILD_ALL:
+           from distutils.msvc9compiler import MSVCCompiler
+           MSVCCompiler().initialize()
+           os.chdir("vcbuild")
+           os.environ['LIBS'] = os.path.normpath(LIBS)
+           if ARCH == "64bit":
+                 os.system("vcbuild64.bat")
+           else:
+                 os.system("vcbuild32.bat")
+           os.chdir("..")
 
     else:
         extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
@@ -156,10 +156,8 @@ def ndtypes_ext():
             extra_link_args = []
             runtime_library_dirs = ["$ORIGIN"]
 
-        # if BUILD_ALL:
-        #    os.system(
-        #      "./configure --with-includes='%s' --with-libs='%s' && make" %
-        #      (CONFIGURE_INCLUDES, CONFIGURE_LIBS))
+        if BUILD_ALL:
+           os.system("./configure CFLAGS=\"-I$PWD/python/ndtypes -I$PWD/python/xnd\" && make")
 
     return Extension (
       "gumath._gumath",
