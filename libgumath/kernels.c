@@ -109,7 +109,7 @@ gm_sin_init(ndt_context_t *ctx)
         return -1;
     }
 
-    kernel.sig = ndt_from_string("Dims... * float64 -> Dims... * float64", ctx);
+    kernel.sig = ndt_from_string("Dims... * N * float64 -> Dims... * N * float64", ctx);
     if (kernel.sig == NULL) {
         return -1;
     }
