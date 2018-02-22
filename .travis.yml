@@ -3,15 +3,16 @@ python: 3.6
 
 language: C
 
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y python3-numpy
+
 matrix:
   include:
     - compiler: gcc
       before_script:
         - git clone https://github.com/plures/ndtypes.git
         - git clone https://github.com/plures/xnd.git
-        - python3 --version
-        - python --version
-        - pip install numpy
         - cd ndtypes
         - python3 setup.py install --local=$PWD/../python
         - cd ../xnd
