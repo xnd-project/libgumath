@@ -102,7 +102,7 @@ if len(sys.argv) == 2:
         path = module_path + ':' + python_path if python_path else module_path
         env = os.environ.copy()
         env['PYTHONPATH'] = path
-        ret = subprocess.call([sys.executable, "python/test_gumath.py", "--long"], env=env)
+        ret = subprocess.call([sys.executable, "python/test_gumath.py"], env=env)
         sys.exit(ret)
     elif sys.argv[1] == 'clean':
         shutil.rmtree("build", ignore_errors=True)

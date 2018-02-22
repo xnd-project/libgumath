@@ -1,0 +1,20 @@
+sudo: required
+python: 3.6
+
+language: C
+
+matrix:
+  include:
+    - compiler: gcc
+      before_script:
+        - git clone https://github.com/plures/ndtypes.git
+        - git clone https://github.com/plures/xnd.git
+        - python3 -m pip install numpy
+        - cd ndtypes
+        - python3 setup.py install --local=$PWD/../python
+        - cd ../xnd
+        - python3 setup.py install --local=$PWD/../python
+        - cd ..
+      script:
+        - python3 setup.py build
+        - python3 setup.py test
