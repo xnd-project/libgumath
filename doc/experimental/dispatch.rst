@@ -123,6 +123,6 @@ level via the gumath Python module.
 Obstacles
 ---------
 
-  - If the datashape (ndt_t) signatures are given on the Python level (which
-    is probably the only sane option), the jit-compiled kernel needs to be
-    type-checked against the ndt_t type.
+- If the datashape (ndt_t) signatures are given on the Python level (which
+  is probably the only sane option), the jit-compiled kernel needs to be
+  type-checked against the ndt_t type.
