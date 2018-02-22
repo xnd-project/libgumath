@@ -54,7 +54,7 @@
 
 /* libxnd.so is not linked without at least one xnd symbol. The -no-as-needed
  * linker option is difficult to integrate into setup.py. */
-static const void *dummy UNUSED = &xnd_error;
+const void *dummy = &xnd_error;
 
 
 /****************************************************************************/

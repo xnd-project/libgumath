@@ -174,14 +174,14 @@ gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
                 return -1;
             }
         }
+
+        return 0;
     }
 
     default: 
         ndt_err_format(ctx, NDT_NotImplementedError, "unsupported type");
         return -1;
    }
-
-    return 0;
 }
 
 /* Look up a multimethod by name and select a kernel. */
