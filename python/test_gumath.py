@@ -59,8 +59,6 @@ class TestCall(unittest.TestCase):
             end = time.time()
             sys.stderr.write("\ngumath: time=%s\n" % (end-start))
 
-            continue
-
             if np is not None:
                 a = np.array(lst, dtype="float64")
 
