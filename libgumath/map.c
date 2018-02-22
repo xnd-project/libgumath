@@ -35,7 +35,6 @@
 #include <limits.h>
 #include <stddef.h>
 #include "gumath.h"
-#include "map.h"
 
 
 /*****************************************************************************/
@@ -113,7 +112,7 @@ func_trie_del(func_trie_t *t)
 }
 
 int
-func_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
+gm_func_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
 {
     func_trie_t *t = func_map;
     const unsigned char *cp;
@@ -152,8 +151,8 @@ func_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
     return 0;
 }
 
-const gm_func_t *
-func_find(const char *key, ndt_context_t *ctx)
+gm_func_t *
+gm_func_find(const char *key, ndt_context_t *ctx)
 {
     func_trie_t *t = func_map;
     const unsigned char *cp;
@@ -205,6 +204,6 @@ gm_init(ndt_context_t *ctx)
 void
 gm_finalize(void)
 {
-    func_trie_del(typedef_map);
+    func_trie_del(func_map);
     func_map = NULL;
 }

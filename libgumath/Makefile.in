@@ -27,9 +27,9 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o kernels.o
+OBJS = apply.o func.o kernels.o map.o
 
-SHARED_OBJS = .objs/apply.o .objs/kernels.o
+SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/map.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -66,11 +66,11 @@ Makefile kernels.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c kernels.c -o .objs/kernels.o
 
 map.o:\
-Makefile map.c gumath.h map.h
+Makefile map.c gumath.h
 	$(CC) $(GM_CFLAGS) -c map.c
 
 .objs/map.o:\
-Makefile map.c gumath.h map.h
+Makefile map.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c map.c -o .objs/map.o
 
 

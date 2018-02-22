@@ -39,8 +39,7 @@
 #include <complex.h>
 #include <assert.h>
 #include "ndtypes.h"
-#include "overflow.h"
-#include "slice.h"
+#include "gumath.h"
 
 
 /******************************************************************************/
@@ -52,7 +51,7 @@ gm_func_new(const char *name, ndt_context_t *ctx)
 {
     gm_func_t *f;
 
-    f = ndt_alloc_size(sizeof *t);
+    f = ndt_alloc_size(sizeof *f);
     if (f == NULL) {
         return ndt_memory_error(ctx);
     }
@@ -74,7 +73,7 @@ gm_func_del(gm_func_t *f)
     ndt_free(f->name);
 
     for (int i = 0; i < f->nkernels; i++) {
-        ndt_del(f->kernels[i].type);
+        ndt_del(f->kernels[i].sig);
     }
 
     ndt_free(f);
@@ -89,7 +88,7 @@ gm_add_func(const char *name, ndt_context_t *ctx)
         return -1;
     }
 
-    if (func_add(name, f, ctx) < 0) {
+    if (gm_func_add(name, f, ctx) < 0) {
         gm_func_del(f);
         return -1;
     }
@@ -100,14 +99,14 @@ gm_add_func(const char *name, ndt_context_t *ctx)
 int
 gm_add_kernel(const char *name, gm_kernel_t kernel, ndt_context_t *ctx)
 {
-    gm_func_t *f = func_find(name, ctx);
+    gm_func_t *f = gm_func_find(name, ctx);
 
     if (f == NULL) {
         return -1;
     }
 
-    if (f->nkernels == GM_MAX_KERNEL) {
-        ndt_del(kernel.type);
+    if (f->nkernels == GM_MAX_KERNELS) {
+        ndt_del(kernel.sig);
         ndt_err_format(ctx, NDT_RuntimeError,
             "%s: maximum number of kernels reached for", f->name);
         return -1;

@@ -129,8 +129,8 @@ apply_kernel(const gm_kernel_t *f, xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
-static int
-map_rec(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
+int
+gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
 {
     xnd_t next[NDT_MAX_ARGS];
     const ndt_t *sig = f->sig;
@@ -170,7 +170,7 @@ map_rec(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
                 next[k].index = stack[k].index + i * u->Concrete.FixedDim.step;
             }
 
-            if (map_rec(f, next, outer_dims-1, ctx) < 0) {
+            if (gm_map(f, next, outer_dims-1, ctx) < 0) {
                 return -1;
             }
         }
@@ -184,59 +184,28 @@ map_rec(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
     return 0;
 }
 
-/* Select a kernel from a multimethod. */
-static const gm_kernel_t *
-select(ndt_t *out[], int *nout,
-       int *outer_dims,
-       const gm_func_t *f,
-       xnd_t stack[], int sp, int nin,
-       ndt_context_t *ctx)
+/* Look up a multimethod by name and select a kernel. */
+const gm_kernel_t *
+gm_select(ndt_t *out_types[],
+          int *outer_dims,
+          const char *name,
+          ndt_t *in_types[], int nin,
+          ndt_context_t *ctx)
 {
-    ndt_t *in[NDT_MAX_ARGS];
+    const gm_func_t *f;
     int i;
 
-    for (i = 0; i < nin; i++) {
-        in[i] = (ndt_t *)stack[sp+i].type;
+    f = gm_func_find(name, ctx);
+    if (f == NULL) {
+        return NULL;
     }
 
     for (i = 0; i < f->nkernels; i++) {
         const gm_kernel_t *kernel = &f->kernels[i];
-        *nout = ndt_typecheck(out, outer_dims, kernel->sig, in, nin, ctx);
-        if (*nout >= 0) {
+        if (ndt_typecheck(out_types, outer_dims, kernel->sig, in_types, nin, ctx) >= 0) {
             return kernel;
         }
     }
 
     return NULL;
-}
-
-int
-map(const gm_func_t *f, xnd_t stack[], int sp, int nin, ndt_context_t *ctx)
-{
-    const gm_kernel_t *kernel;
-    ndt_t *out[NDT_MAX_ARGS];
-    int nout;
-    int outer_dims;
-    int i, k;
-
-    kernel = select(out, &nout, &outer_dims, f, stack, sp, nin, ctx);
-    if (kernel == NULL) {
-        return -1;
-    }
-
-    for (i = 0; i < nout; i++) {
-        xnd_master_t *x = xnd_empty_from_type(out[i], XND_OWN_EMBEDDED, ctx);
-        if (x == NULL) {
-            for (k = 0; k < i; k++) {
-                ;
-            }
-            return -1;
-        }
-
-        stack[sp+nin+i] = x->master;
-    }
-
-    map_rec(kernel, stack, outer_dims, ctx);
-
-    return 0;
 }
