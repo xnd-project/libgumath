@@ -9,12 +9,14 @@ matrix:
       before_script:
         - git clone https://github.com/plures/ndtypes.git
         - git clone https://github.com/plures/xnd.git
-        - python3.6 -m pip install numpy
+        - python3 --version
+        - python --version
+        - pip install numpy
         - cd ndtypes
-        - python3.6 setup.py install --local=$PWD/../python
+        - python3 setup.py install --local=$PWD/../python
         - cd ../xnd
-        - python3.6 setup.py install --local=$PWD/../python
+        - python3 setup.py install --local=$PWD/../python
         - cd ..
       script:
-        - python3.6 setup.py build
-        - python3.6 setup.py test
+        - python3 setup.py build
+        - python3 setup.py test
