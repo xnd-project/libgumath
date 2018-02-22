@@ -72,16 +72,16 @@ The algorithm for gufunc application can be seen in the Python module.
 
 3. Select the kernel:
 
-   I. Lookup the gufunc in the function table.
+   a. Lookup the gufunc in the function table.
 
-   II. Iterate over the type signatures.
+   b. Iterate over the type signatures.
 
-      a. If no match is found, return an error.
+      i.  If no match is found, return an error.
 
-      b. If a match is found, compute the return type(s) and the number
-         of outer dimensions to be skipped.
+      ii. If a match is found, compute the return type(s) and the number
+          of outer dimensions to be skipped.
 
-         This stage should probably also do broadcasting, which is currently not implemented.
+          This stage should probably also do broadcasting, which is currently not implemented.
 
 4. Allocate new xnd container(s) for the return values.
 
