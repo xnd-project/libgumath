@@ -65,7 +65,7 @@ gm_sin_c_d_d(xnd_ndarray_t stack[])
     assert(src->ndim <= 1 && dst->ndim == src->ndim);
     n = src->shape[0];
 
-    for (i = 0; i < n; i += 4) {
+    for (i = 0; i < n-3; i += 4) {
         d[i] = sin(s[i]);
         d[i+1] = sin(s[i+1]);
         d[i+2] = sin(s[i+2]);
