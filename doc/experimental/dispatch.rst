@@ -66,36 +66,36 @@ Kernel application
 
 The algorithm for gufunc application can be seen in the Python module.
 
-  1) Get the function name and the list of xnd function arguments.
+1. Get the function name and the list of xnd function arguments.
 
-  2) Get the types of the function arguments.
+2. Get the types of the function arguments.
 
-  3) Select the kernel:
+3. Select the kernel:
 
-       a) Lookup the gufunc in the function table.
+   a. Lookup the gufunc in the function table.
 
-       b) Iterate over the type signatures.
+   b. Iterate over the type signatures.
 
-           I) If no match is found, return an error.
+      I. If no match is found, return an error.
 
-           II) If a match is found, compute the return type(s) and the number
-               of outer dimensions to be skipped.
+      II. If a match is found, compute the return type(s) and the number
+          of outer dimensions to be skipped.
 
-               [This stage should probably also do broadcasting, which is
-                currently not implemented.]
+          [This stage should probably also do broadcasting, which is
+           currently not implemented.]
 
-  4) Allocate new xnd container(s) for the return values.
+4. Allocate new xnd container(s) for the return values.
 
-  5) Input and output containers are pushed on a single stack. The types,
-     which are available at any stage of the array traversal, keep track
-     of the number of in/out args.
+5. Input and output containers are pushed on a single stack. The types,
+   which are available at any stage of the array traversal, keep track
+   of the number of in/out args.
 
-  6) Call gm_map(), which orchestrates kernel application.
+6. Call gm_map(), which orchestrates kernel application.
 
-  7) The actual kernel {C, Fortran, Strided, Xnd} is selected right before
-     application (in this order of preference).
+7. The actual kernel {C, Fortran, Strided, Xnd} is selected right before
+   application (in this order of preference).
 
-     If no kernel is found, an error is returned.
+   If no kernel is found, an error is returned.
 
 
 More specialized kernel signatures
