@@ -96,6 +96,50 @@ gm_sin_strided_d_d(xnd_ndarray_t stack[])
     }
 }
 
+static void
+gm_sin_c_f_f(xnd_ndarray_t stack[])
+{
+    const xnd_ndarray_t *src = &stack[0];
+    xnd_ndarray_t *dst = &stack[1];
+    const float *s = (const float *)src->ptr;
+    float *d = (float *)dst->ptr;
+    int64_t i, n;
+
+    assert(src->ndim <= 1 && dst->ndim == src->ndim);
+    n = src->shape[0];
+
+    for (i = 0; i < n-3; i += 4) {
+        d[i] = sinf(s[i]);
+        d[i+1] = sinf(s[i+1]);
+        d[i+2] = sinf(s[i+2]);
+        d[i+3] = sinf(s[i+3]);
+    }
+
+    for (; i < n; i++) {
+        d[i] = sinf(s[i]);
+    }
+}
+
+static void
+gm_sin_strided_f_f(xnd_ndarray_t stack[])
+{
+    const xnd_ndarray_t *src = &stack[0];
+    xnd_ndarray_t *dst = &stack[1];
+    const float *s = (const float *)src->ptr;
+    float *d = (float *)dst->ptr;
+    int64_t i, n;
+
+    assert(src->ndim <= 1 && dst->ndim == src->ndim);
+    n = src->shape[0];
+
+    for (i = 0; i < n; i++) {
+        d[i] = sinf(s[i]);
+        s += src->strides[0];
+        d += dst->strides[0];
+    }
+}
+
+
 /****************************************************************************/
 /*                               Example init                               */
 /****************************************************************************/
@@ -103,12 +147,13 @@ gm_sin_strided_d_d(xnd_ndarray_t stack[])
 int
 gm_sin_init(ndt_context_t *ctx)
 {
-    gm_kernel_t kernel = empty_kernel;
+    gm_kernel_t kernel;
 
     if (gm_add_func("sin", ctx) < 0) {
         return -1;
     }
 
+    kernel = empty_kernel;
     kernel.sig = ndt_from_string("Dims... * N * float64 -> Dims... * N * float64", ctx);
     if (kernel.sig == NULL) {
         return -1;
@@ -116,6 +161,19 @@ gm_sin_init(ndt_context_t *ctx)
 
     kernel.C = gm_sin_c_d_d;
     kernel.Strided = gm_sin_strided_d_d;
+
+    if (gm_add_kernel("sin", kernel, ctx) < 0) {
+        return -1;
+    }
+
+    kernel = empty_kernel;
+    kernel.sig = ndt_from_string("Dims... * N * float32 -> Dims... * N * float32", ctx);
+    if (kernel.sig == NULL) {
+        return -1;
+    }
+
+    kernel.C = gm_sin_c_f_f;
+    kernel.Strided = gm_sin_strided_f_f;
 
     if (gm_add_kernel("sin", kernel, ctx) < 0) {
         return -1;

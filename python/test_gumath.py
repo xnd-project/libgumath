@@ -45,29 +45,38 @@ except ImportError:
 class TestCall(unittest.TestCase):
 
     def test_call(self):
-        test_cases = [([[float(i) for i in range(1000000)],
-                        [float(i+1) for i in range(1000000)]],
-                       "2 * 1000000 * float64"),
-                      (1000000 * [[float(i+1) for i in range(2)]],
-                       "1000000 * 2 * float64")]
+        test_cases = [
+          ([[float(i) for i in range(1000000)],
+            [float(i+1) for i in range(1000000)]],
+           "2 * 1000000 * float64", "float64"),
 
-        for lst, t in test_cases:
+          (1000000 * [[float(i+1) for i in range(2)]],
+           "1000000 * 2 * float64", "float64"),
+
+          ([[float(i) for i in range(1000000)],
+            [float(i+1) for i in range(1000000)]],
+           "2 * 1000000 * float32", "float32"),
+
+          (1000000 * [[float(i+1) for i in range(2)]],
+           "1000000 * 2 * float32", "float32")]
+
+        for lst, t, dtype in test_cases:
             x = xnd(lst, type=t)
 
             start = time.time()
             y = call("sin", x)
             end = time.time()
-            sys.stderr.write("\ngumath: time=%s\n" % (end-start))
+            sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
-                a = np.array(lst, dtype="float64")
+                a = np.array(lst, dtype=dtype)
 
                 start = time.time()
                 b = np.sin(lst)
                 end = time.time()
-                sys.stderr.write("numpy: time=%s\n" % (end-start))
+                sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                self.assertEqual(y.value, b.tolist())
+                np.testing.assert_almost_equal(y, b, 7)
 
 
 ALL_TESTS = [
