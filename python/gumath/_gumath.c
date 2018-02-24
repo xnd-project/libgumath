@@ -198,6 +198,45 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     }
 }
 
+static PyObject *
+gufunc_kernels(GufuncObject *self, PyObject *args UNUSED)
+{
+    NDT_STATIC_CONTEXT(ctx);
+    PyObject *list, *tmp;
+    const gm_func_t *f;
+    char *s;
+    int i;
+
+    f = gm_tbl_find(self->name, &ctx);
+    if (f == NULL) {
+        return seterr(&ctx);
+    }
+
+    list = PyList_New(f->nkernels);
+    if (list == NULL) {
+        return NULL;
+    }
+
+    for (i = 0; i < f->nkernels; i++) {
+        s = ndt_as_string(f->kernels[i].sig, &ctx);
+        if (s == NULL) {
+            Py_DECREF(list);
+            return seterr(&ctx);
+        }
+
+        tmp = PyUnicode_FromString(s);
+        ndt_free(s);
+        if (tmp == NULL) {
+            Py_DECREF(list);
+            return NULL;
+        }
+
+        PyList_SET_ITEM(list, i, tmp);
+    }
+
+    return list;
+}
+
 static int
 add_function(const gm_func_t *f, void *state)
 {
@@ -213,27 +252,23 @@ add_function(const gm_func_t *f, void *state)
 }
 
 
+static PyGetSetDef gufunc_getsets [] =
+{
+  { "kernels", (getter)gufunc_kernels, NULL, NULL, NULL},
+  {NULL}
+};
+
+
 static PyTypeObject Gufunc_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "_gumath.gufunc",
-    sizeof(GufuncObject),
-    0,
-    (destructor)gufunc_dealloc,   /* tp_dealloc */
-    0,                            /* tp_print */
-    0,                            /* tp_getattr */
-    0,                            /* tp_setattr */
-    0,                            /* tp_reserved */
-    0,                            /* tp_repr */
-    0,                            /* tp_as_number */
-    0,                            /* tp_as_sequence */
-    0,                            /* tp_as_mapping */
-    PyObject_HashNotImplemented,  /* tp_hash */
-    (ternaryfunc)gufunc_call,     /* tp_call */
-    0,                            /* tp_str */
-    PyObject_GenericGetAttr,      /* tp_getattro */
-    0,                            /* tp_setattro */
-    0,                            /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,           /* tp_flags */
+    .tp_name = "_gumath.gufunc",
+    .tp_basicsize = sizeof(GufuncObject),
+    .tp_dealloc = (destructor)gufunc_dealloc,
+    .tp_hash = PyObject_HashNotImplemented,
+    .tp_call = (ternaryfunc)gufunc_call,
+    .tp_getattro = PyObject_GenericGetAttr,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_getset = gufunc_getsets
 };
 
 

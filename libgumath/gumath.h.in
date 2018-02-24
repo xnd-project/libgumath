@@ -92,11 +92,8 @@ GM_API const gm_kernel_t *gm_select(ndt_t *out_types[], int *outer_dims, const c
 /*                                Gufunc table                                */
 /******************************************************************************/
 
-NDT_PRAGMA(NDT_HIDE_SYMBOLS_START)
-int gm_tbl_add(const char *key, gm_func_t *value, ndt_context_t *ctx);
-gm_func_t *gm_tbl_find(const char *key, ndt_context_t *ctx);
-NDT_PRAGMA(NDT_HIDE_SYMBOLS_END)
-
+GM_API int gm_tbl_add(const char *key, gm_func_t *value, ndt_context_t *ctx);
+GM_API gm_func_t *gm_tbl_find(const char *key, ndt_context_t *ctx);
 GM_API int gm_tbl_map(int (*f)(const gm_func_t *, void *state), void *state);
 
 
