@@ -162,7 +162,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     out = kernel->sig->Function.out;
     for (i = 0; i < out; i++) {
-        PyObject *x = Xnd_EmptyFromType(out_types[i]);
+        PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), out_types[i]);
         if (x == NULL) {
             clear_objects(result, i);
             for (k = i+1; k < out; k++) {
