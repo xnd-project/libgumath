@@ -69,28 +69,46 @@ seterr(ndt_context_t *ctx)
 
 
 /****************************************************************************/
-/*                              Function calls                              */
+/*                              Function object                             */
 /****************************************************************************/
 
-static const char *
-unicode_as_ascii_string(PyObject *v)
+typedef struct {
+    PyObject_HEAD
+    char *name;
+} GufuncObject;
+
+static PyTypeObject Gufunc_Type;
+
+static PyObject *
+gufunc_new(const char *name)
 {
-    if (!PyUnicode_Check(v)) {
-        PyErr_SetString(PyExc_TypeError, "expected string");
+    NDT_STATIC_CONTEXT(ctx);
+    GufuncObject *self;
+
+    self = PyObject_New(GufuncObject, &Gufunc_Type);
+    if (self == NULL) {
         return NULL;
     }
 
-    if (PyUnicode_READY(v) < 0) {
-        return NULL;
+    self->name = ndt_strdup(name, &ctx);
+    if (self->name == NULL) {
+        return seterr(&ctx);
     }
 
-    if (!PyUnicode_IS_ASCII(v)) {
-        PyErr_SetString(PyExc_ValueError, "names must be ascii");
-        return NULL;
-    }
-
-    return PyUnicode_AsUTF8(v);
+    return (PyObject *)self;
 }
+
+static void
+gufunc_dealloc(GufuncObject *self)
+{
+    ndt_free(self->name);
+    PyObject_Del(self);
+}
+
+
+/****************************************************************************/
+/*                              Function calls                              */
+/****************************************************************************/
 
 static void
 clear_objects(PyObject **a, Py_ssize_t len)
@@ -103,7 +121,7 @@ clear_objects(PyObject **a, Py_ssize_t len)
 }
 
 static PyObject *
-gufunc_call(PyObject *mod UNUSED, PyObject *args)
+gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 {
     NDT_STATIC_CONTEXT(ctx);
     Py_ssize_t in = PyTuple_GET_SIZE(args);
@@ -113,21 +131,20 @@ gufunc_call(PyObject *mod UNUSED, PyObject *args)
     ndt_t *out_types[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
     const gm_kernel_t *kernel;
-    const char *name;
     int out, outer_dims;
     int i, k;
 
-    if (in < 1 || in > NDT_MAX_ARGS) {
+    if (kwds) {
+        PyErr_SetString(PyExc_TypeError,
+            "gufunc calls do not support keywords");
+        return NULL;
+    }
+
+    if (in > NDT_MAX_ARGS) {
         PyErr_SetString(PyExc_TypeError,
             "invalid number of arguments");
         return NULL;
     }
-
-    name = unicode_as_ascii_string(a[0]);
-    if (name == NULL) {
-        return NULL;
-    }
-    a++; in--;
 
     for (i = 0; i < in; i++) {
         if (!Xnd_Check(a[i])) {
@@ -138,7 +155,7 @@ gufunc_call(PyObject *mod UNUSED, PyObject *args)
         in_types[i] = stack[i].type;
     }
 
-    kernel = gm_select(out_types, &outer_dims, name, in_types, in, &ctx);
+    kernel = gm_select(out_types, &outer_dims, self->name, in_types, in, &ctx);
     if (kernel == NULL) {
         return seterr(&ctx);
     }
@@ -181,23 +198,55 @@ gufunc_call(PyObject *mod UNUSED, PyObject *args)
     }
 }
 
+static int
+add_function(const gm_func_t *f, void *state)
+{
+    PyObject *m = (PyObject *)state;
+    PyObject *func;
+
+    func = gufunc_new(f->name);
+    if (func == NULL) {
+        return -1;
+    }
+
+    return PyModule_AddObject(m, f->name, func);
+}
+
+
+static PyTypeObject Gufunc_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "_gumath.gufunc",
+    sizeof(GufuncObject),
+    0,
+    (destructor)gufunc_dealloc,   /* tp_dealloc */
+    0,                            /* tp_print */
+    0,                            /* tp_getattr */
+    0,                            /* tp_setattr */
+    0,                            /* tp_reserved */
+    0,                            /* tp_repr */
+    0,                            /* tp_as_number */
+    0,                            /* tp_as_sequence */
+    0,                            /* tp_as_mapping */
+    PyObject_HashNotImplemented,  /* tp_hash */
+    (ternaryfunc)gufunc_call,     /* tp_call */
+    0,                            /* tp_str */
+    PyObject_GenericGetAttr,      /* tp_getattro */
+    0,                            /* tp_setattro */
+    0,                            /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT,           /* tp_flags */
+};
+
 
 /****************************************************************************/
 /*                                  Module                                  */
 /****************************************************************************/
-
-static PyMethodDef _gumath_methods [] =
-{
-  { "call", (PyCFunction)gufunc_call, METH_VARARGS, NULL },
-  { NULL, NULL, 1, NULL }
-};
 
 static struct PyModuleDef gumath_module = {
     PyModuleDef_HEAD_INIT,        /* m_base */
     "_gumath",                    /* m_name */
     NULL,                         /* m_doc */
     -1,                           /* m_size */
-    _gumath_methods,              /* m_methods */
+    NULL,                         /* m_methods */
     NULL,                         /* m_slots */
     NULL,                         /* m_traverse */
     NULL,                         /* m_clear */
@@ -228,10 +277,19 @@ PyInit__gumath(void)
        initialized = 1;
     }
 
+    if (PyType_Ready(&Gufunc_Type) < 0) {
+        return NULL;
+    }
+
     m = PyModule_Create(&gumath_module);
     if (m == NULL) {
         goto error;
     }
+
+    if (gm_tbl_map(add_function, m) < 0) {
+        goto error;
+    }
+
 
     return m;
 

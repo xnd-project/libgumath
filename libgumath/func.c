@@ -88,7 +88,7 @@ gm_add_func(const char *name, ndt_context_t *ctx)
         return -1;
     }
 
-    if (gm_func_add(name, f, ctx) < 0) {
+    if (gm_tbl_add(name, f, ctx) < 0) {
         gm_func_del(f);
         return -1;
     }
@@ -99,7 +99,7 @@ gm_add_func(const char *name, ndt_context_t *ctx)
 int
 gm_add_kernel(const char *name, gm_kernel_t kernel, ndt_context_t *ctx)
 {
-    gm_func_t *f = gm_func_find(name, ctx);
+    gm_func_t *f = gm_tbl_find(name, ctx);
 
     if (f == NULL) {
         return -1;

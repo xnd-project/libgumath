@@ -63,7 +63,7 @@ init_charmap(void)
 
 
 /*****************************************************************************/
-/*                            Global function map                            */
+/*                           Global function table                           */
 /*****************************************************************************/
 
 typedef struct func_trie {
@@ -71,7 +71,7 @@ typedef struct func_trie {
     struct func_trie *next[];
 } func_trie_t;
 
-static func_trie_t *func_map = NULL;
+static func_trie_t *tbl = NULL;
 
 static func_trie_t *
 func_trie_new(ndt_context_t *ctx)
@@ -112,9 +112,9 @@ func_trie_del(func_trie_t *t)
 }
 
 int
-gm_func_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
+gm_tbl_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
 {
-    func_trie_t *t = func_map;
+    func_trie_t *t = tbl;
     const unsigned char *cp;
     int i;
 
@@ -152,9 +152,9 @@ gm_func_add(const char *key, gm_func_t *value, ndt_context_t *ctx)
 }
 
 gm_func_t *
-gm_func_find(const char *key, ndt_context_t *ctx)
+gm_tbl_find(const char *key, ndt_context_t *ctx)
 {
-    func_trie_t *t = func_map;
+    func_trie_t *t = tbl;
     const unsigned char *cp;
     int i;
 
@@ -183,6 +183,32 @@ gm_func_find(const char *key, ndt_context_t *ctx)
     return t->value;
 }
 
+static int
+_gm_tbl_map(int (*f)(const gm_func_t *, void *state), void *state, const func_trie_t *t)
+{
+    int i;
+
+    if (t->value) {
+        if (f(t->value, state) < 0) {
+            return -1;
+        }
+    }
+
+    for (i = 0; i < ALPHABET_LEN; i++) {
+        if (t->next[i] && _gm_tbl_map(f, state, t->next[i]) < 0) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+
+int
+gm_tbl_map(int (*f)(const gm_func_t *, void *), void *state)
+{
+    return _gm_tbl_map(f, state, tbl);
+}
+
 
 /*****************************************************************************/
 /*                     Initialize/finalize global values                     */
@@ -193,8 +219,8 @@ gm_init(ndt_context_t *ctx)
 {
     init_charmap();
 
-    func_map = func_trie_new(ctx);
-    if (func_map == NULL) {
+    tbl = func_trie_new(ctx);
+    if (tbl == NULL) {
         return -1;
     }
 
@@ -204,6 +230,6 @@ gm_init(ndt_context_t *ctx)
 void
 gm_finalize(void)
 {
-    func_trie_del(func_map);
-    func_map = NULL;
+    func_trie_del(tbl);
+    tbl = NULL;
 }

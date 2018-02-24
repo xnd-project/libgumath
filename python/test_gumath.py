@@ -31,7 +31,7 @@
 #
 
 from xnd import xnd
-from gumath import call
+from gumath import sin
 import sys, time
 import unittest
 import argparse
@@ -44,7 +44,7 @@ except ImportError:
 
 class TestCall(unittest.TestCase):
 
-    def test_call(self):
+    def test_sin(self):
         test_cases = [
           ([[float(i) for i in range(1000000)],
             [float(i+1) for i in range(1000000)]],
@@ -64,7 +64,7 @@ class TestCall(unittest.TestCase):
             x = xnd(lst, type=t)
 
             start = time.time()
-            y = call("sin", x)
+            y = sin(x)
             end = time.time()
             sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 

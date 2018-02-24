@@ -195,7 +195,7 @@ gm_select(ndt_t *out_types[],
     const gm_func_t *f;
     int i;
 
-    f = gm_func_find(name, ctx);
+    f = gm_tbl_find(name, ctx);
     if (f == NULL) {
         return NULL;
     }
