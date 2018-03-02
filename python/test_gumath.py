@@ -46,6 +46,47 @@ class TestCall(unittest.TestCase):
 
     def test_sin(self):
         test_cases = [
+          ([float(i) for i in range(2000000)],
+           "2000000 * float64", "float64"),
+
+          ([float(i) for i in range(2000000)],
+           "2000000 * float32", "float32"),
+
+          ([[float(i) for i in range(1000000)],
+          [float(i+1) for i in range(1000000)]],
+          "2 * 1000000 * float64", "float64"),
+
+          (1000000 * [[float(i+1) for i in range(2)]],
+          "1000000 * 2 * float64", "float64"),
+
+          ([[float(i) for i in range(1000000)],
+           [float(i+1) for i in range(1000000)]],
+          "2 * 1000000 * float32", "float32"),
+
+          (1000000 * [[float(i+1) for i in range(2)]],
+          "1000000 * 2 * float32", "float32")
+        ]
+
+        for lst, t, dtype in test_cases:
+            x = xnd(lst, type=t)
+
+            start = time.time()
+            y = sin(x)
+            end = time.time()
+            sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
+
+            if np is not None:
+                a = np.array(lst, dtype=dtype)
+
+                start = time.time()
+                b = np.sin(a)
+                end = time.time()
+                sys.stderr.write("numpy: time=%.3f\n" % (end-start))
+
+                np.testing.assert_almost_equal(y, b, 7)
+
+    def test_sin_strided(self):
+        test_cases = [
           ([[float(i) for i in range(1000000)],
             [float(i+1) for i in range(1000000)]],
            "2 * 1000000 * float64", "float64"),
@@ -62,21 +103,24 @@ class TestCall(unittest.TestCase):
 
         for lst, t, dtype in test_cases:
             x = xnd(lst, type=t)
+            y = x[::-1]
 
             start = time.time()
-            y = sin(x)
+            z = sin(y)
             end = time.time()
             sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
+                b = a[::-1]
 
                 start = time.time()
-                b = np.sin(lst)
+                c = np.sin(b)
                 end = time.time()
                 sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                np.testing.assert_almost_equal(y, b, 7)
+                np.testing.assert_almost_equal(z, c, 7)
+
 
 
 ALL_TESTS = [
