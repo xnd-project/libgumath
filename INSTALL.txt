@@ -1,0 +1,42 @@
+
+
+Minimal install instructions for development
+--------------------------------------------
+
+git clone https://github.com/plures/gumath
+cd gumath
+
+git clone https://github.com/plures/ndtypes
+git clone https://github.com/plures/xnd
+
+
+Install ndtypes locally
+-----------------------
+
+cd ndtypes
+python3 setup.py install --local=$PWD/../python
+
+
+Install xnd locally
+-------------------
+
+cd ../xnd
+python3 setup.py install --local=$PWD/../python
+
+
+Install gumath locally
+----------------------
+
+cd ..
+python3 setup.py build
+
+
+Use the modules
+---------------
+
+cd python/
+
+The modules are now importable from this directory.
+
+
+
