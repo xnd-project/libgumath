@@ -85,7 +85,7 @@ class TestCall(unittest.TestCase):
 
                 np.testing.assert_almost_equal(y, b, 7)
 
-    def test_sin_strided(self):
+    def XXXtest_sin_strided(self):
         test_cases = [
           ([[float(i) for i in range(1000000)],
             [float(i+1) for i in range(1000000)]],

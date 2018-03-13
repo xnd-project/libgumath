@@ -124,15 +124,14 @@ static PyObject *
 gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 {
     NDT_STATIC_CONTEXT(ctx);
-    Py_ssize_t in = PyTuple_GET_SIZE(args);
+    const Py_ssize_t nin = PyTuple_GET_SIZE(args);
     PyObject **a = &PyTuple_GET_ITEM(args, 0);
     PyObject *result[NDT_MAX_ARGS];
-    ndt_t *in_types[NDT_MAX_ARGS];
-    ndt_t *out_types[NDT_MAX_ARGS];
+    ndt_apply_spec_t spec = ndt_apply_spec_empty;
+    const ndt_t *in_types[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
-    const gm_kernel_t *kernel;
-    int out, outer_dims;
-    int i, k;
+    gm_kernel_t kernel;
+    int i;
 
     if (kwds) {
         PyErr_SetString(PyExc_TypeError,
@@ -140,13 +139,13 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
-    if (in > NDT_MAX_ARGS) {
+    if (nin > NDT_MAX_ARGS) {
         PyErr_SetString(PyExc_TypeError,
             "invalid number of arguments");
         return NULL;
     }
 
-    for (i = 0; i < in; i++) {
+    for (i = 0; i < nin; i++) {
         if (!Xnd_Check(a[i])) {
             PyErr_SetString(PyExc_TypeError, "arguments must be xnd");
             return NULL;
@@ -155,42 +154,45 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         in_types[i] = stack[i].type;
     }
 
-    kernel = gm_select(out_types, &outer_dims, self->name, in_types, in, &ctx);
-    if (kernel == NULL) {
+    kernel = gm_select(&spec, self->name, in_types, nin, &ctx);
+    if (kernel.set == NULL) {
         return seterr(&ctx);
     }
 
-    out = kernel->sig->Function.out;
-    for (i = 0; i < out; i++) {
-        PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), out_types[i]);
+    if (spec.nbroadcast > 0) {
+        for (i = 0; i < nin; i++) {
+            stack[i].type = spec.broadcast[i];
+        }
+    }
+
+    for (i = 0; i < spec.nout; i++) {
+        PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), spec.out[i]);
         if (x == NULL) {
             clear_objects(result, i);
-            for (k = i+1; k < out; k++) {
-                ndt_del(out_types[k]);
-            }
+            ndt_apply_spec_clear(&spec);
             return NULL;
         }
         result[i] = x;
-        stack[in+i] = *CONST_XND(x);
+        stack[nin+i] = *CONST_XND(x);
     }
 
-    if (gm_map(kernel, stack, outer_dims, &ctx) < 0) {
-        for (i = 0; i < out; i++) {
+    if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+        for (i = 0; i < spec.nout; i++) {
             Py_DECREF(result[i]);
         }
         return seterr(&ctx);
     }
 
-    switch (out) {
+    switch (spec.nout) {
     case 0: Py_RETURN_NONE;
     case 1: return result[0];
     default: {
-        PyObject *tuple = PyTuple_New(out);
+        PyObject *tuple = PyTuple_New(spec.nout);
         if (tuple == NULL) {
-            clear_objects(result, out);
+            clear_objects(result, spec.nout);
             return NULL;
         }
-        for (i = 0; i < out; i++) {
+        for (i = 0; i < spec.nout; i++) {
             PyTuple_SET_ITEM(tuple, i, result[i]);
         }
         return tuple;

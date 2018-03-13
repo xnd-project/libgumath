@@ -97,7 +97,7 @@ gm_add_func(const char *name, ndt_context_t *ctx)
 }
 
 int
-gm_add_kernel(const char *name, gm_kernel_t kernel, ndt_context_t *ctx)
+gm_add_kernel(const char *name, gm_kernel_set_t kernel, ndt_context_t *ctx)
 {
     gm_func_t *f = gm_tbl_find(name, ctx);
 

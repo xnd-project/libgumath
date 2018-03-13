@@ -41,8 +41,9 @@
 #include "gumath.h"
 
 
-gm_kernel_t empty_kernel =
+gm_kernel_set_t empty_kernel_set =
  { .sig = NULL,
+   .Elementwise = NULL,
    .C = NULL,
    .Fortran = NULL,
    .Strided = NULL,
@@ -53,90 +54,44 @@ gm_kernel_t empty_kernel =
 /*                              Example kernels                             */
 /****************************************************************************/
 
-static void
-gm_sin_c_d_d(xnd_ndarray_t stack[])
+static int
+gm_sin_strided_d_d(char *args[], int64_t dimensions[], int64_t steps[],
+                   void *data GM_UNUSED)
 {
-    const xnd_ndarray_t *src = &stack[0];
-    xnd_ndarray_t *dst = &stack[1];
-    const double *s = (const double *)src->ptr;
-    double *d = (double *)dst->ptr;
-    int64_t i, n;
+    const char *src = args[0];
+    char *dest = args[1];
+    int64_t n = dimensions[0];
+    int64_t i;
 
-    assert(src->ndim <= 1 && dst->ndim == src->ndim);
-    n = src->shape[0];
-
-    for (i = 0; i < n-3; i += 4) {
-        d[i] = sin(s[i]);
-        d[i+1] = sin(s[i+1]);
-        d[i+2] = sin(s[i+2]);
-        d[i+3] = sin(s[i+3]);
-    }
-
-    for (; i < n; i++) {
-        d[i] = sin(s[i]);
-    }
-}
-
-static void
-gm_sin_strided_d_d(xnd_ndarray_t stack[])
-{
-    const xnd_ndarray_t *src = &stack[0];
-    xnd_ndarray_t *dst = &stack[1];
-    const double *s = (const double *)src->ptr;
-    double *d = (double *)dst->ptr;
-    int64_t i, n;
-
-    assert(src->ndim <= 1 && dst->ndim == src->ndim);
-    n = src->shape[0];
+    assert(n == dimensions[1]);
 
     for (i = 0; i < n; i++) {
-        d[i] = sin(s[i]);
-        s += src->strides[0];
-        d += dst->strides[0];
+        *(double *)dest = sin(*(const double *)src);
+        src += steps[0];
+        dest += steps[1];
     }
+
+    return 1;
 }
 
-static void
-gm_sin_c_f_f(xnd_ndarray_t stack[])
+static int
+gm_sin_strided_f_f(char **args, int64_t *dimensions, int64_t *steps,
+                   void *data GM_UNUSED)
 {
-    const xnd_ndarray_t *src = &stack[0];
-    xnd_ndarray_t *dst = &stack[1];
-    const float *s = (const float *)src->ptr;
-    float *d = (float *)dst->ptr;
-    int64_t i, n;
+    const char *src = args[0];
+    char *dest = args[1];
+    int64_t n = dimensions[0];
+    int64_t i;
 
-    assert(src->ndim <= 1 && dst->ndim == src->ndim);
-    n = src->shape[0];
-
-    for (i = 0; i < n-3; i += 4) {
-        d[i] = sinf(s[i]);
-        d[i+1] = sinf(s[i+1]);
-        d[i+2] = sinf(s[i+2]);
-        d[i+3] = sinf(s[i+3]);
-    }
-
-    for (; i < n; i++) {
-        d[i] = sinf(s[i]);
-    }
-}
-
-static void
-gm_sin_strided_f_f(xnd_ndarray_t stack[])
-{
-    const xnd_ndarray_t *src = &stack[0];
-    xnd_ndarray_t *dst = &stack[1];
-    const float *s = (const float *)src->ptr;
-    float *d = (float *)dst->ptr;
-    int64_t i, n;
-
-    assert(src->ndim <= 1 && dst->ndim == src->ndim);
-    n = src->shape[0];
+    assert(n == dimensions[1]);
 
     for (i = 0; i < n; i++) {
-        d[i] = sinf(s[i]);
-        s += src->strides[0];
-        d += dst->strides[0];
+        *(float *)dest = sinf(*(const float *)src);
+        src += steps[0];
+        dest += steps[1];
     }
+
+    return 1;
 }
 
 
@@ -147,35 +102,33 @@ gm_sin_strided_f_f(xnd_ndarray_t stack[])
 int
 gm_sin_init(ndt_context_t *ctx)
 {
-    gm_kernel_t kernel;
+    gm_kernel_set_t set;
 
     if (gm_add_func("sin", ctx) < 0) {
         return -1;
     }
 
-    kernel = empty_kernel;
-    kernel.sig = ndt_from_string("Dims... * N * float64 -> Dims... * N * float64", ctx);
-    if (kernel.sig == NULL) {
+    set = empty_kernel_set;
+    set.sig = ndt_from_string("... * float64 => ... * float64", ctx);
+    if (set.sig == NULL) {
         return -1;
     }
 
-    kernel.C = gm_sin_c_d_d;
-    kernel.Strided = gm_sin_strided_d_d;
-
-    if (gm_add_kernel("sin", kernel, ctx) < 0) {
+    set.Elementwise = gm_sin_strided_d_d;
+    set.Strided = gm_sin_strided_d_d;
+    if (gm_add_kernel("sin", set, ctx) < 0) {
         return -1;
     }
 
-    kernel = empty_kernel;
-    kernel.sig = ndt_from_string("Dims... * N * float32 -> Dims... * N * float32", ctx);
-    if (kernel.sig == NULL) {
+    set = empty_kernel_set;
+    set.sig = ndt_from_string("... * float32 => ... * float32", ctx);
+    if (set.sig == NULL) {
         return -1;
     }
 
-    kernel.C = gm_sin_c_f_f;
-    kernel.Strided = gm_sin_strided_f_f;
-
-    if (gm_add_kernel("sin", kernel, ctx) < 0) {
+    set.Elementwise = gm_sin_strided_f_f;
+    set.Strided = gm_sin_strided_f_f;
+    if (gm_add_kernel("sin", set, ctx) < 0) {
         return -1;
     }
 

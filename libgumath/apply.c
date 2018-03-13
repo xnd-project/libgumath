@@ -40,95 +40,33 @@
 #include "gumath.h"
 
 
-/*********************************************************************/
-/*                        Kernel application                         */
-/*********************************************************************/
-
-static bool
-all_c_contiguous(xnd_t stack[], int n)
-{
-    for (int i = 0; i < n; i++) {
-        if (!ndt_is_c_contiguous(stack[i].type)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-static bool
-all_f_contiguous(xnd_t stack[], int n)
-{
-    for (int i = 0; i < n; i++) {
-        if (!ndt_is_f_contiguous(stack[i].type)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-static inline bool
-all_ndarray(xnd_t stack[], int n)
-{
-    for (int i = 0; i < n; i++) {
-        if (!ndt_is_ndarray(stack[i].type)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
+/*
+ * Flatten an xnd container into a 1D representation for direct elementwise
+ * kernel application.
+ */
 static int
-as_ndarray(xnd_ndarray_t op[], const xnd_t stack[], int n, ndt_context_t *ctx)
+flatten(char *args[NDT_MAX_ARGS],
+        int64_t dimensions[NDT_MAX_ARGS],
+        int64_t steps[NDT_MAX_ARGS],
+        xnd_t stack[], int n,
+        ndt_context_t *ctx)
 {
-    for (int i = 0; i < n; i++) {
-        if (xnd_as_ndarray(&op[i], &stack[i], ctx) < 0) {
+    xnd_ndarray_t nd;
+    int i;
+
+    for (i=0; i < n; i++) {
+        if (xnd_as_ndarray(&nd, &stack[i], ctx) < 0) {
             return -1;
         }
+        args[i] = nd.ptr;
+        dimensions[i] = nd.nelem;
+        steps[i] = nd.itemsize;
     }
 
     return 0;
 }
 
-static int
-apply_kernel(const gm_kernel_t *f, xnd_t stack[], ndt_context_t *ctx)
-{
-    xnd_ndarray_t op[NDT_MAX_ARGS];
-    int in = f->sig->Function.in;
-    int out = f->sig->Function.out;
-    int n = in + out;
-
-    if (f->C && all_c_contiguous(stack, n)) {
-        if (as_ndarray(op, stack, n, ctx) < 0) {
-            return -1;
-        }
-        f->C(op);
-    }
-    else if (f->Fortran && all_f_contiguous(stack, n)) {
-        if (as_ndarray(op, stack, n, ctx) < 0) {
-            return -1;
-        }
-        f->Fortran(op);
-    }
-    else if (f->Strided && all_ndarray(stack, n)) {
-        if (as_ndarray(op, stack, n, ctx) < 0) {
-            return -1;
-        }
-        f->Strided(op);
-    }
-    else if (f->Xnd) {
-        f->Xnd(stack);
-    }
-    else {
-        ndt_err_format(ctx, NDT_RuntimeError, "could not find kernel");
-        return -1;
-    }
-
-    return 0;
-}
-
+#if 0
 int
 gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
 {
@@ -183,29 +121,107 @@ gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
         return -1;
    }
 }
+#endif
+
+int
+gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims GM_UNUSED,
+         ndt_context_t *ctx)
+{
+    int n = kernel->set->sig->Function.in + kernel->set->sig->Function.out;
+
+    switch (kernel->tag) {
+    case Elementwise: {
+        char *args[NDT_MAX_ARGS];
+        int64_t dimensions[NDT_MAX_ARGS];
+        int64_t steps[NDT_MAX_ARGS];
+
+        if (flatten(args, dimensions, steps, stack, n, ctx) < 0) {
+            return -1;
+        }
+
+        return kernel->set->Elementwise(args, dimensions, steps, NULL);
+    }
+    default: {
+        ndt_err_format(ctx, NDT_NotImplementedError, "apply not implemented");
+        return -1;
+      }
+    }
+}
+
+static gm_kernel_t
+select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
+              ndt_context_t *ctx)
+{
+    gm_kernel_t kernel = {Xnd, NULL};
+
+    kernel.set = set;
+
+    switch (spec->tag) {
+    case Elementwise:
+        if (set->Elementwise != NULL) {
+            kernel.tag = Elementwise;
+            return kernel;
+        }
+        goto TryStrided;
+
+    case C:
+        if (set->C != NULL) {
+            kernel.tag = C;
+            return kernel;
+        }
+        goto TryStrided;
+
+    case Fortran:
+        if (set->Fortran != NULL) {
+            kernel.tag = Fortran;
+            return kernel;
+        }
+        /* fall through */
+
+    case Strided: TryStrided:
+        if (set->Strided != NULL) {
+            kernel.tag = Strided;
+            return kernel;
+        }
+        /* fall through */
+
+    case Xnd:
+        if (set->Xnd != NULL) {
+            kernel.tag = Xnd;
+            return kernel;
+        }
+    }
+
+    kernel.set = NULL;
+    ndt_err_format(ctx, NDT_RuntimeError, "could not find specialized kernel");
+    return kernel;
+}
 
 /* Look up a multimethod by name and select a kernel. */
-const gm_kernel_t *
-gm_select(ndt_t *out_types[],
-          int *outer_dims,
+gm_kernel_t
+gm_select(ndt_apply_spec_t *spec,
           const char *name,
-          ndt_t *in_types[], int nin,
+          const ndt_t *in_types[], int nin,
           ndt_context_t *ctx)
 {
+    gm_kernel_t empty_kernel = {Xnd, NULL};
     const gm_func_t *f;
     int i;
 
     f = gm_tbl_find(name, ctx);
     if (f == NULL) {
-        return NULL;
+        return empty_kernel;
     }
 
     for (i = 0; i < f->nkernels; i++) {
-        const gm_kernel_t *kernel = &f->kernels[i];
-        if (ndt_typecheck(out_types, outer_dims, kernel->sig, in_types, nin, ctx) >= 0) {
-            return kernel;
+        const gm_kernel_set_t *set = &f->kernels[i];
+        if (ndt_typecheck(spec, set->sig, in_types, nin, ctx) < 0) {
+            ndt_err_clear(ctx);
+            continue;
         }
+        return select_kernel(spec, set, ctx);
     }
 
-    return NULL;
+    ndt_err_format(ctx, NDT_RuntimeError, "could not find kernel");
+    return empty_kernel;
 }

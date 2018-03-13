@@ -46,32 +46,49 @@
   #else
     #define GM_API
   #endif
+  #ifndef GM_UNUSED
+    #define GM_UNUSED
+  #endif
 #else
   #define GM_API
+  #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+    #define GM_UNUSED __attribute__((unused))
+  #else
+    #define GM_UNUSED
+  #endif
 #endif
 
 
 #define GM_MAX_KERNELS 128
 
 
-typedef void (* gm_c_kernel_t)(xnd_ndarray_t stack[]);
-typedef void (* gm_fortran_kernel_t)(xnd_ndarray_t stack[]);
-typedef void (* gm_strided_kernel_t)(xnd_ndarray_t stack[]);
+typedef int (* gm_c_kernel_t)(char **args, int64_t *dimensions, void *data);
+typedef int (* gm_fortran_kernel_t)(char **args, int64_t *dimensions, void *data);
+typedef int (* gm_strided_kernel_t)(char **args, int64_t *dimensions, int64_t *steps, void *data);
 typedef void (* gm_xnd_kernel_t)(xnd_t stack[]);
 
+/* Collection of specialized kernels for a single function signature. */
 typedef struct {
     ndt_t *sig;
 
+    gm_strided_kernel_t Elementwise;
     gm_c_kernel_t C;
     gm_fortran_kernel_t Fortran;
     gm_strided_kernel_t Strided;
     gm_xnd_kernel_t Xnd;
+} gm_kernel_set_t;
+
+/* Actual kernel selected for application. */
+typedef struct {
+    enum ndt_apply tag;
+    const gm_kernel_set_t *set;
 } gm_kernel_t;
 
+/* Multimethod with associated kernels. */
 typedef struct {
     char *name;
     int nkernels;
-    gm_kernel_t kernels[GM_MAX_KERNELS];
+    gm_kernel_set_t kernels[GM_MAX_KERNELS];
 } gm_func_t;
 
 
@@ -83,9 +100,10 @@ GM_API gm_func_t *gm_func_new(const char *name, ndt_context_t *ctx);
 GM_API void gm_func_del(gm_func_t *f);
 
 GM_API int gm_add_func(const char *name, ndt_context_t *ctx);
-GM_API int gm_add_kernel(const char *name, gm_kernel_t kernel, ndt_context_t *ctx);
-GM_API int gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
-GM_API const gm_kernel_t *gm_select(ndt_t *out_types[], int *outer_dims, const char *name, ndt_t *in_types[], int nin, ndt_context_t *ctx);
+GM_API int gm_add_kernel(const char *name, gm_kernel_set_t kernel, ndt_context_t *ctx);
+GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
+// GM_API int gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
+GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const char *name, const ndt_t *in_types[], int nin, ndt_context_t *ctx);
 
 
 /******************************************************************************/
