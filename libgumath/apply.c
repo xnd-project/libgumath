@@ -85,8 +85,8 @@ gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
 
     switch (t->tag) {
     case FixedDim: {
-        int nargs = sig->Function.shape;
-        int64_t shape = t->FixedDim.shape;
+        const int nargs = sig->Function.nargs;
+        const int64_t shape = t->FixedDim.shape;
 
         for (i = 0; i < shape; i++) {
             for (k = 0; k < nargs; k++) {
@@ -127,7 +127,7 @@ int
 gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims GM_UNUSED,
          ndt_context_t *ctx)
 {
-    int n = kernel->set->sig->Function.in + kernel->set->sig->Function.out;
+    const int nargs = kernel->set->sig->Function.nargs;
 
     switch (kernel->tag) {
     case Elementwise: {
@@ -135,7 +135,7 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims GM_UNUSED,
         int64_t dimensions[NDT_MAX_ARGS];
         int64_t steps[NDT_MAX_ARGS];
 
-        if (flatten(args, dimensions, steps, stack, n, ctx) < 0) {
+        if (flatten(args, dimensions, steps, stack, nargs, ctx) < 0) {
             return -1;
         }
 
