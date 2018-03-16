@@ -27,9 +27,9 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o kernels.o tbl.o
+OBJS = apply.o func.o kernels.o nploops.o tbl.o
 
-SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/tbl.o
+SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/nploops.o .objs/tbl.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -64,6 +64,14 @@ Makefile kernels.c gumath.h
 .objs/kernels.o:\
 Makefile kernels.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c kernels.c -o .objs/kernels.o
+
+nploops.o:\
+Makefile nploops.c gumath.h
+	$(CC) $(GM_CFLAGS) -c nploops.c
+
+.objs/nploops.o:\
+Makefile nploops.c gumath.h
+	$(CC) $(GM_CFLAGS_SHARED) -c nploops.c -o .objs/nploops.o
 
 tbl.o:\
 Makefile tbl.c gumath.h

@@ -43,7 +43,6 @@
 
 gm_kernel_set_t empty_kernel_set =
  { .sig = NULL,
-   .Elementwise = NULL,
    .C = NULL,
    .Fortran = NULL,
    .Strided = NULL,
@@ -63,8 +62,6 @@ gm_sin_strided_d_d(char *args[], int64_t dimensions[], int64_t steps[],
     int64_t n = dimensions[0];
     int64_t i;
 
-    assert(n == dimensions[1]);
-
     for (i = 0; i < n; i++) {
         *(double *)dest = sin(*(const double *)src);
         src += steps[0];
@@ -82,8 +79,6 @@ gm_sin_strided_f_f(char **args, int64_t *dimensions, int64_t *steps,
     char *dest = args[1];
     int64_t n = dimensions[0];
     int64_t i;
-
-    assert(n == dimensions[1]);
 
     for (i = 0; i < n; i++) {
         *(float *)dest = sinf(*(const float *)src);
@@ -109,24 +104,22 @@ gm_sin_init(ndt_context_t *ctx)
     }
 
     set = empty_kernel_set;
-    set.sig = ndt_from_string("... * float64 => ... * float64", ctx);
+    set.sig = ndt_from_string("... * float64 -> ... * float64", ctx);
     if (set.sig == NULL) {
         return -1;
     }
 
-    set.Elementwise = gm_sin_strided_d_d;
     set.Strided = gm_sin_strided_d_d;
     if (gm_add_kernel("sin", set, ctx) < 0) {
         return -1;
     }
 
     set = empty_kernel_set;
-    set.sig = ndt_from_string("... * float32 => ... * float32", ctx);
+    set.sig = ndt_from_string("... * float32 -> ... * float32", ctx);
     if (set.sig == NULL) {
         return -1;
     }
 
-    set.Elementwise = gm_sin_strided_f_f;
     set.Strided = gm_sin_strided_f_f;
     if (gm_add_kernel("sin", set, ctx) < 0) {
         return -1;

@@ -49,18 +49,19 @@ class TestCall(unittest.TestCase):
           ([float(i) for i in range(2000000)],
            "2000000 * float64", "float64"),
 
-          ([float(i) for i in range(2000000)],
-           "2000000 * float32", "float32"),
-
           ([[float(i) for i in range(1000000)],
-          [float(i+1) for i in range(1000000)]],
+            [float(i+1) for i in range(1000000)]],
           "2 * 1000000 * float64", "float64"),
 
           (1000000 * [[float(i+1) for i in range(2)]],
           "1000000 * 2 * float64", "float64"),
 
+
+          ([float(i) for i in range(2000000)],
+           "2000000 * float32", "float32"),
+
           ([[float(i) for i in range(1000000)],
-           [float(i+1) for i in range(1000000)]],
+            [float(i+1) for i in range(1000000)]],
           "2 * 1000000 * float32", "float32"),
 
           (1000000 * [[float(i+1) for i in range(2)]],
@@ -83,9 +84,9 @@ class TestCall(unittest.TestCase):
                 end = time.time()
                 sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                np.testing.assert_almost_equal(y, b, 7)
+                np.testing.assert_almost_equal(y, b, 5)
 
-    def XXXtest_sin_strided(self):
+    def test_sin_strided(self):
         test_cases = [
           ([[float(i) for i in range(1000000)],
             [float(i+1) for i in range(1000000)]],
@@ -95,15 +96,16 @@ class TestCall(unittest.TestCase):
            "1000000 * 2 * float64", "float64"),
 
           ([[float(i) for i in range(1000000)],
-            [float(i+1) for i in range(1000000)]],
+             [float(i+1) for i in range(1000000)]],
            "2 * 1000000 * float32", "float32"),
 
           (1000000 * [[float(i+1) for i in range(2)]],
-           "1000000 * 2 * float32", "float32")]
+           "1000000 * 2 * float32", "float32")
+        ]
 
         for lst, t, dtype in test_cases:
             x = xnd(lst, type=t)
-            y = x[::-1]
+            y = x[::-1, ::-1]
 
             start = time.time()
             z = sin(y)
@@ -112,14 +114,14 @@ class TestCall(unittest.TestCase):
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
-                b = a[::-1]
+                b = a[::-1, ::-1]
 
                 start = time.time()
                 c = np.sin(b)
                 end = time.time()
                 sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                np.testing.assert_almost_equal(z, c, 7)
+                np.testing.assert_almost_equal(z, c, 5)
 
 
 

@@ -71,7 +71,6 @@ typedef void (* gm_xnd_kernel_t)(xnd_t stack[]);
 typedef struct {
     ndt_t *sig;
 
-    gm_strided_kernel_t Elementwise;
     gm_c_kernel_t C;
     gm_fortran_kernel_t Fortran;
     gm_strided_kernel_t Strided;
@@ -104,6 +103,28 @@ GM_API int gm_add_kernel(const char *name, gm_kernel_set_t kernel, ndt_context_t
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 // GM_API int gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const char *name, const ndt_t *in_types[], int nin, ndt_context_t *ctx);
+
+
+/******************************************************************************/
+/*                                NumPy loops                                 */
+/******************************************************************************/
+
+GM_API int gm_np_flatten(char **args, const int nargs,
+                         int64_t *dimensions, int64_t *strides, const xnd_t stack[],
+                         ndt_context_t *ctx);
+
+GM_API int gm_np_convert_xnd(char **args, const int nargs,
+                             int64_t *dimensions, const int dims_size,
+                             int64_t *steps, const int steps_size,
+                             xnd_t stack[], const int outer_dims,
+                             ndt_context_t *ctx);
+
+GM_API int gm_np_map(const gm_strided_kernel_t f,
+                     char **args, const int nargs,
+                     intptr_t *dimensions,
+                     intptr_t *steps,
+                     void *data,
+                     int outer_dims);
 
 
 /******************************************************************************/

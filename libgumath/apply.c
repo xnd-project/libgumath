@@ -40,106 +40,45 @@
 #include "gumath.h"
 
 
-/*
- * Flatten an xnd container into a 1D representation for direct elementwise
- * kernel application.
- */
 static int
-flatten(char *args[NDT_MAX_ARGS],
-        int64_t dimensions[NDT_MAX_ARGS],
-        int64_t steps[NDT_MAX_ARGS],
-        xnd_t stack[], int n,
-        ndt_context_t *ctx)
+sum_inner_dimensions(const xnd_t stack[], int nargs, int outer_dims)
 {
-    xnd_ndarray_t nd;
+    int sum = 0, n;
     int i;
 
-    for (i=0; i < n; i++) {
-        if (xnd_as_ndarray(&nd, &stack[i], ctx) < 0) {
-            return -1;
-        }
-        args[i] = nd.ptr;
-        dimensions[i] = nd.nelem;
-        steps[i] = nd.itemsize;
+    for (i = 0; i < nargs; i++) {
+        const ndt_t *t = stack[i].type;
+        n = t->ndim - outer_dims;
+        sum += n == 0 ? 1 : n;
     }
 
-    return 0;
+    return sum;
 }
 
-#if 0
 int
-gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx)
-{
-    xnd_t next[NDT_MAX_ARGS];
-    const ndt_t *sig = f->sig;
-    const ndt_t *t;
-    int i, k;
-
-    assert(sig->tag == Function);
-
-    if (outer_dims == 0) {
-        return apply_kernel(f, stack, ctx);
-    }
-
-    t = stack[0].type;
-
-    switch (t->tag) {
-    case FixedDim: {
-        const int nargs = sig->Function.nargs;
-        const int64_t shape = t->FixedDim.shape;
-
-        for (i = 0; i < shape; i++) {
-            for (k = 0; k < nargs; k++) {
-                const ndt_t *u = stack[k].type;
-
-                if (u->tag != FixedDim) {
-                    ndt_err_format(ctx, NDT_RuntimeError,
-                        "expected fixed dimension");
-                    return -1;
-                }
-
-                if (u->FixedDim.shape != shape) {
-                    ndt_err_format(ctx, NDT_ValueError, "shape mismatch in gufunc");
-                    return -1;
-                }
-
-                next[k] = stack[k];
-                next[k].type = u->FixedDim.type;
-                next[k].index = stack[k].index + i * u->Concrete.FixedDim.step;
-            }
-
-            if (gm_map(f, next, outer_dims-1, ctx) < 0) {
-                return -1;
-            }
-        }
-
-        return 0;
-    }
-
-    default: 
-        ndt_err_format(ctx, NDT_NotImplementedError, "unsupported type");
-        return -1;
-   }
-}
-#endif
-
-int
-gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims GM_UNUSED,
+gm_apply(const gm_kernel_t *kernel, xnd_t stack[], const int outer_dims,
          ndt_context_t *ctx)
 {
     const int nargs = kernel->set->sig->Function.nargs;
 
     switch (kernel->tag) {
-    case Elementwise: {
-        char *args[NDT_MAX_ARGS];
-        int64_t dimensions[NDT_MAX_ARGS];
-        int64_t steps[NDT_MAX_ARGS];
+    case Strided: {
+        const int sum_inner = sum_inner_dimensions(stack, nargs, outer_dims);
+        const int dims_size = outer_dims + sum_inner;
+        const int steps_size = nargs * outer_dims + sum_inner;
+        char *args[nargs];
+        int64_t dimensions[dims_size];
+        int64_t steps[steps_size];
 
-        if (flatten(args, dimensions, steps, stack, nargs, ctx) < 0) {
+        if (gm_np_convert_xnd(args, nargs,
+                              dimensions, dims_size,
+                              steps, steps_size,
+                              stack, outer_dims, ctx) < 0) {
             return -1;
         }
 
-        return kernel->set->Elementwise(args, dimensions, steps, NULL);
+        return gm_np_map(kernel->set->Strided, args, nargs,
+                         dimensions, steps, NULL, outer_dims);
     }
     default: {
         ndt_err_format(ctx, NDT_NotImplementedError, "apply not implemented");
@@ -157,13 +96,6 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
     kernel.set = set;
 
     switch (spec->tag) {
-    case Elementwise:
-        if (set->Elementwise != NULL) {
-            kernel.tag = Elementwise;
-            return kernel;
-        }
-        goto TryStrided;
-
     case C:
         if (set->C != NULL) {
             kernel.tag = C;
