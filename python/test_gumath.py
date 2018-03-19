@@ -171,7 +171,7 @@ class TestCall(unittest.TestCase):
 
         if np is not None:
             a = np.array(lst, dtype="complex64")
-            b = np.matmul(a, a)
+            b = np.einsum("ijk,ikl->ijl", a, a)
             np.testing.assert_equal(y, b)
 
     def test_quaternion_error(self):
