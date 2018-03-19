@@ -82,6 +82,11 @@ typedef struct {
 
 typedef struct {
     const char *name;
+    const char *type;
+} gm_typedef_init_t;
+
+typedef struct {
+    const char *name;
     const char *sig;
 
     gm_c_kernel_t C;

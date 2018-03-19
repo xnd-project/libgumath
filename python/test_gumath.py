@@ -150,6 +150,14 @@ class TestCall(unittest.TestCase):
             b = np.einsum("ijk,ikl->ijl", a, a)
             np.testing.assert_equal(y, b)
 
+        x = xnd(lst, type="3 * quaternion128")
+        y = gm.multiply(x, x)
+
+        if np is not None:
+            a = np.array(lst, dtype="complex128")
+            b = np.einsum("ijk,ikl->ijl", a, a)
+            np.testing.assert_equal(y, b)
+
     def test_quaternion_error(self):
   
         lst = [[[1+2j, 4+3j],

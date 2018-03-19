@@ -125,6 +125,39 @@ gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[],
     return 0;
 }
 
+static int
+gm_multiply_strided_q128_q128(char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED)
+{
+    const char *src1 = args[0];
+    const char *src2 = args[1];
+    char *dest = args[2];
+    const ndt_complex128_t (*s1)[2];
+    const ndt_complex128_t (*s2)[2];
+    ndt_complex128_t (*d1)[2];
+    int64_t n = dimensions[0];
+    int64_t i, j, k, l;
+
+    for (i = 0; i < n; i++) {
+      s1 = (const ndt_complex128_t (*)[2])src1;
+      s2 = (const ndt_complex128_t (*)[2])src2;
+      d1 = (ndt_complex128_t (*)[2])dest;
+      for (j = 0; j < 2; j++){
+        for (k = 0; k < 2; k++) {
+          ndt_complex128_t sum = 0;
+          for (l = 0; l < 2; l++) {
+            sum += s1[j][l] * s2[l][k];
+          }
+          d1[j][k] = sum;
+        }
+      }
+      src1 += steps[0];
+      src2 += steps[1];
+      dest += steps[2];
+    }
+
+    return 0;
+}
+
 NP_STRIDED(sin, float32, float64)
 NP_STRIDED(sin, float64, float64)
 NP_STRIDED(sin, uint8, float64)
@@ -150,6 +183,12 @@ NP_COPY_STRIDED(float32, float32)
 NP_COPY_STRIDED(float64, float64)
 
 
+static const gm_typedef_init_t typedefs[] = {
+  {.name = "quaternion64", .type = "2 * 2 * complex64" },
+  {.name = "quaternion128", .type = "2 * 2 * complex128" },
+  {.name = NULL, .type = NULL }
+};
+
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
   {.name = "copy", .sig = "... * uint8 -> ... * uint8", .Strided=gm_copy_strided_uint8_uint8 },
@@ -162,12 +201,12 @@ static const gm_kernel_init_t kernels[] = {
   {.name = "copy", .sig = "... * int32 -> ... * int32", .Strided=gm_copy_strided_int32_int32 },
   {.name = "copy", .sig = "... * int64 -> ... * int64", .Strided=gm_copy_strided_int64_int64 },
 
-  {.name= "copy", .sig = "... * float32 -> ... * float32", .Strided=gm_copy_strided_float32_float32 },
+  {.name = "copy", .sig = "... * float32 -> ... * float32", .Strided=gm_copy_strided_float32_float32 },
   {.name = "copy", .sig = "... * float64 -> ... * float64", .Strided=gm_copy_strided_float64_float64 },
 
   /* SIN */
   /* return float32 */
-  {.name="sin", .sig = "... * float32 -> ... * float32", .Strided=gm_sinf_strided_float32_float32 },
+  {.name = "sin", .sig = "... * float32 -> ... * float32", .Strided=gm_sinf_strided_float32_float32 },
 
   /* return float64 */
   {.name = "sin", .sig = "... * uint8 -> ... * float64", .Strided=gm_sin_strided_uint8_float64 },
@@ -189,18 +228,29 @@ static const gm_kernel_init_t kernels[] = {
    .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
    .Strided=gm_multiply_strided_q64_q64 },
 
+  {.name="multiply",
+   .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
+   .Strided=gm_multiply_strided_q128_q128 },
+
   {.sig = NULL}
 };
 
 
 /****************************************************************************/
-/*                               Example init                               */
+/*                       Initialize kernel table                            */
 /****************************************************************************/
 
 int
 gm_init_kernels(ndt_context_t *ctx)
 {
+    const gm_typedef_init_t *t;
     const gm_kernel_init_t *k;
+
+    for (t = typedefs; t->name != NULL; t++) {
+        if (ndt_typedef_from_string(t->name, t->type, ctx) < 0) {
+            return -1;
+        }
+    }
 
     for (k = kernels; k->sig != NULL; k++) {
         if (gm_add_kernel(k, ctx) < 0) {
