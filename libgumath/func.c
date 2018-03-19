@@ -79,38 +79,54 @@ gm_func_del(gm_func_t *f)
     ndt_free(f);
 }
 
-int
+gm_func_t *
 gm_add_func(const char *name, ndt_context_t *ctx)
 {
     gm_func_t *f = gm_func_new(name, ctx);
 
     if (f == NULL) {
-        return -1;
+        return NULL;
     }
 
     if (gm_tbl_add(name, f, ctx) < 0) {
         gm_func_del(f);
-        return -1;
+        return NULL;
     }
 
-    return 0;
+    return f;
 }
 
 int
-gm_add_kernel(const char *name, gm_kernel_set_t kernel, ndt_context_t *ctx)
+gm_add_kernel(const gm_kernel_init_t *k, ndt_context_t *ctx)
 {
-    gm_func_t *f = gm_tbl_find(name, ctx);
+    gm_func_t *f = gm_tbl_find(k->name, ctx);
+    gm_kernel_set_t kernel;
+    ndt_t *t;
 
     if (f == NULL) {
+        f = gm_add_func(k->name, ctx);
+        if (f == NULL) {
+            return -1;
+        }
+    }
+
+    t = ndt_from_string(k->sig, ctx);
+    if (t == NULL) {
         return -1;
     }
 
     if (f->nkernels == GM_MAX_KERNELS) {
-        ndt_del(kernel.sig);
+        ndt_del(t);
         ndt_err_format(ctx, NDT_RuntimeError,
             "%s: maximum number of kernels reached for", f->name);
         return -1;
     }
+
+    kernel.sig = t;
+    kernel.C = k->C;
+    kernel.Fortran = k->Fortran;
+    kernel.Strided = k->Strided;
+    kernel.Xnd = k->Xnd;
 
     f->kernels[f->nkernels++] = kernel;
     return 0;

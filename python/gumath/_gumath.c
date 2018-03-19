@@ -308,7 +308,7 @@ PyInit__gumath(void)
        if (gm_init(&ctx) < 0) {
            return seterr(&ctx);
        }
-       if (gm_sin_init(&ctx) < 0) {
+       if (gm_init_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
        initialized = 1;

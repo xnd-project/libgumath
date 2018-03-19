@@ -61,6 +61,9 @@
 
 #define GM_MAX_KERNELS 128
 
+typedef float float32_t;
+typedef double float64_t;
+
 
 typedef int (* gm_c_kernel_t)(char **args, int64_t *dimensions, void *data);
 typedef int (* gm_fortran_kernel_t)(char **args, int64_t *dimensions, void *data);
@@ -76,6 +79,16 @@ typedef struct {
     gm_strided_kernel_t Strided;
     gm_xnd_kernel_t Xnd;
 } gm_kernel_set_t;
+
+typedef struct {
+    const char *name;
+    const char *sig;
+
+    gm_c_kernel_t C;
+    gm_fortran_kernel_t Fortran;
+    gm_strided_kernel_t Strided;
+    gm_xnd_kernel_t Xnd;
+} gm_kernel_init_t;
 
 /* Actual kernel selected for application. */
 typedef struct {
@@ -98,8 +111,8 @@ typedef struct {
 GM_API gm_func_t *gm_func_new(const char *name, ndt_context_t *ctx);
 GM_API void gm_func_del(gm_func_t *f);
 
-GM_API int gm_add_func(const char *name, ndt_context_t *ctx);
-GM_API int gm_add_kernel(const char *name, gm_kernel_set_t kernel, ndt_context_t *ctx);
+GM_API gm_func_t *gm_add_func(const char *name, ndt_context_t *ctx);
+GM_API int gm_add_kernel(const gm_kernel_init_t *kernel, ndt_context_t *ctx);
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 // GM_API int gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const char *name, const ndt_t *in_types[], int nin, ndt_context_t *ctx);
@@ -141,9 +154,9 @@ GM_API int gm_tbl_map(int (*f)(const gm_func_t *, void *state), void *state);
 /******************************************************************************/
 
 GM_API int gm_init(ndt_context_t *ctx);
-GM_API void gm_finalize(void);
+GM_API int gm_init_kernels(ndt_context_t *ctx);
 
-GM_API int gm_sin_init(ndt_context_t *ctx);
+GM_API void gm_finalize(void);
 
 
 #endif /* GUMATH_H */

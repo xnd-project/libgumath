@@ -53,41 +53,104 @@ gm_kernel_set_t empty_kernel_set =
 /*                              Example kernels                             */
 /****************************************************************************/
 
-static int
-gm_sin_strided_d_d(char *args[], int64_t dimensions[], int64_t steps[],
-                   void *data GM_UNUSED)
-{
-    const char *src = args[0];
-    char *dest = args[1];
-    int64_t n = dimensions[0];
-    int64_t i;
-
-    for (i = 0; i < n; i++) {
-        *(double *)dest = sin(*(const double *)src);
-        src += steps[0];
-        dest += steps[1];
-    }
-
-    return 1;
+/* NumPy signatures */
+#define NP_STRIDED(func, srctype, desttype) \
+static int                                                                     \
+gm_##func##_strided_##srctype##_##desttype(                                         \
+    char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED) \
+{                                                                              \
+    const char *src = args[0];                                                 \
+    char *dest = args[1];                                                      \
+    int64_t n = dimensions[0];                                                 \
+    int64_t i;                                                                 \
+                                                                               \
+    for (i = 0; i < n; i++) {                                                  \
+        *(desttype##_t *)dest = func(*(const srctype##_t *)src);               \
+        src += steps[0];                                                       \
+        dest += steps[1];                                                      \
+    }                                                                          \
+                                                                               \
+    return 0;                                                                  \
 }
 
-static int
-gm_sin_strided_f_f(char **args, int64_t *dimensions, int64_t *steps,
-                   void *data GM_UNUSED)
-{
-    const char *src = args[0];
-    char *dest = args[1];
-    int64_t n = dimensions[0];
-    int64_t i;
-
-    for (i = 0; i < n; i++) {
-        *(float *)dest = sinf(*(const float *)src);
-        src += steps[0];
-        dest += steps[1];
-    }
-
-    return 1;
+#define NP_COPY_STRIDED(srctype, desttype) \
+static int                                                                     \
+gm_copy_strided_##srctype##_##desttype(                                        \
+    char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED) \
+{                                                                              \
+    const char *src = args[0];                                                 \
+    char *dest = args[1];                                                      \
+    int64_t n = dimensions[0];                                                 \
+    int64_t i;                                                                 \
+                                                                               \
+    for (i = 0; i < n; i++) {                                                  \
+        *(desttype##_t *)dest = *(const srctype##_t *)src;                     \
+        src += steps[0];                                                       \
+        dest += steps[1];                                                      \
+    }                                                                          \
+    return 0;                                                                  \
 }
+
+NP_STRIDED(sin, float32, float64)
+NP_STRIDED(sin, float64, float64)
+NP_STRIDED(sin, uint8, float64)
+NP_STRIDED(sin, uint16, float64)
+NP_STRIDED(sin, uint32, float64)
+NP_STRIDED(sin, uint64, float64)
+NP_STRIDED(sin, int8, float64)
+NP_STRIDED(sin, int16, float64)
+NP_STRIDED(sin, int32, float64)
+NP_STRIDED(sin, int64, float64)
+
+NP_STRIDED(sinf, float32, float32)
+
+NP_COPY_STRIDED(uint8, uint8)
+NP_COPY_STRIDED(uint16, uint16)
+NP_COPY_STRIDED(uint32, uint32)
+NP_COPY_STRIDED(uint64, uint64)
+NP_COPY_STRIDED(int8, int8)
+NP_COPY_STRIDED(int16, int16)
+NP_COPY_STRIDED(int32, int32)
+NP_COPY_STRIDED(int64, int64)
+NP_COPY_STRIDED(float32, float32)
+NP_COPY_STRIDED(float64, float64)
+
+
+static const gm_kernel_init_t kernels[] = {
+  /* COPY */
+  {.name = "copy", .sig = "... * uint8 -> ... * uint8", .Strided=gm_copy_strided_uint8_uint8 },
+  {.name = "copy", .sig = "... * uint16 -> ... * uint16", .Strided=gm_copy_strided_uint16_uint16 },
+  {.name = "copy", .sig = "... * uint32 -> ... * uint32", .Strided=gm_copy_strided_uint32_uint32 },
+  {.name = "copy", .sig = "... * uint64 -> ... * uint64", .Strided=gm_copy_strided_uint64_uint64 },
+
+  {.name = "copy", .sig = "... * int8 -> ... * int8", .Strided=gm_copy_strided_int8_int8 },
+  {.name = "copy", .sig = "... * int16 -> ... * int16", .Strided=gm_copy_strided_int16_int16 },
+  {.name = "copy", .sig = "... * int32 -> ... * int32", .Strided=gm_copy_strided_int32_int32 },
+  {.name = "copy", .sig = "... * int64 -> ... * int64", .Strided=gm_copy_strided_int64_int64 },
+
+  {.name= "copy", .sig = "... * float32 -> ... * float32", .Strided=gm_copy_strided_float32_float32 },
+  {.name = "copy", .sig = "... * float64 -> ... * float64", .Strided=gm_copy_strided_float64_float64 },
+
+  /* SIN */
+  /* float32 out */
+  {.name="sin", .sig = "... * float32 -> ... * float32", .Strided=gm_sinf_strided_float32_float32 },
+
+  /* float64 out */
+  {.name = "sin", .sig = "... * uint8 -> ... * float64", .Strided=gm_sin_strided_uint8_float64 },
+  {.name = "sin", .sig = "... * uint16 -> ... * float64", .Strided=gm_sin_strided_uint16_float64 },
+  {.name = "sin", .sig = "... * uint32 -> ... * float64", .Strided=gm_sin_strided_uint32_float64 },
+  {.name = "sin", .sig = "... * uint64 -> ... * float64", .Strided=gm_sin_strided_uint64_float64 },
+
+  {.name = "sin", .sig = "... * int8 -> ... * float64", .Strided=gm_sin_strided_int8_float64 },
+  {.name = "sin", .sig = "... * int16 -> ... * float64", .Strided=gm_sin_strided_int16_float64 },
+  {.name = "sin", .sig = "... * int32 -> ... * float64", .Strided=gm_sin_strided_int32_float64 },
+  {.name = "sin", .sig = "... * int64 -> ... * float64", .Strided=gm_sin_strided_int64_float64 },
+
+  {.name = "sin", .sig = "... * float32 -> ... * float64", .Strided=gm_sin_strided_float32_float64 },
+  {.name = "sin", .sig = "... * float64 -> ... * float64", .Strided=gm_sin_strided_float64_float64 },
+
+  {.sig = NULL}
+};
 
 
 /****************************************************************************/
@@ -95,34 +158,14 @@ gm_sin_strided_f_f(char **args, int64_t *dimensions, int64_t *steps,
 /****************************************************************************/
 
 int
-gm_sin_init(ndt_context_t *ctx)
+gm_init_kernels(ndt_context_t *ctx)
 {
-    gm_kernel_set_t set;
+    const gm_kernel_init_t *k;
 
-    if (gm_add_func("sin", ctx) < 0) {
-        return -1;
-    }
-
-    set = empty_kernel_set;
-    set.sig = ndt_from_string("... * float64 -> ... * float64", ctx);
-    if (set.sig == NULL) {
-        return -1;
-    }
-
-    set.Strided = gm_sin_strided_d_d;
-    if (gm_add_kernel("sin", set, ctx) < 0) {
-        return -1;
-    }
-
-    set = empty_kernel_set;
-    set.sig = ndt_from_string("... * float32 -> ... * float32", ctx);
-    if (set.sig == NULL) {
-        return -1;
-    }
-
-    set.Strided = gm_sin_strided_f_f;
-    if (gm_add_kernel("sin", set, ctx) < 0) {
-        return -1;
+    for (k = kernels; k->sig != NULL; k++) {
+        if (gm_add_kernel(k, ctx) < 0) {
+            return -1;
+        }
     }
 
     return 0;

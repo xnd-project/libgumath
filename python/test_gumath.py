@@ -30,8 +30,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import gumath as gm
 from xnd import xnd
-from gumath import sin
 import sys, time
 import unittest
 import argparse
@@ -42,39 +42,34 @@ except ImportError:
     np = None
 
 
+
+TEST_CASES = [
+  ([float(i) for i in range(2000000)], "2000000 * float64", "float64"),
+
+  ([[float(i) for i in range(1000000)], [float(i+1) for i in range(1000000)]],
+   "2 * 1000000 * float64", "float64"),
+
+  (1000000 * [[float(i+1) for i in range(2)]], "1000000 * 2 * float64", "float64"),
+
+  ([float(i) for i in range(2000000)], "2000000 * float32", "float32"),
+
+  ([[float(i) for i in range(1000000)], [float(i+1) for i in range(1000000)]],
+   "2 * 1000000 * float32", "float32"),
+
+  (1000000 * [[float(i+1) for i in range(2)]], "1000000 * 2 * float32", "float32"),
+]
+
 class TestCall(unittest.TestCase):
 
     def test_sin(self):
-        test_cases = [
-          ([float(i) for i in range(2000000)],
-           "2000000 * float64", "float64"),
 
-          ([[float(i) for i in range(1000000)],
-            [float(i+1) for i in range(1000000)]],
-          "2 * 1000000 * float64", "float64"),
-
-          (1000000 * [[float(i+1) for i in range(2)]],
-          "1000000 * 2 * float64", "float64"),
-
-
-          ([float(i) for i in range(2000000)],
-           "2000000 * float32", "float32"),
-
-          ([[float(i) for i in range(1000000)],
-            [float(i+1) for i in range(1000000)]],
-          "2 * 1000000 * float32", "float32"),
-
-          (1000000 * [[float(i+1) for i in range(2)]],
-          "1000000 * 2 * float32", "float32")
-        ]
-
-        for lst, t, dtype in test_cases:
+        for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
 
             start = time.time()
-            y = sin(x)
+            y = gm.sin(x)
             end = time.time()
-            sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
+            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
@@ -82,47 +77,85 @@ class TestCall(unittest.TestCase):
                 start = time.time()
                 b = np.sin(a)
                 end = time.time()
-                sys.stderr.write("numpy: time=%.3f\n" % (end-start))
+                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                np.testing.assert_almost_equal(y, b, 5)
+                if dtype == "float64":
+                    np.testing.assert_equal(y, b)
+                else:
+                    np.testing.assert_almost_equal(y, b, 7)
 
     def test_sin_strided(self):
-        test_cases = [
-          ([[float(i) for i in range(1000000)],
-            [float(i+1) for i in range(1000000)]],
-           "2 * 1000000 * float64", "float64"),
 
-          (1000000 * [[float(i+1) for i in range(2)]],
-           "1000000 * 2 * float64", "float64"),
-
-          ([[float(i) for i in range(1000000)],
-             [float(i+1) for i in range(1000000)]],
-           "2 * 1000000 * float32", "float32"),
-
-          (1000000 * [[float(i+1) for i in range(2)]],
-           "1000000 * 2 * float32", "float32")
-        ]
-
-        for lst, t, dtype in test_cases:
+        for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
-            y = x[::-1, ::-1]
+            if x.type.ndim < 2:
+                continue
+
+            y = x[::-2, ::-2]
 
             start = time.time()
-            z = sin(y)
+            z = gm.sin(y)
             end = time.time()
-            sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
+            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
-                b = a[::-1, ::-1]
+                b = a[::-2, ::-2]
 
                 start = time.time()
                 c = np.sin(b)
                 end = time.time()
-                sys.stderr.write("numpy: time=%.3f\n" % (end-start))
+                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
-                np.testing.assert_almost_equal(z, c, 5)
+                if dtype == "float64":
+                    np.testing.assert_equal(z, c)
+                else:
+                    np.testing.assert_almost_equal(z, c, 7)
 
+    def test_copy(self):
+
+        for lst, t, dtype in TEST_CASES:
+            x = xnd(lst, type=t)
+
+            start = time.time()
+            y = gm.copy(x)
+            end = time.time()
+            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
+
+            if np is not None:
+                a = np.array(lst, dtype=dtype)
+
+                start = time.time()
+                b = np.copy(a)
+                end = time.time()
+                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
+
+                np.testing.assert_equal(y, b)
+
+    def test_copy_strided(self):
+
+        for lst, t, dtype in TEST_CASES:
+            x = xnd(lst, type=t)
+            if x.type.ndim < 2:
+                continue
+
+            y = x[::-2, ::-2]
+
+            start = time.time()
+            z = gm.copy(y)
+            end = time.time()
+            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
+
+            if np is not None:
+                a = np.array(lst, dtype=dtype)
+                b = a[::-2, ::-2]
+
+                start = time.time()
+                c = np.copy(b)
+                end = time.time()
+                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
+
+                np.testing.assert_equal(y, b)
 
 
 ALL_TESTS = [
