@@ -61,28 +61,34 @@ TEST_CASES = [
 
 class TestCall(unittest.TestCase):
 
+    def test_sin0d(self):
+
+        x1 = xnd(1.2, type="float64")
+        y1 = gm.sin(x1)
+
+        x2 = xnd(1.23e10, type="float32")
+        y2 = gm.sin(x2)
+
+        if np is not None:
+            a1 = np.array(1.2, dtype="float64")
+            b1 = np.sin(a1)
+
+            a2 = np.array(1.23e10, dtype="float32")
+            b2 = np.sin(a2)
+
+            np.testing.assert_equal(y1.value, b1)
+            np.testing.assert_equal(y2.value, b2)
+
     def test_sin(self):
 
         for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
-
-            start = time.time()
             y = gm.sin(x)
-            end = time.time()
-            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
-
-                start = time.time()
                 b = np.sin(a)
-                end = time.time()
-                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
-
-                if dtype == "float64":
-                    np.testing.assert_equal(y, b)
-                else:
-                    np.testing.assert_almost_equal(y, b, 7)
+                np.testing.assert_equal(y, b)
 
     def test_sin_strided(self):
 
@@ -92,44 +98,23 @@ class TestCall(unittest.TestCase):
                 continue
 
             y = x[::-2, ::-2]
-
-            start = time.time()
             z = gm.sin(y)
-            end = time.time()
-            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
                 b = a[::-2, ::-2]
-
-                start = time.time()
                 c = np.sin(b)
-                end = time.time()
-                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
-
-                if dtype == "float64":
-                    np.testing.assert_equal(z, c)
-                else:
-                    np.testing.assert_almost_equal(z, c, 7)
+                np.testing.assert_equal(z, c)
 
     def test_copy(self):
 
         for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
-
-            start = time.time()
             y = gm.copy(x)
-            end = time.time()
-            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
-
-                start = time.time()
                 b = np.copy(a)
-                end = time.time()
-                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
-
                 np.testing.assert_equal(y, b)
 
     def test_copy_strided(self):
@@ -140,21 +125,12 @@ class TestCall(unittest.TestCase):
                 continue
 
             y = x[::-2, ::-2]
-
-            start = time.time()
             z = gm.copy(y)
-            end = time.time()
-            # sys.stderr.write("\ngumath: time=%.3f\n" % (end-start))
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
                 b = a[::-2, ::-2]
-
-                start = time.time()
                 c = np.copy(b)
-                end = time.time()
-                # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
-
                 np.testing.assert_equal(y, b)
 
     def test_quaternion(self):

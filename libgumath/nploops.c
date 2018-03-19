@@ -53,6 +53,46 @@
     } while (0)
 
 
+static int
+gm_as_ndarray(xnd_ndarray_t *a, const xnd_t *x, ndt_context_t *ctx)
+{
+    const ndt_t *t = x->type;
+    int i;
+
+    assert(t->ndim <= NDT_MAX_DIM);
+
+    if (ndt_is_abstract(t)) {
+        ndt_err_format(ctx, NDT_TypeError, "type is not an ndarray");
+        return -1;
+    }
+
+    if (!ndt_is_ndarray(t)) {
+        if (t->ndim == 0) {
+            a->ndim = 1;
+            a->itemsize = t->datasize;
+            a->nelem = 1;
+            a->shape[0] = 1;
+            a->strides[0] = 0;
+            a->ptr = x->ptr + x->index * t->datasize;
+            return 0;
+        }
+        ndt_err_format(ctx, NDT_TypeError, "type is not an ndarray");
+        return -1;
+    }
+
+    a->ndim = t->ndim;
+    a->itemsize = t->Concrete.FixedDim.itemsize;
+    a->nelem = t->datasize / t->Concrete.FixedDim.itemsize;
+    a->ptr = x->ptr + x->index * a->itemsize;
+
+    for (i=0; t->ndim > 0; i++, t=t->FixedDim.type) {
+        a->shape[i] = t->FixedDim.shape;
+        a->strides[i] = t->Concrete.FixedDim.step * a->itemsize;
+    }
+
+    return 0;
+}
+
 /*
  * Convert an xnd container into the {args, dimensions, strides} representation.
  */
@@ -73,7 +113,7 @@ gm_np_convert_xnd(char **args, const int nargs,
     }
 
     for (i = 0; i < nargs; i++) {
-        if (xnd_as_ndarray(&nd[i], &stack[i], ctx) < 0) {
+        if (gm_as_ndarray(&nd[i], &stack[i], ctx) < 0) {
             return -1;
         }
         args[i] = nd[i].ptr;
@@ -119,7 +159,7 @@ gm_np_flatten(char **args, const int nargs,
     int i;
 
     for (i = 0; i < nargs; i++) {
-        if (xnd_as_ndarray(&nd, &stack[i], ctx) < 0) {
+        if (gm_as_ndarray(&nd, &stack[i], ctx) < 0) {
             return -1;
         }
         args[i] = nd.ptr;
@@ -142,11 +182,8 @@ gm_np_map(const gm_strided_kernel_t f,
     intptr_t shape, i;
     int k;
 
-    if (outer_dims == 1) {
+    if (outer_dims <= 1) {
         return f(args, dimensions, steps, data);
-    }
-    if (outer_dims == 0) {
-        assert(0);
     }
 
     shape = dimensions[0];
