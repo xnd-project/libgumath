@@ -35,6 +35,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <complex.h>
 #include <inttypes.h>
 #include "ndtypes.h"
 #include "xnd.h"
@@ -56,7 +57,7 @@ gm_kernel_set_t empty_kernel_set =
 /* NumPy signatures */
 #define NP_STRIDED(func, srctype, desttype) \
 static int                                                                     \
-gm_##func##_strided_##srctype##_##desttype(                                         \
+gm_##func##_strided_##srctype##_##desttype(                                    \
     char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED) \
 {                                                                              \
     const char *src = args[0];                                                 \
@@ -89,6 +90,39 @@ gm_copy_strided_##srctype##_##desttype(                                        \
         dest += steps[1];                                                      \
     }                                                                          \
     return 0;                                                                  \
+}
+
+static int
+gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED)
+{
+    const char *src1 = args[0];
+    const char *src2 = args[1];
+    char *dest = args[2];
+    const ndt_complex64_t (*s1)[2];
+    const ndt_complex64_t (*s2)[2];
+    ndt_complex64_t (*d1)[2];
+    int64_t n = dimensions[0];
+    int64_t i, j, k, l;
+
+    for (i = 0; i < n; i++) {
+      s1 = (const ndt_complex64_t (*)[2])src1;
+      s2 = (const ndt_complex64_t (*)[2])src2;
+      d1 = (ndt_complex64_t (*)[2])dest;
+      for (j = 0; j < 2; j++){
+        for (k = 0; k < 2; k++) {
+          ndt_complex64_t sum = 0;
+          for (l = 0; l < 2; l++) {
+            sum += s1[j][l] * s2[l][k];
+          }
+          d1[j][k] = sum;
+        }
+      }
+      src1 += steps[0];
+      src2 += steps[1];
+      dest += steps[2];
+    }
+
+    return 0;
 }
 
 NP_STRIDED(sin, float32, float64)
@@ -132,10 +166,10 @@ static const gm_kernel_init_t kernels[] = {
   {.name = "copy", .sig = "... * float64 -> ... * float64", .Strided=gm_copy_strided_float64_float64 },
 
   /* SIN */
-  /* float32 out */
+  /* return float32 */
   {.name="sin", .sig = "... * float32 -> ... * float32", .Strided=gm_sinf_strided_float32_float32 },
 
-  /* float64 out */
+  /* return float64 */
   {.name = "sin", .sig = "... * uint8 -> ... * float64", .Strided=gm_sin_strided_uint8_float64 },
   {.name = "sin", .sig = "... * uint16 -> ... * float64", .Strided=gm_sin_strided_uint16_float64 },
   {.name = "sin", .sig = "... * uint32 -> ... * float64", .Strided=gm_sin_strided_uint32_float64 },
@@ -148,6 +182,12 @@ static const gm_kernel_init_t kernels[] = {
 
   {.name = "sin", .sig = "... * float32 -> ... * float64", .Strided=gm_sin_strided_float32_float64 },
   {.name = "sin", .sig = "... * float64 -> ... * float64", .Strided=gm_sin_strided_float64_float64 },
+
+  /* MULTIPLY */
+  /* quaternions */
+  {.name="multiply",
+   .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
+   .Strided=gm_multiply_strided_q64_q64 },
 
   {.sig = NULL}
 };

@@ -104,6 +104,7 @@ gm_add_kernel(const gm_kernel_init_t *k, ndt_context_t *ctx)
     ndt_t *t;
 
     if (f == NULL) {
+        ndt_err_clear(ctx);
         f = gm_add_func(k->name, ctx);
         if (f == NULL) {
             return -1;

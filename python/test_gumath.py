@@ -44,19 +44,19 @@ except ImportError:
 
 
 TEST_CASES = [
-  ([float(i) for i in range(2000000)], "2000000 * float64", "float64"),
+  ([float(i) for i in range(2000)], "2000 * float64", "float64"),
 
-  ([[float(i) for i in range(1000000)], [float(i+1) for i in range(1000000)]],
-   "2 * 1000000 * float64", "float64"),
+  ([[float(i) for i in range(1000)], [float(i+1) for i in range(1000)]],
+   "2 * 1000 * float64", "float64"),
 
-  (1000000 * [[float(i+1) for i in range(2)]], "1000000 * 2 * float64", "float64"),
+  (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float64", "float64"),
 
-  ([float(i) for i in range(2000000)], "2000000 * float32", "float32"),
+  ([float(i) for i in range(2000)], "2000 * float32", "float32"),
 
-  ([[float(i) for i in range(1000000)], [float(i+1) for i in range(1000000)]],
-   "2 * 1000000 * float32", "float32"),
+  ([[float(i) for i in range(1000)], [float(i+1) for i in range(1000)]],
+   "2 * 1000 * float32", "float32"),
 
-  (1000000 * [[float(i+1) for i in range(2)]], "1000000 * 2 * float32", "float32"),
+  (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float32", "float32"),
 ]
 
 class TestCall(unittest.TestCase):
@@ -156,6 +156,35 @@ class TestCall(unittest.TestCase):
                 # sys.stderr.write("numpy: time=%.3f\n" % (end-start))
 
                 np.testing.assert_equal(y, b)
+
+    def test_quaternion(self):
+  
+        lst = [[[1+2j, 4+3j],
+                [-4+3j, 1-2j]],
+               [[4+2j, 1+10j],
+                [-1+10j, 4-2j]],
+               [[-4+2j, 3+10j],
+                [-3+10j, -4-2j]]]
+
+        x = xnd(lst, type="3 * Q64(2 * 2 * complex64)")
+        y = gm.multiply(x, x)
+
+        if np is not None:
+            a = np.array(lst, dtype="complex64")
+            b = np.matmul(a, a)
+            np.testing.assert_equal(y, b)
+
+    def test_quaternion_error(self):
+  
+        lst = [[[1+2j, 4+3j],
+                [-4+3j, 1-2j]],
+               [[4+2j, 1+10j],
+                [-1+10j, 4-2j]],
+               [[-4+2j, 3+10j],
+                [-3+10j, -4-2j]]]
+
+        x = xnd(lst, type="3 * Foo(2 * 2 * complex64)")
+        self.assertRaises(TypeError, gm.multiply, x, x)
 
 
 ALL_TESTS = [

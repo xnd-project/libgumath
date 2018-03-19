@@ -154,6 +154,6 @@ gm_select(ndt_apply_spec_t *spec,
         return select_kernel(spec, set, ctx);
     }
 
-    ndt_err_format(ctx, NDT_RuntimeError, "could not find kernel");
+    ndt_err_format(ctx, NDT_TypeError, "could not find kernel");
     return empty_kernel;
 }
