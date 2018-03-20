@@ -184,55 +184,55 @@ NP_COPY_STRIDED(float64, float64)
 
 
 static const gm_typedef_init_t typedefs[] = {
-  {.name = "quaternion64", .type = "2 * 2 * complex64" },
-  {.name = "quaternion128", .type = "2 * 2 * complex128" },
-  {.name = NULL, .type = NULL }
+  { .name = "quaternion64", .type = "2 * 2 * complex64" },
+  { .name = "quaternion128", .type = "2 * 2 * complex128" },
+  { .name = NULL, .type = NULL }
 };
 
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
-  {.name = "copy", .sig = "... * uint8 -> ... * uint8", .Strided=gm_copy_strided_uint8_uint8 },
-  {.name = "copy", .sig = "... * uint16 -> ... * uint16", .Strided=gm_copy_strided_uint16_uint16 },
-  {.name = "copy", .sig = "... * uint32 -> ... * uint32", .Strided=gm_copy_strided_uint32_uint32 },
-  {.name = "copy", .sig = "... * uint64 -> ... * uint64", .Strided=gm_copy_strided_uint64_uint64 },
+  { .name = "copy", .sig = "... * uint8 -> ... * uint8", .Strided = gm_copy_strided_uint8_uint8 },
+  { .name = "copy", .sig = "... * uint16 -> ... * uint16", .Strided = gm_copy_strided_uint16_uint16 },
+  { .name = "copy", .sig = "... * uint32 -> ... * uint32", .Strided = gm_copy_strided_uint32_uint32 },
+  { .name = "copy", .sig = "... * uint64 -> ... * uint64", .Strided = gm_copy_strided_uint64_uint64 },
 
-  {.name = "copy", .sig = "... * int8 -> ... * int8", .Strided=gm_copy_strided_int8_int8 },
-  {.name = "copy", .sig = "... * int16 -> ... * int16", .Strided=gm_copy_strided_int16_int16 },
-  {.name = "copy", .sig = "... * int32 -> ... * int32", .Strided=gm_copy_strided_int32_int32 },
-  {.name = "copy", .sig = "... * int64 -> ... * int64", .Strided=gm_copy_strided_int64_int64 },
+  { .name = "copy", .sig = "... * int8 -> ... * int8", .Strided = gm_copy_strided_int8_int8 },
+  { .name = "copy", .sig = "... * int16 -> ... * int16", .Strided = gm_copy_strided_int16_int16 },
+  { .name = "copy", .sig = "... * int32 -> ... * int32", .Strided = gm_copy_strided_int32_int32 },
+  { .name = "copy", .sig = "... * int64 -> ... * int64", .Strided = gm_copy_strided_int64_int64 },
 
-  {.name = "copy", .sig = "... * float32 -> ... * float32", .Strided=gm_copy_strided_float32_float32 },
-  {.name = "copy", .sig = "... * float64 -> ... * float64", .Strided=gm_copy_strided_float64_float64 },
+  { .name = "copy", .sig = "... * float32 -> ... * float32", .Strided = gm_copy_strided_float32_float32 },
+  { .name = "copy", .sig = "... * float64 -> ... * float64", .Strided = gm_copy_strided_float64_float64 },
 
   /* SIN */
   /* return float32 */
-  {.name = "sin", .sig = "... * float32 -> ... * float32", .Strided=gm_sinf_strided_float32_float32 },
+  { .name = "sin", .sig = "... * float32 -> ... * float32", .Strided = gm_sinf_strided_float32_float32 },
 
   /* return float64 */
-  {.name = "sin", .sig = "... * uint8 -> ... * float64", .Strided=gm_sin_strided_uint8_float64 },
-  {.name = "sin", .sig = "... * uint16 -> ... * float64", .Strided=gm_sin_strided_uint16_float64 },
-  {.name = "sin", .sig = "... * uint32 -> ... * float64", .Strided=gm_sin_strided_uint32_float64 },
-  {.name = "sin", .sig = "... * uint64 -> ... * float64", .Strided=gm_sin_strided_uint64_float64 },
+  { .name = "sin", .sig = "... * uint8 -> ... * float64", .Strided = gm_sin_strided_uint8_float64 },
+  { .name = "sin", .sig = "... * uint16 -> ... * float64", .Strided = gm_sin_strided_uint16_float64 },
+  { .name = "sin", .sig = "... * uint32 -> ... * float64", .Strided = gm_sin_strided_uint32_float64 },
+  { .name = "sin", .sig = "... * uint64 -> ... * float64", .Strided = gm_sin_strided_uint64_float64 },
 
-  {.name = "sin", .sig = "... * int8 -> ... * float64", .Strided=gm_sin_strided_int8_float64 },
-  {.name = "sin", .sig = "... * int16 -> ... * float64", .Strided=gm_sin_strided_int16_float64 },
-  {.name = "sin", .sig = "... * int32 -> ... * float64", .Strided=gm_sin_strided_int32_float64 },
-  {.name = "sin", .sig = "... * int64 -> ... * float64", .Strided=gm_sin_strided_int64_float64 },
+  { .name = "sin", .sig = "... * int8 -> ... * float64", .Strided = gm_sin_strided_int8_float64 },
+  { .name = "sin", .sig = "... * int16 -> ... * float64", .Strided = gm_sin_strided_int16_float64 },
+  { .name = "sin", .sig = "... * int32 -> ... * float64", .Strided = gm_sin_strided_int32_float64 },
+  { .name = "sin", .sig = "... * int64 -> ... * float64", .Strided = gm_sin_strided_int64_float64 },
 
-  {.name = "sin", .sig = "... * float32 -> ... * float64", .Strided=gm_sin_strided_float32_float64 },
-  {.name = "sin", .sig = "... * float64 -> ... * float64", .Strided=gm_sin_strided_float64_float64 },
+  { .name = "sin", .sig = "... * float32 -> ... * float64", .Strided = gm_sin_strided_float32_float64 },
+  { .name = "sin", .sig = "... * float64 -> ... * float64", .Strided = gm_sin_strided_float64_float64 },
 
   /* MULTIPLY */
   /* quaternions */
-  {.name="multiply",
-   .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
-   .Strided=gm_multiply_strided_q64_q64 },
+  { .name = "multiply",
+    .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
+    .Strided = gm_multiply_strided_q64_q64 },
 
-  {.name="multiply",
-   .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
-   .Strided=gm_multiply_strided_q128_q128 },
+  { .name = "multiply",
+    .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
+    .Strided = gm_multiply_strided_q128_q128 },
 
-  {.sig = NULL}
+  { .name = NULL, .sig = NULL }
 };
 
 
@@ -252,7 +252,7 @@ gm_init_kernels(ndt_context_t *ctx)
         }
     }
 
-    for (k = kernels; k->sig != NULL; k++) {
+    for (k = kernels; k->name != NULL; k++) {
         if (gm_add_kernel(k, ctx) < 0) {
             return -1;
         }
