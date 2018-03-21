@@ -27,9 +27,10 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o kernels.o nploops.o tbl.o
+OBJS = apply.o func.o kernels.o nploops.o tbl.o xndloops.o
 
-SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/nploops.o .objs/tbl.o
+SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/nploops.o \
+              .objs/tbl.o .objs/xndloops.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -81,6 +82,13 @@ Makefile tbl.c gumath.h
 Makefile tbl.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c tbl.c -o .objs/tbl.o
 
+xndloops.o:\
+Makefile xndloops.c gumath.h
+	$(CC) $(GM_CFLAGS) -c xndloops.c
+
+.objs/xndloops.o:\
+Makefile xndloops.c gumath.h
+	$(CC) $(GM_CFLAGS_SHARED) -c xndloops.c -o .objs/xndloops.o
 
 
 # Coverage

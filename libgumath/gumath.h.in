@@ -68,11 +68,12 @@ typedef double float64_t;
 typedef int (* gm_c_kernel_t)(char **args, int64_t *dimensions, void *data);
 typedef int (* gm_fortran_kernel_t)(char **args, int64_t *dimensions, void *data);
 typedef int (* gm_strided_kernel_t)(char **args, int64_t *dimensions, int64_t *steps, void *data);
-typedef void (* gm_xnd_kernel_t)(xnd_t stack[]);
+typedef int (* gm_xnd_kernel_t)(xnd_t stack[], ndt_context_t *ctx);
 
 /* Collection of specialized kernels for a single function signature. */
 typedef struct {
     ndt_t *sig;
+    bool vectorize;
 
     gm_c_kernel_t C;
     gm_fortran_kernel_t Fortran;
@@ -88,6 +89,7 @@ typedef struct {
 typedef struct {
     const char *name;
     const char *sig;
+    bool vectorize;
 
     gm_c_kernel_t C;
     gm_fortran_kernel_t Fortran;
@@ -143,6 +145,14 @@ GM_API int gm_np_map(const gm_strided_kernel_t f,
                      intptr_t *steps,
                      void *data,
                      int outer_dims);
+
+
+/******************************************************************************/
+/*                                  Xnd loops                                 */
+/******************************************************************************/
+
+GM_API int gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
+                      const int outer_dims, bool vectorize, ndt_context_t *ctx);
 
 
 /******************************************************************************/

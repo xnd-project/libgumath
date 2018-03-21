@@ -170,9 +170,27 @@ class TestCall(unittest.TestCase):
         x = xnd(lst, type="3 * Foo(2 * 2 * complex64)")
         self.assertRaises(TypeError, gm.multiply, x, x)
 
+class TestMissingValues(unittest.TestCase):
+
+    def test_missing_values(self):
+
+        x = [{'index': 0, 'name': 'brazil', 'value': 10},
+             {'index': 1, 'name': 'france', 'value': None},
+             {'index': 1, 'name': 'russia', 'value': 2}]
+
+        y = [{'index': 0, 'name': 'iceland', 'value': 5},
+             {'index': 1, 'name': 'norway', 'value': None},
+             {'index': 1, 'name': 'italy', 'value': None}]
+
+        z = xnd([x, y], type="2 * 3 * {index: int64, name: string, value: ?int64}")
+        ans = gm.count_valid_missing(z)
+
+        self.assertEqual(ans.value, [{'valid': 2, 'missing': 1}, {'valid': 1, 'missing': 2}])
+
 
 ALL_TESTS = [
-  TestCall
+  TestCall,
+  TestMissingValues
 ]
 
 

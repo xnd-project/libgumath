@@ -51,10 +51,70 @@ gm_kernel_set_t empty_kernel_set =
 
 
 /****************************************************************************/
-/*                              Example kernels                             */
+/*                               Xnd kernels                                */
 /****************************************************************************/
 
-/* NumPy signatures */
+/*
+ * Count valid/missing values in a 1D array of records and return the result
+ * as a record.
+ *
+ * Signature:
+ *    "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}"
+ */
+static int
+count_valid_missing(xnd_t stack[], ndt_context_t *ctx)
+{
+    const ndt_t *t = stack[0].type;
+    int64_t index = stack[0].index;
+    int64_t N = t->FixedDim.shape; /* corresponds to N in the above signature */
+
+    const ndt_t *u = t->FixedDim.type;
+    const ndt_t *v = stack[1].type;
+
+    char *ptr;
+    xnd_t value;
+    int64_t valid = 0;
+    int64_t missing = 0;
+    int64_t i;
+
+    for (i = 0; i < N; i++) {
+        index = stack[0].index + i * t->Concrete.FixedDim.step;
+
+        value.bitmap = stack[0].bitmap;
+        value.type = u;
+        value.index = index;
+
+
+        value.bitmap = xnd_bitmap_next(&value, 2, ctx);
+        if (ndt_err_occurred(ctx)) {
+            return -1;
+        }
+        value.type = u->Record.types[2];
+        value.index = 0;
+
+        if (xnd_is_na(&value)) {
+            missing++;
+        }
+        else {
+            valid++;
+        }
+    }
+
+    /* XXX Always applying the linear index at ndim==0 is tedious. Change
+       xnd to keep ptr and index in sync. */
+    ptr = stack[1].ptr + stack[1].index * v->datasize;
+    *(int64_t *)ptr = valid;
+    ptr += v->Concrete.Record.offset[1];
+    *(int64_t *)ptr = missing;
+
+    return 0;
+}
+
+
+/****************************************************************************/
+/*                              NumPy kernels                               */
+/****************************************************************************/
+
 #define NP_STRIDED(func, srctype, desttype) \
 static int                                                                     \
 gm_##func##_strided_##srctype##_##desttype(                                    \
@@ -191,46 +251,55 @@ static const gm_typedef_init_t typedefs[] = {
 
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
-  { .name = "copy", .sig = "... * uint8 -> ... * uint8", .Strided = gm_copy_strided_uint8_uint8 },
-  { .name = "copy", .sig = "... * uint16 -> ... * uint16", .Strided = gm_copy_strided_uint16_uint16 },
-  { .name = "copy", .sig = "... * uint32 -> ... * uint32", .Strided = gm_copy_strided_uint32_uint32 },
-  { .name = "copy", .sig = "... * uint64 -> ... * uint64", .Strided = gm_copy_strided_uint64_uint64 },
+  { .name = "copy", .sig = "... * uint8 -> ... * uint8", .vectorize = true, .Strided = gm_copy_strided_uint8_uint8 },
+  { .name = "copy", .sig = "... * uint16 -> ... * uint16", .vectorize = true, .Strided = gm_copy_strided_uint16_uint16 },
+  { .name = "copy", .sig = "... * uint32 -> ... * uint32", .vectorize = true, .Strided = gm_copy_strided_uint32_uint32 },
+  { .name = "copy", .sig = "... * uint64 -> ... * uint64", .vectorize = true, .Strided = gm_copy_strided_uint64_uint64 },
 
-  { .name = "copy", .sig = "... * int8 -> ... * int8", .Strided = gm_copy_strided_int8_int8 },
-  { .name = "copy", .sig = "... * int16 -> ... * int16", .Strided = gm_copy_strided_int16_int16 },
-  { .name = "copy", .sig = "... * int32 -> ... * int32", .Strided = gm_copy_strided_int32_int32 },
-  { .name = "copy", .sig = "... * int64 -> ... * int64", .Strided = gm_copy_strided_int64_int64 },
+  { .name = "copy", .sig = "... * int8 -> ... * int8", .vectorize = true, .Strided = gm_copy_strided_int8_int8 },
+  { .name = "copy", .sig = "... * int16 -> ... * int16", .vectorize = true, .Strided = gm_copy_strided_int16_int16 },
+  { .name = "copy", .sig = "... * int32 -> ... * int32", .vectorize = true, .Strided = gm_copy_strided_int32_int32 },
+  { .name = "copy", .sig = "... * int64 -> ... * int64", .vectorize = true, .Strided = gm_copy_strided_int64_int64 },
 
-  { .name = "copy", .sig = "... * float32 -> ... * float32", .Strided = gm_copy_strided_float32_float32 },
-  { .name = "copy", .sig = "... * float64 -> ... * float64", .Strided = gm_copy_strided_float64_float64 },
+  { .name = "copy", .sig = "... * float32 -> ... * float32", .vectorize = true, .Strided = gm_copy_strided_float32_float32 },
+  { .name = "copy", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_copy_strided_float64_float64 },
 
   /* SIN */
   /* return float32 */
-  { .name = "sin", .sig = "... * float32 -> ... * float32", .Strided = gm_sinf_strided_float32_float32 },
+  { .name = "sin", .sig = "... * float32 -> ... * float32", .vectorize = true, .Strided = gm_sinf_strided_float32_float32 },
 
   /* return float64 */
-  { .name = "sin", .sig = "... * uint8 -> ... * float64", .Strided = gm_sin_strided_uint8_float64 },
-  { .name = "sin", .sig = "... * uint16 -> ... * float64", .Strided = gm_sin_strided_uint16_float64 },
-  { .name = "sin", .sig = "... * uint32 -> ... * float64", .Strided = gm_sin_strided_uint32_float64 },
-  { .name = "sin", .sig = "... * uint64 -> ... * float64", .Strided = gm_sin_strided_uint64_float64 },
+  { .name = "sin", .sig = "... * uint8 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint8_float64 },
+  { .name = "sin", .sig = "... * uint16 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint16_float64 },
+  { .name = "sin", .sig = "... * uint32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint32_float64 },
+  { .name = "sin", .sig = "... * uint64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint64_float64 },
 
-  { .name = "sin", .sig = "... * int8 -> ... * float64", .Strided = gm_sin_strided_int8_float64 },
-  { .name = "sin", .sig = "... * int16 -> ... * float64", .Strided = gm_sin_strided_int16_float64 },
-  { .name = "sin", .sig = "... * int32 -> ... * float64", .Strided = gm_sin_strided_int32_float64 },
-  { .name = "sin", .sig = "... * int64 -> ... * float64", .Strided = gm_sin_strided_int64_float64 },
+  { .name = "sin", .sig = "... * int8 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int8_float64 },
+  { .name = "sin", .sig = "... * int16 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int16_float64 },
+  { .name = "sin", .sig = "... * int32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int32_float64 },
+  { .name = "sin", .sig = "... * int64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int64_float64 },
 
-  { .name = "sin", .sig = "... * float32 -> ... * float64", .Strided = gm_sin_strided_float32_float64 },
-  { .name = "sin", .sig = "... * float64 -> ... * float64", .Strided = gm_sin_strided_float64_float64 },
+  { .name = "sin", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float32_float64 },
+  { .name = "sin", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float64_float64 },
 
   /* MULTIPLY */
   /* quaternions */
   { .name = "multiply",
     .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
+    .vectorize = true,
     .Strided = gm_multiply_strided_q64_q64 },
 
   { .name = "multiply",
     .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
+    .vectorize = true,
     .Strided = gm_multiply_strided_q128_q128 },
+
+  /* XND */
+  /* example for handling structs with missing values */
+  { .name = "count_valid_missing",
+    .sig = "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}",
+    .vectorize = false,
+    .Xnd = count_valid_missing },
 
   { .name = NULL, .sig = NULL }
 };

@@ -80,6 +80,11 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], const int outer_dims,
         return gm_np_map(kernel->set->Strided, args, nargs,
                          dimensions, steps, NULL, outer_dims);
     }
+    case Xnd: {
+        return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims,
+                          kernel->set->vectorize, ctx);
+    }
+
     default: {
         ndt_err_format(ctx, NDT_NotImplementedError, "apply not implemented");
         return -1;
