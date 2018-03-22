@@ -53,8 +53,18 @@
     } while (0)
 
 
+typedef struct {
+    int ndim;
+    int64_t itemsize;
+    int64_t nelem;
+    int64_t shape[NDT_MAX_DIM];
+    int64_t strides[NDT_MAX_DIM];
+    char *ptr;
+} gm_ndarray_t;
+
+
 static int
-gm_as_ndarray(xnd_ndarray_t *a, const xnd_t *x, ndt_context_t *ctx)
+gm_as_ndarray(gm_ndarray_t *a, const xnd_t *x, ndt_context_t *ctx)
 {
     const ndt_t *t = x->type;
     int i;
@@ -103,7 +113,7 @@ gm_np_convert_xnd(char **args, const int nargs,
                   xnd_t stack[], const int outer_dims,
                   ndt_context_t *ctx)
 {
-    xnd_ndarray_t nd[nargs];
+    gm_ndarray_t nd[nargs];
     intptr_t shape;
     int n = 0, m = 0;
     int i, k;
@@ -155,7 +165,7 @@ gm_np_flatten(char **args, const int nargs,
               const xnd_t stack[],
               ndt_context_t *ctx)
 {
-    xnd_ndarray_t nd;
+    gm_ndarray_t nd;
     int i;
 
     for (i = 0; i < nargs; i++) {
