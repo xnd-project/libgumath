@@ -64,48 +64,32 @@ gm_kernel_set_t empty_kernel_set =
 static int
 count_valid_missing(xnd_t stack[], ndt_context_t *ctx)
 {
-    const ndt_t *t = stack[0].type;
-    int64_t index = stack[0].index;
-    int64_t N = t->FixedDim.shape; /* corresponds to N in the above signature */
+    const xnd_t *array = &stack[0];
+    int64_t N = array->type->FixedDim.shape; /* N in the above signature */
+    xnd_t *out = &stack[1];
+    int64_t ok = 0;
+    int64_t na = 0;
 
-    const ndt_t *u = t->FixedDim.type;
-    const ndt_t *v = stack[1].type;
-
-    char *ptr;
-    xnd_t value;
-    int64_t valid = 0;
-    int64_t missing = 0;
-    int64_t i;
-
-    for (i = 0; i < N; i++) {
-        index = stack[0].index + i * t->Concrete.FixedDim.step;
-
-        value.bitmap = stack[0].bitmap;
-        value.type = u;
-        value.index = index;
-
-
-        value.bitmap = xnd_bitmap_next(&value, 2, ctx);
-        if (ndt_err_occurred(ctx)) {
+    for (int64_t i = 0; i < N; i++) {
+        const xnd_t record = xnd_fixed_dim_next(array, i);
+        const xnd_t value = xnd_record_next(&record, 2, ctx);
+        if (value.ptr == NULL) {
             return -1;
         }
-        value.type = u->Record.types[2];
-        value.index = 0;
 
         if (xnd_is_na(&value)) {
-            missing++;
+            na++;
         }
         else {
-            valid++;
+            ok++;
         }
     }
 
-    /* XXX Always applying the linear index at ndim==0 is tedious. Change
-       xnd to keep ptr and index in sync. */
-    ptr = stack[1].ptr + stack[1].index * v->datasize;
-    *(int64_t *)ptr = valid;
-    ptr += v->Concrete.Record.offset[1];
-    *(int64_t *)ptr = missing;
+    xnd_t valid = xnd_record_next(out, 0, ctx);
+    *(int64_t *)(valid.ptr) = ok;
+
+    xnd_t missing = xnd_record_next(out, 1, ctx);
+    *(int64_t *)(missing.ptr) = na;
 
     return 0;
 }

@@ -45,8 +45,7 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
            const int outer_dims, bool vectorize, ndt_context_t *ctx)
 {
     xnd_t next[nargs];
-    const ndt_t *t;
-    int i, k;
+    const ndt_t * const t = stack[0].type;
 
     if (vectorize && outer_dims == 1) {
         return f(stack, ctx);
@@ -55,14 +54,12 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
         return f(stack, ctx);
     }
 
-    t = stack[0].type;
-
     switch (t->tag) {
     case FixedDim: {
         const int64_t shape = t->FixedDim.shape;
 
-        for (i = 0; i < shape; i++) {
-            for (k = 0; k < nargs; k++) {
+        for (int64_t i = 0; i < shape; i++) {
+            for (int k = 0; k < nargs; k++) {
                 const ndt_t *u = stack[k].type;
 
                 if (u->tag != FixedDim || u->FixedDim.shape != shape) {
@@ -71,9 +68,7 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
                     return -1;
                 }
 
-                next[k] = stack[k];
-                next[k].type = u->FixedDim.type;
-                next[k].index = stack[k].index + i * u->Concrete.FixedDim.step;
+                next[k] = xnd_fixed_dim_next(&stack[k], i);
             }
 
             if (gm_xnd_map(f, next, nargs, outer_dims-1, vectorize, ctx) < 0) {
