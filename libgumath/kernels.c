@@ -269,7 +269,7 @@ static const gm_kernel_init_t kernels[] = {
   /* MULTIPLY */
   /* quaternions */
   { .name = "multiply",
-    .sig = "... * Q64(2 * 2 * complex64), ... * Q64(2 * 2 * complex64) -> ... * Q64(2 * 2 * complex64)",
+    .sig = "... * quaternion64, ... * quaternion64 -> ... * quaternion64",
     .vectorize = true,
     .Strided = gm_multiply_strided_q64_q64 },
 

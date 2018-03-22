@@ -142,7 +142,7 @@ class TestCall(unittest.TestCase):
                [[-4+2j, 3+10j],
                 [-3+10j, -4-2j]]]
 
-        x = xnd(lst, type="3 * Q64(2 * 2 * complex64)")
+        x = xnd(lst, type="3 * quaternion64")
         y = gm.multiply(x, x)
 
         if np is not None:
@@ -169,6 +169,7 @@ class TestCall(unittest.TestCase):
 
         x = xnd(lst, type="3 * Foo(2 * 2 * complex64)")
         self.assertRaises(TypeError, gm.multiply, x, x)
+
 
 class TestMissingValues(unittest.TestCase):
 
