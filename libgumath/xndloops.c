@@ -45,7 +45,7 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
            const int outer_dims, bool vectorize, ndt_context_t *ctx)
 {
     xnd_t next[nargs];
-    const ndt_t * const t = stack[0].type;
+    const ndt_t *t;
 
     if (vectorize && outer_dims == 1) {
         return f(stack, ctx);
@@ -54,20 +54,24 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
         return f(stack, ctx);
     }
 
+    t = stack[0].type;
+
     switch (t->tag) {
     case FixedDim: {
         const int64_t shape = t->FixedDim.shape;
 
+        for (int k = 1; k < nargs; k++) {
+            const ndt_t *u = stack[k].type;
+
+            if (u->tag != FixedDim || u->FixedDim.shape != shape) {
+                ndt_err_format(ctx, NDT_RuntimeError,
+                    "type or shape mismatch in outer dimensions");
+                return -1;
+            }
+        }
+
         for (int64_t i = 0; i < shape; i++) {
             for (int k = 0; k < nargs; k++) {
-                const ndt_t *u = stack[k].type;
-
-                if (u->tag != FixedDim || u->FixedDim.shape != shape) {
-                    ndt_err_format(ctx, NDT_RuntimeError,
-                        "type or shape mismatch in outer dimensions");
-                    return -1;
-                }
-
                 next[k] = xnd_fixed_dim_next(&stack[k], i);
             }
 
