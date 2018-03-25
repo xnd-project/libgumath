@@ -43,7 +43,6 @@ except ImportError:
     np = None
 
 
-
 TEST_CASES = [
   ([float(i) for i in range(2000)], "2000 * float64", "float64"),
 
@@ -59,6 +58,7 @@ TEST_CASES = [
 
   (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float32", "float32"),
 ]
+
 
 class TestCall(unittest.TestCase):
 
