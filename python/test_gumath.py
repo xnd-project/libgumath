@@ -62,7 +62,7 @@ TEST_CASES = [
 
 class TestCall(unittest.TestCase):
 
-    def test_sin0d(self):
+    def test_sin_scalar(self):
 
         x1 = xnd(1.2, type="float64")
         y1 = gm.sin(x1)
