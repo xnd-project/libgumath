@@ -94,6 +94,43 @@ count_valid_missing(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+/*
+ * sin() on ragged arrays.
+ *
+ * Signature:
+ *   "D... * var * float64 -> D... * var * float64"
+ */
+static int
+gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
+{
+    int64_t start[2], step[2];
+    int64_t shape, n;
+
+    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,
+                            stack[0].index, ctx);
+    if (shape < 0) {
+        return -1;
+    }
+
+    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,
+                        ctx);
+    if (n < 0) {
+        return -1;
+    }
+    if (n != shape) {
+        ndt_err_format(ctx, NDT_ValueError, "shape mismatch in xnd_var_sin()");
+        return -1;
+    }
+
+    for (int64_t i = 0; i < shape; i++) {
+        const xnd_t in = xnd_var_dim_next(&stack[0], start[0], step[0], i);
+        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i);
+        *(double *)out.ptr = sin(*(double *)in.ptr);
+    }
+
+    return 0;
+}
+
 
 /****************************************************************************/
 /*                              NumPy kernels                               */
@@ -265,6 +302,9 @@ static const gm_kernel_init_t kernels[] = {
 
   { .name = "sin", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float32_float64 },
   { .name = "sin", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float64_float64 },
+
+  /* ragged arrays */
+  { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
 
   /* MULTIPLY */
   /* quaternions */

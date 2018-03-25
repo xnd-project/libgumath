@@ -33,6 +33,7 @@
 import gumath as gm
 from xnd import xnd
 import sys, time
+import math
 import unittest
 import argparse
 
@@ -189,8 +190,32 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(ans.value, [{'valid': 2, 'missing': 1}, {'valid': 1, 'missing': 2}])
 
 
+class TestRaggedArrays(unittest.TestCase):
+
+    def test_sin(self):
+        s = math.sin
+        lst = [[[1.0],
+                [2.0, 3.0],
+                [4.0, 5.0, 6.0]],
+               [[7.0],
+                [8.0, 9.0],
+                [10.0, 11.0, 12.0]]]
+
+        ans = [[[s(1.0)],
+                [s(2.0), s(3.0)],
+                [s(4.0), s(5.0), s(6.0)]],
+               [[s(7.0)],
+                [s(8.0), s(9.0)],
+                [s(10.0), s(11.0), s(12.0)]]]
+
+        x = xnd(lst)
+        y = gm.sin(x)
+        self.assertEqual(y.value, ans)
+
+
 ALL_TESTS = [
   TestCall,
+  TestRaggedArrays,
   TestMissingValues
 ]
 

@@ -83,6 +83,49 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
         return 0;
     }
 
+    case VarDim: {
+        int64_t start[nargs];
+        int64_t step[nargs];
+        const int64_t shape = ndt_var_indices(&start[0], &step[0], t,
+                                              stack[0].index, ctx);
+        if (shape < 0) {
+            return -1;
+        }
+
+        for (int k = 1; k < nargs; k++) {
+            const ndt_t *u = stack[k].type;
+
+            if (u->tag != VarDim) {
+                ndt_err_format(ctx, NDT_RuntimeError,
+                    "type mismatch in outer dimensions");
+                return -1;
+            }
+
+            int64_t n = ndt_var_indices(&start[k], &step[k], u, stack[k].index, ctx);
+            if (n < 0) {
+                return -1;
+            }
+
+            if (n != shape) {
+                ndt_err_format(ctx, NDT_RuntimeError,
+                    "shape mismatch in outer dimensions");
+                return -1;
+            }
+        }
+
+        for (int64_t i = 0; i < shape; i++) {
+            for (int k = 0; k < nargs; k++) {
+                next[k] = xnd_var_dim_next(&stack[k], start[k], step[k], i);
+            }
+
+            if (gm_xnd_map(f, next, nargs, outer_dims-1, vectorize, ctx) < 0) {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
     default: 
         ndt_err_format(ctx, NDT_NotImplementedError, "unsupported type");
         return -1;
