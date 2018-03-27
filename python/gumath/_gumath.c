@@ -131,7 +131,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     const ndt_t *in_types[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
     gm_kernel_t kernel;
-    int i;
+    int i, k;
 
     if (kwds) {
         PyErr_SetString(PyExc_TypeError,
@@ -166,21 +166,41 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     }
 
     for (i = 0; i < spec.nout; i++) {
-        PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), spec.out[i]);
-        if (x == NULL) {
-            clear_objects(result, i);
-            ndt_apply_spec_clear(&spec);
-            return NULL;
-        }
-        result[i] = x;
-        stack[nin+i] = *CONST_XND(x);
+        if (ndt_is_concrete(spec.out[i])) {
+            PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), spec.out[i]);
+            if (x == NULL) {
+                clear_objects(result, i);
+                ndt_apply_spec_clear(&spec);
+                return NULL;
+            }
+            result[i] = x;
+            stack[nin+i] = *CONST_XND(x);
+         }
+         else {
+            result[i] = NULL;
+            stack[nin+i] = xnd_error;
+         }
     }
 
     if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
-        for (i = 0; i < spec.nout; i++) {
-            Py_DECREF(result[i]);
-        }
+        clear_objects(result, spec.nout);
         return seterr(&ctx);
+    }
+
+    for (i = 0; i < spec.nout; i++) {
+        if (ndt_is_abstract(spec.out[i])) {
+            PyObject *x = Xnd_FromXnd(Py_TYPE(a[i]), &stack[nin+i]);
+            stack[nin+i] = xnd_error;
+            if (x == NULL) {
+                clear_objects(result, i);
+                for (k = i+1; k < spec.nout; k++) {
+                    if (ndt_is_abstract(spec.out[k])) {
+                        xnd_buffer_del(&stack[nin+k], XND_OWN_ALL);
+                    }
+                }
+            }
+            result[i] = x;
+        }
     }
 
     switch (spec.nout) {
