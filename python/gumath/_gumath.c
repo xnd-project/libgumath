@@ -195,7 +195,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
                 clear_objects(result, i);
                 for (k = i+1; k < spec.nout; k++) {
                     if (ndt_is_abstract(spec.out[k])) {
-                        xnd_buffer_del(&stack[nin+k], XND_OWN_ALL);
+                        xnd_del_buffer(&stack[nin+k], XND_OWN_ALL);
                     }
                 }
             }
