@@ -170,6 +170,7 @@ GM_API int gm_tbl_map(int (*f)(const gm_func_t *, void *state), void *state);
 
 GM_API int gm_init(ndt_context_t *ctx);
 GM_API int gm_init_kernels(ndt_context_t *ctx);
+GM_API int gm_init_graph_kernels(ndt_context_t *ctx);
 
 GM_API void gm_finalize(void);
 

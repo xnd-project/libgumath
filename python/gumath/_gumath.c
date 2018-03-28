@@ -189,6 +189,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
+            ndt_del(spec.out[i]);
             PyObject *x = Xnd_FromXnd(Py_TYPE(a[i]), &stack[nin+i]);
             stack[nin+i] = xnd_error;
             if (x == NULL) {
@@ -200,6 +201,12 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
                 }
             }
             result[i] = x;
+        }
+    }
+
+    if (spec.nbroadcast > 0) {
+        for (i = 0; i < nin; i++) {
+            ndt_del(spec.broadcast[i]);
         }
     }
 
@@ -329,6 +336,9 @@ PyInit__gumath(void)
            return seterr(&ctx);
        }
        if (gm_init_kernels(&ctx) < 0) {
+           return seterr(&ctx);
+       }
+       if (gm_init_graph_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
        initialized = 1;

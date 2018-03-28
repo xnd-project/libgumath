@@ -213,10 +213,42 @@ class TestRaggedArrays(unittest.TestCase):
         self.assertEqual(y.value, ans)
 
 
+class TestGraphs(unittest.TestCase):
+
+    def test_shortest_path(self):
+        graphs = [[[(1, 1.2), (2, 4.4)],
+                   [(2, 2.2)],
+                   [(1, 2.3)]],
+
+                  [[(1, 1.2), (2, 4.4)],
+                   [(2, 2.2)],
+                   [(1, 2.3)],
+                   [(2, 1.1)]]]
+
+        ans = [[[[0], [0, 1], [0, 1, 2]],      # graph1, start 0
+                [[], [1], [1, 2]],             # graph1, start 1
+                [[], [2, 1], [2]]],            # graph1, start 2
+
+               [[[0], [0, 1], [0, 1, 2], []],  # graph2, start 0
+                [[], [1], [1, 2], []],         # graph2, start 1
+                [[], [2, 1], [2], []],         # graph2, start 2
+                [[], [3, 2, 1], [3, 2], [3]]]] # graph2, start 3
+
+
+        for i, lst in enumerate(graphs):
+            N = len(lst)
+            g = xnd(lst, dtype="(node, cost)")
+            for start in range(N):
+                s = xnd(start, type="node")
+                x = gm.single_source_shortest_paths(g, s)
+                self.assertEqual(x.value, ans[i][start], msg="i: %s   start: %s" % (i, start))
+
+
 ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
-  TestMissingValues
+  TestMissingValues,
+  TestGraphs
 ]
 
 
