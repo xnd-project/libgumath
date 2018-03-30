@@ -243,6 +243,12 @@ class TestGraphs(unittest.TestCase):
                 x = gm.single_source_shortest_paths(g, s)
                 self.assertEqual(x.value, ans[i][start], msg="i: %s   start: %s" % (i, start))
 
+    def test_constraint(self):
+        g = [[(0, 1.2)],
+             [(2, 2.2), (1, 0.1)]]
+
+        self.assertRaises(ValueError, xnd, g, typedef="graph")
+
 
 ALL_TESTS = [
   TestCall,

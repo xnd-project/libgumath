@@ -84,6 +84,7 @@ typedef struct {
 typedef struct {
     const char *name;
     const char *type;
+    ndt_constraint_t constraint;
 } gm_typedef_init_t;
 
 typedef struct {

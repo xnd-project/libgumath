@@ -43,6 +43,49 @@
 
 
 /*****************************************************************************/
+/*                           Check graph invariants                          */
+/*****************************************************************************/
+
+static bool
+graph_constraint(void *graph, ndt_context_t *ctx)
+{
+    const xnd_t *g = (xnd_t *)graph;
+    int64_t start2, step2; /* start, step of ndim2 (the graph) */
+    int64_t start1, step1; /* start, step of ndim1 (an array of edges) */
+    int32_t N;  /* number of nodes */
+
+
+    N = ndt_var_indices(&start2, &step2, g->type, g->index, ctx);
+    if (N < 0) {
+        return false;
+    }
+
+    for (int32_t u = 0; u < N; u++) {
+        const xnd_t edges = xnd_var_dim_next(g, start2, step2, u);
+        const int64_t nedges = ndt_var_indices(&start1, &step1, edges.type,
+                                               edges.index, ctx);
+        if (nedges < 0) {
+            return false;
+        }
+
+        for (int64_t k = 0; k < nedges; k++) {
+            const xnd_t tuple = xnd_var_dim_next(&edges, start1, step1, k);
+            const xnd_t target = xnd_tuple_next(&tuple, 0, ctx);
+            const int32_t v = *(int32_t *)target.ptr;
+
+            if (v < 0 || v >= N) {
+                ndt_err_format(ctx, NDT_ValueError,
+                    "node id must be in range [0, N-1]");
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/*****************************************************************************/
 /*      Bellman-Ford single-source shortest-paths algorithm (CLRS p588)      */
 /*****************************************************************************/
 
@@ -301,10 +344,10 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
 }
 
 static const gm_typedef_init_t typedefs[] = {
-  { .name = "node", .type = "int32" },
-  { .name = "cost", .type = "float64" },
-  { .name = "graph", .type = "var * var * (node, cost)" },
-  { .name = NULL, .type = NULL }
+  { .name = "node", .type = "int32", .constraint=NULL },
+  { .name = "cost", .type = "float64", .constraint=NULL },
+  { .name = "graph", .type = "var * var * (node, cost)", .constraint=graph_constraint },
+  { .name = NULL, .type = NULL, .constraint=NULL }
 };
 
 static const gm_kernel_init_t kernels[] = {
@@ -328,7 +371,7 @@ gm_init_graph_kernels(ndt_context_t *ctx)
     const gm_kernel_init_t *k;
 
     for (t = typedefs; t->name != NULL; t++) {
-        if (ndt_typedef_from_string(t->name, t->type, ctx) < 0) {
+        if (ndt_typedef_from_string(t->name, t->type, t->constraint, ctx) < 0) {
             return -1;
         }
     }
