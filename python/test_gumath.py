@@ -32,6 +32,7 @@
 
 import gumath as gm
 from xnd import xnd
+from extending import Graph
 import sys, time
 import math
 import unittest
@@ -237,17 +238,17 @@ class TestGraphs(unittest.TestCase):
 
         for i, lst in enumerate(graphs):
             N = len(lst)
-            g = xnd(lst, typedef="graph")
+            graph = Graph(lst)
             for start in range(N):
-                s = xnd(start, type="node")
-                x = gm.single_source_shortest_paths(g, s)
-                self.assertEqual(x.value, ans[i][start], msg="i: %s   start: %s" % (i, start))
+                node = xnd(start, type="node")
+                x = graph.shortest_paths(node)
+                self.assertEqual(x.value, ans[i][start])
 
     def test_constraint(self):
-        g = [[(0, 1.2)],
-             [(2, 2.2), (1, 0.1)]]
+        lst = [[(0, 1.2)],
+               [(2, 2.2), (1, 0.1)]]
 
-        self.assertRaises(ValueError, xnd, g, typedef="graph")
+        self.assertRaises(ValueError, Graph, lst)
 
 
 ALL_TESTS = [
