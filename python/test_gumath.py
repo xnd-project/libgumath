@@ -237,7 +237,7 @@ class TestGraphs(unittest.TestCase):
 
         for i, lst in enumerate(graphs):
             N = len(lst)
-            g = xnd(lst, dtype="(node, cost)")
+            g = xnd(lst, typedef="graph")
             for start in range(N):
                 s = xnd(start, type="node")
                 x = gm.single_source_shortest_paths(g, s)

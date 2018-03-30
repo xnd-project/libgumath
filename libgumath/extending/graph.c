@@ -142,7 +142,6 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     int32_t *ndim1_offsets = NULL;
     ndt_t *t;
     int64_t sum, v;
-    char *s;
 
     if (N+1 > INT32_MAX) {
         goto offset_overflow;
@@ -175,12 +174,7 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     ndim1_offsets[v] = (int32_t)sum;
 
 
-    s = ndt_strdup("node", ctx);
-    if (s == NULL) {
-        goto error;
-    }
-
-    t = ndt_nominal(s, ctx);
+    t = ndt_from_string("node", ctx);
     if (t == NULL) {
         goto error;
     }
@@ -226,7 +220,6 @@ offset_overflow:
 static int
 shortest_path(xnd_t stack[], ndt_context_t *ctx)
 {
-    const xnd_t *graph = &stack[0]; /* graph in adjacency list representation */
     const int32_t single_source = *(int32_t *)stack[1].ptr; /* start node */
     int64_t start2, step2; /* start, step of ndim2 (the graph) */
     int64_t start1, step1; /* start, step of ndim1 (an array of edges) */
@@ -234,7 +227,13 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
     int32_t *p; /* predecessor array */
     int32_t N;  /* number of nodes */
 
-    N = ndt_var_indices(&start2, &step2, graph->type, graph->index, ctx);
+    /* graph in adjacency list representation */
+    const xnd_t graph = xnd_nominal_next(&stack[0], ctx);
+    if (graph.ptr == NULL) {
+        return -1;
+    }
+
+    N = ndt_var_indices(&start2, &step2, graph.type, graph.index, ctx);
     if (N < 0) {
         return -1;
     }
@@ -245,7 +244,7 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
 
     for (int64_t i = 0; i < N-1; i++) {
         for (int32_t u = 0; u < N; u++) {
-            const xnd_t edges = xnd_var_dim_next(graph, start2, step2, u);
+            const xnd_t edges = xnd_var_dim_next(&graph, start2, step2, u);
             const int64_t nedges = ndt_var_indices(&start1, &step1, edges.type,
                                                    edges.index, ctx);
             if (nedges < 0) {
@@ -266,7 +265,7 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
     }
 
     for (int32_t u = 0; u < N; u++) {
-        const xnd_t edges = xnd_var_dim_next(graph, start2, step2, u);
+        const xnd_t edges = xnd_var_dim_next(&graph, start2, step2, u);
         const int64_t nedges = ndt_var_indices(&start1, &step1, edges.type,
                                                edges.index, ctx);
         if (nedges < 0) {
@@ -304,12 +303,13 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
 static const gm_typedef_init_t typedefs[] = {
   { .name = "node", .type = "int32" },
   { .name = "cost", .type = "float64" },
+  { .name = "graph", .type = "var * var * (node, cost)" },
   { .name = NULL, .type = NULL }
 };
 
 static const gm_kernel_init_t kernels[] = {
   { .name = "single_source_shortest_paths",
-    .sig = "var * var * (node, cost), node -> var * var * node",
+    .sig = "graph, node -> var * var * node",
     .vectorize = false,
     .Xnd = shortest_path },
 
