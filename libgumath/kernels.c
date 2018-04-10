@@ -265,8 +265,8 @@ NP_COPY_STRIDED(float64, float64)
 
 
 static const gm_typedef_init_t typedefs[] = {
-  { .name = "quaternion64", .type = "2 * 2 * complex64", .constraint=NULL },
-  { .name = "quaternion128", .type = "2 * 2 * complex128", .constraint=NULL },
+  { .name = "quaternion64", .type = "2 * 2 * complex64", .init=NULL, .constraint=NULL },
+  { .name = "quaternion128", .type = "2 * 2 * complex128", .init=NULL, .constraint=NULL },
   { .name = NULL, .type = NULL }
 };
 
@@ -340,7 +340,7 @@ gm_init_kernels(ndt_context_t *ctx)
     const gm_kernel_init_t *k;
 
     for (t = typedefs; t->name != NULL; t++) {
-        if (ndt_typedef_from_string(t->name, t->type, t->constraint, ctx) < 0) {
+        if (ndt_typedef_from_string(t->name, t->type, t->init, t->constraint, ctx) < 0) {
             return -1;
         }
     }

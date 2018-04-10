@@ -341,6 +341,9 @@ PyInit__gumath(void)
        if (gm_init_graph_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
+       if (gm_init_bfloat16_kernels(&ctx) < 0) {
+           return seterr(&ctx);
+       }
        initialized = 1;
     }
 

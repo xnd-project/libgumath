@@ -344,10 +344,10 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
 }
 
 static const gm_typedef_init_t typedefs[] = {
-  { .name = "node", .type = "int32", .constraint=NULL },
-  { .name = "cost", .type = "float64", .constraint=NULL },
-  { .name = "graph", .type = "var * var * (node, cost)", .constraint=graph_constraint },
-  { .name = NULL, .type = NULL, .constraint=NULL }
+  { .name = "node", .type = "int32", .init=NULL, .constraint=NULL },
+  { .name = "cost", .type = "float64", .init=NULL, .constraint=NULL },
+  { .name = "graph", .type = "var * var * (node, cost)", .init=NULL, .constraint=graph_constraint },
+  { .name = NULL, .type = NULL, .init=NULL, .constraint=NULL }
 };
 
 static const gm_kernel_init_t kernels[] = {
@@ -371,7 +371,7 @@ gm_init_graph_kernels(ndt_context_t *ctx)
     const gm_kernel_init_t *k;
 
     for (t = typedefs; t->name != NULL; t++) {
-        if (ndt_typedef_from_string(t->name, t->type, t->constraint, ctx) < 0) {
+        if (ndt_typedef_from_string(t->name, t->type, t->init, t->constraint, ctx) < 0) {
             return -1;
         }
     }
