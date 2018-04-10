@@ -66,7 +66,7 @@ bfloat16_init(void *dest, void *src, ndt_context_t *ctx)
         return 0;
     }
 
-    const char *cp = ndt_is_little_endian(t) ? (char *)&f : ((char *)&f)+2;
+    const char *cp = ndt_is_big_endian(t) ? (char *)&f : ((char *)&f)+2;
     memcpy(x->ptr, cp, sizeof(uint16_t));
     return 1;
 }
