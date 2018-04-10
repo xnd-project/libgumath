@@ -14,3 +14,11 @@ class Graph(xnd):
 
    def shortest_paths(self, start):
        return gm.single_source_shortest_paths(self, start)
+
+
+class bfloat16(xnd):
+   def __new__(cls, *args, **kwargs):
+       return super().__new__(cls, *args, dtypedef="bfloat16")
+
+   def __repr__(self):
+       return "bfloat16(%s)" % str(self)

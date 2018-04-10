@@ -32,7 +32,7 @@
 
 import gumath as gm
 from xnd import xnd
-from extending import Graph
+from extending import Graph, bfloat16
 import sys, time
 import math
 import unittest
@@ -251,11 +251,22 @@ class TestGraphs(unittest.TestCase):
         self.assertRaises(ValueError, Graph, lst)
 
 
+class TestBFloat16(unittest.TestCase):
+
+    def test_init(self):
+        lst = [1.2e10, 2.1121, -3e20]
+        ans = [11945377792.0, 2.109375, -2.997595911977802e+20]
+
+        x = bfloat16(lst)
+        self.assertEqual(x.value, ans)
+
+
 ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
   TestMissingValues,
-  TestGraphs
+  TestGraphs,
+  TestBFloat16,
 ]
 
 
