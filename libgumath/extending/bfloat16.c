@@ -45,6 +45,7 @@
 /* Avoid Python.h dependency. */
 struct _object;
 double PyFloat_AsDouble(const struct _object *);
+struct _object *PyFloat_FromDouble (double v);
 struct _object *PyErr_Occurred(void);
 
 
@@ -52,8 +53,9 @@ struct _object *PyErr_Occurred(void);
 /*                Initialize a single bfloat16 from a PyObject               */
 /*****************************************************************************/
 
+/* XXX Maybe rename "init", "repr" to "from_object", "to_object". */
 static bool
-bfloat16_init(void *dest, void *src, ndt_context_t *ctx)
+bfloat16_init(void *dest, const void *src, ndt_context_t *ctx)
 {
     const struct _object *v = (struct _object *)src;
     xnd_t *x = (xnd_t *)dest;
@@ -71,11 +73,25 @@ bfloat16_init(void *dest, void *src, ndt_context_t *ctx)
     return 1;
 }
 
+static void *
+bfloat16_repr(const void *src, ndt_context_t *ctx)
+{
+    const xnd_t *x = (xnd_t *)src;
+    const ndt_t *t = x->type;
+    float f = 0;
+    (void)ctx;
+
+    char *cp = ndt_is_big_endian(t) ? (char *)&f : ((char *)&f)+2;
+    memcpy(cp, x->ptr, sizeof(uint16_t));
+
+    return PyFloat_FromDouble(f);
+}
+
 
 static const ndt_methods_t bfloat16_methods = {
   .init = bfloat16_init,
   .constraint = NULL,
-  .repr = NULL,
+  .repr = bfloat16_repr,
 };
 
 static const gm_typedef_init_t typedefs[] = {

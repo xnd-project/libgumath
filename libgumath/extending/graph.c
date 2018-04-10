@@ -47,7 +47,7 @@
 /*****************************************************************************/
 
 static bool
-graph_constraint(void *graph, ndt_context_t *ctx)
+graph_constraint(const void *graph, ndt_context_t *ctx)
 {
     const xnd_t *g = (xnd_t *)graph;
     int64_t start2, step2; /* start, step of ndim2 (the graph) */
