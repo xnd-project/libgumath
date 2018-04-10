@@ -71,9 +71,16 @@ bfloat16_init(void *dest, void *src, ndt_context_t *ctx)
     return 1;
 }
 
+
+static const ndt_methods_t bfloat16_methods = {
+  .init = bfloat16_init,
+  .constraint = NULL,
+  .repr = NULL,
+};
+
 static const gm_typedef_init_t typedefs[] = {
-  { .name = "bfloat16", .type = "uint16", .init=bfloat16_init, .constraint=NULL },
-  { .name = NULL, .type = NULL, .init=NULL, .constraint=NULL }
+  { .name = "bfloat16", .type = "uint16", .meth=&bfloat16_methods },
+  { .name = NULL, .type = NULL, .meth=NULL }
 };
 
 static const gm_kernel_init_t kernels[] = {
@@ -92,7 +99,7 @@ gm_init_bfloat16_kernels(ndt_context_t *ctx)
     const gm_kernel_init_t *k;
 
     for (t = typedefs; t->name != NULL; t++) {
-        if (ndt_typedef_from_string(t->name, t->type, t->init, t->constraint, ctx) < 0) {
+        if (ndt_typedef_from_string(t->name, t->type, t->meth, ctx) < 0) {
             return -1;
         }
     }
