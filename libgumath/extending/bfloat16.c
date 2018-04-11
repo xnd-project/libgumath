@@ -57,7 +57,7 @@ struct _object *PyErr_Occurred(void);
 static bool
 bfloat16_init(void *dest, const void *src, ndt_context_t *ctx)
 {
-    const struct _object *v = (struct _object *)src;
+    const struct _object *v = (const struct _object *)src;
     xnd_t *x = (xnd_t *)dest;
     const ndt_t *t = x->type;
     float f;
@@ -76,7 +76,7 @@ bfloat16_init(void *dest, const void *src, ndt_context_t *ctx)
 static void *
 bfloat16_repr(const void *src, ndt_context_t *ctx)
 {
-    const xnd_t *x = (xnd_t *)src;
+    const xnd_t *x = (const xnd_t *)src;
     const ndt_t *t = x->type;
     float f = 0;
     (void)ctx;
