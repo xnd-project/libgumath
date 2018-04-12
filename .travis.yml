@@ -21,3 +21,21 @@ matrix:
       script:
         - python3 setup.py build
         - python3 setup.py test
+
+    - language: objective-c
+      os: osx
+      compiler: clang
+      before_install:
+        - brew install python3
+      before_script:
+        - export CC=clang
+        - git clone https://github.com/plures/ndtypes.git
+        - git clone https://github.com/plures/xnd.git
+        - cd ndtypes
+        - python3 setup.py install --local=$PWD/../python
+        - cd ../xnd
+        - python3 setup.py install --local=$PWD/../python
+        - cd ..
+      script:
+        - python3 setup.py build
+        - python3 setup.py test
