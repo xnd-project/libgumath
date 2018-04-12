@@ -280,6 +280,44 @@ add_function(const gm_func_t *f, void *state)
     return PyModule_AddObject(m, f->name, func);
 }
 
+static PyObject *
+unsafe_add_numpy_kernel(PyObject *m UNUSED, PyObject *args, PyObject *kwds)
+{
+    NDT_STATIC_CONTEXT(ctx);
+    static char *kwlist[] = {"name", "sig", "ptr", NULL};
+    gm_kernel_init_t k = {NULL};
+    gm_func_t *f;
+    char *name;
+    char *sig;
+    PyObject *ptr;
+    void *p;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ssO", kwlist, &name, &sig,
+        &ptr)) {
+        return NULL;
+    }
+
+    p = PyLong_AsVoidPtr(ptr);
+    if (p == NULL) {
+        return NULL;
+    }
+
+    k.name = name;
+    k.sig = sig;
+    k.vectorize = true;
+    k.Strided = p;
+
+    if (gm_add_kernel(&k, &ctx) < 0) {
+        return seterr(&ctx);
+    }
+
+    f = gm_tbl_find(name, &ctx);
+    if (f == NULL) {
+        return seterr(&ctx);
+    }
+
+    return gufunc_new(f->name);
+}
 
 static PyGetSetDef gufunc_getsets [] =
 {
@@ -305,12 +343,20 @@ static PyTypeObject Gufunc_Type = {
 /*                                  Module                                  */
 /****************************************************************************/
 
+static PyMethodDef gumath_methods [] =
+{
+  /* Methods */
+  { "unsafe_add_numpy_kernel", (PyCFunction)unsafe_add_numpy_kernel, METH_VARARGS|METH_KEYWORDS, NULL },
+  { NULL, NULL, 1 }
+};
+
+
 static struct PyModuleDef gumath_module = {
     PyModuleDef_HEAD_INIT,        /* m_base */
     "_gumath",                    /* m_name */
     NULL,                         /* m_doc */
     -1,                           /* m_size */
-    NULL,                         /* m_methods */
+    gumath_methods,               /* m_methods */
     NULL,                         /* m_slots */
     NULL,                         /* m_traverse */
     NULL,                         /* m_clear */
