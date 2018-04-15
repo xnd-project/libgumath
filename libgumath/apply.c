@@ -136,9 +136,8 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
 
 /* Look up a multimethod by name and select a kernel. */
 gm_kernel_t
-gm_select(ndt_apply_spec_t *spec,
-          const char *name,
-          const ndt_t *in_types[], int nin,
+gm_select(ndt_apply_spec_t *spec, const char *name,
+          const ndt_t *in_types[], int nin, const xnd_t args[],
           ndt_context_t *ctx)
 {
     gm_kernel_t empty_kernel = {Xnd, NULL};
@@ -152,7 +151,8 @@ gm_select(ndt_apply_spec_t *spec,
 
     for (i = 0; i < f->nkernels; i++) {
         const gm_kernel_set_t *set = &f->kernels[i];
-        if (ndt_typecheck(spec, set->sig, in_types, nin, ctx) < 0) {
+        if (ndt_typecheck(spec, set->sig, in_types, nin, set->constraint, args,
+                          ctx) < 0) {
             ndt_err_clear(ctx);
             continue;
         }

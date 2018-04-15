@@ -261,12 +261,44 @@ class TestBFloat16(unittest.TestCase):
         self.assertEqual(x.value, ans)
 
 
+class TestPdist(unittest.TestCase):
+
+    def test_exceptions(self):
+        x = xnd([], dtype="float64")
+        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+
+        x = xnd([[]], dtype="float64")
+        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+
+        x = xnd([[], []], dtype="float64")
+        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+
+        x = xnd([[1], [1]], dtype="int64")
+        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+
+    def test_pdist(self):
+        x = xnd([[1]], dtype="float64")
+        y = gm.euclidian_pdist(x)
+        self.assertEqual(y.value, [])
+
+        x = xnd([[1, 2, 3]], dtype="float64")
+        y = gm.euclidian_pdist(x)
+        self.assertEqual(y.value, [])
+
+        x = xnd([[-1.2200, -100.5000,   20.1250,  30.1230],
+                 [ 2.2200,    2.2720, -122.8400, 122.3330],
+                 [ 2.1000,  -25.0000,  100.2000, -99.5000]], dtype="float64")
+        y = gm.euclidian_pdist(x)
+        self.assertEqual(y.value, [198.78529349275314, 170.0746899276903, 315.75385646576035])
+
+
 ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
   TestMissingValues,
   TestGraphs,
   TestBFloat16,
+  TestPdist,
 ]
 
 

@@ -133,7 +133,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     gm_kernel_t kernel;
     int i, k;
 
-    if (kwds) {
+    if (kwds && PyDict_Size(kwds) > 0) {
         PyErr_SetString(PyExc_TypeError,
             "gufunc calls do not support keywords");
         return NULL;
@@ -154,7 +154,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         in_types[i] = stack[i].type;
     }
 
-    kernel = gm_select(&spec, self->name, in_types, nin, &ctx);
+    kernel = gm_select(&spec, self->name, in_types, nin, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
@@ -388,6 +388,9 @@ PyInit__gumath(void)
            return seterr(&ctx);
        }
        if (gm_init_bfloat16_kernels(&ctx) < 0) {
+           return seterr(&ctx);
+       }
+       if (gm_init_pdist_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
        initialized = 1;

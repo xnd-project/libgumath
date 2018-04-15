@@ -124,6 +124,7 @@ gm_add_kernel(const gm_kernel_init_t *k, ndt_context_t *ctx)
     }
 
     kernel.sig = t;
+    kernel.constraint = k->constraint;
     kernel.vectorize = k->vectorize;
     kernel.C = k->C;
     kernel.Fortran = k->Fortran;
