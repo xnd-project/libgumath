@@ -382,9 +382,11 @@ PyInit__gumath(void)
        if (gm_init_graph_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
+#ifndef _MSC_VER
        if (gm_init_bfloat16_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
+#endif
        if (gm_init_pdist_kernels(&ctx) < 0) {
            return seterr(&ctx);
        }
