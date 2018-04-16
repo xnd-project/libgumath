@@ -56,7 +56,7 @@ sum_inner_dimensions(const xnd_t stack[], int nargs, int outer_dims)
 }
 
 int
-gm_apply(const gm_kernel_t *kernel, xnd_t stack[], const int outer_dims,
+gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
          ndt_context_t *ctx)
 {
     const int nargs = kernel->set->sig->Function.nargs;
