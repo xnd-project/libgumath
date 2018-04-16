@@ -137,40 +137,42 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
 /****************************************************************************/
 
 #define NP_STRIDED(func, srctype, desttype) \
-static int                                                                     \
-gm_##func##_strided_##srctype##_##desttype(                                    \
-    char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED) \
-{                                                                              \
-    const char *src = args[0];                                                 \
-    char *dest = args[1];                                                      \
-    int64_t n = dimensions[0];                                                 \
-    int64_t i;                                                                 \
-                                                                               \
-    for (i = 0; i < n; i++) {                                                  \
-        *(desttype##_t *)dest = func(*(const srctype##_t *)src);               \
-        src += steps[0];                                                       \
-        dest += steps[1];                                                      \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
+static int                                                           \
+gm_##func##_strided_##srctype##_##desttype(                          \
+    char *args[], int64_t dimensions[], int64_t steps[], void *data) \
+{                                                                    \
+    const char *src = args[0];                                       \
+    char *dest = args[1];                                            \
+    int64_t n = dimensions[0];                                       \
+    int64_t i;                                                       \
+    (void)data;                                                      \
+                                                                     \
+    for (i = 0; i < n; i++) {                                        \
+        *(desttype##_t *)dest = func(*(const srctype##_t *)src);     \
+        src += steps[0];                                             \
+        dest += steps[1];                                            \
+    }                                                                \
+                                                                     \
+    return 0;                                                        \
 }
 
 #define NP_COPY_STRIDED(srctype, desttype) \
-static int                                                                     \
-gm_copy_strided_##srctype##_##desttype(                                        \
-    char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED) \
-{                                                                              \
-    const char *src = args[0];                                                 \
-    char *dest = args[1];                                                      \
-    int64_t n = dimensions[0];                                                 \
-    int64_t i;                                                                 \
-                                                                               \
-    for (i = 0; i < n; i++) {                                                  \
-        *(desttype##_t *)dest = *(const srctype##_t *)src;                     \
-        src += steps[0];                                                       \
-        dest += steps[1];                                                      \
-    }                                                                          \
-    return 0;                                                                  \
+static int                                                           \
+gm_copy_strided_##srctype##_##desttype(                              \
+    char *args[], int64_t dimensions[], int64_t steps[], void *data) \
+{                                                                    \
+    const char *src = args[0];                                       \
+    char *dest = args[1];                                            \
+    int64_t n = dimensions[0];                                       \
+    int64_t i;                                                       \
+    (void)data;                                                      \
+                                                                     \
+    for (i = 0; i < n; i++) {                                        \
+        *(desttype##_t *)dest = *(const srctype##_t *)src;           \
+        src += steps[0];                                             \
+        dest += steps[1];                                            \
+    }                                                                \
+    return 0;                                                        \
 }
 
 #ifndef _MSC_VER
