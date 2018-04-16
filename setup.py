@@ -130,7 +130,7 @@ def ndtypes_ext():
 
     if sys.platform == "win32":
         libraries = ["libgumath-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
-        extra_compile_args = ["/DIMPORT"]
+        extra_compile_args = ["/DGM_IMPORT"]
         extra_link_args = []
         runtime_library_dirs = []
 

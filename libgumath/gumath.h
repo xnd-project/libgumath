@@ -39,9 +39,9 @@
 
 
 #ifdef _MSC_VER
-  #if defined (EXPORT)
+  #if defined (GM_EXPORT)
     #define GM_API __declspec(dllexport)
-  #elif defined(IMPORT)
+  #elif defined(GM_IMPORT)
     #define GM_API __declspec(dllimport)
   #else
     #define GM_API

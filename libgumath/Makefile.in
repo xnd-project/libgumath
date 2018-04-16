@@ -127,7 +127,7 @@ FORCE:
 
 clean: FORCE
 	rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
-	rm -f $(LIBSTATIC) $(LIBSHARED) $(LIBSONAME) $(LIBNAME) gumath.h
+	rm -f $(LIBSTATIC) $(LIBSHARED) $(LIBSONAME) $(LIBNAME)
 	cd .objs && rm -f *.o *.so *.gch *.gcda *.gcno *.gcov *.dyn *.dpi *.lock
 
 distclean: clean
