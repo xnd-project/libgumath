@@ -59,7 +59,7 @@ int
 gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
          ndt_context_t *ctx)
 {
-    const int nargs = kernel->set->sig->Function.nargs;
+    const int nargs = (int)kernel->set->sig->Function.nargs;
 
     switch (kernel->tag) {
     case Strided: {
