@@ -2,7 +2,7 @@
 AC_PREREQ([2.67])
 AC_INIT(gumath, 0.2.0dev3, plures@anaconda.com, gumath, https://github.com/plures/)
 AC_CONFIG_HEADER(config.h)
-AC_CONFIG_FILES([Makefile libgumath/Makefile libgumath/gumath.h])
+AC_CONFIG_FILES([Makefile libgumath/Makefile])
 
 # System and machine type (only used for Darwin):
 AC_MSG_CHECKING(system as reported by uname -s)
