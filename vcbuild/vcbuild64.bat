@@ -15,9 +15,6 @@ copy /y libgumath-0.2.0dev3.dll.lib ..\vcbuild\dist64
 copy /y libgumath-0.2.0dev3.dll.exp ..\vcbuild\dist64
 copy /y gumath.h ..\vcbuild\dist64
 
-copy /y runtest.exe ..\..\vcbuild\dist64
-copy /y runtest_shared.exe ..\..\vcbuild\dist64
-
 cd ..\..\vcbuild
 
 
