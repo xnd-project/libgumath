@@ -148,7 +148,8 @@ gm_##func##_strided_##srctype##_##desttype(                          \
     (void)data;                                                      \
                                                                      \
     for (i = 0; i < n; i++) {                                        \
-        *(desttype##_t *)dest = func(*(const srctype##_t *)src);     \
+        const srctype##_t v = *(const srctype##_t *)src;             \
+        *(desttype##_t *)dest = func((desttype##_t)v);               \
         src += steps[0];                                             \
         dest += steps[1];                                            \
     }                                                                \
