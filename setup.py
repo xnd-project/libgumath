@@ -129,8 +129,8 @@ def ndtypes_ext():
     library_dirs = ["python/ndtypes", "python/xnd", "python/gumath"]
 
     if sys.platform == "win32":
-        libraries = ["libgumath-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
-        extra_compile_args = ["/DGM_IMPORT"]
+        libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
+        extra_compile_args = ["/DNDT_IMPORT", "/DXND_IMPORT", "/DGM_IMPORT"]
         extra_link_args = []
         runtime_library_dirs = []
 
@@ -138,7 +138,10 @@ def ndtypes_ext():
            from distutils.msvc9compiler import MSVCCompiler
            MSVCCompiler().initialize()
            os.chdir("vcbuild")
-           os.environ['LIBS'] = os.path.normpath(LIBS)
+           os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath("../ndtypes/libndtypes")
+           os.environ['LIBNDTYPESDIR'] = os.path.normpath("../ndtypes/libndtypes")
+           os.environ['LIBXNDINCLUDE'] = os.path.normpath("../xnd/libxnd")
+           os.environ['LIBXNDDIR'] = os.path.normpath("../xnd/libxnd")
            if ARCH == "64bit":
                  os.system("vcbuild64.bat")
            else:
