@@ -1,0 +1,155 @@
+
+# ======================================================================
+#                  Visual C (nmake) Makefile for libgumath
+# ======================================================================
+
+LIBSTATIC = libgumath-0.2.0dev3.lib
+LIBIMPORT = libgumath-0.2.0dev3.dll.lib
+LIBSHARED = libgumath-0.2.0dev3.dll
+LIBNDTYPESIMPORT = libndtypes-0.2.0dev3.dll.lib
+LIBXNDIMPORT = libxnd-0.2.0dev3.dll.lib
+
+!ifndef LIBNDTYPESINCLUDE
+LIBNDTYPESINCLUDE = ..\ndtypes\libndtypes
+!endif
+
+!ifndef LIBNDTYPESDIR
+LIBNDTYPESDIR = ..\ndtypes\libndtypes
+!endif
+
+!ifndef LIBXNDINCLUDE
+LIBXNDINCLUDE = ..\xnd\libxnd
+!endif
+
+!ifndef LIBXNDDIR
+LIBXNDDIR = ..\xnd\libxnd
+!endif
+
+OPT = /MT /Ox /GS /EHsc
+OPT_SHARED = /DEXPORT /MD /Ox /GS /EHsc /Fo.objs^\
+OPT = /MT /Ox /GS /EHsc
+OPT_SHARED = /DEXPORT /MD /Ox /GS /EHsc /Fo.objs^\
+
+COMMON_CFLAGS = /nologo /W4 /wd4200 /wd4201 /wd4204
+CFLAGS = $(COMMON_CFLAGS) $(OPT)
+CFLAGS_SHARED = $(COMMON_CFLAGS) $(OPT_SHARED)
+
+
+default: $(LIBSTATIC) $(LIBSHARED)
+	copy /y gumath.h ..\python\gumath
+	copy /y $(LIBSTATIC) ..\python\gumath
+	copy /y $(LIBIMPORT) ..\python\gumath
+	copy /y $(LIBSHARED) ..\python\gumath
+
+
+OBJS = apply.obj func.obj kernels.obj nploops.obj tbl.obj xndloops.obj \
+       graph.obj bfloat16.obj pdist.obj
+
+SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/kernels.obj .objs/nploops.obj \
+              .objs/tbl.obj .objs/xndloops.obj .objs/graph.obj .objs/bfloat16.obj \
+              .objs/pdist.obj
+
+
+$(LIBSTATIC):\
+Makefile $(OBJS)
+	-@if exist $@ del $(LIBSTATIC)
+	lib /nologo /out:$(LIBSTATIC) $(OBJS)
+
+$(LIBSHARED):\
+Makefile $(SHARED_OBJS)
+	-@if exist $@ del $(LIBSHARED)
+	link /nologo /DLL /MANIFEST /out:$(LIBSHARED) /implib:$(LIBIMPORT) $(SHARED_OBJS) \
+             "/LIBPATH:$(LIBNDTYPESDIR)" $(LIBNDTYPESIMPORT) \
+             "/LIBPATH:$(LIBXNDDIR)" $(LIBXNDIMPORT)
+	mt /nologo -manifest $(LIBSHARED).manifest -outputresource:$(LIBSHARED);2
+
+
+apply.obj:\
+Makefile apply.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c apply.c
+
+.objs\apply.obj:\
+Makefile apply.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c apply.c
+
+func.obj:\
+Makefile func.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c func.c
+
+.objs\func.obj:\
+Makefile func.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c func.c
+
+kernels.obj:\
+Makefile kernels.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c kernels.c
+
+.objs\kernels.obj:\
+Makefile kernels.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c kernels.c
+
+nploops.obj:\
+Makefile nploops.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c nploops.c
+
+.objs\nploops.obj:\
+Makefile nploops.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c nploops.c
+
+tbl.obj:\
+Makefile tbl.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c tbl.c
+
+.objs\tbl.obj:\
+Makefile tbl.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c tbl.c
+
+xndloops.obj:\
+Makefile xndloops.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c xndloops.c
+
+.objs\xndloops.obj:\
+Makefile xndloops.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
+
+graph.obj:\
+Makefile graph.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c graph.c
+
+.objs\graph.obj:\
+Makefile graph.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c graph.c
+
+bfloat16.obj:\
+Makefile bfloat16.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c bfloat16.c
+
+.objs\bfloat16.obj:\
+Makefile bfloat16.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c bfloat16.c
+
+pdist.obj:\
+Makefile pdist.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c pdist.c
+
+.objs\pdist.obj:\
+Makefile pdist.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c pdist.c
+
+
+FORCE:
+
+clean: FORCE
+	del /q /f *.exe *.obj *.lib *.dll *.exp *.manifest 2>NUL
+	cd .objs && del /q /f *.obj 2>NUL
+	if exist "..\build\" rd /q /s "..\build\"
+	if exist "..\dist\" rd /q /s "..\dist\"
+	if exist "..\MANIFEST" del "..\MANIFEST"
+	if exist "..\record.txt" del "..\record.txt"
+	cd ..\python\xnd && del *.lib *.dll *.pyd xnd.h 2>NUL
+
+distclean: clean
+	del Makefile 2>NUL
+
+
+
