@@ -173,6 +173,7 @@ gm_copy_strided_##srctype##_##desttype(                                        \
     return 0;                                                                  \
 }
 
+#ifndef _MSC_VER
 static int
 gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED)
 {
@@ -238,6 +239,7 @@ gm_multiply_strided_q128_q128(char *args[], int64_t dimensions[], int64_t steps[
 
     return 0;
 }
+#endif
 
 NP_STRIDED(sin, float32, float64)
 NP_STRIDED(sin, float64, float64)
@@ -265,8 +267,10 @@ NP_COPY_STRIDED(float64, float64)
 
 
 static const gm_typedef_init_t typedefs[] = {
+#ifndef _MSC_VER
   { .name = "quaternion64", .type = "2 * 2 * complex64", .meth=NULL },
   { .name = "quaternion128", .type = "2 * 2 * complex128", .meth=NULL },
+#endif
   { .name = NULL, .type = NULL }
 };
 
@@ -308,6 +312,7 @@ static const gm_kernel_init_t kernels[] = {
 
   /* MULTIPLY */
   /* quaternions */
+#ifndef _MSC_VER
   { .name = "multiply",
     .sig = "... * quaternion64, ... * quaternion64 -> ... * quaternion64",
     .vectorize = true,
@@ -317,6 +322,7 @@ static const gm_kernel_init_t kernels[] = {
     .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
     .vectorize = true,
     .Strided = gm_multiply_strided_q128_q128 },
+#endif
 
   /* XND */
   /* example for handling structs with missing values */
