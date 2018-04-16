@@ -66,9 +66,9 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
         const int sum_inner = sum_inner_dimensions(stack, nargs, outer_dims);
         const int dims_size = outer_dims + sum_inner;
         const int steps_size = nargs * outer_dims + sum_inner;
-        char *args[nargs];
-        int64_t dimensions[dims_size];
-        int64_t steps[steps_size];
+        ALLOCA(char *, args, nargs);
+        ALLOCA(int64_t, dimensions, dims_size);
+        ALLOCA(int64_t, steps, steps_size);
 
         if (gm_np_convert_xnd(args, nargs,
                               dimensions, dims_size,
