@@ -52,11 +52,6 @@
 #endif
 
 
-/* libxnd.so is not linked without at least one xnd symbol. The -no-as-needed
- * linker option is difficult to integrate into setup.py. */
-const void *dummy = &xnd_error;
-
-
 /****************************************************************************/
 /*                               Error handling                             */
 /****************************************************************************/
