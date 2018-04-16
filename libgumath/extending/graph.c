@@ -52,7 +52,7 @@ graph_constraint(const void *graph, ndt_context_t *ctx)
     const xnd_t *g = (xnd_t *)graph;
     int64_t start2, step2; /* start, step of ndim2 (the graph) */
     int64_t start1, step1; /* start, step of ndim1 (an array of edges) */
-    int32_t N;  /* number of nodes */
+    int64_t N;  /* number of nodes */
 
 
     N = ndt_var_indices(&start2, &step2, g->type, g->index, ctx);
