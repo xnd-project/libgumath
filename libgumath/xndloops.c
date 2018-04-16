@@ -44,7 +44,7 @@ int
 gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
            const int outer_dims, bool vectorize, ndt_context_t *ctx)
 {
-    xnd_t next[nargs];
+    ALLOCA(xnd_t, next, nargs);
     const ndt_t *t;
 
     if (vectorize && outer_dims == 1) {
@@ -84,8 +84,8 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
     }
 
     case VarDim: {
-        int64_t start[nargs];
-        int64_t step[nargs];
+        ALLOCA(int64_t, start, nargs);
+        ALLOCA(int64_t, step, nargs);
         const int64_t shape = ndt_var_indices(&start[0], &step[0], t,
                                               stack[0].index, ctx);
         if (shape < 0) {
