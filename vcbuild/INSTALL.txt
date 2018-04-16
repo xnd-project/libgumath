@@ -21,9 +21,6 @@ vcvarsall.bat x64
 # should be in the dist64 directory.
 vcbuild64.bat
 
-# Test
-runtest64.bat
-
 
 32-bit build
 ------------
@@ -35,8 +32,5 @@ vcvarsall.bat x86
 # common header file and two executables for running the unit tests
 # should be in the dist32 directory.
 vcbuild32.bat
-
-# Test
-runtest32.bat
 
 

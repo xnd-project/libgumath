@@ -15,11 +15,6 @@ copy /y libgumath-0.2.0dev3.dll.lib ..\vcbuild\dist32
 copy /y libgumath-0.2.0dev3.dll.exp ..\vcbuild\dist32
 copy /y gumath.h ..\vcbuild\dist32
 
-cd tests
-copy /y Makefile.vc Makefile
-nmake /nologo clean
-nmake /nologo
-
 copy /y runtest.exe ..\..\vcbuild\dist32
 copy /y runtest_shared.exe ..\..\vcbuild\dist32
 
