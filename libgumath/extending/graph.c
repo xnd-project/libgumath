@@ -100,7 +100,7 @@ static const int32_t NIL = INT32_MIN;
  * u := single source node id
  */
 static int
-init(double **d, int32_t **p, int32_t N, int32_t u, ndt_context_t *ctx)
+init(double **d, int32_t **p, int64_t N, int32_t u, ndt_context_t *ctx)
 {
     *d = ndt_alloc(N, sizeof **d);
     if (*d == NULL) {
@@ -152,7 +152,7 @@ relax(double d[], int32_t p[], int32_t u, int32_t v, double cost)
  */
 static int64_t
 write_path(int32_t *dest, const int32_t dsize,
-           const int32_t p[], const int32_t psize,
+           const int32_t p[], const int64_t psize,
            const int32_t s, int32_t v)
 {
     int64_t n = dsize;
@@ -184,7 +184,8 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     int32_t *ndim2_offsets = NULL;
     int32_t *ndim1_offsets = NULL;
     ndt_t *t;
-    int64_t sum, v;
+    int64_t sum;
+    int32_t v;
 
     if (N+1 > INT32_MAX) {
         goto offset_overflow;
@@ -196,7 +197,7 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
         return xnd_error;
     }
     ndim2_offsets[0] = 0;
-    ndim2_offsets[1] = N;
+    ndim2_offsets[1] = (int32_t)N;
 
 
     ndim1_offsets = ndt_alloc(N+1, sizeof *ndim1_offsets);
@@ -222,7 +223,7 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
         goto error;
     }
 
-    t = ndt_var_dim(t, InternalOffsets, N+1, ndim1_offsets, 0, NULL, ctx);
+    t = ndt_var_dim(t, InternalOffsets, (int32_t)(N+1), ndim1_offsets, 0, NULL, ctx);
     ndim1_offsets = NULL;
     if (t == NULL) {
         goto error;
@@ -243,7 +244,7 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
 
     t = out.type->VarDim.type;
     for (v = 0; v < N; v++) {
-        int64_t shape = t->Concrete.VarDim.offsets[v+1]-t->Concrete.VarDim.offsets[v];
+        int32_t shape = t->Concrete.VarDim.offsets[v+1]-t->Concrete.VarDim.offsets[v];
         char *ptr = out.ptr + t->Concrete.VarDim.offsets[v] * t->Concrete.VarDim.itemsize;
         (void)write_path((int32_t *)ptr, shape, p, N, u, v);
     }
@@ -268,7 +269,7 @@ shortest_path(xnd_t stack[], ndt_context_t *ctx)
     int64_t start1, step1; /* start, step of ndim1 (an array of edges) */
     double *d;  /* distance array */
     int32_t *p; /* predecessor array */
-    int32_t N;  /* number of nodes */
+    int64_t N;  /* number of nodes */
 
     /* graph in adjacency list representation */
     const xnd_t graph = xnd_nominal_next(&stack[0], ctx);
