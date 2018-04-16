@@ -113,28 +113,28 @@ Makefile xndloops.c gumath.h
 	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
 
 graph.obj:\
-Makefile graph.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c graph.c
+Makefile extending\graph.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c extending\graph.c
 
 .objs\graph.obj:\
-Makefile graph.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c graph.c
+Makefile extending\graph.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c extending\graph.c
 
 bfloat16.obj:\
-Makefile bfloat16.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c bfloat16.c
+Makefile extending\bfloat16.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c extending\bfloat16.c
 
 .objs\bfloat16.obj:\
-Makefile bfloat16.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c bfloat16.c
+Makefile extending\bfloat16.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c extending\bfloat16.c
 
 pdist.obj:\
-Makefile pdist.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c pdist.c
+Makefile extending\pdist.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c extending\pdist.c
 
 .objs\pdist.obj:\
-Makefile pdist.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c pdist.c
+Makefile extending\pdist.c gumath.h
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c extending\pdist.c
 
 
 FORCE:
