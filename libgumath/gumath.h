@@ -130,7 +130,6 @@ GM_API void gm_func_del(gm_func_t *f);
 GM_API gm_func_t *gm_add_func(const char *name, ndt_context_t *ctx);
 GM_API int gm_add_kernel(const gm_kernel_init_t *kernel, ndt_context_t *ctx);
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
-// GM_API int gm_map(const gm_kernel_t *f, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const char *name, const ndt_t *in_types[], int nin,
                              const xnd_t args[], ndt_context_t *ctx);
 
@@ -150,7 +149,7 @@ GM_API int gm_np_convert_xnd(char **args, const int nargs,
                              ndt_context_t *ctx);
 
 GM_API int gm_np_map(const gm_strided_kernel_t f,
-                     char **args, const int nargs,
+                     char **args, int nargs,
                      intptr_t *dimensions,
                      intptr_t *steps,
                      void *data,

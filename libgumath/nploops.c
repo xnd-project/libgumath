@@ -113,7 +113,7 @@ gm_np_convert_xnd(char **args, const int nargs,
                   xnd_t stack[], const int outer_dims,
                   ndt_context_t *ctx)
 {
-    gm_ndarray_t nd[nargs];
+    ALLOCA(gm_ndarray_t, nd, nargs);
     intptr_t shape;
     int n = 0, m = 0;
     int i, k;
@@ -188,7 +188,7 @@ gm_np_map(const gm_strided_kernel_t f,
           void *data,
           int outer_dims)
 {
-    char *next[nargs];
+    ALLOCA(char *, next, nargs);
     intptr_t shape, i;
     int k;
 
