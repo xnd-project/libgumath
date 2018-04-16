@@ -66,75 +66,75 @@ Makefile $(SHARED_OBJS)
 
 apply.obj:\
 Makefile apply.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c apply.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c apply.c
 
 .objs\apply.obj:\
 Makefile apply.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c apply.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c apply.c
 
 func.obj:\
 Makefile func.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c func.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c func.c
 
 .objs\func.obj:\
 Makefile func.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c func.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c func.c
 
 kernels.obj:\
 Makefile kernels.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c kernels.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels.c
 
 .objs\kernels.obj:\
 Makefile kernels.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c kernels.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels.c
 
 nploops.obj:\
 Makefile nploops.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c nploops.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c nploops.c
 
 .objs\nploops.obj:\
 Makefile nploops.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c nploops.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c nploops.c
 
 tbl.obj:\
 Makefile tbl.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c tbl.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c tbl.c
 
 .objs\tbl.obj:\
 Makefile tbl.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c tbl.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c tbl.c
 
 xndloops.obj:\
 Makefile xndloops.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c xndloops.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c xndloops.c
 
 .objs\xndloops.obj:\
 Makefile xndloops.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
 
 graph.obj:\
 Makefile graph.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c graph.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c graph.c
 
 .objs\graph.obj:\
 Makefile graph.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c graph.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c graph.c
 
 bfloat16.obj:\
 Makefile bfloat16.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c bfloat16.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c bfloat16.c
 
 .objs\bfloat16.obj:\
 Makefile bfloat16.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c bfloat16.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c bfloat16.c
 
 pdist.obj:\
 Makefile pdist.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS) -c pdist.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c pdist.c
 
 .objs\pdist.obj:\
 Makefile pdist.c gumath.h
-	$(CC) "-I$(LIBNDTYPESINCLUDE)" $(CFLAGS_SHARED) -c pdist.c
+	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c pdist.c
 
 
 FORCE:
