@@ -135,6 +135,7 @@ class TestCall(unittest.TestCase):
                 c = np.copy(b)
                 np.testing.assert_equal(y, b)
 
+    @unittest.skipIf(sys.platform == "win32", "missing C99 complex support")
     def test_quaternion(self):
   
         lst = [[[1+2j, 4+3j],
@@ -160,6 +161,7 @@ class TestCall(unittest.TestCase):
             b = np.einsum("ijk,ikl->ijl", a, a)
             np.testing.assert_equal(y, b)
 
+    @unittest.skipIf(sys.platform == "win32", "missing C99 complex support")
     def test_quaternion_error(self):
   
         lst = [[[1+2j, 4+3j],
@@ -251,6 +253,7 @@ class TestGraphs(unittest.TestCase):
         self.assertRaises(ValueError, Graph, lst)
 
 
+@unittest.skipIf(sys.platform == "win32", "unresolved external symbols")
 class TestBFloat16(unittest.TestCase):
 
     def test_init(self):
