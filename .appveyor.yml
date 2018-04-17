@@ -1,0 +1,28 @@
+skip_tags: true
+
+matrix:
+  fast_finish: true
+
+os: Visual Studio 2015
+
+environment:
+  matrix:
+    - PLATFORM: "x64"
+      PYTHON: "C:\\Python36-x64"
+    - PLATFORM: "x86"
+      PYTHON: "C:\\Python36"
+
+before_build:
+  "\"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat\" %PLATFORM%"
+
+build_script:
+  - git clone https://github.com/plures/ndtypes.git
+  - git clone https://github.com/plures/xnd.git
+  - cd ndtypes
+  - "%PYTHON%\\python.exe setup.py install --local=\"%cd%\\..\\python\""
+  - cd ..\xnd
+  - "%PYTHON%\\python.exe setup.py install --local=\"%cd%\\..\\python\""
+  - cd ..
+  - "%PYTHON%\\python.exe setup.py build"
+  - "%PYTHON%\\python.exe setup.py test"
+
