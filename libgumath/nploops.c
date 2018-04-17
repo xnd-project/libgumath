@@ -194,7 +194,7 @@ gm_np_map(const gm_strided_kernel_t f,
 {
     ALLOCA(char *, next, nargs);
     intptr_t shape, i;
-    int k;
+    int ret, k;
 
     if (outer_dims <= 1) {
         return f(args, dimensions, steps, data);
@@ -207,9 +207,10 @@ gm_np_map(const gm_strided_kernel_t f,
             next[k] = args[k] + i * steps[k];
         }
 
-        if (gm_np_map(f, next, nargs, dimensions+1, steps+nargs, data,
-                      outer_dims-1) < 0) {
-            return -1;
+        ret = gm_np_map(f, next, nargs, dimensions+1, steps+nargs, data,
+                        outer_dims-1);
+        if (ret != 0) {
+            return ret;
         }
     }
 
