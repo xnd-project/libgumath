@@ -43,13 +43,17 @@
 /* Loops and functions for NumPy strided kernels. */
 
 
-#define ASSIGN_OVERFLOW(array, index, value, max, ctx) \
-    do {                                                                        \
-        if (index >= max) {                                                     \
-            ndt_err_format(ctx, NDT_RuntimeError, "unexpected array overflow"); \
-            return -1;                                                          \
-        }                                                                       \
-        array[index++] = value;                                                 \
+#define ASSIGN_OVERFLOW(array, index, maxindex, value, maxvalue, ctx) \
+    do {                                                                         \
+        if (index >= maxindex) {                                                 \
+            ndt_err_format(ctx, NDT_RuntimeError, "unexpected array overflow");  \
+            return -1;                                                           \
+        }                                                                        \
+        if (value >= maxvalue) {                                                 \
+            ndt_err_format(ctx, NDT_RuntimeError, "unexpected intptr overflow"); \
+            return -1;                                                           \
+        }                                                                        \
+        array[index++] = (intptr_t)value;                                        \
     } while (0)
 
 
@@ -108,13 +112,13 @@ gm_as_ndarray(gm_ndarray_t *a, const xnd_t *x, ndt_context_t *ctx)
  */
 int
 gm_np_convert_xnd(char **args, const int nargs,
-                  int64_t *dimensions, const int dims_size,
-                  int64_t *steps, const int steps_size,
+                  intptr_t *dimensions, const int dims_size,
+                  intptr_t *steps, const int steps_size,
                   xnd_t stack[], const int outer_dims,
                   ndt_context_t *ctx)
 {
     ALLOCA(gm_ndarray_t, nd, nargs);
-    intptr_t shape;
+    int64_t shape;
     int n = 0, m = 0;
     int i, k;
 
@@ -131,7 +135,7 @@ gm_np_convert_xnd(char **args, const int nargs,
 
     for (i = 0; i < outer_dims; i++) {
         shape = nd[0].shape[i];
-        ASSIGN_OVERFLOW(dimensions, n, shape, dims_size, ctx);
+        ASSIGN_OVERFLOW(dimensions, n, dims_size, shape, INTPTR_MAX, ctx);
 
         for (k = 0; k < nargs; k++) {
             if (nd[k].shape[i] != shape) {
@@ -140,14 +144,14 @@ gm_np_convert_xnd(char **args, const int nargs,
                 return -1;
             }
 
-            ASSIGN_OVERFLOW(steps, m, nd[k].strides[i], steps_size, ctx);
+            ASSIGN_OVERFLOW(steps, m, steps_size, nd[k].strides[i], INTPTR_MAX, ctx);
         }
     }
 
     for (i = 0; i < nargs; i++) {
         for (k = outer_dims; k < nd[i].ndim; k++) {
-            ASSIGN_OVERFLOW(dimensions, n, nd[i].shape[k], dims_size, ctx);
-            ASSIGN_OVERFLOW(steps, m, nd[i].strides[k], steps_size, ctx);
+            ASSIGN_OVERFLOW(dimensions, n, dims_size, nd[i].shape[k], INTPTR_MAX, ctx);
+            ASSIGN_OVERFLOW(steps, m, steps_size, nd[i].strides[k], INTPTR_MAX, ctx);
         }
     }
 

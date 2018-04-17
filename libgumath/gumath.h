@@ -71,9 +71,9 @@ typedef float float32_t;
 typedef double float64_t;
 
 
-typedef int (* gm_c_kernel_t)(char **args, int64_t *dimensions, void *data);
-typedef int (* gm_fortran_kernel_t)(char **args, int64_t *dimensions, void *data);
-typedef int (* gm_strided_kernel_t)(char **args, int64_t *dimensions, int64_t *steps, void *data);
+typedef int (* gm_c_kernel_t)(char **args, intptr_t *dimensions, void *data);
+typedef int (* gm_fortran_kernel_t)(char **args, intptr_t *dimensions, void *data);
+typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t *steps, void *data);
 typedef int (* gm_xnd_kernel_t)(xnd_t stack[], ndt_context_t *ctx);
 
 /* Collection of specialized kernels for a single function signature. */
@@ -143,8 +143,8 @@ GM_API int gm_np_flatten(char **args, const int nargs,
                          ndt_context_t *ctx);
 
 GM_API int gm_np_convert_xnd(char **args, const int nargs,
-                             int64_t *dimensions, const int dims_size,
-                             int64_t *steps, const int steps_size,
+                             intptr_t *dimensions, const int dims_size,
+                             intptr_t *steps, const int steps_size,
                              xnd_t stack[], const int outer_dims,
                              ndt_context_t *ctx);
 

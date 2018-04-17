@@ -137,48 +137,47 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
 /****************************************************************************/
 
 #define NP_STRIDED(func, srctype, desttype) \
-static int                                                           \
-gm_##func##_strided_##srctype##_##desttype(                          \
-    char *args[], int64_t dimensions[], int64_t steps[], void *data) \
-{                                                                    \
-    const char *src = args[0];                                       \
-    char *dest = args[1];                                            \
-    int64_t n = dimensions[0];                                       \
-    int64_t i;                                                       \
-    (void)data;                                                      \
-                                                                     \
-    for (i = 0; i < n; i++) {                                        \
-        const srctype##_t v = *(const srctype##_t *)src;             \
-        *(desttype##_t *)dest = func((desttype##_t)v);               \
-        src += steps[0];                                             \
-        dest += steps[1];                                            \
-    }                                                                \
-                                                                     \
-    return 0;                                                        \
+static int                                                             \
+gm_##func##_strided_##srctype##_##desttype(                            \
+    char *args[], intptr_t dimensions[], intptr_t steps[], void *data) \
+{                                                                      \
+    const char *src = args[0];                                         \
+    char *dest = args[1];                                              \
+    intptr_t n = dimensions[0];                                        \
+    (void)data;                                                        \
+                                                                       \
+    for (intptr_t i = 0; i < n; i++) {                                 \
+        const srctype##_t v = *(const srctype##_t *)src;               \
+        *(desttype##_t *)dest = func((desttype##_t)v);                 \
+        src += steps[0];                                               \
+        dest += steps[1];                                              \
+    }                                                                  \
+                                                                       \
+    return 0;                                                          \
 }
 
 #define NP_COPY_STRIDED(srctype, desttype) \
-static int                                                           \
-gm_copy_strided_##srctype##_##desttype(                              \
-    char *args[], int64_t dimensions[], int64_t steps[], void *data) \
-{                                                                    \
-    const char *src = args[0];                                       \
-    char *dest = args[1];                                            \
-    int64_t n = dimensions[0];                                       \
-    int64_t i;                                                       \
-    (void)data;                                                      \
-                                                                     \
-    for (i = 0; i < n; i++) {                                        \
-        *(desttype##_t *)dest = *(const srctype##_t *)src;           \
-        src += steps[0];                                             \
-        dest += steps[1];                                            \
-    }                                                                \
-    return 0;                                                        \
+static int                                                             \
+gm_copy_strided_##srctype##_##desttype(                                \
+    char *args[], intptr_t dimensions[], intptr_t steps[], void *data) \
+{                                                                      \
+    const char *src = args[0];                                         \
+    char *dest = args[1];                                              \
+    intptr_t n = dimensions[0];                                        \
+    (void)data;                                                        \
+                                                                       \
+    for (intptr_t i = 0; i < n; i++) {                                 \
+        *(desttype##_t *)dest = *(const srctype##_t *)src;             \
+        src += steps[0];                                               \
+        dest += steps[1];                                              \
+    }                                                                  \
+    return 0;                                                          \
 }
 
 #ifndef _MSC_VER
 static int
-gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED)
+gm_multiply_strided_q64_q64(char *args[], intptr_t dimensions[], intptr_t steps[],
+                            void *data GM_UNUSED)
 {
     const char *src1 = args[0];
     const char *src2 = args[1];
@@ -186,8 +185,8 @@ gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[],
     const ndt_complex64_t (*s1)[2];
     const ndt_complex64_t (*s2)[2];
     ndt_complex64_t (*d1)[2];
-    int64_t n = dimensions[0];
-    int64_t i, j, k, l;
+    intptr_t n = dimensions[0];
+    intptr_t i, j, k, l;
 
     for (i = 0; i < n; i++) {
       s1 = (const ndt_complex64_t (*)[2])src1;
@@ -211,7 +210,8 @@ gm_multiply_strided_q64_q64(char *args[], int64_t dimensions[], int64_t steps[],
 }
 
 static int
-gm_multiply_strided_q128_q128(char *args[], int64_t dimensions[], int64_t steps[], void *data GM_UNUSED)
+gm_multiply_strided_q128_q128(char *args[], intptr_t dimensions[], intptr_t steps[],
+                              void *data GM_UNUSED)
 {
     const char *src1 = args[0];
     const char *src2 = args[1];
@@ -219,8 +219,8 @@ gm_multiply_strided_q128_q128(char *args[], int64_t dimensions[], int64_t steps[
     const ndt_complex128_t (*s1)[2];
     const ndt_complex128_t (*s2)[2];
     ndt_complex128_t (*d1)[2];
-    int64_t n = dimensions[0];
-    int64_t i, j, k, l;
+    intptr_t n = dimensions[0];
+    intptr_t i, j, k, l;
 
     for (i = 0; i < n; i++) {
       s1 = (const ndt_complex128_t (*)[2])src1;
