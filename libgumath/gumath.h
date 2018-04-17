@@ -52,7 +52,7 @@
   #endif
 
   #include "malloc.h"
-  #define ALLOCA(type, name, size) type *name = _alloca(size)
+  #define ALLOCA(type, name, nmemb) type *name = _alloca(nmemb * sizeof(type))
 #else
   #define GM_API
   #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
@@ -61,7 +61,7 @@
     #define GM_UNUSED
   #endif
 
-  #define ALLOCA(type, name, size) type name[size]
+  #define ALLOCA(type, name, nmemb) type name[nmemb]
 #endif
 
 
