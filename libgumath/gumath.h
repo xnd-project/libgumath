@@ -71,10 +71,8 @@ typedef float float32_t;
 typedef double float64_t;
 
 
-typedef int (* gm_c_kernel_t)(char **args, intptr_t *dimensions, void *data);
-typedef int (* gm_fortran_kernel_t)(char **args, intptr_t *dimensions, void *data);
-typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t *steps, void *data);
 typedef int (* gm_xnd_kernel_t)(xnd_t stack[], ndt_context_t *ctx);
+typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t *steps, void *data);
 
 /* Collection of specialized kernels for a single function signature. */
 typedef struct {
@@ -82,10 +80,13 @@ typedef struct {
     const ndt_constraint_t *constraint;
     bool vectorize;
 
-    gm_c_kernel_t C;
-    gm_fortran_kernel_t Fortran;
+    /* Xnd signatures */
+    gm_xnd_kernel_t C;       /* dispatch ensures c-contiguous */
+    gm_xnd_kernel_t Fortran; /* dispatch ensures f-contiguous */
+    gm_xnd_kernel_t Xnd;     /* selected if non-contiguous or both C and Fortran are NULL */
+
+    /* NumPy signature */
     gm_strided_kernel_t Strided;
-    gm_xnd_kernel_t Xnd;
 } gm_kernel_set_t;
 
 typedef struct {
@@ -100,10 +101,10 @@ typedef struct {
     const ndt_constraint_t *constraint;
     bool vectorize;
 
-    gm_c_kernel_t C;
-    gm_fortran_kernel_t Fortran;
-    gm_strided_kernel_t Strided;
+    gm_xnd_kernel_t C;
+    gm_xnd_kernel_t Fortran;
     gm_xnd_kernel_t Xnd;
+    gm_strided_kernel_t Strided;
 } gm_kernel_init_t;
 
 /* Actual kernel selected for application. */
