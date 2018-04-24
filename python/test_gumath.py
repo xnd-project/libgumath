@@ -295,6 +295,34 @@ class TestPdist(unittest.TestCase):
         self.assertEqual(y.value, [198.78529349275314, 170.0746899276903, 315.75385646576035])
 
 
+@unittest.skipIf(gm.xndvectorize is None, "test requires numpy and numba")
+class TestNumba(unittest.TestCase):
+
+    def test_numba(self):
+
+        @gm.xndvectorize("... * N * M * float64, ... * M * P * float64 -> ... * N * P * float64")
+        def matmul(x, y, res):
+            col = np.arange(y.shape[0])
+            for j in range(y.shape[1]):
+                for k in range(y.shape[0]):
+                    col[k] = y[k, j]
+                for i in range(x.shape[0]):
+                    s = 0
+                    for k in range(x.shape[1]):
+                        s += x[i, k] * col[k]
+                    res[i, j] = s
+
+        a = np.arange(50000.0).reshape(1000, 5, 10)
+        b = np.arange(70000.0).reshape(1000, 10, 7)
+        c = np.einsum("ijk,ikl->ijl", a, b)
+
+        x = xnd(a.tolist(), type="1000 * 5 * 10 * float64")
+        y = xnd(b.tolist(), type="1000 * 10 * 7 * float64")
+        z = matmul(x, y)
+
+        np.testing.assert_equal(z, c)
+
+
 ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
@@ -302,6 +330,7 @@ ALL_TESTS = [
   TestGraphs,
   TestBFloat16,
   TestPdist,
+  TestNumba,
 ]
 
 

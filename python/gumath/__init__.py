@@ -30,8 +30,29 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import ndtypes
-import xnd
+from ndtypes import ndt
+from xnd import xnd
 from ._gumath import *
 
-del xnd, ndtypes
+
+try:
+    import numpy as np
+    from numba.npyufunc import GUVectorize
+
+    def xndvectorize(s):
+        def wrap(func):
+            sig, coretypes = ndt(s).to_nbformat()
+            guvec = GUVectorize(func, sig, nopython=True)
+            guvec.add(coretypes)
+            g = guvec.build_ufunc()
+            def h(*args, **kwargs):
+                out = g(*args, **kwargs)
+                view = xnd.from_buffer(out)
+                ret = xnd.empty(view.type)
+                np.copyto(np.array(ret, copy=False), out)
+                return ret
+            return h
+        return wrap
+
+except ImportError:
+    xndvectorize = None

@@ -1,11 +1,11 @@
 sudo: required
-python: 3.6
 
-language: C
+language: python
+python:
+  - 3.6
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y python3-numpy
+  - pip install numpy numba
 
 matrix:
   include:
