@@ -59,9 +59,35 @@ if sys.platform == "darwin":
     LIBSONAME = "libxnd.0.dylib"
     LIBSHARED = "libxnd.0.2.0dev3.dylib"
 else:
+    LIBNAME = "libgumath.so"
+    LIBSONAME = "libgumath.so.0"
+    LIBSHARED = "libgumath.so.0.2.0dev3"
     LIBNDTYPES = "libndtypes.so.0.2.0dev3"
     LIBXND = "libxnd.so.0.2.0dev3"
-    LIBGUMATH = "libgumath.so.0.2.0dev3"
+
+if "install" in sys.argv or "bdist_wheel" in sys.argv:
+    CONFIGURE_INCLUDES = ["%s/ndtypes" % get_python_lib(),
+                          "%s/xnd" % get_python_lib()]
+    CONFIGURE_LIBS = CONFIGURE_INCLUDES
+    INCLUDES = LIBS = CONFIGURE_INCLUDES
+    LIBGUMATHDIR = "%s/gumath" % get_python_lib()
+    INSTALL_LIBS = True
+elif "conda_install" in sys.argv:
+    site = ["%s/ndtypes" % get_python_lib(), "%s/xnd" % get_python_lib()]
+    sys_includes = os.path.join(os.environ['PREFIX'], "include")
+    libdir = "Library/bin" if sys.platform == "win32" else "lib"
+    sys_libs = os.path.join(os.environ['PREFIX'], libdir)
+    CONFIGURE_INCLUDES = INCLUDES = sys_includes + site
+    LIBS = [sys_libs] + site
+    LIBGUMATHDIR = "%s/gumath" % get_python_lib()
+    INSTALL_LIBS = False
+else:
+    CONFIGURE_INCLUDES = ["../python/ndtypes", "../python/xnd"]
+    CONFIGURE_LIBS = CONFIGURE_INCLUDES
+    INCLUDES = LIBS = CONFIGURE_INCLUDES
+    LIBGUMATHDIR = "../python/gumath"
+    INSTALL_LIBS = False
+
 
 
 PY_MAJOR = sys.version_info[0]
@@ -89,6 +115,12 @@ def copy_ext():
         pathlist = glob("build/lib.*/gumath/_gumath.*.so")
     if pathlist:
         shutil.copy2(pathlist[0], "python/gumath")
+
+def make_symlinks():
+    os.chdir(LIBGUMATHDIR)
+    os.chmod(LIBSHARED, 0o755)
+    os.system("ln -sf %s %s" % (LIBSHARED, LIBSONAME))
+    os.system("ln -sf %s %s" % (LIBSHARED, LIBNAME))
 
 
 if len(sys.argv) == 2:
@@ -122,11 +154,11 @@ if len(sys.argv) == 2:
         pass
 
 
-def ndtypes_ext():
-    depends = ["python/gumath/util.h", "python/gumath/kernels.h"]
+def gumath_ext():
+    include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
+    library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
+    depends = []
     sources = ["python/gumath/_gumath.c"]
-    include_dirs = ["python/ndtypes", "python/xnd", "python/gumath"]
-    library_dirs = ["python/ndtypes", "python/xnd", "python/gumath"]
 
     if sys.platform == "win32":
         libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
@@ -155,12 +187,14 @@ def ndtypes_ext():
             extra_link_args = ["-Wl,-rpath,@loader_path"]
             runtime_library_dirs = []
         else:
-            libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBGUMATH]
+            libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
             extra_link_args = []
             runtime_library_dirs = ["$ORIGIN"]
 
         if BUILD_ALL:
-           os.system("./configure CFLAGS=\"-I$PWD/python/ndtypes -I$PWD/python/xnd\" && make")
+           cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
+           ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
+           os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
 
     return Extension (
       "gumath._gumath",
@@ -200,8 +234,12 @@ setup (
     install_requires = ["ndtypes == v0.2.0dev3", "xnd == v0.2.0dev3"],
     package_dir = {"": "python"},
     packages = ["gumath"],
-    package_data = {"gumath": []},
-    ext_modules = [ndtypes_ext()],
+    package_data = {"gumath": ["libgumath*", "gumath.h"]
+                    if INSTALL_LIBS else []},
+    ext_modules = [gumath_ext()],
 )
 
 copy_ext()
+
+if INSTALL_LIBS and sys.platform != "win32" and not "bdist_wheel" in sys.argv:
+    make_symlinks()
