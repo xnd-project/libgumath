@@ -107,18 +107,21 @@ typedef struct {
     gm_strided_kernel_t Strided;
 } gm_kernel_init_t;
 
-/* Actual kernel selected for application. */
+/* Actual kernel selected for application */
 typedef struct {
     enum ndt_apply tag;
     const gm_kernel_set_t *set;
 } gm_kernel_t;
 
-/* Multimethod with associated kernels. */
+/* Multimethod with associated kernels */
 typedef struct {
     char *name;
     int nkernels;
     gm_kernel_set_t kernels[GM_MAX_KERNELS];
 } gm_func_t;
+
+
+typedef struct _gm_tbl gm_tbl_t;
 
 
 /******************************************************************************/
@@ -128,11 +131,13 @@ typedef struct {
 GM_API gm_func_t *gm_func_new(const char *name, ndt_context_t *ctx);
 GM_API void gm_func_del(gm_func_t *f);
 
-GM_API gm_func_t *gm_add_func(const char *name, ndt_context_t *ctx);
-GM_API int gm_add_kernel(const gm_kernel_init_t *kernel, ndt_context_t *ctx);
+GM_API gm_func_t *gm_add_func(gm_tbl_t *tbl, const char *name, ndt_context_t *ctx);
+GM_API int gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_context_t *ctx);
+
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
-GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const char *name, const ndt_t *in_types[], int nin,
-                             const xnd_t args[], ndt_context_t *ctx);
+GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, gm_tbl_t *tbl, const char *name,
+                             const ndt_t *in_types[], int nin, const xnd_t args[],
+                             ndt_context_t *ctx);
 
 
 /******************************************************************************/
@@ -168,21 +173,23 @@ GM_API int gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
 /******************************************************************************/
 /*                                Gufunc table                                */
 /******************************************************************************/
+GM_API gm_tbl_t *gm_tbl_new(ndt_context_t *ctx);
+GM_API void gm_tbl_del(gm_tbl_t *t);
 
-GM_API int gm_tbl_add(const char *key, gm_func_t *value, ndt_context_t *ctx);
-GM_API gm_func_t *gm_tbl_find(const char *key, ndt_context_t *ctx);
-GM_API int gm_tbl_map(int (*f)(const gm_func_t *, void *state), void *state);
+GM_API int gm_tbl_add(gm_tbl_t *tbl, const char *key, gm_func_t *value, ndt_context_t *ctx);
+GM_API gm_func_t *gm_tbl_find(const gm_tbl_t *tbl, const char *key, ndt_context_t *ctx);
+GM_API int gm_tbl_map(const gm_tbl_t *tbl, int (*f)(const gm_func_t *, void *state), void *state);
 
 
 /******************************************************************************/
 /*                       Library initialization and tables                    */
 /******************************************************************************/
 
-GM_API int gm_init(ndt_context_t *ctx);
-GM_API int gm_init_kernels(ndt_context_t *ctx);
-GM_API int gm_init_graph_kernels(ndt_context_t *ctx);
-GM_API int gm_init_bfloat16_kernels(ndt_context_t *ctx);
-GM_API int gm_init_pdist_kernels(ndt_context_t *ctx);
+GM_API void gm_init(void);
+GM_API int gm_init_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_graph_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_bfloat16_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_pdist_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API void gm_finalize(void);
 

@@ -80,7 +80,7 @@ gm_func_del(gm_func_t *f)
 }
 
 gm_func_t *
-gm_add_func(const char *name, ndt_context_t *ctx)
+gm_add_func(gm_tbl_t *tbl, const char *name, ndt_context_t *ctx)
 {
     gm_func_t *f = gm_func_new(name, ctx);
 
@@ -88,7 +88,7 @@ gm_add_func(const char *name, ndt_context_t *ctx)
         return NULL;
     }
 
-    if (gm_tbl_add(name, f, ctx) < 0) {
+    if (gm_tbl_add(tbl, name, f, ctx) < 0) {
         gm_func_del(f);
         return NULL;
     }
@@ -97,15 +97,15 @@ gm_add_func(const char *name, ndt_context_t *ctx)
 }
 
 int
-gm_add_kernel(const gm_kernel_init_t *k, ndt_context_t *ctx)
+gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t *ctx)
 {
-    gm_func_t *f = gm_tbl_find(k->name, ctx);
+    gm_func_t *f = gm_tbl_find(tbl, k->name, ctx);
     gm_kernel_set_t kernel;
     ndt_t *t;
 
     if (f == NULL) {
         ndt_err_clear(ctx);
-        f = gm_add_func(k->name, ctx);
+        f = gm_add_func(tbl, k->name, ctx);
         if (f == NULL) {
             return -1;
         }

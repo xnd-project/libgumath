@@ -234,8 +234,8 @@ setup (
     install_requires = ["ndtypes == v0.2.0dev3", "xnd == v0.2.0dev3"],
     package_dir = {"": "python"},
     packages = ["gumath"],
-    package_data = {"gumath": ["libgumath*", "gumath.h"]
-                    if INSTALL_LIBS else []},
+    package_data = {"gumath": ["libgumath*", "gumath.h", "pygumath.h"]
+                    if INSTALL_LIBS else ["pygumath.h"]},
     ext_modules = [gumath_ext()],
 )
 

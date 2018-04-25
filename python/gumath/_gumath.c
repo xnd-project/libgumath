@@ -38,18 +38,21 @@
 #include "pyxnd.h"
 #include "gumath.h"
 
+#define GUMATH_MODULE
+#include "pygumath.h"
 
-#ifdef _MSC_VER
-  #ifndef UNUSED
-    #define UNUSED
-  #endif
-#else
-  #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
-    #define UNUSED __attribute__((unused))
-  #else
-    #define UNUSED
-  #endif
-#endif
+
+/* libxnd.so is not linked without at least one xnd symbol. The -no-as-needed
+ * linker option is difficult to integrate into setup.py. */
+const void *dummy = &xnd_error;
+
+
+/****************************************************************************/
+/*                              Module globals                              */
+/****************************************************************************/
+
+/* Function table */
+static gm_tbl_t *table = NULL;
 
 
 /****************************************************************************/
@@ -69,13 +72,14 @@ seterr(ndt_context_t *ctx)
 
 typedef struct {
     PyObject_HEAD
-    char *name;
+    const gm_tbl_t *tbl; /* kernel table */
+    char *name;          /* function name */
 } GufuncObject;
 
 static PyTypeObject Gufunc_Type;
 
 static PyObject *
-gufunc_new(const char *name)
+gufunc_new(const gm_tbl_t *tbl, const char *name)
 {
     NDT_STATIC_CONTEXT(ctx);
     GufuncObject *self;
@@ -84,6 +88,8 @@ gufunc_new(const char *name)
     if (self == NULL) {
         return NULL;
     }
+
+    self->tbl = tbl;
 
     self->name = ndt_strdup(name, &ctx);
     if (self->name == NULL) {
@@ -149,7 +155,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         in_types[i] = stack[i].type;
     }
 
-    kernel = gm_select(&spec, self->name, in_types, nin, stack, &ctx);
+    kernel = gm_select(&spec, self->tbl, self->name, in_types, nin, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
@@ -223,7 +229,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 }
 
 static PyObject *
-gufunc_kernels(GufuncObject *self, PyObject *args UNUSED)
+gufunc_kernels(GufuncObject *self, PyObject *args GM_UNUSED)
 {
     NDT_STATIC_CONTEXT(ctx);
     PyObject *list, *tmp;
@@ -231,7 +237,7 @@ gufunc_kernels(GufuncObject *self, PyObject *args UNUSED)
     char *s;
     int i;
 
-    f = gm_tbl_find(self->name, &ctx);
+    f = gm_tbl_find(self->tbl, self->name, &ctx);
     if (f == NULL) {
         return seterr(&ctx);
     }
@@ -261,22 +267,79 @@ gufunc_kernels(GufuncObject *self, PyObject *args UNUSED)
     return list;
 }
 
-static int
-add_function(const gm_func_t *f, void *state)
+
+static PyGetSetDef gufunc_getsets [] =
 {
-    PyObject *m = (PyObject *)state;
+  { "kernels", (getter)gufunc_kernels, NULL, NULL, NULL},
+  {NULL}
+};
+
+
+static PyTypeObject Gufunc_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "_gumath.gufunc",
+    .tp_basicsize = sizeof(GufuncObject),
+    .tp_dealloc = (destructor)gufunc_dealloc,
+    .tp_hash = PyObject_HashNotImplemented,
+    .tp_call = (ternaryfunc)gufunc_call,
+    .tp_getattro = PyObject_GenericGetAttr,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_getset = gufunc_getsets
+};
+
+
+/****************************************************************************/
+/*                                   C-API                                  */
+/****************************************************************************/
+
+static void **gumath_api[GUMATH_MAX_API];
+
+struct map_args {
+    PyObject *module;
+    const gm_tbl_t *tbl;
+};
+
+static int
+add_function(const gm_func_t *f, void *args)
+{
+    struct map_args *a = (struct map_args *)args;
     PyObject *func;
 
-    func = gufunc_new(f->name);
+    func = gufunc_new(a->tbl, f->name);
     if (func == NULL) {
         return -1;
     }
 
-    return PyModule_AddObject(m, f->name, func);
+    return PyModule_AddObject(a->module, f->name, func);
+}
+
+static int
+Gumath_AddFunctions(PyObject *m, const gm_tbl_t *tbl)
+{
+    struct map_args args = {m, tbl};
+
+    if (gm_tbl_map(tbl, add_function, &args) < 0) {
+        return -1;
+    }
+
+    return 0;
 }
 
 static PyObject *
-unsafe_add_numpy_kernel(PyObject *m UNUSED, PyObject *args, PyObject *kwds)
+init_api(void)
+{
+    gumath_api[Gumath_AddFunctions_INDEX] = (void *)Gumath_AddFunctions;
+
+    return PyCapsule_New(gumath_api, "gumath._gumath._API", NULL);
+}
+
+
+/****************************************************************************/
+/*                                  Module                                  */
+/****************************************************************************/
+
+static PyObject *
+unsafe_add_numpy_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
 {
     NDT_STATIC_CONTEXT(ctx);
     static char *kwlist[] = {"name", "sig", "ptr", NULL};
@@ -302,41 +365,17 @@ unsafe_add_numpy_kernel(PyObject *m UNUSED, PyObject *args, PyObject *kwds)
     k.vectorize = true;
     k.Strided = p;
 
-    if (gm_add_kernel(&k, &ctx) < 0) {
+    if (gm_add_kernel(table, &k, &ctx) < 0) {
         return seterr(&ctx);
     }
 
-    f = gm_tbl_find(name, &ctx);
+    f = gm_tbl_find(table, name, &ctx);
     if (f == NULL) {
         return seterr(&ctx);
     }
 
-    return gufunc_new(f->name);
+    return gufunc_new(table, f->name);
 }
-
-static PyGetSetDef gufunc_getsets [] =
-{
-  { "kernels", (getter)gufunc_kernels, NULL, NULL, NULL},
-  {NULL}
-};
-
-
-static PyTypeObject Gufunc_Type = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    .tp_name = "_gumath.gufunc",
-    .tp_basicsize = sizeof(GufuncObject),
-    .tp_dealloc = (destructor)gufunc_dealloc,
-    .tp_hash = PyObject_HashNotImplemented,
-    .tp_call = (ternaryfunc)gufunc_call,
-    .tp_getattro = PyObject_GenericGetAttr,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
-    .tp_getset = gufunc_getsets
-};
-
-
-/****************************************************************************/
-/*                                  Module                                  */
-/****************************************************************************/
 
 static PyMethodDef gumath_methods [] =
 {
@@ -364,32 +403,44 @@ PyInit__gumath(void)
 {
     NDT_STATIC_CONTEXT(ctx);
     PyObject *m = NULL;
+    static PyObject *capsule = NULL;
     static int initialized = 0;
 
     if (!initialized) {
+       gm_init();
+
        if (import_ndtypes() < 0) {
             return NULL;
        }
        if (import_xnd() < 0) {
             return NULL;
        }
-       if (gm_init(&ctx) < 0) {
+
+       capsule = init_api();
+       if (capsule == NULL) {
+            return NULL;
+       }
+
+       table = gm_tbl_new(&ctx);
+       if (table == NULL) {
            return seterr(&ctx);
        }
-       if (gm_init_kernels(&ctx) < 0) {
+
+       if (gm_init_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
-       if (gm_init_graph_kernels(&ctx) < 0) {
+       if (gm_init_graph_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
 #ifndef _MSC_VER
-       if (gm_init_bfloat16_kernels(&ctx) < 0) {
+       if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
 #endif
-       if (gm_init_pdist_kernels(&ctx) < 0) {
+       if (gm_init_pdist_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
+
        initialized = 1;
     }
 
@@ -402,10 +453,14 @@ PyInit__gumath(void)
         goto error;
     }
 
-    if (gm_tbl_map(add_function, m) < 0) {
+    Py_INCREF(capsule);
+    if (PyModule_AddObject(m, "_API", capsule) < 0) {
         goto error;
     }
 
+    if (Gumath_AddFunctions(m, table) < 0) {
+        goto error;
+    }
 
     return m;
 

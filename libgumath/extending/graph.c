@@ -373,7 +373,7 @@ static const gm_kernel_init_t kernels[] = {
 /****************************************************************************/
 
 int
-gm_init_graph_kernels(ndt_context_t *ctx)
+gm_init_graph_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 {
     const gm_typedef_init_t *t;
     const gm_kernel_init_t *k;
@@ -385,7 +385,7 @@ gm_init_graph_kernels(ndt_context_t *ctx)
     }
 
     for (k = kernels; k->name != NULL; k++) {
-        if (gm_add_kernel(k, ctx) < 0) {
+        if (gm_add_kernel(tbl, k, ctx) < 0) {
             return -1;
         }
     }
