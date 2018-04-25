@@ -44,7 +44,7 @@
 
 /* libxnd.so is not linked without at least one xnd symbol. The -no-as-needed
  * linker option is difficult to integrate into setup.py. */
-const void *dummy = &xnd_error;
+const void *dummy = NULL;
 
 
 /****************************************************************************/
@@ -155,7 +155,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         in_types[i] = stack[i].type;
     }
 
-    kernel = gm_select(&spec, self->tbl, self->name, in_types, nin, stack, &ctx);
+    kernel = gm_select(&spec, self->tbl, self->name, in_types, (int)nin, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
@@ -407,6 +407,8 @@ PyInit__gumath(void)
     static int initialized = 0;
 
     if (!initialized) {
+       dummy = &xnd_error;
+
        gm_init();
 
        if (import_ndtypes() < 0) {

@@ -135,7 +135,7 @@ GM_API gm_func_t *gm_add_func(gm_tbl_t *tbl, const char *name, ndt_context_t *ct
 GM_API int gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_context_t *ctx);
 
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
-GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, gm_tbl_t *tbl, const char *name,
+GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
                              const ndt_t *in_types[], int nin, const xnd_t args[],
                              ndt_context_t *ctx);
 
