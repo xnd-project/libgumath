@@ -322,6 +322,34 @@ class TestNumba(unittest.TestCase):
 
         np.testing.assert_equal(z, c)
 
+    def test_numba_multimethod(self):
+
+        import numba as nb
+
+        @nb.guvectorize(["void(int32, int32, int32)",
+                         "void(int64, int64, int64)",
+                         "void(float32, float32, float32)",
+                         "void(float64, float64, float64)"], "(), () -> ()")
+        def f(x, y, out):
+            out = x + y
+
+        @gm.xndvectorize(["... * int32, ... * int32 -> ... * int32",
+                          "... * int64, ... * int64 -> ... * int64",
+                          "... * float32, ... *  float32 -> ... * float32",
+                          "... * float64, ... * float64 -> ... * float64"])
+        def g(x, y, out):
+            out = x + y
+
+        a = np.arange(50000).reshape(1000, 5, 10)
+        b = np.arange(50000.0).reshape(1000, 5, 10)
+        c = f(a, a)
+
+        x = xnd(a.tolist(), type="1000 * 5 * 10 * int64")
+        y = xnd(b.tolist(), type="1000 * 5 * 10 * float64")
+        z = g(a, a)
+
+        np.testing.assert_equal(z, c)
+
 
 ALL_TESTS = [
   TestCall,

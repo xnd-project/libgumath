@@ -39,19 +39,35 @@ try:
     import numpy as np
     from numba.npyufunc import GUVectorize
 
-    def xndvectorize(s):
+    def xndvectorize(v):
+        if isinstance(v, str):
+            v = [v]
+        if isinstance(v, list):
+            lst = [ndt(s).to_nbformat() for s in v]
+            sigs = [x[0] for x in lst]
+            coretypes = [x[1] for x in lst]
+            if (len(set(sigs))) != 1:
+                raise ValueError(
+                         "empty list or different signatures in multimethod")
+            sig = sigs[0]
+        else:
+            raise TypeError("unsupported input type %s" % type(v))
+
         def wrap(func):
-            sig, coretypes = ndt(s).to_nbformat()
             guvec = GUVectorize(func, sig, nopython=True)
-            guvec.add(coretypes)
+            for t in coretypes:
+                guvec.add(t)
             g = guvec.build_ufunc()
+
             def h(*args, **kwargs):
                 out = g(*args, **kwargs)
                 view = xnd.from_buffer(out)
                 ret = xnd.empty(view.type)
                 np.copyto(np.array(ret, copy=False), out)
                 return ret
+
             return h
+
         return wrap
 
 except ImportError:
