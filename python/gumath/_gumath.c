@@ -377,10 +377,50 @@ unsafe_add_numpy_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     return gufunc_new(table, f->name);
 }
 
+static PyObject *
+unsafe_add_xnd_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
+{
+    NDT_STATIC_CONTEXT(ctx);
+    static char *kwlist[] = {"name", "sig", "ptr", NULL};
+    gm_kernel_init_t k = {NULL};
+    gm_func_t *f;
+    char *name;
+    char *sig;
+    PyObject *ptr;
+    void *p;
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ssO", kwlist, &name, &sig,
+        &ptr)) {
+        return NULL;
+    }
+
+    p = PyLong_AsVoidPtr(ptr);
+    if (p == NULL) {
+        return NULL;
+    }
+
+    k.name = name;
+    k.sig = sig;
+    k.vectorize = false;
+    k.Xnd = p;
+
+    if (gm_add_kernel(table, &k, &ctx) < 0) {
+        return seterr(&ctx);
+    }
+
+    f = gm_tbl_find(table, name, &ctx);
+    if (f == NULL) {
+        return seterr(&ctx);
+    }
+
+    return gufunc_new(table, f->name);
+}
+
 static PyMethodDef gumath_methods [] =
 {
   /* Methods */
   { "unsafe_add_numpy_kernel", (PyCFunction)unsafe_add_numpy_kernel, METH_VARARGS|METH_KEYWORDS, NULL },
+  { "unsafe_add_xnd_kernel", (PyCFunction)unsafe_add_xnd_kernel, METH_VARARGS|METH_KEYWORDS, NULL },
   { NULL, NULL, 1 }
 };
 
