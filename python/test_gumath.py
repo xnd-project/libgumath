@@ -92,6 +92,19 @@ class TestCall(unittest.TestCase):
                 b = np.sin(a)
                 np.testing.assert_equal(y, b)
 
+    def test_sin_xnd(self):
+
+        lst, t, dtype = TEST_CASES[0]
+        x = xnd(lst, type=t)
+        y = gm.xnd_sin0d(x)
+        z = gm.xnd_sin1d(x)
+
+        if np is not None:
+            a = np.array(lst, dtype=dtype)
+            b = np.sin(a)
+            np.testing.assert_equal(y, b)
+            np.testing.assert_equal(z, b)
+
     def test_sin_strided(self):
 
         for lst, t, dtype in TEST_CASES:
@@ -107,6 +120,22 @@ class TestCall(unittest.TestCase):
                 b = a[::-2, ::-2]
                 c = np.sin(b)
                 np.testing.assert_equal(z, c)
+
+    def test_sin_xnd_strided(self):
+
+        lst, t, dtype = TEST_CASES[1]
+        x = xnd(lst, type=t)
+
+        y = x[::-2, ::-2]
+        z1 = gm.xnd_sin0d(y)
+        z2 = gm.xnd_sin1d(y)
+
+        if np is not None:
+            a = np.array(lst, dtype=dtype)
+            b = a[::-2, ::-2]
+            c = np.sin(b)
+            np.testing.assert_equal(z1, c)
+            np.testing.assert_equal(z2, c)
 
     def test_copy(self):
 
@@ -340,13 +369,13 @@ class TestNumba(unittest.TestCase):
         def g(x, y, out):
             out = x + y
 
-        a = np.arange(50000).reshape(1000, 5, 10)
+        a = np.arange(50000.0).reshape(1000, 5, 10)
         b = np.arange(50000.0).reshape(1000, 5, 10)
-        c = f(a, a)
+        c = f(a, b)
 
-        x = xnd(a.tolist(), type="1000 * 5 * 10 * int64")
+        x = xnd(a.tolist(), type="1000 * 5 * 10 * float64")
         y = xnd(b.tolist(), type="1000 * 5 * 10 * float64")
-        z = g(a, a)
+        z = g(a, b)
 
         np.testing.assert_equal(z, c)
 

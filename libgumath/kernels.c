@@ -131,6 +131,32 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+int
+gm_0D_sin_d_d(xnd_t stack[], ndt_context_t *ctx GM_UNUSED)
+{
+    const xnd_t *in = &stack[0];
+    xnd_t *out = &stack[1];
+
+    *(double *)out->ptr = sin(*(double *)in->ptr);
+    return 0;
+}
+
+int
+gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx GM_UNUSED)
+{
+    const xnd_t *in = &stack[0];
+    xnd_t *out = &stack[1];
+    int64_t N = xnd_fixed_shape(in);
+
+    for (intptr_t i = 0; i < N; i++) {
+        const xnd_t v = xnd_fixed_dim_next(in, i);
+        const xnd_t u = xnd_fixed_dim_next(out, i);
+        *(double *)u.ptr = sin(*(double *)v.ptr);
+    }
+
+    return 0;
+}
+
 
 /****************************************************************************/
 /*                              NumPy kernels                               */
@@ -309,6 +335,10 @@ static const gm_kernel_init_t kernels[] = {
 
   { .name = "sin", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float32_float64 },
   { .name = "sin", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float64_float64 },
+
+  /* Xnd kernels */
+  { .name = "xnd_sin0d", .sig = "... * float64 -> ... * float64", .vectorize = false, .Xnd = gm_0D_sin_d_d },
+  { .name = "xnd_sin1d", .sig = "... * float64 -> ... * float64", .vectorize = true, .Xnd = gm_1D_sin_d_d },
 
   /* ragged arrays */
   { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
