@@ -132,21 +132,23 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
 }
 
 int
-gm_0D_sin_d_d(xnd_t stack[], ndt_context_t *ctx GM_UNUSED)
+gm_0D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
 {
     const xnd_t *in = &stack[0];
     xnd_t *out = &stack[1];
+    (void)ctx;
 
     *(double *)out->ptr = sin(*(double *)in->ptr);
     return 0;
 }
 
 int
-gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx GM_UNUSED)
+gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
 {
     const xnd_t *in = &stack[0];
     xnd_t *out = &stack[1];
     int64_t N = xnd_fixed_shape(in);
+    (void)ctx;
 
     for (intptr_t i = 0; i < N; i++) {
         const xnd_t v = xnd_fixed_dim_next(in, i);
