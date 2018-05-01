@@ -72,3 +72,8 @@ try:
 
 except ImportError:
     xndvectorize = None
+
+try:
+    from .numba import jit_to_kernel
+except ImportError:
+    jit_to_kernel = None
