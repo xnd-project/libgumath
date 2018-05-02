@@ -379,6 +379,36 @@ class TestNumba(unittest.TestCase):
 
         np.testing.assert_equal(z, c)
 
+    def test_numba_add_scalar(self):
+
+        import numba as nb
+
+        @nb.guvectorize(["void(int64[:], int64, int64[:])"], '(n),()->(n)')
+        def g(x, y, res):
+            for i in range(x.shape[0]):
+                res[i] = x[i] + y
+
+        a = np.arange(5000).reshape(100, 5, 10)
+        b = np.arange(500).reshape(100, 5)
+        c = g(a, b)
+
+        x = xnd(a.tolist(), type="100 * 5 * 10 * int64")
+        y = xnd(b.tolist(), type="100 * 5 * int64")
+        z = gm.add_scalar(x, y)
+
+        np.testing.assert_equal(z, c)
+
+        a = np.arange(500)
+        b = np.array(100)
+        c = g(a, b)
+
+        x = xnd(a.tolist(), type="500 * int64")
+        y = xnd(b.tolist(), type="int64")
+        z = gm.add_scalar(x, y)
+
+        np.testing.assert_equal(z, c)
+
+
 
 ALL_TESTS = [
   TestCall,

@@ -150,10 +150,29 @@ gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
     int64_t N = xnd_fixed_shape(in);
     (void)ctx;
 
-    for (intptr_t i = 0; i < N; i++) {
+    for (int64_t i = 0; i < N; i++) {
         const xnd_t v = xnd_fixed_dim_next(in, i);
         const xnd_t u = xnd_fixed_dim_next(out, i);
         *(double *)u.ptr = sin(*(double *)v.ptr);
+    }
+
+    return 0;
+}
+
+int
+gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *x = &stack[0];
+    const xnd_t *y = &stack[1];
+    xnd_t *z = &stack[2];
+    int64_t N = xnd_fixed_shape(x);
+    int64_t yy = *(int64_t *)y->ptr;
+    (void)ctx;
+
+    for (int64_t i = 0; i < N; i++) {
+        const xnd_t xx = xnd_fixed_dim_next(x, i);
+        const xnd_t zz = xnd_fixed_dim_next(z, i);
+        *(int64_t *)zz.ptr = *(int64_t *)xx.ptr + yy;
     }
 
     return 0;
@@ -341,6 +360,8 @@ static const gm_kernel_init_t kernels[] = {
   /* Xnd kernels */
   { .name = "xnd_sin0d", .sig = "... * float64 -> ... * float64", .vectorize = false, .Xnd = gm_0D_sin_d_d },
   { .name = "xnd_sin1d", .sig = "... * float64 -> ... * float64", .vectorize = true, .Xnd = gm_1D_sin_d_d },
+
+  { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .vectorize = false, .Xnd = gm_0D_add_scalar },
 
   /* ragged arrays */
   { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
