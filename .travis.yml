@@ -61,6 +61,8 @@ matrix:
         - conda build .conda/gumath -c plures/label/dev
         - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
         - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBXND --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $XND --user plures --label dev; fi
 
     - language: objective-c
       os: osx
@@ -85,3 +87,9 @@ matrix:
         - conda build .conda/gumath -c plures/label/dev
         - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
         - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBXND --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $XND --user plures --label dev; fi
+
+env:
+  global:
+    - secure: "cxhvakc6xXUvK6HbA7H/zXf6mGF+Qqgp+zdUqioeeEiOOB7lj5Ygxubco55BuaB/48OyiujnwEeAy8lHiXB0gBfqlykOYrwvW+s6leqyPq+OnH3FZmEIhSsAKx0xDvH/PjPdGeWBdHTEwowof9YWSdQaJlnLeiIAMB6UbuyvLA8ytLS4Jcb+fOCnKRKs+wppT97UudlHzwXqAF/bHjDTzoDvowinRmeFoFcrgjL1+gvXWZcXMx+BO3FutLa3CCgN4J+6Oi+nzVo1vLLuHaSpdrFUHZfAG+CqlnWYVfC7lloFvFotNCMOz/0vSfrjtOWQ5T68l5XczLS0Q6dyS0L27fIuZYxGhqk0K72uhMZB0n80cVnZ4RDAnP3fvLtk43u8iB436pmtHOqU+EcvAmI1flK613s8k7UYtlc4t7I+T6E6065GuxLo/vbJwdmVF6Z5SICrpCD0WDlldKyLG7+/qd+7oca4BONzdfa7qjBF05NgFWSvGeWmf+wPDRPY7q/9yMAh5Z7Bi7FgOFTSklOXOch8v70D4+wX1aUUZ9qx+kiZYI8/djUIEPnqS54gXAyRfraDN/VuY3yk0aPgXZgCXzr8kOXxbyF8o+9y0sUZ26qN0cRegrrhNVZ1BYYOnsDAS7QPF447ZQIIaqYVuhh0+wdiTJjXqyGgsa9PuuCFAL8="
