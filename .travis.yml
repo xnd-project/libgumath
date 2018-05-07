@@ -26,8 +26,8 @@ matrix:
       os: osx
       compiler: clang
       before_install:
-        - brew install python3
-        - pip install numpy numba
+        - brew install python3 pip
+        - python3 -m pip install numpy numba
       before_script:
         - export CC=clang
         - git clone https://github.com/plures/ndtypes.git
