@@ -20,3 +20,11 @@ build_script:
   - conda-build .conda/gumath -c plures/label/dev
   - ps: $env:LIBGUMATH = (conda build --output .conda/libgumath -c plures/label/dev)
   - ps: $env:GUMATH = (conda build --output .conda/gumath -c plures/label/dev)
+
+on_success:
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:LIBGUMATH --user plures --label dev "2>&1" }
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:GUMATH --user plures --label dev "2>&1" }
+
+environment:
+  anaconda_token:
+    secure: rTnsCbMjHi/mOYo8Tz2SzaungqlrdypPkMMzuMniN06Gv2fgCizppeKw2gz/kQ7T
