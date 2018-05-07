@@ -46,7 +46,7 @@ import warnings
 
 
 DESCRIPTION = """\
-Vectorized functions that operate on xnd containers.\
+Extensible array functions that operate on xnd containers.\
 """
 
 LONG_DESCRIPTION = """\
@@ -70,6 +70,7 @@ if "install" in sys.argv or "bdist_wheel" in sys.argv:
                           "%s/xnd" % get_python_lib()]
     CONFIGURE_LIBS = CONFIGURE_INCLUDES
     INCLUDES = LIBS = CONFIGURE_INCLUDES
+    LIBGUMATHDIR = "%s/gumath" % get_python_lib()
     INSTALL_LIBS = True
 elif "conda_install" in sys.argv:
     site = ["%s/ndtypes" % get_python_lib(), "%s/xnd" % get_python_lib()]
