@@ -70,14 +70,13 @@ if "install" in sys.argv or "bdist_wheel" in sys.argv:
                           "%s/xnd" % get_python_lib()]
     CONFIGURE_LIBS = CONFIGURE_INCLUDES
     INCLUDES = LIBS = CONFIGURE_INCLUDES
-    LIBGUMATHDIR = "%s/gumath" % get_python_lib()
     INSTALL_LIBS = True
 elif "conda_install" in sys.argv:
     site = ["%s/ndtypes" % get_python_lib(), "%s/xnd" % get_python_lib()]
-    sys_includes = os.path.join(os.environ['PREFIX'], "include")
+    sys_includes = [os.path.join(os.environ['PREFIX'], "include")]
     libdir = "Library/bin" if sys.platform == "win32" else "lib"
     sys_libs = os.path.join(os.environ['PREFIX'], libdir)
-    CONFIGURE_INCLUDES = INCLUDES = sys_includes + site
+    INCLUDES = CONFIGURE_INCLUDES = sys_includes + site
     LIBS = [sys_libs] + site
     LIBGUMATHDIR = "%s/gumath" % get_python_lib()
     INSTALL_LIBS = False

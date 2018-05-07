@@ -1,6 +1,6 @@
 
 AC_PREREQ([2.67])
-AC_INIT(gumath, 0.2.0dev3, plures@anaconda.com, gumath, https://github.com/plures/)
+AC_INIT(gumath, 0.2.0dev3, skrah@bytereef.org, gumath, https://github.com/plures/)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_FILES([Makefile libgumath/Makefile])
 
