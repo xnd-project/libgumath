@@ -9,7 +9,7 @@ matrix:
   include:
     - compiler: gcc
       before_install:
-        - pip install numpy numba
+        - pip install numpy
       before_script:
         - git clone https://github.com/plures/ndtypes.git
         - git clone https://github.com/plures/xnd.git
