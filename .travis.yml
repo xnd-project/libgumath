@@ -39,3 +39,44 @@ matrix:
       script:
         - python3 setup.py build
         - python3 setup.py test
+
+    - compiler: conda
+      install:
+        - cd ..
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        - bash Miniconda3-latest-Linux-x86_64.sh -b
+        - export PATH=$HOME/miniconda3/bin:$PATH
+        - conda update --yes conda
+        - conda install --yes conda-build=3.3.0
+        - conda install --yes anaconda-client
+        - conda install --yes -c plures/label/dev ndtypes
+        - conda install --yes -c plures/label/dev xnd
+      script:
+        - cd gumath
+        - git fetch --unshallow
+        - conda build .conda/libgumath -c plures/label/dev
+        - conda build .conda/gumath -c plures/label/dev
+        - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
+        - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
+
+    - language: objective-c
+      os: osx
+      compiler: conda
+      install:
+        - cd ..
+        - wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+        - bash Miniconda3-latest-MacOSX-x86_64.sh -b
+        - export PATH=$HOME/miniconda3/bin:$PATH
+        - export CC=clang
+        - conda update --yes conda
+        - conda install --yes conda-build=3.3.0
+        - conda install --yes anaconda-client
+        - conda install --yes -c plures/label/dev ndtypes
+        - conda install --yes -c plures/label/dev xnd
+      script:
+        - cd gumath
+        - git fetch --unshallow
+        - conda build .conda/libgumath -c plures/label/dev
+        - conda build .conda/gumath -c plures/label/dev
+        - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
+        - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
