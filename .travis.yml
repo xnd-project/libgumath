@@ -61,8 +61,8 @@ matrix:
         - conda build .conda/gumath -c plures/label/dev
         - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
         - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBXND --user plures --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $XND --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user plures --label dev; fi
 
     - language: objective-c
       os: osx
@@ -87,8 +87,8 @@ matrix:
         - conda build .conda/gumath -c plures/label/dev
         - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
         - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBXND --user plures --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $XND --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user plures --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user plures --label dev; fi
 
 env:
   global:
