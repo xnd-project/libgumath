@@ -50,6 +50,8 @@ matrix:
         - conda update --yes conda
         - conda install --yes conda-build=3.3.0
         - conda install --yes anaconda-client
+        - conda install --yes numpy
+        - conda install --yes numba
         - conda install --yes -c plures/label/dev ndtypes
         - conda install --yes -c plures/label/dev xnd
       script:
@@ -72,6 +74,8 @@ matrix:
         - conda update --yes conda
         - conda install --yes conda-build=3.3.0
         - conda install --yes anaconda-client
+        - conda install --yes numpy
+        - conda install --yes numba
         - conda install --yes -c plures/label/dev ndtypes
         - conda install --yes -c plures/label/dev xnd
       script:
