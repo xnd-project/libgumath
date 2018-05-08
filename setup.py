@@ -220,7 +220,7 @@ setup (
     keywords = ["gufuncs", "array computing", "vectorization"],
     platforms = ["Many"],
     classifiers = [
-        "Development Status :: 0 - Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Programming Language :: C",
