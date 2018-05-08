@@ -14,16 +14,16 @@ build_script:
   - conda install --yes anaconda-client
   - conda install --yes numpy
   - conda install --yes numba
-  - conda install --yes ndtypes -c plures/label/dev
-  - conda install --yes xnd -c plures/label/dev
-  - conda-build .conda/libgumath -c plures/label/dev
-  - conda-build .conda/gumath -c plures/label/dev
-  - ps: $env:LIBGUMATH = (conda build --output .conda/libgumath -c plures/label/dev)
-  - ps: $env:GUMATH = (conda build --output .conda/gumath -c plures/label/dev)
+  - conda install --yes ndtypes -c xnd/label/dev
+  - conda install --yes xnd -c xnd/label/dev
+  - conda-build .conda/libgumath -c xnd/label/dev
+  - conda-build .conda/gumath -c xnd/label/dev
+  - ps: $env:LIBGUMATH = (conda build --output .conda/libgumath -c xnd/label/dev)
+  - ps: $env:GUMATH = (conda build --output .conda/gumath -c xnd/label/dev)
 
 on_success:
-  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:LIBGUMATH --user plures --label dev "2>&1" }
-  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:GUMATH --user plures --label dev "2>&1" }
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:LIBGUMATH --user xnd --label dev "2>&1" }
+  - ps: if(-not $env:APPVEYOR_PULL_REQUEST_NUMBER) { cmd /C anaconda --token $env:anaconda_token upload $env:GUMATH --user xnd --label dev "2>&1" }
 
 environment:
   anaconda_token:

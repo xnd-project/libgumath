@@ -52,17 +52,17 @@ matrix:
         - conda install --yes anaconda-client
         - conda install --yes numpy
         - conda install --yes numba
-        - conda install --yes -c plures/label/dev ndtypes
-        - conda install --yes -c plures/label/dev xnd
+        - conda install --yes -c xnd/label/dev ndtypes
+        - conda install --yes -c xnd/label/dev xnd
       script:
         - cd gumath
         - git fetch --unshallow
-        - conda build .conda/libgumath -c plures/label/dev
-        - conda build .conda/gumath -c plures/label/dev
-        - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
-        - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user plures --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user plures --label dev; fi
+        - conda build .conda/libgumath -c xnd/label/dev
+        - conda build .conda/gumath -c xnd/label/dev
+        - export LIBGUMATH=`conda build --output .conda/libgumath -c xnd/label/dev`
+        - export GUMATH=`conda build --output .conda/gumath -c xnd/label/dev`
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user xnd --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user xnd --label dev; fi
 
     - language: objective-c
       os: osx
@@ -78,17 +78,17 @@ matrix:
         - conda install --yes anaconda-client
         - conda install --yes numpy
         - conda install --yes numba
-        - conda install --yes -c plures/label/dev ndtypes
-        - conda install --yes -c plures/label/dev xnd
+        - conda install --yes -c xnd/label/dev ndtypes
+        - conda install --yes -c xnd/label/dev xnd
       script:
         - cd gumath
         - git fetch --unshallow
-        - conda build .conda/libgumath -c plures/label/dev
-        - conda build .conda/gumath -c plures/label/dev
-        - export LIBGUMATH=`conda build --output .conda/libgumath -c plures/label/dev`
-        - export GUMATH=`conda build --output .conda/gumath -c plures/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user plures --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user plures --label dev; fi
+        - conda build .conda/libgumath -c xnd/label/dev
+        - conda build .conda/gumath -c xnd/label/dev
+        - export LIBGUMATH=`conda build --output .conda/libgumath -c xnd/label/dev`
+        - export GUMATH=`conda build --output .conda/gumath -c xnd/label/dev`
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user xnd --label dev; fi
+        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user xnd --label dev; fi
 
 env:
   global:
