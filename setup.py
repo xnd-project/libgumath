@@ -55,9 +55,9 @@ LONG_DESCRIPTION = """\
 warnings.simplefilter("ignore", UserWarning)
 
 if sys.platform == "darwin":
-    LIBNAME = "libxnd.dylib"
-    LIBSONAME = "libxnd.0.dylib"
-    LIBSHARED = "libxnd.0.2.0dev3.dylib"
+    LIBNAME = "libgumath.dylib"
+    LIBSONAME = "libgumath.0.dylib"
+    LIBSHARED = "libgumath.0.2.0dev3.dylib"
 else:
     LIBNAME = "libgumath.so"
     LIBSONAME = "libgumath.so.0"
