@@ -159,6 +159,71 @@ gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+/*
+ * cos() on ragged arrays.
+ *
+ * Signature:
+ *   "D... * var * float64 -> D... * var * float64"
+ */
+static int
+gm_var_cos(xnd_t stack[], ndt_context_t *ctx)
+{
+    int64_t start[2], step[2];
+    int64_t shape, n;
+
+    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,
+                            stack[0].index, ctx);
+    if (shape < 0) {
+        return -1;
+    }
+
+    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,
+                        ctx);
+    if (n < 0) {
+        return -1;
+    }
+    if (n != shape) {
+        ndt_err_format(ctx, NDT_ValueError, "shape mismatch in xnd_var_cos()");
+        return -1;
+    }
+
+    for (int64_t i = 0; i < shape; i++) {
+        const xnd_t in = xnd_var_dim_next(&stack[0], start[0], step[0], i);
+        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i);
+        *(double *)out.ptr = cos(*(double *)in.ptr);
+    }
+
+    return 0;
+}
+
+int
+gm_0D_cos_d_d(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *in = &stack[0];
+    xnd_t *out = &stack[1];
+    (void)ctx;
+
+    *(double *)out->ptr = cos(*(double *)in->ptr);
+    return 0;
+}
+
+int
+gm_1D_cos_d_d(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *in = &stack[0];
+    xnd_t *out = &stack[1];
+    int64_t N = xnd_fixed_shape(in);
+    (void)ctx;
+
+    for (int64_t i = 0; i < N; i++) {
+        const xnd_t v = xnd_fixed_dim_next(in, i);
+        const xnd_t u = xnd_fixed_dim_next(out, i);
+        *(double *)u.ptr = cos(*(double *)v.ptr);
+    }
+
+    return 0;
+}
+
 int
 gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
 {
@@ -304,6 +369,19 @@ NP_STRIDED(sin, int64, float64)
 
 NP_STRIDED(sinf, float32, float32)
 
+NP_STRIDED(cos, float32, float64)
+NP_STRIDED(cos, float64, float64)
+NP_STRIDED(cos, uint8, float64)
+NP_STRIDED(cos, uint16, float64)
+NP_STRIDED(cos, uint32, float64)
+NP_STRIDED(cos, uint64, float64)
+NP_STRIDED(cos, int8, float64)
+NP_STRIDED(cos, int16, float64)
+NP_STRIDED(cos, int32, float64)
+NP_STRIDED(cos, int64, float64)
+
+NP_STRIDED(cosf, float32, float32)
+
 NP_COPY_STRIDED(uint8, uint8)
 NP_COPY_STRIDED(uint16, uint16)
 NP_COPY_STRIDED(uint32, uint32)
@@ -357,14 +435,37 @@ static const gm_kernel_init_t kernels[] = {
   { .name = "sin", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float32_float64 },
   { .name = "sin", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float64_float64 },
 
+  /* COS */
+  /* return float32 */
+  { .name = "cos", .sig = "... * float32 -> ... * float32", .vectorize = true, .Strided = gm_cosf_strided_float32_float32 },
+
+  /* return float64 */
+  { .name = "cos", .sig = "... * uint8 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_uint8_float64 },
+  { .name = "cos", .sig = "... * uint16 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_uint16_float64 },
+  { .name = "cos", .sig = "... * uint32 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_uint32_float64 },
+  { .name = "cos", .sig = "... * uint64 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_uint64_float64 },
+
+  { .name = "cos", .sig = "... * int8 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_int8_float64 },
+  { .name = "cos", .sig = "... * int16 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_int16_float64 },
+  { .name = "cos", .sig = "... * int32 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_int32_float64 },
+  { .name = "cos", .sig = "... * int64 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_int64_float64 },
+
+  { .name = "cos", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_float32_float64 },
+  { .name = "cos", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_cos_strided_float64_float64 },
+
   /* Xnd kernels */
   { .name = "xnd_sin0d", .sig = "... * float64 -> ... * float64", .vectorize = false, .Xnd = gm_0D_sin_d_d },
   { .name = "xnd_sin1d", .sig = "... * float64 -> ... * float64", .vectorize = true, .Xnd = gm_1D_sin_d_d },
+
+  { .name = "xnd_cos0d", .sig = "... * float64 -> ... * float64", .vectorize = false, .Xnd = gm_0D_cos_d_d },
+  { .name = "xnd_cos1d", .sig = "... * float64 -> ... * float64", .vectorize = true, .Xnd = gm_1D_cos_d_d },
 
   { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .vectorize = false, .Xnd = gm_0D_add_scalar },
 
   /* ragged arrays */
   { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
+
+  { .name = "cos", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_cos },
 
   /* MULTIPLY */
   /* quaternions */

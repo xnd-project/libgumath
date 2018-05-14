@@ -137,6 +137,80 @@ class TestCall(unittest.TestCase):
             np.testing.assert_equal(z1, c)
             np.testing.assert_equal(z2, c)
 
+    def test_cos_scalar(self):
+
+        x1 = xnd(1.2, type="float64")
+        y1 = gm.cos(x1)
+
+        x2 = xnd(1.23e10, type="float32")
+        y2 = gm.cos(x2)
+
+        if np is not None:
+            a1 = np.array(1.2, dtype="float64")
+            b1 = np.cos(a1)
+
+            a2 = np.array(1.23e10, dtype="float32")
+            b2 = np.cos(a2)
+
+            np.testing.assert_equal(y1.value, b1)
+            np.testing.assert_equal(y2.value, b2)
+
+    def test_cos(self):
+
+        for lst, t, dtype in TEST_CASES:
+            x = xnd(lst, type=t)
+            y = gm.cos(x)
+
+            if np is not None:
+                a = np.array(lst, dtype=dtype)
+                b = np.cos(a)
+                np.testing.assert_equal(y, b)
+
+    def test_cos_xnd(self):
+
+        lst, t, dtype = TEST_CASES[0]
+        x = xnd(lst, type=t)
+        y = gm.xnd_cos0d(x)
+        z = gm.xnd_cos1d(x)
+
+        if np is not None:
+            a = np.array(lst, dtype=dtype)
+            b = np.cos(a)
+            np.testing.assert_equal(y, b)
+            np.testing.assert_equal(z, b)
+
+    def test_cos_strided(self):
+
+        for lst, t, dtype in TEST_CASES:
+            x = xnd(lst, type=t)
+            if x.type.ndim < 2:
+                continue
+
+            y = x[::-2, ::-2]
+            z = gm.cos(y)
+
+            if np is not None:
+                a = np.array(lst, dtype=dtype)
+                b = a[::-2, ::-2]
+                c = np.cos(b)
+                np.testing.assert_equal(z, c)
+
+    def test_cos_xnd_strided(self):
+
+        lst, t, dtype = TEST_CASES[1]
+        x = xnd(lst, type=t)
+
+        y = x[::-2, ::-2]
+        z1 = gm.xnd_cos0d(y)
+        z2 = gm.xnd_cos1d(y)
+
+        if np is not None:
+            a = np.array(lst, dtype=dtype)
+            b = a[::-2, ::-2]
+            c = np.cos(b)
+            np.testing.assert_equal(z1, c)
+            np.testing.assert_equal(z2, c)
+
     def test_copy(self):
 
         for lst, t, dtype in TEST_CASES:
@@ -166,7 +240,7 @@ class TestCall(unittest.TestCase):
 
     @unittest.skipIf(sys.platform == "win32", "missing C99 complex support")
     def test_quaternion(self):
-  
+
         lst = [[[1+2j, 4+3j],
                 [-4+3j, 1-2j]],
                [[4+2j, 1+10j],
@@ -192,7 +266,7 @@ class TestCall(unittest.TestCase):
 
     @unittest.skipIf(sys.platform == "win32", "missing C99 complex support")
     def test_quaternion_error(self):
-  
+
         lst = [[[1+2j, 4+3j],
                 [-4+3j, 1-2j]],
                [[4+2j, 1+10j],
