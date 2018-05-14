@@ -1,7 +1,7 @@
 .. meta::
    :robots: index, follow
    :description: gumath documentation
-   :keywords: libgumath, gumath, C, Python, array computing
+   :keywords: libgumath, gumath, C, Python, function dispatch
 
 .. sectionauthor:: Stefan Krah <skrah at bytereef.org>
 
@@ -9,7 +9,8 @@
 gumath
 ======
 
-gumath is a Python wrapper for the ligmumath library. It provides support for the function dispatch.
+This package provides tools to dispatch functions towards the memory containers. These containers can be have a general
+ sctructure or a Numpy-like container with a composable, generalized function concept.
 
 
 Libgumath

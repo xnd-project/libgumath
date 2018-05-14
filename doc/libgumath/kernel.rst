@@ -1,3 +1,10 @@
+.. meta::
+   :robots: index, follow
+   :description: libgumath documentation
+   :keywords: libgumath, function dispatch, kernel, C
+
+.. sectionauthor:: Stefan Krah <skrah at bytereef.org>
+
 Kernel
 ======
 

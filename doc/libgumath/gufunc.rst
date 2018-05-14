@@ -1,3 +1,10 @@
+.. meta::
+   :robots: index, follow
+   :description: gumath documentation
+   :keywords: function dispatch, mathematical functions, C, multimethods
+
+.. sectionauthor:: Stefan Krah <skrah at bytereef.org>
+
 Gufunc
 ======
 

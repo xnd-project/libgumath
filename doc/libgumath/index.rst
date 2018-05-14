@@ -1,7 +1,7 @@
 .. meta::
    :robots: index, follow
    :description: libgumath documentation
-   :keywords: libgumath, C, array computing
+   :keywords: libgumath, C
 
 .. sectionauthor:: Stefan Krah <skrah at bytereef.org>
 
