@@ -10,7 +10,7 @@ gumath
 ======
 
 This package provides tools to dispatch functions towards the memory containers. These containers can be have a general
- sctructure or a Numpy-like container with a composable, generalized function concept.
+structure or a Numpy-like container with a composable, generalized function concept.
 
 
 Libgumath

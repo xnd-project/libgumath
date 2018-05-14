@@ -1,7 +1,7 @@
 .. meta::
    :robots: index, follow
    :description: gumath documentation
-   :keywords: gumath, sin, Python
+   :keywords: gumath, trigonometry, sin, Python
 
 .. sectionauthor:: Vital Fernandez <vital-fernandez at gmail.com>
 
@@ -39,5 +39,3 @@ Example
    >>> gm.sin(xnd(x))
    xnd([0.0, 0.49999, 0.99999], type='3 * float64')
 
-Notes
-=====

@@ -20,9 +20,4 @@ for Numba.
 
 Currently there is just one working test with sin().
 
-The following list includes some of the issues to be discussed before the next release:
-
--  If the datashape (ndt_t) signatures are given on the Python level (which is probably the only sane option),
-the jit-compiled kernel needs to be type-checked against the ndt_t type.
-
 
