@@ -170,10 +170,10 @@ def gumath_ext():
            from distutils.msvc9compiler import MSVCCompiler
            MSVCCompiler().initialize()
            os.chdir("vcbuild")
-           os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath("../ndtypes/libndtypes")
-           os.environ['LIBNDTYPESDIR'] = os.path.normpath("../ndtypes/libndtypes")
-           os.environ['LIBXNDINCLUDE'] = os.path.normpath("../xnd/libxnd")
-           os.environ['LIBXNDDIR'] = os.path.normpath("../xnd/libxnd")
+           os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[0])
+           os.environ['LIBNDTYPESDIR'] = os.path.normpath(CONFIGURE_LIBS[0])
+           os.environ['LIBXNDINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[1])
+           os.environ['LIBXNDDIR'] = os.path.normpath(CONFIGURE_LIBS[1])
            if ARCH == "64bit":
                  os.system("vcbuild64.bat")
            else:
