@@ -43,8 +43,8 @@
 
 
 static int
-gm_multiply_strided_q64_q64(char *args[], intptr_t dimensions[], intptr_t steps[],
-                            void *data GM_UNUSED)
+gm_multiply_strided_1D_q64_q64(char *args[], intptr_t dimensions[], intptr_t steps[],
+                               void *data GM_UNUSED)
 {
     const char *src1 = args[0];
     const char *src2 = args[1];
@@ -77,8 +77,8 @@ gm_multiply_strided_q64_q64(char *args[], intptr_t dimensions[], intptr_t steps[
 }
 
 static int
-gm_multiply_strided_q128_q128(char *args[], intptr_t dimensions[], intptr_t steps[],
-                              void *data GM_UNUSED)
+gm_multiply_strided_1D_q128_q128(char *args[], intptr_t dimensions[], intptr_t steps[],
+                                 void *data GM_UNUSED)
 {
     const char *src1 = args[0];
     const char *src2 = args[1];
@@ -119,14 +119,14 @@ static const gm_typedef_init_t typedefs[] = {
 
 static const gm_kernel_init_t kernels[] = {
   { .name = "multiply",
-    .sig = "... * quaternion64, ... * quaternion64 -> ... * quaternion64",
-    .vectorize = true,
-    .Strided = gm_multiply_strided_q64_q64 },
+    .sig = "... * N * quaternion64, ... * N * quaternion64 -> ... * N * quaternion64",
+    .vectorize = false,
+    .Strided = gm_multiply_strided_1D_q64_q64 },
 
   { .name = "multiply",
-    .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
-    .vectorize = true,
-    .Strided = gm_multiply_strided_q128_q128 },
+    .sig = "... * N * quaternion128, ... * N * quaternion128 -> ... * N * quaternion128",
+    .vectorize = false,
+    .Strided = gm_multiply_strided_1D_q128_q128 },
 
   { .name = NULL, .sig = NULL }
 };
