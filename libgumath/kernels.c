@@ -42,9 +42,6 @@
 #include "gumath.h"
 
 
-#define XSTRINGIZE(v) #v
-#define STRINGIZE(v) XSTRINGIZE(v)
-
 gm_kernel_set_t empty_kernel_set =
  { .sig = NULL,
    .C = NULL,
@@ -97,6 +94,25 @@ count_valid_missing(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+int
+gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *x = &stack[0];
+    const xnd_t *y = &stack[1];
+    xnd_t *z = &stack[2];
+    int64_t N = xnd_fixed_shape(x);
+    int64_t yy = *(int64_t *)y->ptr;
+    (void)ctx;
+
+    for (int64_t i = 0; i < N; i++) {
+        const xnd_t xx = xnd_fixed_dim_next(x, i);
+        const xnd_t zz = xnd_fixed_dim_next(z, i);
+        *(int64_t *)zz.ptr = *(int64_t *)xx.ptr + yy;
+    }
+
+    return 0;
+}
+
 /*
  * sin() on ragged arrays.
  *
@@ -135,6 +151,14 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
 }
 
 
+/****************************************************************************/
+/*                           Generated Xnd kernels                          */
+/****************************************************************************/
+
+#define XSTRINGIZE(v) #v
+#define STRINGIZE(v) XSTRINGIZE(v)
+
+
 #define XND_ELEMWISE(func, srctype, desttype) \
 static int                                                               \
 gm_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
@@ -164,6 +188,18 @@ gm_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
     return 0;                                                            \
 }
 
+#define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
+  { .name = STRINGIZE(funcname),                                                \
+    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype), \
+    .vectorize = false,                                                         \
+    .Xnd = gm_##func##_1D_##srctype##_##desttype },                             \
+                                                                                \
+  { .name = STRINGIZE(funcname),                                                \
+    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),         \
+    .vectorize = false,                                                         \
+    .Xnd = gm_##func##_0D_##srctype##_##desttype }                              \
+
+
 XND_ELEMWISE(sinf, float32, float32)
 XND_ELEMWISE(sinf, int8, float32)
 XND_ELEMWISE(sinf, int16, float32)
@@ -186,36 +222,6 @@ XND_ELEMWISE(copy, uint64, uint64)
 XND_ELEMWISE(copy, float32, float32)
 XND_ELEMWISE(copy, float64, float64)
 
-
-#define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
-  { .name = STRINGIZE(funcname),                                                \
-    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype), \
-    .vectorize = false,                                                         \
-    .Xnd = gm_##func##_1D_##srctype##_##desttype },                             \
-                                                                                \
-  { .name = STRINGIZE(funcname),                                                \
-    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),         \
-    .vectorize = false,                                                         \
-    .Xnd = gm_##func##_0D_##srctype##_##desttype }                              \
-
-int
-gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
-{
-    const xnd_t *x = &stack[0];
-    const xnd_t *y = &stack[1];
-    xnd_t *z = &stack[2];
-    int64_t N = xnd_fixed_shape(x);
-    int64_t yy = *(int64_t *)y->ptr;
-    (void)ctx;
-
-    for (int64_t i = 0; i < N; i++) {
-        const xnd_t xx = xnd_fixed_dim_next(x, i);
-        const xnd_t zz = xnd_fixed_dim_next(z, i);
-        *(int64_t *)zz.ptr = *(int64_t *)xx.ptr + yy;
-    }
-
-    return 0;
-}
 
 
 static const gm_kernel_init_t kernels[] = {
