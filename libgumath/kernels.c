@@ -113,43 +113,6 @@ gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
-/*
- * sin() on ragged arrays.
- *
- * Signature:
- *   "D... * var * float64 -> D... * var * float64"
- */
-static int
-gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
-{
-    int64_t start[2], step[2];
-    int64_t shape, n;
-
-    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,
-                            stack[0].index, ctx);
-    if (shape < 0) {
-        return -1;
-    }
-
-    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,
-                        ctx);
-    if (n < 0) {
-        return -1;
-    }
-    if (n != shape) {
-        ndt_err_format(ctx, NDT_ValueError, "shape mismatch in xnd_var_sin()");
-        return -1;
-    }
-
-    for (int64_t i = 0; i < shape; i++) {
-        const xnd_t in = xnd_var_dim_next(&stack[0], start[0], step[0], i);
-        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i);
-        *(double *)out.ptr = sin(*(double *)in.ptr);
-    }
-
-    return 0;
-}
-
 
 /****************************************************************************/
 /*                           Generated Xnd kernels                          */
@@ -160,44 +123,81 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
 
 
 #define XND_ELEMWISE(func, srctype, desttype) \
-static int                                                               \
-gm_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
-{                                                                        \
-    const xnd_t *in = &stack[0];                                         \
-    xnd_t *out = &stack[1];                                              \
-    (void)ctx;                                                           \
-                                                                         \
-    *(desttype##_t *)out->ptr = func(*(const srctype##_t *)in->ptr);     \
-    return 0;                                                            \
-}                                                                        \
-                                                                         \
-static int                                                               \
-gm_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
-{                                                                        \
-    const xnd_t *in = &stack[0];                                         \
-    xnd_t *out = &stack[1];                                              \
-    int64_t N = xnd_fixed_shape(in);                                     \
-    (void)ctx;                                                           \
-                                                                         \
-    for (int64_t i = 0; i < N; i++) {                                    \
-        const xnd_t v = xnd_fixed_dim_next(in, i);                       \
-        const xnd_t u = xnd_fixed_dim_next(out, i);                      \
-        *(desttype##_t *)u.ptr = func(*(const srctype##_t *)v.ptr);      \
-    }                                                                    \
-                                                                         \
-    return 0;                                                            \
+static int                                                                     \
+gm_fixed_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                              \
+    const xnd_t *in = &stack[0];                                               \
+    xnd_t *out = &stack[1];                                                    \
+    (void)ctx;                                                                 \
+                                                                               \
+    *(desttype##_t *)out->ptr = func(*(const srctype##_t *)in->ptr);           \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+static int                                                                     \
+gm_fixed_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                              \
+    const xnd_t *in = &stack[0];                                               \
+    xnd_t *out = &stack[1];                                                    \
+    int64_t N = xnd_fixed_shape(in);                                           \
+    (void)ctx;                                                                 \
+                                                                               \
+    for (int64_t i = 0; i < N; i++) {                                          \
+        const xnd_t v = xnd_fixed_dim_next(in, i);                             \
+        const xnd_t u = xnd_fixed_dim_next(out, i);                            \
+        *(desttype##_t *)u.ptr = func(*(const srctype##_t *)v.ptr);            \
+    }                                                                          \
+                                                                               \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+static int                                                                     \
+gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
+{                                                                              \
+    int64_t start[2], step[2];                                                 \
+    int64_t shape, n;                                                          \
+                                                                               \
+    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,                \
+                            stack[0].index, ctx);                              \
+    if (shape < 0) {                                                           \
+        return -1;                                                             \
+    }                                                                          \
+                                                                               \
+    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,    \
+                        ctx);                                                  \
+    if (n < 0) {                                                               \
+        return -1;                                                             \
+    }                                                                          \
+    if (n != shape) {                                                          \
+        ndt_err_format(ctx, NDT_ValueError,                                    \
+            "shape mismatch in xnd_var_sin()");                                \
+        return -1;                                                             \
+    }                                                                          \
+                                                                               \
+    for (int64_t i = 0; i < shape; i++) {                                      \
+        const xnd_t in = xnd_var_dim_next(&stack[0], start[0], step[0], i);    \
+        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i);         \
+        *(desttype##_t *)out.ptr = func(*(const srctype##_t *)in.ptr);         \
+    }                                                                          \
+                                                                               \
+    return 0;                                                                  \
 }
 
 #define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
-  { .name = STRINGIZE(funcname),                                                \
-    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype), \
-    .vectorize = false,                                                         \
-    .Xnd = gm_##func##_1D_##srctype##_##desttype },                             \
-                                                                                \
-  { .name = STRINGIZE(funcname),                                                \
-    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),         \
-    .vectorize = false,                                                         \
-    .Xnd = gm_##func##_0D_##srctype##_##desttype }                              \
+  { .name = STRINGIZE(funcname),                                                      \
+    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),       \
+    .vectorize = false,                                                               \
+    .Xnd = gm_fixed_##func##_1D_##srctype##_##desttype },                             \
+                                                                                      \
+  { .name = STRINGIZE(funcname),                                                      \
+    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),               \
+    .vectorize = false,                                                               \
+    .Xnd = gm_fixed_##func##_0D_##srctype##_##desttype },                             \
+                                                                                      \
+  { .name = STRINGIZE(funcname),                                                      \
+    .sig = "D... * var * " STRINGIZE(srctype) "-> D... * var * " STRINGIZE(desttype), \
+    .vectorize = false,                                                               \
+    .Xnd = gm_var_##func##_1D_##srctype##_##desttype }
 
 
 XND_ELEMWISE(sinf, float32, float32)
@@ -221,7 +221,6 @@ XND_ELEMWISE(copy, uint32, uint32)
 XND_ELEMWISE(copy, uint64, uint64)
 XND_ELEMWISE(copy, float32, float32)
 XND_ELEMWISE(copy, float64, float64)
-
 
 
 static const gm_kernel_init_t kernels[] = {
@@ -251,10 +250,6 @@ static const gm_kernel_init_t kernels[] = {
 
   { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .vectorize = false, .Xnd = gm_0D_add_scalar },
 
-  /* ragged arrays */
-  { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
-
-  /* XND */
   /* example for handling structs with missing values */
   { .name = "count_valid_missing",
     .sig = "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}",
