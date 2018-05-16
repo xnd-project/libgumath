@@ -27,11 +27,12 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o kernels.o nploops.o tbl.o xndloops.o graph.o bfloat16.o pdist.o
+OBJS = apply.o func.o kernels.o nploops.o tbl.o xndloops.o bfloat16.o graph.o \
+       quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/nploops.o \
-              .objs/tbl.o .objs/xndloops.o .objs/graph.o .objs/bfloat16.o \
-              .objs/pdist.o
+              .objs/tbl.o .objs/xndloops.o .objs/bfloat16.o .objs/graph.o \
+              .objs/quaternion.o .objs/pdist.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -92,6 +93,14 @@ Makefile xndloops.c gumath.h
 Makefile xndloops.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c xndloops.c -o .objs/xndloops.o
 
+bfloat16.o:\
+Makefile extending/bfloat16.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c extending/bfloat16.c -o bfloat16.o
+
+.objs/bfloat16.o:\
+Makefile extending/bfloat16.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/bfloat16.c -o .objs/bfloat16.o
+
 graph.o:\
 Makefile extending/graph.c gumath.h
 	$(CC) -I. $(GM_CFLAGS) -c extending/graph.c -o graph.o
@@ -100,13 +109,13 @@ Makefile extending/graph.c gumath.h
 Makefile extending/graph.c gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/graph.c -o .objs/graph.o
 
-bfloat16.o:\
-Makefile extending/bfloat16.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c extending/bfloat16.c -o bfloat16.o
+quaternion.o:\
+Makefile extending/quaternion.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c extending/quaternion.c -o quaternion.o
 
-.objs/bfloat16.o:\
-Makefile extending/bfloat16.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/bfloat16.c -o .objs/bfloat16.o
+.objs/quaternion.o:\
+Makefile extending/quaternion.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/quaternion.c -o .objs/quaternion.o
 
 pdist.o:\
 Makefile extending/pdist.c gumath.h

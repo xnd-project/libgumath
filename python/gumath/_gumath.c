@@ -443,11 +443,16 @@ PyInit__gumath(void)
        if (gm_init_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
+#ifndef _MSC_VER
+       if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
+           return seterr(&ctx);
+       }
+#endif
        if (gm_init_graph_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
 #ifndef _MSC_VER
-       if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
+       if (gm_init_quaternion_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
 #endif

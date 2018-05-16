@@ -221,76 +221,6 @@ gm_copy_strided_##srctype##_##desttype(                                \
     return 0;                                                          \
 }
 
-#ifndef _MSC_VER
-static int
-gm_multiply_strided_q64_q64(char *args[], intptr_t dimensions[], intptr_t steps[],
-                            void *data GM_UNUSED)
-{
-    const char *src1 = args[0];
-    const char *src2 = args[1];
-    char *dest = args[2];
-    const ndt_complex64_t (*s1)[2];
-    const ndt_complex64_t (*s2)[2];
-    ndt_complex64_t (*d1)[2];
-    intptr_t n = dimensions[0];
-    intptr_t i, j, k, l;
-
-    for (i = 0; i < n; i++) {
-      s1 = (const ndt_complex64_t (*)[2])src1;
-      s2 = (const ndt_complex64_t (*)[2])src2;
-      d1 = (ndt_complex64_t (*)[2])dest;
-      for (j = 0; j < 2; j++){
-        for (k = 0; k < 2; k++) {
-          ndt_complex64_t sum = 0;
-          for (l = 0; l < 2; l++) {
-            sum += s1[j][l] * s2[l][k];
-          }
-          d1[j][k] = sum;
-        }
-      }
-      src1 += steps[0];
-      src2 += steps[1];
-      dest += steps[2];
-    }
-
-    return 0;
-}
-
-static int
-gm_multiply_strided_q128_q128(char *args[], intptr_t dimensions[], intptr_t steps[],
-                              void *data GM_UNUSED)
-{
-    const char *src1 = args[0];
-    const char *src2 = args[1];
-    char *dest = args[2];
-    const ndt_complex128_t (*s1)[2];
-    const ndt_complex128_t (*s2)[2];
-    ndt_complex128_t (*d1)[2];
-    intptr_t n = dimensions[0];
-    intptr_t i, j, k, l;
-
-    for (i = 0; i < n; i++) {
-      s1 = (const ndt_complex128_t (*)[2])src1;
-      s2 = (const ndt_complex128_t (*)[2])src2;
-      d1 = (ndt_complex128_t (*)[2])dest;
-      for (j = 0; j < 2; j++){
-        for (k = 0; k < 2; k++) {
-          ndt_complex128_t sum = 0;
-          for (l = 0; l < 2; l++) {
-            sum += s1[j][l] * s2[l][k];
-          }
-          d1[j][k] = sum;
-        }
-      }
-      src1 += steps[0];
-      src2 += steps[1];
-      dest += steps[2];
-    }
-
-    return 0;
-}
-#endif
-
 NP_STRIDED(sin, float32, float64)
 NP_STRIDED(sin, float64, float64)
 NP_STRIDED(sin, uint8, float64)
@@ -315,14 +245,6 @@ NP_COPY_STRIDED(int64, int64)
 NP_COPY_STRIDED(float32, float32)
 NP_COPY_STRIDED(float64, float64)
 
-
-static const gm_typedef_init_t typedefs[] = {
-#ifndef _MSC_VER
-  { .name = "quaternion64", .type = "2 * 2 * complex64", .meth=NULL },
-  { .name = "quaternion128", .type = "2 * 2 * complex128", .meth=NULL },
-#endif
-  { .name = NULL, .type = NULL }
-};
 
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
@@ -366,20 +288,6 @@ static const gm_kernel_init_t kernels[] = {
   /* ragged arrays */
   { .name = "sin", .sig = "D... * var * float64 -> D... * var * float64", .vectorize = false, .Xnd = gm_var_sin },
 
-  /* MULTIPLY */
-  /* quaternions */
-#ifndef _MSC_VER
-  { .name = "multiply",
-    .sig = "... * quaternion64, ... * quaternion64 -> ... * quaternion64",
-    .vectorize = true,
-    .Strided = gm_multiply_strided_q64_q64 },
-
-  { .name = "multiply",
-    .sig = "... * quaternion128, ... * quaternion128 -> ... * quaternion128",
-    .vectorize = true,
-    .Strided = gm_multiply_strided_q128_q128 },
-#endif
-
   /* XND */
   /* example for handling structs with missing values */
   { .name = "count_valid_missing",
@@ -398,14 +306,7 @@ static const gm_kernel_init_t kernels[] = {
 int
 gm_init_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 {
-    const gm_typedef_init_t *t;
     const gm_kernel_init_t *k;
-
-    for (t = typedefs; t->name != NULL; t++) {
-        if (ndt_typedef_from_string(t->name, t->type, t->meth, ctx) < 0) {
-            return -1;
-        }
-    }
 
     for (k = kernels; k->name != NULL; k++) {
         if (gm_add_kernel(tbl, k, ctx) < 0) {
