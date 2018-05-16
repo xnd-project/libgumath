@@ -218,30 +218,6 @@ gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
 }
 
 
-/****************************************************************************/
-/*                              NumPy kernels                               */
-/****************************************************************************/
-
-#define NP_STRIDED(func, srctype, desttype) \
-static int                                                             \
-gm_##func##_strided_##srctype##_##desttype(                            \
-    char *args[], intptr_t dimensions[], intptr_t steps[], void *data) \
-{                                                                      \
-    const char *src = args[0];                                         \
-    char *dest = args[1];                                              \
-    intptr_t n = dimensions[0];                                        \
-    (void)data;                                                        \
-                                                                       \
-    for (intptr_t i = 0; i < n; i++) {                                 \
-        const srctype##_t v = *(const srctype##_t *)src;               \
-        *(desttype##_t *)dest = func((desttype##_t)v);                 \
-        src += steps[0];                                               \
-        dest += steps[1];                                              \
-    }                                                                  \
-                                                                       \
-    return 0;                                                          \
-}
-
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
   XND_ELEMWISE_INIT(copy, copy, int8, int8),
