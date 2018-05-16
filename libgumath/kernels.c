@@ -142,7 +142,7 @@ gm_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
     xnd_t *out = &stack[1];                                              \
     (void)ctx;                                                           \
                                                                          \
-    *(desttype##_t *)out->ptr = func(*(srctype##_t *)in->ptr);           \
+    *(desttype##_t *)out->ptr = func(*(const srctype##_t *)in->ptr);     \
     return 0;                                                            \
 }                                                                        \
                                                                          \
@@ -157,7 +157,7 @@ gm_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
     for (int64_t i = 0; i < N; i++) {                                    \
         const xnd_t v = xnd_fixed_dim_next(in, i);                       \
         const xnd_t u = xnd_fixed_dim_next(out, i);                      \
-        *(desttype##_t *)u.ptr = func(*(srctype##_t *)v.ptr);            \
+        *(desttype##_t *)u.ptr = func(*(const srctype##_t *)v.ptr);      \
     }                                                                    \
                                                                          \
     return 0;                                                            \
