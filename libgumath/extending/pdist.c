@@ -115,7 +115,6 @@ static const gm_kernel_init_t kernels[] = {
   { .name = "euclidian_pdist",
     .sig = "N * M * float64 -> P * float64",
     .constraint = &constraint,
-    .vectorize = false,
     .Xnd = pdist },
 
   { .name = NULL, .sig = NULL }

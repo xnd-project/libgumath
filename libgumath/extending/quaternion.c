@@ -120,12 +120,10 @@ static const gm_typedef_init_t typedefs[] = {
 static const gm_kernel_init_t kernels[] = {
   { .name = "multiply",
     .sig = "... * N * quaternion64, ... * N * quaternion64 -> ... * N * quaternion64",
-    .vectorize = false,
     .Strided = gm_multiply_strided_1D_q64_q64 },
 
   { .name = "multiply",
     .sig = "... * N * quaternion128, ... * N * quaternion128 -> ... * N * quaternion128",
-    .vectorize = false,
     .Strided = gm_multiply_strided_1D_q128_q128 },
 
   { .name = NULL, .sig = NULL }

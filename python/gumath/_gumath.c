@@ -342,18 +342,17 @@ static PyObject *
 unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
 {
     NDT_STATIC_CONTEXT(ctx);
-    static char *kwlist[] = {"name", "sig", "tag", "vectorize", "ptr", NULL};
+    static char *kwlist[] = {"name", "sig", "tag", "ptr", NULL};
     gm_kernel_init_t k = {NULL};
     gm_func_t *f;
     char *name;
     char *sig;
     char *tag;
-    int vectorize;
     PyObject *ptr;
     void *p;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ssspO", kwlist, &name, &sig,
-        &tag, &vectorize, &ptr)) {
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "sssO", kwlist, &name, &sig,
+        &tag, &ptr)) {
         return NULL;
     }
 
@@ -364,7 +363,6 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
 
     k.name = name;
     k.sig = sig;
-    k.vectorize = vectorize;
 
     if (strcmp(tag, "Strided") == 0) {
         k.Strided = p;

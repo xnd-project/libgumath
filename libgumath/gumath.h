@@ -78,7 +78,6 @@ typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t 
 typedef struct {
     ndt_t *sig;
     const ndt_constraint_t *constraint;
-    bool vectorize;
 
     /* Xnd signatures */
     gm_xnd_kernel_t C;       /* dispatch ensures c-contiguous */
@@ -99,7 +98,6 @@ typedef struct {
     const char *name;
     const char *sig;
     const ndt_constraint_t *constraint;
-    bool vectorize;
 
     gm_xnd_kernel_t C;
     gm_xnd_kernel_t Fortran;
@@ -167,7 +165,7 @@ GM_API int gm_np_map(const gm_strided_kernel_t f,
 /******************************************************************************/
 
 GM_API int gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
-                      const int outer_dims, bool vectorize, ndt_context_t *ctx);
+                      const int outer_dims, ndt_context_t *ctx);
 
 
 /******************************************************************************/

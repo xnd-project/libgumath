@@ -81,8 +81,7 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
                          dimensions, steps, NULL, outer_dims);
     }
     case Xnd: {
-        return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims,
-                          kernel->set->vectorize, ctx);
+        return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims, ctx);
     }
 
     default: {

@@ -361,7 +361,6 @@ static const gm_typedef_init_t typedefs[] = {
 static const gm_kernel_init_t kernels[] = {
   { .name = "single_source_shortest_paths",
     .sig = "graph, node -> var * var * node",
-    .vectorize = false,
     .Xnd = shortest_path },
 
   { .name = NULL, .sig = NULL }

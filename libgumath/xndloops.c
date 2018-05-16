@@ -42,14 +42,11 @@
 
 int
 gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
-           const int outer_dims, bool vectorize, ndt_context_t *ctx)
+           const int outer_dims, ndt_context_t *ctx)
 {
     ALLOCA(xnd_t, next, nargs);
     const ndt_t *t;
 
-    if (vectorize && outer_dims == 1) {
-        return f(stack, ctx);
-    }
     if (outer_dims == 0 || nargs == 0) {
         return f(stack, ctx);
     }
@@ -75,7 +72,7 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
                 next[k] = xnd_fixed_dim_next(&stack[k], i);
             }
 
-            if (gm_xnd_map(f, next, nargs, outer_dims-1, vectorize, ctx) < 0) {
+            if (gm_xnd_map(f, next, nargs, outer_dims-1, ctx) < 0) {
                 return -1;
             }
         }
@@ -118,7 +115,7 @@ gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
                 next[k] = xnd_var_dim_next(&stack[k], start[k], step[k], i);
             }
 
-            if (gm_xnd_map(f, next, nargs, outer_dims-1, vectorize, ctx) < 0) {
+            if (gm_xnd_map(f, next, nargs, outer_dims-1, ctx) < 0) {
                 return -1;
             }
         }

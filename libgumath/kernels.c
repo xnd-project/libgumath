@@ -186,17 +186,14 @@ gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
 #define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
   { .name = STRINGIZE(funcname),                                                      \
     .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),       \
-    .vectorize = false,                                                               \
     .Xnd = gm_fixed_##func##_1D_##srctype##_##desttype },                             \
                                                                                       \
   { .name = STRINGIZE(funcname),                                                      \
     .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),               \
-    .vectorize = false,                                                               \
     .Xnd = gm_fixed_##func##_0D_##srctype##_##desttype },                             \
                                                                                       \
   { .name = STRINGIZE(funcname),                                                      \
     .sig = "D... * var * " STRINGIZE(srctype) "-> D... * var * " STRINGIZE(desttype), \
-    .vectorize = false,                                                               \
     .Xnd = gm_var_##func##_1D_##srctype##_##desttype }
 
 
@@ -248,12 +245,11 @@ static const gm_kernel_init_t kernels[] = {
   XND_ELEMWISE_INIT(sin, sin, int32, float64),
 
 
-  { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .vectorize = false, .Xnd = gm_0D_add_scalar },
+  { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .Xnd = gm_0D_add_scalar },
 
   /* example for handling structs with missing values */
   { .name = "count_valid_missing",
     .sig = "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}",
-    .vectorize = false,
     .Xnd = count_valid_missing },
 
   { .name = NULL, .sig = NULL }
