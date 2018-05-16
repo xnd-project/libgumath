@@ -134,6 +134,7 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+
 #define XND_ELEMWISE(func, srctype, desttype) \
 static int                                                               \
 gm_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
@@ -164,14 +165,26 @@ gm_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
 }
 
 XND_ELEMWISE(sinf, float32, float32)
-XND_ELEMWISE(sinf, uint8, float32)
-XND_ELEMWISE(sinf, uint16, float32)
 XND_ELEMWISE(sinf, int8, float32)
 XND_ELEMWISE(sinf, int16, float32)
+XND_ELEMWISE(sinf, uint8, float32)
+XND_ELEMWISE(sinf, uint16, float32)
 
 XND_ELEMWISE(sin, float64, float64)
-XND_ELEMWISE(sin, uint32, float64)
 XND_ELEMWISE(sin, int32, float64)
+XND_ELEMWISE(sin, uint32, float64)
+
+#define copy(x) x
+XND_ELEMWISE(copy, int8, int8)
+XND_ELEMWISE(copy, int16, int16)
+XND_ELEMWISE(copy, int32, int32)
+XND_ELEMWISE(copy, int64, int64)
+XND_ELEMWISE(copy, uint8, uint8)
+XND_ELEMWISE(copy, uint16, uint16)
+XND_ELEMWISE(copy, uint32, uint32)
+XND_ELEMWISE(copy, uint64, uint64)
+XND_ELEMWISE(copy, float32, float32)
+XND_ELEMWISE(copy, float64, float64)
 
 
 #define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
@@ -229,50 +242,18 @@ gm_##func##_strided_##srctype##_##desttype(                            \
     return 0;                                                          \
 }
 
-#define NP_COPY_STRIDED(srctype, desttype) \
-static int                                                             \
-gm_copy_strided_##srctype##_##desttype(                                \
-    char *args[], intptr_t dimensions[], intptr_t steps[], void *data) \
-{                                                                      \
-    const char *src = args[0];                                         \
-    char *dest = args[1];                                              \
-    intptr_t n = dimensions[0];                                        \
-    (void)data;                                                        \
-                                                                       \
-    for (intptr_t i = 0; i < n; i++) {                                 \
-        *(desttype##_t *)dest = *(const srctype##_t *)src;             \
-        src += steps[0];                                               \
-        dest += steps[1];                                              \
-    }                                                                  \
-    return 0;                                                          \
-}
-
-NP_COPY_STRIDED(uint8, uint8)
-NP_COPY_STRIDED(uint16, uint16)
-NP_COPY_STRIDED(uint32, uint32)
-NP_COPY_STRIDED(uint64, uint64)
-NP_COPY_STRIDED(int8, int8)
-NP_COPY_STRIDED(int16, int16)
-NP_COPY_STRIDED(int32, int32)
-NP_COPY_STRIDED(int64, int64)
-NP_COPY_STRIDED(float32, float32)
-NP_COPY_STRIDED(float64, float64)
-
-
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
-  { .name = "copy", .sig = "... * uint8 -> ... * uint8", .vectorize = true, .Strided = gm_copy_strided_uint8_uint8 },
-  { .name = "copy", .sig = "... * uint16 -> ... * uint16", .vectorize = true, .Strided = gm_copy_strided_uint16_uint16 },
-  { .name = "copy", .sig = "... * uint32 -> ... * uint32", .vectorize = true, .Strided = gm_copy_strided_uint32_uint32 },
-  { .name = "copy", .sig = "... * uint64 -> ... * uint64", .vectorize = true, .Strided = gm_copy_strided_uint64_uint64 },
-
-  { .name = "copy", .sig = "... * int8 -> ... * int8", .vectorize = true, .Strided = gm_copy_strided_int8_int8 },
-  { .name = "copy", .sig = "... * int16 -> ... * int16", .vectorize = true, .Strided = gm_copy_strided_int16_int16 },
-  { .name = "copy", .sig = "... * int32 -> ... * int32", .vectorize = true, .Strided = gm_copy_strided_int32_int32 },
-  { .name = "copy", .sig = "... * int64 -> ... * int64", .vectorize = true, .Strided = gm_copy_strided_int64_int64 },
-
-  { .name = "copy", .sig = "... * float32 -> ... * float32", .vectorize = true, .Strided = gm_copy_strided_float32_float32 },
-  { .name = "copy", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_copy_strided_float64_float64 },
+  XND_ELEMWISE_INIT(copy, copy, int8, int8),
+  XND_ELEMWISE_INIT(copy, copy, int16, int16),
+  XND_ELEMWISE_INIT(copy, copy, int32, int32),
+  XND_ELEMWISE_INIT(copy, copy, int64, int64),
+  XND_ELEMWISE_INIT(copy, copy, uint8, uint8),
+  XND_ELEMWISE_INIT(copy, copy, uint16, uint16),
+  XND_ELEMWISE_INIT(copy, copy, uint32, uint32),
+  XND_ELEMWISE_INIT(copy, copy, uint64, uint64),
+  XND_ELEMWISE_INIT(copy, copy, float32, float32),
+  XND_ELEMWISE_INIT(copy, copy, float64, float64),
 
   /* SIN */
   XND_ELEMWISE_INIT(sin, sinf, float32, float32),
