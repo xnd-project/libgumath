@@ -42,6 +42,9 @@
 #include "gumath.h"
 
 
+#define XSTRINGIZE(v) #v
+#define STRINGIZE(v) XSTRINGIZE(v)
+
 gm_kernel_set_t empty_kernel_set =
  { .sig = NULL,
    .C = NULL,
@@ -131,33 +134,56 @@ gm_var_sin(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
-int
-gm_0D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
-{
-    const xnd_t *in = &stack[0];
-    xnd_t *out = &stack[1];
-    (void)ctx;
-
-    *(double *)out->ptr = sin(*(double *)in->ptr);
-    return 0;
+#define XND_ELEMWISE(func, srctype, desttype) \
+static int                                                               \
+gm_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                        \
+    const xnd_t *in = &stack[0];                                         \
+    xnd_t *out = &stack[1];                                              \
+    (void)ctx;                                                           \
+                                                                         \
+    *(desttype##_t *)out->ptr = func(*(srctype##_t *)in->ptr);           \
+    return 0;                                                            \
+}                                                                        \
+                                                                         \
+static int                                                               \
+gm_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                        \
+    const xnd_t *in = &stack[0];                                         \
+    xnd_t *out = &stack[1];                                              \
+    int64_t N = xnd_fixed_shape(in);                                     \
+    (void)ctx;                                                           \
+                                                                         \
+    for (int64_t i = 0; i < N; i++) {                                    \
+        const xnd_t v = xnd_fixed_dim_next(in, i);                       \
+        const xnd_t u = xnd_fixed_dim_next(out, i);                      \
+        *(desttype##_t *)u.ptr = func(*(srctype##_t *)v.ptr);            \
+    }                                                                    \
+                                                                         \
+    return 0;                                                            \
 }
 
-int
-gm_1D_sin_d_d(xnd_t stack[], ndt_context_t *ctx)
-{
-    const xnd_t *in = &stack[0];
-    xnd_t *out = &stack[1];
-    int64_t N = xnd_fixed_shape(in);
-    (void)ctx;
+XND_ELEMWISE(sinf, float32, float32)
+XND_ELEMWISE(sinf, uint8, float32)
+XND_ELEMWISE(sinf, uint16, float32)
+XND_ELEMWISE(sinf, int8, float32)
+XND_ELEMWISE(sinf, int16, float32)
 
-    for (int64_t i = 0; i < N; i++) {
-        const xnd_t v = xnd_fixed_dim_next(in, i);
-        const xnd_t u = xnd_fixed_dim_next(out, i);
-        *(double *)u.ptr = sin(*(double *)v.ptr);
-    }
+XND_ELEMWISE(sin, float64, float64)
+XND_ELEMWISE(sin, uint32, float64)
+XND_ELEMWISE(sin, int32, float64)
 
-    return 0;
-}
+
+#define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
+  { .name = STRINGIZE(funcname),                                                \
+    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype), \
+    .vectorize = false,                                                         \
+    .Xnd = gm_##func##_1D_##srctype##_##desttype },                             \
+                                                                                \
+  { .name = STRINGIZE(funcname),                                                \
+    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),         \
+    .vectorize = false,                                                         \
+    .Xnd = gm_##func##_0D_##srctype##_##desttype }                              \
 
 int
 gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
@@ -221,19 +247,6 @@ gm_copy_strided_##srctype##_##desttype(                                \
     return 0;                                                          \
 }
 
-NP_STRIDED(sin, float32, float64)
-NP_STRIDED(sin, float64, float64)
-NP_STRIDED(sin, uint8, float64)
-NP_STRIDED(sin, uint16, float64)
-NP_STRIDED(sin, uint32, float64)
-NP_STRIDED(sin, uint64, float64)
-NP_STRIDED(sin, int8, float64)
-NP_STRIDED(sin, int16, float64)
-NP_STRIDED(sin, int32, float64)
-NP_STRIDED(sin, int64, float64)
-
-NP_STRIDED(sinf, float32, float32)
-
 NP_COPY_STRIDED(uint8, uint8)
 NP_COPY_STRIDED(uint16, uint16)
 NP_COPY_STRIDED(uint32, uint32)
@@ -262,26 +275,16 @@ static const gm_kernel_init_t kernels[] = {
   { .name = "copy", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_copy_strided_float64_float64 },
 
   /* SIN */
-  /* return float32 */
-  { .name = "sin", .sig = "... * float32 -> ... * float32", .vectorize = true, .Strided = gm_sinf_strided_float32_float32 },
+  XND_ELEMWISE_INIT(sin, sinf, float32, float32),
+  XND_ELEMWISE_INIT(sin, sinf, uint8, float32),
+  XND_ELEMWISE_INIT(sin, sinf, uint16, float32),
+  XND_ELEMWISE_INIT(sin, sinf, int8, float32),
+  XND_ELEMWISE_INIT(sin, sinf, int16, float32),
 
-  /* return float64 */
-  { .name = "sin", .sig = "... * uint8 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint8_float64 },
-  { .name = "sin", .sig = "... * uint16 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint16_float64 },
-  { .name = "sin", .sig = "... * uint32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint32_float64 },
-  { .name = "sin", .sig = "... * uint64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_uint64_float64 },
+  XND_ELEMWISE_INIT(sin, sin, float64, float64),
+  XND_ELEMWISE_INIT(sin, sin, uint32, float64),
+  XND_ELEMWISE_INIT(sin, sin, int32, float64),
 
-  { .name = "sin", .sig = "... * int8 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int8_float64 },
-  { .name = "sin", .sig = "... * int16 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int16_float64 },
-  { .name = "sin", .sig = "... * int32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int32_float64 },
-  { .name = "sin", .sig = "... * int64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_int64_float64 },
-
-  { .name = "sin", .sig = "... * float32 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float32_float64 },
-  { .name = "sin", .sig = "... * float64 -> ... * float64", .vectorize = true, .Strided = gm_sin_strided_float64_float64 },
-
-  /* Xnd kernels */
-  { .name = "xnd_sin0d", .sig = "... * float64 -> ... * float64", .vectorize = false, .Xnd = gm_0D_sin_d_d },
-  { .name = "xnd_sin1d", .sig = "... * float64 -> ... * float64", .vectorize = true, .Xnd = gm_1D_sin_d_d },
 
   { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .vectorize = false, .Xnd = gm_0D_add_scalar },
 

@@ -45,17 +45,17 @@ except ImportError:
 
 
 TEST_CASES = [
-  ([float(i) for i in range(2000)], "2000 * float64", "float64"),
+  ([float(i)/100.0 for i in range(2000)], "2000 * float64", "float64"),
 
-  ([[float(i) for i in range(1000)], [float(i+1) for i in range(1000)]],
+  ([[float(i)/100.0 for i in range(1000)], [float(i+1) for i in range(1000)]],
    "2 * 1000 * float64", "float64"),
 
   (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float64", "float64"),
 
-  ([float(i) for i in range(2000)], "2000 * float32", "float32"),
+  ([float(i)/10.0 for i in range(2000)], "2000 * float32", "float32"),
 
-  ([[float(i) for i in range(1000)], [float(i+1) for i in range(1000)]],
-   "2 * 1000 * float32", "float32"),
+  ([[float(i)/10.0 for i in range(1000)], [float(i+1) for i in range(1000)]],
+  "2 * 1000 * float32", "float32"),
 
   (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float32", "float32"),
 ]
@@ -68,14 +68,14 @@ class TestCall(unittest.TestCase):
         x1 = xnd(1.2, type="float64")
         y1 = gm.sin(x1)
 
-        x2 = xnd(1.23e10, type="float32")
+        x2 = xnd(1.23e1, type="float32")
         y2 = gm.sin(x2)
 
         if np is not None:
             a1 = np.array(1.2, dtype="float64")
             b1 = np.sin(a1)
 
-            a2 = np.array(1.23e10, dtype="float32")
+            a2 = np.array(1.23e1, dtype="float32")
             b2 = np.sin(a2)
 
             np.testing.assert_equal(y1.value, b1)
@@ -92,19 +92,6 @@ class TestCall(unittest.TestCase):
                 b = np.sin(a)
                 np.testing.assert_equal(y, b)
 
-    def test_sin_xnd(self):
-
-        lst, t, dtype = TEST_CASES[0]
-        x = xnd(lst, type=t)
-        y = gm.xnd_sin0d(x)
-        z = gm.xnd_sin1d(x)
-
-        if np is not None:
-            a = np.array(lst, dtype=dtype)
-            b = np.sin(a)
-            np.testing.assert_equal(y, b)
-            np.testing.assert_equal(z, b)
-
     def test_sin_strided(self):
 
         for lst, t, dtype in TEST_CASES:
@@ -120,22 +107,6 @@ class TestCall(unittest.TestCase):
                 b = a[::-2, ::-2]
                 c = np.sin(b)
                 np.testing.assert_equal(z, c)
-
-    def test_sin_xnd_strided(self):
-
-        lst, t, dtype = TEST_CASES[1]
-        x = xnd(lst, type=t)
-
-        y = x[::-2, ::-2]
-        z1 = gm.xnd_sin0d(y)
-        z2 = gm.xnd_sin1d(y)
-
-        if np is not None:
-            a = np.array(lst, dtype=dtype)
-            b = a[::-2, ::-2]
-            c = np.sin(b)
-            np.testing.assert_equal(z1, c)
-            np.testing.assert_equal(z2, c)
 
     def test_copy(self):
 
