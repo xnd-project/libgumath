@@ -152,6 +152,17 @@ gm_fixed_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
 }                                                                              \
                                                                                \
 static int                                                                     \
+gm_var_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
+{                                                                              \
+    const xnd_t *in = &stack[0];                                               \
+    xnd_t *out = &stack[1];                                                    \
+    (void)ctx;                                                                 \
+                                                                               \
+    *(desttype##_t *)out->ptr = func(*(const srctype##_t *)in->ptr);           \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+static int                                                                     \
 gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
 {                                                                              \
     int64_t start[2], step[2];                                                 \
@@ -184,17 +195,22 @@ gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
 }
 
 #define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
-  { .name = STRINGIZE(funcname),                                                      \
-    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),       \
-    .Xnd = gm_fixed_##func##_1D_##srctype##_##desttype },                             \
-                                                                                      \
-  { .name = STRINGIZE(funcname),                                                      \
-    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),               \
-    .Xnd = gm_fixed_##func##_0D_##srctype##_##desttype },                             \
-                                                                                      \
-  { .name = STRINGIZE(funcname),                                                      \
-    .sig = "D... * var * " STRINGIZE(srctype) "-> D... * var * " STRINGIZE(desttype), \
-    .Xnd = gm_var_##func##_1D_##srctype##_##desttype }
+  { .name = STRINGIZE(funcname),                                                          \
+    .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),           \
+    .Xnd = gm_fixed_##func##_1D_##srctype##_##desttype },                                 \
+                                                                                          \
+  { .name = STRINGIZE(funcname),                                                          \
+    .sig = "... * " STRINGIZE(srctype) "-> ... * " STRINGIZE(desttype),                   \
+    .Xnd = gm_fixed_##func##_0D_##srctype##_##desttype },                                 \
+                                                                                          \
+  { .name = STRINGIZE(funcname),                                                          \
+    .sig = "var... * var * " STRINGIZE(srctype) "-> var... * var * " STRINGIZE(desttype), \
+    .Xnd = gm_var_##func##_1D_##srctype##_##desttype },                                   \
+                                                                                          \
+  { .name = STRINGIZE(funcname),                                                          \
+    .sig = "var... * " STRINGIZE(srctype) "-> var... * " STRINGIZE(desttype),             \
+    .Xnd = gm_var_##func##_0D_##srctype##_##desttype }
+
 
 
 XND_ELEMWISE(sinf, float32, float32)
