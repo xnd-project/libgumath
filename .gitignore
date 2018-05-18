@@ -1,0 +1,18 @@
+# Ignore ./configure generated files
+Makefile
+config.h
+config.log
+config.status
+
+# Ignore make generated C Files
+*.a
+*.o
+*.so
+*.so.*
+python/gumath/gumath.h
+
+# Ignore python generated build files
+build/
+doc/build/
+*.egg-info
+__pycache__
