@@ -62,6 +62,18 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
     const int nargs = (int)kernel->set->sig->Function.nargs;
 
     switch (kernel->tag) {
+    case C: {
+        return gm_xnd_map(kernel->set->C, stack, nargs, outer_dims, ctx);
+    }
+
+    case Fortran: {
+        return gm_xnd_map(kernel->set->Fortran, stack, nargs, outer_dims, ctx);
+    }
+
+    case Xnd: {
+        return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims, ctx);
+    }
+
     case Strided: {
         const int sum_inner = sum_inner_dimensions(stack, nargs, outer_dims);
         const int dims_size = outer_dims + sum_inner;
@@ -79,16 +91,11 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
 
         return gm_np_map(kernel->set->Strided, args, nargs,
                          dimensions, steps, NULL, outer_dims);
-    }
-    case Xnd: {
-        return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims, ctx);
-    }
-
-    default: {
-        ndt_err_format(ctx, NDT_NotImplementedError, "apply not implemented");
-        return -1;
       }
     }
+
+    /* NOT REACHED: tags should be exhaustive. */
+    ndt_internal_error("invalid tag");
 }
 
 static gm_kernel_t

@@ -121,6 +121,12 @@ gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
 #define XSTRINGIZE(v) #v
 #define STRINGIZE(v) XSTRINGIZE(v)
 
+static inline char *
+apply_index(const xnd_t *x)
+{
+    return xnd_fixed_apply_index(x);
+}
+
 
 #define XND_ELEMWISE(func, srctype, desttype) \
 static int                                                                     \
@@ -131,6 +137,22 @@ gm_fixed_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
     (void)ctx;                                                                 \
                                                                                \
     *(desttype##_t *)out->ptr = func(*(const srctype##_t *)in->ptr);           \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+static int                                                                     \
+gm_fixed_##func##_1D_C_##srctype##_##desttype(                                 \
+    xnd_t stack[], ndt_context_t *ctx)                                         \
+{                                                                              \
+    const srctype##_t *in = (const srctype##_t *)apply_index(&stack[0]);       \
+    desttype##_t *out = (desttype##_t *)apply_index(&stack[1]);                \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                    \
+    (void)ctx;                                                                 \
+                                                                               \
+    for (int64_t i = 0; i < N; i++) {                                          \
+        out[i] = func(in[i]);                                                  \
+    }                                                                          \
+                                                                               \
     return 0;                                                                  \
 }                                                                              \
                                                                                \
@@ -197,6 +219,7 @@ gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
 #define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
   { .name = STRINGIZE(funcname),                                                          \
     .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),           \
+    .C = gm_fixed_##func##_1D_C_##srctype##_##desttype,                                   \
     .Xnd = gm_fixed_##func##_1D_##srctype##_##desttype },                                 \
                                                                                           \
   { .name = STRINGIZE(funcname),                                                          \
