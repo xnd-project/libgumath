@@ -120,16 +120,16 @@ GM_OPT="-O2"
 case $CC in
     *gcc*)
         GM_WARN="-Wall -Wextra -std=c11 -pedantic"
-        GM_OPT="-O2"
+        GM_OPT="-O3"
         ;;
     *icc*)
         AR=xiar
         GM_WARN="-Wall"
-        GM_OPT="-O2"
+        GM_OPT="-O3"
         ;;
     *clang*)
         GM_WARN="-Wall -Wextra -std=c11 -pedantic"
-        GM_OPT="-O2"
+        GM_OPT="-O3"
         ;;
 esac
 

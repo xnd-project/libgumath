@@ -441,6 +441,9 @@ PyInit__gumath(void)
        if (gm_init_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
+       if (gm_init_binary_kernels(table, &ctx) < 0) {
+           return seterr(&ctx);
+       }
        if (gm_init_example_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
