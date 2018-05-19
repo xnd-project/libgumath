@@ -58,91 +58,96 @@ apply_index(const xnd_t *x)
 
 
 #define XND_UNARY(func, t1, t2) \
-static int                                                                  \
-gm_fixed_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
-{                                                                           \
-    const xnd_t *in = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                 \
-    (void)ctx;                                                              \
-                                                                            \
-    *(t2##_t *)out->ptr = func(*(const t1##_t *)in->ptr);                   \
-    return 0;                                                               \
-}                                                                           \
-                                                                            \
-static int                                                                  \
-gm_fixed_##func##_1D_C_##t1##_##t2(                                         \
-    xnd_t stack[], ndt_context_t *ctx)                                      \
-{                                                                           \
-    const t1##_t *in = (const t1##_t *)apply_index(&stack[0]);              \
-    t2##_t *out = (t2##_t *)apply_index(&stack[1]);                         \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                 \
-    (void)ctx;                                                              \
-                                                                            \
-    for (int64_t i = 0; i < N; i++) {                                       \
-        out[i] = func(in[i]);                                               \
-    }                                                                       \
-                                                                            \
-    return 0;                                                               \
-}                                                                           \
-                                                                            \
-static int                                                                  \
-gm_fixed_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
-{                                                                           \
-    const xnd_t *in = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                 \
-    int64_t N = xnd_fixed_shape(in);                                        \
-    (void)ctx;                                                              \
-                                                                            \
-    for (int64_t i = 0; i < N; i++) {                                       \
-        const xnd_t v = xnd_fixed_dim_next(in, i);                          \
-        const xnd_t u = xnd_fixed_dim_next(out, i);                         \
-        *(t2##_t *)u.ptr = func(*(const t1##_t *)v.ptr);                    \
-    }                                                                       \
-                                                                            \
-    return 0;                                                               \
-}                                                                           \
-                                                                            \
-static int                                                                  \
-gm_var_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
-{                                                                           \
-    const xnd_t *in = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                 \
-    (void)ctx;                                                              \
-                                                                            \
-    *(t2##_t *)out->ptr = func(*(const t1##_t *)in->ptr);                   \
-    return 0;                                                               \
-}                                                                           \
-                                                                            \
-static int                                                                  \
-gm_var_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
-{                                                                           \
-    int64_t start[2], step[2];                                              \
-    int64_t shape, n;                                                       \
-                                                                            \
-    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,             \
-                            stack[0].index, ctx);                           \
-    if (shape < 0) {                                                        \
-        return -1;                                                          \
-    }                                                                       \
-                                                                            \
-    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index, \
-                        ctx);                                               \
-    if (n < 0) {                                                            \
-        return -1;                                                          \
-    }                                                                       \
-    if (n != shape) {                                                       \
-        ndt_err_format(ctx, NDT_ValueError,                                 \
-            "shape mismatch in xnd_var_sin()");                             \
-        return -1;                                                          \
-    }                                                                       \
-                                                                            \
-    for (int64_t i = 0; i < shape; i++) {                                   \
-        const xnd_t in = xnd_var_dim_next(&stack[0], start[0], step[0], i); \
-        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i);      \
-        *(t2##_t *)out.ptr = func(*(const t1##_t *)in.ptr);                 \
-    }                                                                       \
-                                                                            \
-    return 0;                                                               \
+static int                                                                   \
+gm_fixed_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)          \
+{                                                                            \
+    const xnd_t *in1 = &stack[0];                                            \
+    xnd_t *out = &stack[1];                                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    const t1##_t x = *(const t1##_t *)in1->ptr;                              \
+    *(t2##_t *)out->ptr = func(x);                                           \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_fixed_##func##_1D_C_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        \
+{                                                                            \
+    const t1##_t *in1 = (const t1##_t *)apply_index(&stack[0]);              \
+    t2##_t *out = (t2##_t *)apply_index(&stack[1]);                          \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    for (int64_t i = 0; i < N; i++) {                                        \
+        out[i] = func(in1[i]);                                               \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_fixed_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)          \
+{                                                                            \
+    const xnd_t *in1 = &stack[0];                                            \
+    xnd_t *out = &stack[1];                                                  \
+    int64_t N = xnd_fixed_shape(in1);                                        \
+    (void)ctx;                                                               \
+                                                                             \
+    for (int64_t i = 0; i < N; i++) {                                        \
+        const xnd_t v = xnd_fixed_dim_next(in1, i);                          \
+        const xnd_t u = xnd_fixed_dim_next(out, i);                          \
+        const t1##_t x = *(const t1##_t *)v.ptr;                             \
+        *(t2##_t *)u.ptr = func(x);                                          \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_var_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)            \
+{                                                                            \
+    const xnd_t *in1 = &stack[0];                                            \
+    xnd_t *out = &stack[1];                                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    const t1##_t x = *(const t1##_t *)in1->ptr;                              \
+    *(t2##_t *)out->ptr = func(x);                                           \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_var_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)            \
+{                                                                            \
+    int64_t start[2], step[2];                                               \
+    int64_t shape, n;                                                        \
+                                                                             \
+    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,              \
+                            stack[0].index, ctx);                            \
+    if (shape < 0) {                                                         \
+        return -1;                                                           \
+    }                                                                        \
+                                                                             \
+    n = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,  \
+                        ctx);                                                \
+    if (n < 0) {                                                             \
+        return -1;                                                           \
+    }                                                                        \
+                                                                             \
+    if (n != shape) {                                                        \
+        ndt_err_format(ctx, NDT_ValueError, "shape mismatch");               \
+        return -1;                                                           \
+    }                                                                        \
+                                                                             \
+    for (int64_t i = 0; i < shape; i++) {                                    \
+        const xnd_t in1 = xnd_var_dim_next(&stack[0], start[0], step[0], i); \
+        xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i) ;      \
+        const t1##_t x = *(const t1##_t *)in1.ptr;                           \
+        *(t2##_t *)out.ptr = func(x);                                        \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
 }
 
 #define XND_UNARY_INIT(funcname, func, t1, t2) \

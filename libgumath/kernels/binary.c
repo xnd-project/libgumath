@@ -68,6 +68,7 @@ gm_fixed_##func##_0D_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx)     \
     const t1##_t x = *(const t1##_t *)in1->ptr;                                \
     const t2##_t y = *(const t2##_t *)in2->ptr;                                \
     *(t3##_t *)out->ptr = func(x, y);                                          \
+                                                                               \
     return 0;                                                                  \
 }                                                                              \
                                                                                \
