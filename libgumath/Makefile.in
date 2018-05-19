@@ -27,12 +27,12 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o unary.o binary.o nploops.o tbl.o xndloops.o \
+OBJS = apply.o func.o nploops.o tbl.o xndloops.o unary.o binary.o \
        examples.o bfloat16.o graph.o quaternion.o pdist.o
 
-SHARED_OBJS = .objs/apply.o .objs/func.o .objs/unary.o .objs/binary.o \
-              .objs/nploops.o .objs/tbl.o .objs/xndloops.o .objs/examples.o \
-              .objs/bfloat16.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
+SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/xndloops.o \
+              .objs/unary.o .objs/binary.o .objs/examples.o .objs/bfloat16.o .objs/graph.o \
+              .objs/quaternion.o .objs/pdist.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -61,22 +61,6 @@ Makefile func.c gumath.h
 Makefile func.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c func.c -o .objs/func.o
 
-unary.o:\
-Makefile kernels/unary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c kernels/unary.c
-
-.objs/unary.o:\
-Makefile kernels/unary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/unary.c -o .objs/unary.o
-
-binary.o:\
-Makefile kernels/binary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c kernels/binary.c
-
-.objs/binary.o:\
-Makefile kernels/binary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary.c -o .objs/binary.o
-
 nploops.o:\
 Makefile nploops.c gumath.h
 	$(CC) $(GM_CFLAGS) -c nploops.c
@@ -100,6 +84,22 @@ Makefile xndloops.c gumath.h
 .objs/xndloops.o:\
 Makefile xndloops.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c xndloops.c -o .objs/xndloops.o
+
+unary.o:\
+Makefile kernels/unary.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c kernels/unary.c
+
+.objs/unary.o:\
+Makefile kernels/unary.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/unary.c -o .objs/unary.o
+
+binary.o:\
+Makefile kernels/binary.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c kernels/binary.c
+
+.objs/binary.o:\
+Makefile kernels/binary.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary.c -o .objs/binary.o
 
 examples.o:\
 Makefile extending/examples.c gumath.h
