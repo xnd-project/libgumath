@@ -441,6 +441,9 @@ PyInit__gumath(void)
        if (gm_init_kernels(table, &ctx) < 0) {
            return seterr(&ctx);
        }
+       if (gm_init_example_kernels(table, &ctx) < 0) {
+           return seterr(&ctx);
+       }
 #ifndef _MSC_VER
        if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
            return seterr(&ctx);

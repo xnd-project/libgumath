@@ -27,12 +27,12 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o kernels.o nploops.o tbl.o xndloops.o bfloat16.o graph.o \
-       quaternion.o pdist.o
+OBJS = apply.o func.o kernels.o nploops.o tbl.o xndloops.o examples.o \
+       bfloat16.o graph.o quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/kernels.o .objs/nploops.o \
-              .objs/tbl.o .objs/xndloops.o .objs/bfloat16.o .objs/graph.o \
-              .objs/quaternion.o .objs/pdist.o
+              .objs/tbl.o .objs/xndloops.o .objs/examples.o .objs/bfloat16.o \
+              .objs/graph.o .objs/quaternion.o .objs/pdist.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -92,6 +92,14 @@ Makefile xndloops.c gumath.h
 .objs/xndloops.o:\
 Makefile xndloops.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c xndloops.c -o .objs/xndloops.o
+
+examples.o:\
+Makefile extending/examples.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c extending/examples.c -o examples.o
+
+.objs/examples.o:\
+Makefile extending/examples.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/examples.c -o .objs/examples.o
 
 bfloat16.o:\
 Makefile extending/bfloat16.c gumath.h

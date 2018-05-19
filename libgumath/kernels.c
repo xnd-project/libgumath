@@ -51,70 +51,6 @@ gm_kernel_set_t empty_kernel_set =
 
 
 /****************************************************************************/
-/*                               Xnd kernels                                */
-/****************************************************************************/
-
-/*
- * Count valid/missing values in a 1D array of records and return the result
- * as a record.
- *
- * Signature:
- *    "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}"
- */
-static int
-count_valid_missing(xnd_t stack[], ndt_context_t *ctx)
-{
-    const xnd_t *array = &stack[0];
-    int64_t N = array->type->FixedDim.shape; /* N in the above signature */
-    xnd_t *out = &stack[1];
-    int64_t ok = 0;
-    int64_t na = 0;
-
-    for (int64_t i = 0; i < N; i++) {
-        const xnd_t record = xnd_fixed_dim_next(array, i);
-        const xnd_t value = xnd_record_next(&record, 2, ctx);
-        if (value.ptr == NULL) {
-            return -1;
-        }
-
-        if (xnd_is_na(&value)) {
-            na++;
-        }
-        else {
-            ok++;
-        }
-    }
-
-    xnd_t valid = xnd_record_next(out, 0, ctx);
-    *(int64_t *)(valid.ptr) = ok;
-
-    xnd_t missing = xnd_record_next(out, 1, ctx);
-    *(int64_t *)(missing.ptr) = na;
-
-    return 0;
-}
-
-int
-gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
-{
-    const xnd_t *x = &stack[0];
-    const xnd_t *y = &stack[1];
-    xnd_t *z = &stack[2];
-    int64_t N = xnd_fixed_shape(x);
-    int64_t yy = *(int64_t *)y->ptr;
-    (void)ctx;
-
-    for (int64_t i = 0; i < N; i++) {
-        const xnd_t xx = xnd_fixed_dim_next(x, i);
-        const xnd_t zz = xnd_fixed_dim_next(z, i);
-        *(int64_t *)zz.ptr = *(int64_t *)xx.ptr + yy;
-    }
-
-    return 0;
-}
-
-
-/****************************************************************************/
 /*                           Generated Xnd kernels                          */
 /****************************************************************************/
 
@@ -282,14 +218,6 @@ static const gm_kernel_init_t kernels[] = {
   XND_UNARY_INIT(sin, sin, float64, float64),
   XND_UNARY_INIT(sin, sin, uint32, float64),
   XND_UNARY_INIT(sin, sin, int32, float64),
-
-
-  { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .Xnd = gm_0D_add_scalar },
-
-  /* example for handling structs with missing values */
-  { .name = "count_valid_missing",
-    .sig = "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}",
-    .Xnd = count_valid_missing },
 
   { .name = NULL, .sig = NULL }
 };

@@ -41,10 +41,11 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.obj func.obj kernels.obj nploops.obj tbl.obj xndloops.obj \
-       graph.obj pdist.obj
+       examples.obj graph.obj pdist.obj
 
 SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/kernels.obj .objs/nploops.obj \
-              .objs/tbl.obj .objs/xndloops.obj .objs/graph.obj .objs/pdist.obj
+              .objs/tbl.obj .objs/xndloops.obj .objs/examples.obj .objs/graph.obj \
+              .objs/pdist.obj
 
 
 $(LIBSTATIC):\
@@ -108,6 +109,14 @@ Makefile xndloops.c gumath.h
 .objs\xndloops.obj:\
 Makefile xndloops.c gumath.h
 	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
+
+examples.obj:\
+Makefile extending\examples.c gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c extending\examples.c
+
+.objs\examples.obj:\
+Makefile extending\examples.c gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c extending\examples.c
 
 graph.obj:\
 Makefile extending\graph.c gumath.h
