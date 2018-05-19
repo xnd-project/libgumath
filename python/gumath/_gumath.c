@@ -133,7 +133,6 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     xnd_t stack[NDT_MAX_ARGS];
     gm_kernel_t kernel;
     int i, k;
-    clock_t start_clock, end_clock;
 
     if (kwds && PyDict_Size(kwds) > 0) {
         PyErr_SetString(PyExc_TypeError,
@@ -156,13 +155,10 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         in_types[i] = stack[i].type;
     }
 
-start_clock = clock();
     kernel = gm_select(&spec, self->tbl, self->name, in_types, (int)nin, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
-end_clock = clock();
-printf("select: %f\n\n", (double)(end_clock-start_clock)/(double)CLOCKS_PER_SEC);
 
     if (spec.nbroadcast > 0) {
         for (i = 0; i < nin; i++) {
@@ -170,7 +166,6 @@ printf("select: %f\n\n", (double)(end_clock-start_clock)/(double)CLOCKS_PER_SEC)
         }
     }
 
-start_clock = clock();
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_concrete(spec.out[i])) {
             PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), spec.out[i]);
@@ -187,18 +182,12 @@ start_clock = clock();
             stack[nin+i] = xnd_error;
          }
     }
-end_clock = clock();
-printf("xnd_alloc: %f\n\n", (double)(end_clock-start_clock)/(double)CLOCKS_PER_SEC);
 
-start_clock = clock();
     if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
         clear_objects(result, spec.nout);
         return seterr(&ctx);
     }
-end_clock = clock();
-printf("apply: %f\n\n", (double)(end_clock-start_clock)/(double)CLOCKS_PER_SEC);
 
-start_clock = clock();
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
             ndt_del(spec.out[i]);
@@ -215,8 +204,6 @@ start_clock = clock();
             result[i] = x;
         }
     }
-end_clock = clock();
-printf("from_xnd: %f\n\n", (double)(end_clock-start_clock)/(double)CLOCKS_PER_SEC);
 
     if (spec.nbroadcast > 0) {
         for (i = 0; i < nin; i++) {
