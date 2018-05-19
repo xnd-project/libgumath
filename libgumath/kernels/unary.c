@@ -57,68 +57,68 @@ apply_index(const xnd_t *x)
 }
 
 
-#define XND_UNARY(func, t1, t2) \
+#define XND_UNARY(func, t0, t1) \
 static int                                                                   \
-gm_fixed_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)          \
+gm_fixed_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)          \
 {                                                                            \
-    const xnd_t *in1 = &stack[0];                                            \
+    const xnd_t *in0 = &stack[0];                                            \
     xnd_t *out = &stack[1];                                                  \
     (void)ctx;                                                               \
                                                                              \
-    const t1##_t x = *(const t1##_t *)in1->ptr;                              \
-    *(t2##_t *)out->ptr = func(x);                                           \
+    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
+    *(t1##_t *)out->ptr = func(x);                                           \
                                                                              \
     return 0;                                                                \
 }                                                                            \
                                                                              \
 static int                                                                   \
-gm_fixed_##func##_1D_C_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        \
+gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
 {                                                                            \
-    const t1##_t *in1 = (const t1##_t *)apply_index(&stack[0]);              \
-    t2##_t *out = (t2##_t *)apply_index(&stack[1]);                          \
+    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);              \
+    t1##_t *out = (t1##_t *)apply_index(&stack[1]);                          \
     int64_t N = xnd_fixed_shape(&stack[0]);                                  \
     (void)ctx;                                                               \
                                                                              \
     for (int64_t i = 0; i < N; i++) {                                        \
-        out[i] = func(in1[i]);                                               \
+        out[i] = func(in0[i]);                                               \
     }                                                                        \
                                                                              \
     return 0;                                                                \
 }                                                                            \
                                                                              \
 static int                                                                   \
-gm_fixed_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)          \
+gm_fixed_##func##_1D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)          \
 {                                                                            \
-    const xnd_t *in1 = &stack[0];                                            \
+    const xnd_t *in0 = &stack[0];                                            \
     xnd_t *out = &stack[1];                                                  \
-    int64_t N = xnd_fixed_shape(in1);                                        \
+    int64_t N = xnd_fixed_shape(in0);                                        \
     (void)ctx;                                                               \
                                                                              \
     for (int64_t i = 0; i < N; i++) {                                        \
-        const xnd_t v = xnd_fixed_dim_next(in1, i);                          \
+        const xnd_t v = xnd_fixed_dim_next(in0, i);                          \
         const xnd_t u = xnd_fixed_dim_next(out, i);                          \
-        const t1##_t x = *(const t1##_t *)v.ptr;                             \
-        *(t2##_t *)u.ptr = func(x);                                          \
+        const t0##_t x = *(const t0##_t *)v.ptr;                             \
+        *(t1##_t *)u.ptr = func(x);                                          \
     }                                                                        \
                                                                              \
     return 0;                                                                \
 }                                                                            \
                                                                              \
 static int                                                                   \
-gm_var_##func##_0D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)            \
+gm_var_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)            \
 {                                                                            \
-    const xnd_t *in1 = &stack[0];                                            \
+    const xnd_t *in0 = &stack[0];                                            \
     xnd_t *out = &stack[1];                                                  \
     (void)ctx;                                                               \
                                                                              \
-    const t1##_t x = *(const t1##_t *)in1->ptr;                              \
-    *(t2##_t *)out->ptr = func(x);                                           \
+    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
+    *(t1##_t *)out->ptr = func(x);                                           \
                                                                              \
     return 0;                                                                \
 }                                                                            \
                                                                              \
 static int                                                                   \
-gm_var_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)            \
+gm_var_##func##_1D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)            \
 {                                                                            \
     int64_t start[2], step[2];                                               \
     int64_t shape, n;                                                        \
@@ -141,32 +141,32 @@ gm_var_##func##_1D_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)            \
     }                                                                        \
                                                                              \
     for (int64_t i = 0; i < shape; i++) {                                    \
-        const xnd_t in1 = xnd_var_dim_next(&stack[0], start[0], step[0], i); \
+        const xnd_t in0 = xnd_var_dim_next(&stack[0], start[0], step[0], i); \
         xnd_t out = xnd_var_dim_next(&stack[1], start[1], step[1], i) ;      \
-        const t1##_t x = *(const t1##_t *)in1.ptr;                           \
-        *(t2##_t *)out.ptr = func(x);                                        \
+        const t0##_t x = *(const t0##_t *)in0.ptr;                           \
+        *(t1##_t *)out.ptr = func(x);                                        \
     }                                                                        \
                                                                              \
     return 0;                                                                \
 }
 
-#define XND_UNARY_INIT(funcname, func, t1, t2) \
+#define XND_UNARY_INIT(funcname, func, t0, t1) \
   { .name = STRINGIZE(funcname),                                               \
-    .sig = "... * N * " STRINGIZE(t1) "-> ... * N * " STRINGIZE(t2),           \
-    .C = gm_fixed_##func##_1D_C_##t1##_##t2,                                   \
-    .Xnd = gm_fixed_##func##_1D_##t1##_##t2 },                                 \
+    .sig = "... * N * " STRINGIZE(t0) "-> ... * N * " STRINGIZE(t1),           \
+    .C = gm_fixed_##func##_1D_C_##t0##_##t1,                                   \
+    .Xnd = gm_fixed_##func##_1D_##t0##_##t1 },                                 \
                                                                                \
   { .name = STRINGIZE(funcname),                                               \
-    .sig = "... * " STRINGIZE(t1) "-> ... * " STRINGIZE(t2),                   \
-    .Xnd = gm_fixed_##func##_0D_##t1##_##t2 },                                 \
+    .sig = "... * " STRINGIZE(t0) "-> ... * " STRINGIZE(t1),                   \
+    .Xnd = gm_fixed_##func##_0D_##t0##_##t1 },                                 \
                                                                                \
   { .name = STRINGIZE(funcname),                                               \
-    .sig = "var... * var * " STRINGIZE(t1) "-> var... * var * " STRINGIZE(t2), \
-    .Xnd = gm_var_##func##_1D_##t1##_##t2 },                                   \
+    .sig = "var... * var * " STRINGIZE(t0) "-> var... * var * " STRINGIZE(t1), \
+    .Xnd = gm_var_##func##_1D_##t0##_##t1 },                                   \
                                                                                \
   { .name = STRINGIZE(funcname),                                               \
-    .sig = "var... * " STRINGIZE(t1) "-> var... * " STRINGIZE(t2),             \
-    .Xnd = gm_var_##func##_0D_##t1##_##t2 }
+    .sig = "var... * " STRINGIZE(t0) "-> var... * " STRINGIZE(t1),             \
+    .Xnd = gm_var_##func##_0D_##t0##_##t1 }
 
 
 
