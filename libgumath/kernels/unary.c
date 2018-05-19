@@ -226,7 +226,7 @@ static const gm_kernel_init_t kernels[] = {
 /****************************************************************************/
 
 int
-gm_init_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
+gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 {
     const gm_kernel_init_t *k;
 

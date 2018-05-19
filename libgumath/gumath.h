@@ -184,7 +184,7 @@ GM_API int gm_tbl_map(const gm_tbl_t *tbl, int (*f)(const gm_func_t *, void *sta
 /******************************************************************************/
 
 GM_API void gm_init(void);
-GM_API int gm_init_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_example_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_bfloat16_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
