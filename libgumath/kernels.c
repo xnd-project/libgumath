@@ -128,7 +128,7 @@ apply_index(const xnd_t *x)
 }
 
 
-#define XND_ELEMWISE(func, srctype, desttype) \
+#define XND_UNARY(func, srctype, desttype) \
 static int                                                                     \
 gm_fixed_##func##_0D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                              \
@@ -216,7 +216,7 @@ gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
     return 0;                                                                  \
 }
 
-#define XND_ELEMWISE_INIT(funcname, func, srctype, desttype) \
+#define XND_UNARY_INIT(funcname, func, srctype, desttype) \
   { .name = STRINGIZE(funcname),                                                          \
     .sig = "... * N * " STRINGIZE(srctype) "-> ... * N * " STRINGIZE(desttype),           \
     .C = gm_fixed_##func##_1D_C_##srctype##_##desttype,                                   \
@@ -236,52 +236,52 @@ gm_var_##func##_1D_##srctype##_##desttype(xnd_t stack[], ndt_context_t *ctx)   \
 
 
 
-XND_ELEMWISE(sinf, float32, float32)
-XND_ELEMWISE(sinf, int8, float32)
-XND_ELEMWISE(sinf, int16, float32)
-XND_ELEMWISE(sinf, uint8, float32)
-XND_ELEMWISE(sinf, uint16, float32)
+XND_UNARY(sinf, float32, float32)
+XND_UNARY(sinf, int8, float32)
+XND_UNARY(sinf, int16, float32)
+XND_UNARY(sinf, uint8, float32)
+XND_UNARY(sinf, uint16, float32)
 
-XND_ELEMWISE(sin, float64, float64)
-XND_ELEMWISE(sin, int32, float64)
-XND_ELEMWISE(sin, uint32, float64)
+XND_UNARY(sin, float64, float64)
+XND_UNARY(sin, int32, float64)
+XND_UNARY(sin, uint32, float64)
 
 #define copy(x) x
-XND_ELEMWISE(copy, int8, int8)
-XND_ELEMWISE(copy, int16, int16)
-XND_ELEMWISE(copy, int32, int32)
-XND_ELEMWISE(copy, int64, int64)
-XND_ELEMWISE(copy, uint8, uint8)
-XND_ELEMWISE(copy, uint16, uint16)
-XND_ELEMWISE(copy, uint32, uint32)
-XND_ELEMWISE(copy, uint64, uint64)
-XND_ELEMWISE(copy, float32, float32)
-XND_ELEMWISE(copy, float64, float64)
+XND_UNARY(copy, int8, int8)
+XND_UNARY(copy, int16, int16)
+XND_UNARY(copy, int32, int32)
+XND_UNARY(copy, int64, int64)
+XND_UNARY(copy, uint8, uint8)
+XND_UNARY(copy, uint16, uint16)
+XND_UNARY(copy, uint32, uint32)
+XND_UNARY(copy, uint64, uint64)
+XND_UNARY(copy, float32, float32)
+XND_UNARY(copy, float64, float64)
 
 
 static const gm_kernel_init_t kernels[] = {
   /* COPY */
-  XND_ELEMWISE_INIT(copy, copy, int8, int8),
-  XND_ELEMWISE_INIT(copy, copy, int16, int16),
-  XND_ELEMWISE_INIT(copy, copy, int32, int32),
-  XND_ELEMWISE_INIT(copy, copy, int64, int64),
-  XND_ELEMWISE_INIT(copy, copy, uint8, uint8),
-  XND_ELEMWISE_INIT(copy, copy, uint16, uint16),
-  XND_ELEMWISE_INIT(copy, copy, uint32, uint32),
-  XND_ELEMWISE_INIT(copy, copy, uint64, uint64),
-  XND_ELEMWISE_INIT(copy, copy, float32, float32),
-  XND_ELEMWISE_INIT(copy, copy, float64, float64),
+  XND_UNARY_INIT(copy, copy, int8, int8),
+  XND_UNARY_INIT(copy, copy, int16, int16),
+  XND_UNARY_INIT(copy, copy, int32, int32),
+  XND_UNARY_INIT(copy, copy, int64, int64),
+  XND_UNARY_INIT(copy, copy, uint8, uint8),
+  XND_UNARY_INIT(copy, copy, uint16, uint16),
+  XND_UNARY_INIT(copy, copy, uint32, uint32),
+  XND_UNARY_INIT(copy, copy, uint64, uint64),
+  XND_UNARY_INIT(copy, copy, float32, float32),
+  XND_UNARY_INIT(copy, copy, float64, float64),
 
   /* SIN */
-  XND_ELEMWISE_INIT(sin, sinf, float32, float32),
-  XND_ELEMWISE_INIT(sin, sinf, uint8, float32),
-  XND_ELEMWISE_INIT(sin, sinf, uint16, float32),
-  XND_ELEMWISE_INIT(sin, sinf, int8, float32),
-  XND_ELEMWISE_INIT(sin, sinf, int16, float32),
+  XND_UNARY_INIT(sin, sinf, float32, float32),
+  XND_UNARY_INIT(sin, sinf, uint8, float32),
+  XND_UNARY_INIT(sin, sinf, uint16, float32),
+  XND_UNARY_INIT(sin, sinf, int8, float32),
+  XND_UNARY_INIT(sin, sinf, int16, float32),
 
-  XND_ELEMWISE_INIT(sin, sin, float64, float64),
-  XND_ELEMWISE_INIT(sin, sin, uint32, float64),
-  XND_ELEMWISE_INIT(sin, sin, int32, float64),
+  XND_UNARY_INIT(sin, sin, float64, float64),
+  XND_UNARY_INIT(sin, sin, uint32, float64),
+  XND_UNARY_INIT(sin, sin, int32, float64),
 
 
   { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .Xnd = gm_0D_add_scalar },
