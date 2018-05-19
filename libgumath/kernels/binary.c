@@ -175,7 +175,7 @@ gm_var_##func##_1D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)       \
     .Xnd = gm_fixed_##func##_0D_##t0##_##t1##_##t2 },                                                            \
                                                                                                                  \
   { .name = STRINGIZE(func),                                                                                     \
-    .sig = "var... * var * " STRINGIZE(t0) ", var... * var * " STRINGIZE(t0) "-> var... * var * " STRINGIZE(t2), \
+    .sig = "var... * var * " STRINGIZE(t0) ", var... * var * " STRINGIZE(t1) "-> var... * var * " STRINGIZE(t2), \
     .Xnd = gm_var_##func##_1D_##t0##_##t1##_##t2 },                                                              \
                                                                                                                  \
   { .name = STRINGIZE(func),                                                                                     \
