@@ -42,13 +42,6 @@
 #include "gumath.h"
 
 
-gm_kernel_set_t empty_kernel_set =
- { .sig = NULL,
-   .C = NULL,
-   .Fortran = NULL,
-   .Strided = NULL,
-   .Xnd = NULL };
-
 
 /****************************************************************************/
 /*                           Generated Xnd kernels                          */
