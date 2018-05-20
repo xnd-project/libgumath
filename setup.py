@@ -160,15 +160,15 @@ class GmBuildExt(build_ext):
     def __init__(self, dist):
         build_ext.__init__(self, dist)
 
-        self.include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
-        self.library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
-        self.depends = []
+        self.add_include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
+        self.add_library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
+        self.add_depends = []
 
         if sys.platform == "win32":
-            self.libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
-            self.extra_compile_args = ["/DNDT_IMPORT", "/DXND_IMPORT", "/DGM_IMPORT"]
-            self.extra_link_args = []
-            self.runtime_library_dirs = []
+            self.add_libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
+            self.add_extra_compile_args = ["/DNDT_IMPORT", "/DXND_IMPORT", "/DGM_IMPORT"]
+            self.add_extra_link_args = []
+            self.add_runtime_library_dirs = []
 
             if BUILD_ALL:
                 from distutils.msvc9compiler import MSVCCompiler
@@ -185,21 +185,20 @@ class GmBuildExt(build_ext):
                      os.system("vcbuild32.bat")
                 os.chdir("..")
         else:
-            self.extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
+            self.add_extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
             if sys.platform == "darwin":
-                self.libraries = ["ndtypes", "xnd", "gumath"]
-                self.extra_link_args = ["-Wl,-rpath,@loader_path"]
-                self.runtime_library_dirs = []
+                self.add_libraries = ["ndtypes", "xnd", "gumath"]
+                self.add_extra_link_args = ["-Wl,-rpath,@loader_path"]
+                self.add_runtime_library_dirs = []
             else:
-                self.libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
-                self.extra_link_args = []
-                self.runtime_library_dirs = ["$ORIGIN"]
+                self.add_libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
+                self.add_extra_link_args = []
+                self.add_runtime_library_dirs = ["$ORIGIN"]
 
             if BUILD_ALL:
                 cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
                 ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
                 os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
-
 
     def build_extensions(self):
         self.extensions = []
@@ -212,14 +211,14 @@ class GmBuildExt(build_ext):
 
         return Extension (
             "gumath._gumath",
-            include_dirs = self.include_dirs,
-            library_dirs = self.library_dirs,
-            depends = self.depends,
+            include_dirs = self.add_include_dirs,
+            library_dirs = self.add_library_dirs,
+            depends = self.add_depends,
             sources = sources,
-            libraries = self.libraries,
-            extra_compile_args = self.extra_compile_args,
-            extra_link_args = self.extra_link_args,
-            runtime_library_dirs = self.runtime_library_dirs
+            libraries = self.add_libraries,
+            extra_compile_args = self.add_extra_compile_args,
+            extra_link_args = self.add_extra_link_args,
+            runtime_library_dirs = self.add_runtime_library_dirs
         ) 
 
     def functions_ext(self):
@@ -227,14 +226,14 @@ class GmBuildExt(build_ext):
 
         return Extension (
             "gumath.functions",
-            include_dirs = self.include_dirs,
-            library_dirs = self.library_dirs,
-            depends = self.depends,
+            include_dirs = self.add_include_dirs,
+            library_dirs = self.add_library_dirs,
+            depends = self.add_depends,
             sources = sources,
-            libraries = self.libraries,
-            extra_compile_args = self.extra_compile_args,
-            extra_link_args = self.extra_link_args,
-            runtime_library_dirs = self.runtime_library_dirs
+            libraries = self.add_libraries,
+            extra_compile_args = self.add_extra_compile_args,
+            extra_link_args = self.add_extra_link_args,
+            runtime_library_dirs = self.add_runtime_library_dirs
         )
 
 
