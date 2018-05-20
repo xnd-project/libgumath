@@ -37,6 +37,7 @@ if "bdist_wheel" in sys.argv:
 else:
     from distutils.core import setup, Extension
 
+from distutils.command.build_ext import build_ext
 from distutils.sysconfig import get_python_lib
 from glob import glob
 import platform
@@ -110,11 +111,11 @@ def get_module_path():
 
 def copy_ext():
     if sys.platform == "win32":
-        pathlist = glob("build/lib.*/gumath/_gumath.*.pyd")
+        pathlist = glob("build/lib.*/gumath/*.pyd")
     else:
-        pathlist = glob("build/lib.*/gumath/_gumath.*.so")
-    if pathlist:
-        shutil.copy2(pathlist[0], "python/gumath")
+        pathlist = glob("build/lib.*/gumath/*.so")
+    for f in pathlist:
+        shutil.copy2(f, "python/gumath")
 
 def make_symlinks():
     os.chdir(LIBGUMATHDIR)
@@ -154,59 +155,88 @@ if len(sys.argv) == 2:
         pass
 
 
-def gumath_ext():
-    include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
-    library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
-    depends = []
-    sources = ["python/gumath/_gumath.c"]
+class GmBuildExt(build_ext):
 
-    if sys.platform == "win32":
-        libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
-        extra_compile_args = ["/DNDT_IMPORT", "/DXND_IMPORT", "/DGM_IMPORT"]
-        extra_link_args = []
-        runtime_library_dirs = []
+    def __init__(self, dist):
+        build_ext.__init__(self, dist)
 
-        if BUILD_ALL:
-           from distutils.msvc9compiler import MSVCCompiler
-           MSVCCompiler().initialize()
-           os.chdir("vcbuild")
-           os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[0])
-           os.environ['LIBNDTYPESDIR'] = os.path.normpath(CONFIGURE_LIBS[0])
-           os.environ['LIBXNDINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[1])
-           os.environ['LIBXNDDIR'] = os.path.normpath(CONFIGURE_LIBS[1])
-           if ARCH == "64bit":
-                 os.system("vcbuild64.bat")
-           else:
-                 os.system("vcbuild32.bat")
-           os.chdir("..")
+        self.include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
+        self.library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
+        self.depends = []
 
-    else:
-        extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
-        if sys.platform == "darwin":
-            libraries = ["ndtypes", "xnd", "gumath"]
-            extra_link_args = ["-Wl,-rpath,@loader_path"]
-            runtime_library_dirs = []
+        if sys.platform == "win32":
+            self.libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
+            self.extra_compile_args = ["/DNDT_IMPORT", "/DXND_IMPORT", "/DGM_IMPORT"]
+            self.extra_link_args = []
+            self.runtime_library_dirs = []
+
+            if BUILD_ALL:
+                from distutils.msvc9compiler import MSVCCompiler
+                MSVCCompiler().initialize()
+                os.chdir("vcbuild")
+                os.chdir("vcbuild")
+                os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[0])
+                os.environ['LIBNDTYPESDIR'] = os.path.normpath(CONFIGURE_LIBS[0])
+                os.environ['LIBXNDINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[1])
+                os.environ['LIBXNDDIR'] = os.path.normpath(CONFIGURE_LIBS[1])
+                if ARCH == "64bit":
+                     os.system("vcbuild64.bat")
+                else:
+                     os.system("vcbuild32.bat")
+                os.chdir("..")
         else:
-            libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
-            extra_link_args = []
-            runtime_library_dirs = ["$ORIGIN"]
+            self.extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
+            if sys.platform == "darwin":
+                self.libraries = ["ndtypes", "xnd", "gumath"]
+                self.extra_link_args = ["-Wl,-rpath,@loader_path"]
+                self.runtime_library_dirs = []
+            else:
+                self.libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
+                self.extra_link_args = []
+                self.runtime_library_dirs = ["$ORIGIN"]
 
-        if BUILD_ALL:
-           cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
-           ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
-           os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
+            if BUILD_ALL:
+                cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
+                ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
+                os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
 
-    return Extension (
-      "gumath._gumath",
-      include_dirs = include_dirs,
-      library_dirs = library_dirs,
-      depends = depends,
-      sources = sources,
-      libraries = libraries,
-      extra_compile_args = extra_compile_args,
-      extra_link_args = extra_link_args,
-      runtime_library_dirs = runtime_library_dirs
-    )
+
+    def build_extensions(self):
+        self.extensions = []
+        self.extensions.append(self.gumath_ext())
+        self.extensions.append(self.functions_ext())
+        build_ext.build_extensions(self)
+
+    def gumath_ext(self):
+        sources = ["python/gumath/_gumath.c"]
+
+        return Extension (
+            "gumath._gumath",
+            include_dirs = self.include_dirs,
+            library_dirs = self.library_dirs,
+            depends = self.depends,
+            sources = sources,
+            libraries = self.libraries,
+            extra_compile_args = self.extra_compile_args,
+            extra_link_args = self.extra_link_args,
+            runtime_library_dirs = self.runtime_library_dirs
+        ) 
+
+    def functions_ext(self):
+        sources = ["python/gumath/functions.c"]
+
+        return Extension (
+            "gumath.functions",
+            include_dirs = self.include_dirs,
+            library_dirs = self.library_dirs,
+            depends = self.depends,
+            sources = sources,
+            libraries = self.libraries,
+            extra_compile_args = self.extra_compile_args,
+            extra_link_args = self.extra_link_args,
+            runtime_library_dirs = self.runtime_library_dirs
+        )
+
 
 setup (
     name = "gumath",
@@ -231,12 +261,14 @@ setup (
         "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Software Development"
     ],
+    cmdclass = {'build_ext': GmBuildExt},
     install_requires = ["ndtypes == v0.2.0dev3", "xnd == v0.2.0dev3"],
     package_dir = {"": "python"},
     packages = ["gumath"],
     package_data = {"gumath": ["libgumath*", "gumath.h", "pygumath.h"]
                     if INSTALL_LIBS else ["pygumath.h"]},
-    ext_modules = [gumath_ext()],
+    # List must be non-empty to trigger the build.
+    ext_modules = [Extension('NA', sources=[])],
 )
 
 copy_ext()

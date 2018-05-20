@@ -438,14 +438,6 @@ PyInit__gumath(void)
            return seterr(&ctx);
        }
 
-       /* math kernels */
-       if (gm_init_unary_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-       if (gm_init_binary_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-
        /* custom examples */
        if (gm_init_example_kernels(table, &ctx) < 0) {
            return seterr(&ctx);

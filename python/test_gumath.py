@@ -31,6 +31,7 @@
 #
 
 import gumath as gm
+import gumath.functions as fn
 from xnd import xnd
 from extending import Graph, bfloat16
 import sys, time
@@ -66,10 +67,10 @@ class TestCall(unittest.TestCase):
     def test_sin_scalar(self):
 
         x1 = xnd(1.2, type="float64")
-        y1 = gm.sin(x1)
+        y1 = fn.sin(x1)
 
         x2 = xnd(1.23e1, type="float32")
-        y2 = gm.sin(x2)
+        y2 = fn.sin(x2)
 
         if np is not None:
             a1 = np.array(1.2, dtype="float64")
@@ -85,7 +86,7 @@ class TestCall(unittest.TestCase):
 
         for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
-            y = gm.sin(x)
+            y = fn.sin(x)
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
@@ -100,7 +101,7 @@ class TestCall(unittest.TestCase):
                 continue
 
             y = x[::-2, ::-2]
-            z = gm.sin(y)
+            z = fn.sin(y)
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
@@ -112,7 +113,7 @@ class TestCall(unittest.TestCase):
 
         for lst, t, dtype in TEST_CASES:
             x = xnd(lst, type=t)
-            y = gm.copy(x)
+            y = fn.copy(x)
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
@@ -127,7 +128,7 @@ class TestCall(unittest.TestCase):
                 continue
 
             y = x[::-2, ::-2]
-            z = gm.copy(y)
+            z = fn.copy(y)
 
             if np is not None:
                 a = np.array(lst, dtype=dtype)
@@ -212,7 +213,7 @@ class TestRaggedArrays(unittest.TestCase):
                 [s(10.0), s(11.0), s(12.0)]]]
 
         x = xnd(lst)
-        y = gm.sin(x)
+        y = fn.sin(x)
         self.assertEqual(y.value, ans)
 
 
