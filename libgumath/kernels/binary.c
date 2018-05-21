@@ -182,330 +182,141 @@ gm_var_##func##_1D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)       \
     .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) "-> var... * " STRINGIZE(t2),                   \
     .Xnd = gm_var_##func##_0D_##t0##_##t1##_##t2 }
 
+#define XND_ALL_BINARY(name) \
+    XND_BINARY(name, int8, int8, int8)          \
+    XND_BINARY(name, int8, int16, int16)        \
+    XND_BINARY(name, int8, int32, int32)        \
+    XND_BINARY(name, int8, int64, int64)        \
+    XND_BINARY(name, int16, int8, int16)        \
+    XND_BINARY(name, int32, int8, int32)        \
+    XND_BINARY(name, int64, int8, int64)        \
+    XND_BINARY(name, int16, int16, int16)       \
+    XND_BINARY(name, int16, int32, int32)       \
+    XND_BINARY(name, int16, int64, int64)       \
+    XND_BINARY(name, int32, int16, int32)       \
+    XND_BINARY(name, int64, int16, int64)       \
+    XND_BINARY(name, int32, int32, int32)       \
+    XND_BINARY(name, int32, int64, int64)       \
+    XND_BINARY(name, int64, int32, int64)       \
+    XND_BINARY(name, int64, int64, int64)       \
+    XND_BINARY(name, uint8, uint8, uint8)       \
+    XND_BINARY(name, uint8, uint16, uint16)     \
+    XND_BINARY(name, uint8, uint32, uint32)     \
+    XND_BINARY(name, uint8, uint64, uint64)     \
+    XND_BINARY(name, uint16, uint8, uint16)     \
+    XND_BINARY(name, uint32, uint8, uint32)     \
+    XND_BINARY(name, uint64, uint8, uint64)     \
+    XND_BINARY(name, uint16, uint16, uint16)    \
+    XND_BINARY(name, uint16, uint32, uint32)    \
+    XND_BINARY(name, uint16, uint64, uint64)    \
+    XND_BINARY(name, uint32, uint16, uint32)    \
+    XND_BINARY(name, uint64, uint16, uint64)    \
+    XND_BINARY(name, uint32, uint32, uint32)    \
+    XND_BINARY(name, uint32, uint64, uint64)    \
+    XND_BINARY(name, uint64, uint32, uint64)    \
+    XND_BINARY(name, uint64, uint64, uint64)    \
+    XND_BINARY(name, int8, float32, float32)    \
+    XND_BINARY(name, int8, float64, float64)    \
+    XND_BINARY(name, float32, int8, float32)    \
+    XND_BINARY(name, float64, int8, float64)    \
+    XND_BINARY(name, int16, float32, float32)   \
+    XND_BINARY(name, int16, float64, float64)   \
+    XND_BINARY(name, float32, int16, float32)   \
+    XND_BINARY(name, float64, int16, float64)   \
+    XND_BINARY(name, int32, float64, float64)   \
+    XND_BINARY(name, float64, int32, float64)   \
+    XND_BINARY(name, uint8, float32, float32)   \
+    XND_BINARY(name, uint8, float64, float64)   \
+    XND_BINARY(name, float32, uint8, float32)   \
+    XND_BINARY(name, float64, uint8, float64)   \
+    XND_BINARY(name, uint16, float32, float32)  \
+    XND_BINARY(name, uint16, float64, float64)  \
+    XND_BINARY(name, float32, uint16, float32)  \
+    XND_BINARY(name, float64, uint16, float64)  \
+    XND_BINARY(name, uint32, float64, float64)  \
+    XND_BINARY(name, float64, uint32, float64)  \
+    XND_BINARY(name, float32, float32, float32) \
+    XND_BINARY(name, float32, float64, float64) \
+    XND_BINARY(name, float64, float32, float64) \
+    XND_BINARY(name, float64, float64, float64)
 
-/****************************************************************************/
-/*                                   Add                                    */
-/****************************************************************************/
+#define XND_ALL_BINARY_INIT(name) \
+    XND_BINARY_INIT(name, int8, int8, int8),          \
+    XND_BINARY_INIT(name, int8, int16, int16),        \
+    XND_BINARY_INIT(name, int8, int32, int32),        \
+    XND_BINARY_INIT(name, int8, int64, int64),        \
+    XND_BINARY_INIT(name, int16, int8, int16),        \
+    XND_BINARY_INIT(name, int32, int8, int32),        \
+    XND_BINARY_INIT(name, int64, int8, int64),        \
+    XND_BINARY_INIT(name, int16, int16, int16),       \
+    XND_BINARY_INIT(name, int16, int32, int32),       \
+    XND_BINARY_INIT(name, int16, int64, int64),       \
+    XND_BINARY_INIT(name, int32, int16, int32),       \
+    XND_BINARY_INIT(name, int64, int16, int64),      \
+    XND_BINARY_INIT(name, int32, int32, int32),       \
+    XND_BINARY_INIT(name, int32, int64, int64),       \
+    XND_BINARY_INIT(name, int64, int32, int64),       \
+    XND_BINARY_INIT(name, int64, int64, int64),       \
+    XND_BINARY_INIT(name, uint8, uint8, uint8),       \
+    XND_BINARY_INIT(name, uint8, uint16, uint16),     \
+    XND_BINARY_INIT(name, uint8, uint32, uint32),     \
+    XND_BINARY_INIT(name, uint8, uint64, uint64),     \
+    XND_BINARY_INIT(name, uint16, uint8, uint16),     \
+    XND_BINARY_INIT(name, uint32, uint8, uint32),    \
+    XND_BINARY_INIT(name, uint64, uint8, uint64),     \
+    XND_BINARY_INIT(name, uint16, uint16, uint16),    \
+    XND_BINARY_INIT(name, uint16, uint32, uint32),    \
+    XND_BINARY_INIT(name, uint16, uint64, uint64),    \
+    XND_BINARY_INIT(name, uint32, uint16, uint32),    \
+    XND_BINARY_INIT(name, uint64, uint16, uint64),   \
+    XND_BINARY_INIT(name, uint32, uint32, uint32),    \
+    XND_BINARY_INIT(name, uint32, uint64, uint64),    \
+    XND_BINARY_INIT(name, uint64, uint32, uint64),    \
+    XND_BINARY_INIT(name, uint64, uint64, uint64),    \
+    XND_BINARY_INIT(name, int8, float32, float32),    \
+    XND_BINARY_INIT(name, int8, float64, float64),    \
+    XND_BINARY_INIT(name, float32, int8, float32),    \
+    XND_BINARY_INIT(name, float64, int8, float64),    \
+    XND_BINARY_INIT(name, int16, float32, float32),   \
+    XND_BINARY_INIT(name, int16, float64, float64),   \
+    XND_BINARY_INIT(name, float32, int16, float32),   \
+    XND_BINARY_INIT(name, float64, int16, float64),   \
+    XND_BINARY_INIT(name, int32, float64, float64),   \
+    XND_BINARY_INIT(name, float64, int32, float64),   \
+    XND_BINARY_INIT(name, uint8, float32, float32),   \
+    XND_BINARY_INIT(name, uint8, float64, float64),   \
+    XND_BINARY_INIT(name, float32, uint8, float32),  \
+    XND_BINARY_INIT(name, float64, uint8, float64),   \
+    XND_BINARY_INIT(name, uint16, float32, float32),  \
+    XND_BINARY_INIT(name, uint16, float64, float64),  \
+    XND_BINARY_INIT(name, float32, uint16, float32),  \
+    XND_BINARY_INIT(name, float64, uint16, float64),  \
+    XND_BINARY_INIT(name, uint32, float64, float64),  \
+    XND_BINARY_INIT(name, float64, uint32, float64),  \
+    XND_BINARY_INIT(name, float32, float32, float32), \
+    XND_BINARY_INIT(name, float32, float64, float64), \
+    XND_BINARY_INIT(name, float64, float32, float64), \
+    XND_BINARY_INIT(name, float64, float64, float64)
+
 
 #define add(x, y) x + y
-/* signed */
-XND_BINARY(add, int8, int8, int8)
-XND_BINARY(add, int8, int16, int16)
-XND_BINARY(add, int8, int32, int32)
-XND_BINARY(add, int8, int64, int64)
+XND_ALL_BINARY(add)
 
-XND_BINARY(add, int16, int8, int16)
-XND_BINARY(add, int32, int8, int32)
-XND_BINARY(add, int64, int8, int64)
-
-XND_BINARY(add, int16, int16, int16)
-XND_BINARY(add, int16, int32, int32)
-XND_BINARY(add, int16, int64, int64)
-XND_BINARY(add, int32, int16, int32)
-XND_BINARY(add, int64, int16, int64)
-
-XND_BINARY(add, int32, int32, int32)
-XND_BINARY(add, int32, int64, int64)
-XND_BINARY(add, int64, int32, int64)
-
-XND_BINARY(add, int64, int64, int64)
-
-/* unsigned */
-XND_BINARY(add, uint8, uint8, uint8)
-XND_BINARY(add, uint8, uint16, uint16)
-XND_BINARY(add, uint8, uint32, uint32)
-XND_BINARY(add, uint8, uint64, uint64)
-XND_BINARY(add, uint16, uint8, uint16)
-XND_BINARY(add, uint32, uint8, uint32)
-XND_BINARY(add, uint64, uint8, uint64)
-
-XND_BINARY(add, uint16, uint16, uint16)
-XND_BINARY(add, uint16, uint32, uint32)
-XND_BINARY(add, uint16, uint64, uint64)
-XND_BINARY(add, uint32, uint16, uint32)
-XND_BINARY(add, uint64, uint16, uint64)
-
-XND_BINARY(add, uint32, uint32, uint32)
-XND_BINARY(add, uint32, uint64, uint64)
-XND_BINARY(add, uint64, uint32, uint64)
-
-XND_BINARY(add, uint64, uint64, uint64)
-
-/* signed/float */
-XND_BINARY(add, int8, float32, float32)
-XND_BINARY(add, int8, float64, float64)
-XND_BINARY(add, float32, int8, float32)
-XND_BINARY(add, float64, int8, float64)
-
-XND_BINARY(add, int16, float32, float32)
-XND_BINARY(add, int16, float64, float64)
-XND_BINARY(add, float32, int16, float32)
-XND_BINARY(add, float64, int16, float64)
-
-XND_BINARY(add, int32, float64, float64)
-XND_BINARY(add, float64, int32, float64)
-
-/* unsigned/float */
-XND_BINARY(add, uint8, float32, float32)
-XND_BINARY(add, uint8, float64, float64)
-XND_BINARY(add, float32, uint8, float32)
-XND_BINARY(add, float64, uint8, float64)
-
-XND_BINARY(add, uint16, float32, float32)
-XND_BINARY(add, uint16, float64, float64)
-XND_BINARY(add, float32, uint16, float32)
-XND_BINARY(add, float64, uint16, float64)
-
-XND_BINARY(add, uint32, float64, float64)
-XND_BINARY(add, float64, uint32, float64)
-
-/* float/float */
-XND_BINARY(add, float32, float32, float32)
-XND_BINARY(add, float32, float64, float64)
-XND_BINARY(add, float64, float32, float64)
-XND_BINARY(add, float64, float64, float64)
-
-
-/****************************************************************************/
-/*                                Multiply                                  */
-/****************************************************************************/
+#define subtract(x, y) x - y
+XND_ALL_BINARY(subtract)
 
 #define multiply(x, y) x * y
-/* signed */
-XND_BINARY(multiply, int8, int8, int8)
-XND_BINARY(multiply, int8, int16, int16)
-XND_BINARY(multiply, int8, int32, int32)
-XND_BINARY(multiply, int8, int64, int64)
+XND_ALL_BINARY(multiply)
 
-XND_BINARY(multiply, int16, int8, int16)
-XND_BINARY(multiply, int32, int8, int32)
-XND_BINARY(multiply, int64, int8, int64)
-
-XND_BINARY(multiply, int16, int16, int16)
-XND_BINARY(multiply, int16, int32, int32)
-XND_BINARY(multiply, int16, int64, int64)
-XND_BINARY(multiply, int32, int16, int32)
-XND_BINARY(multiply, int64, int16, int64)
-
-XND_BINARY(multiply, int32, int32, int32)
-XND_BINARY(multiply, int32, int64, int64)
-XND_BINARY(multiply, int64, int32, int64)
-
-XND_BINARY(multiply, int64, int64, int64)
-
-/* unsigned */
-XND_BINARY(multiply, uint8, uint8, uint8)
-XND_BINARY(multiply, uint8, uint16, uint16)
-XND_BINARY(multiply, uint8, uint32, uint32)
-XND_BINARY(multiply, uint8, uint64, uint64)
-XND_BINARY(multiply, uint16, uint8, uint16)
-XND_BINARY(multiply, uint32, uint8, uint32)
-XND_BINARY(multiply, uint64, uint8, uint64)
-
-XND_BINARY(multiply, uint16, uint16, uint16)
-XND_BINARY(multiply, uint16, uint32, uint32)
-XND_BINARY(multiply, uint16, uint64, uint64)
-XND_BINARY(multiply, uint32, uint16, uint32)
-XND_BINARY(multiply, uint64, uint16, uint64)
-
-XND_BINARY(multiply, uint32, uint32, uint32)
-XND_BINARY(multiply, uint32, uint64, uint64)
-XND_BINARY(multiply, uint64, uint32, uint64)
-
-XND_BINARY(multiply, uint64, uint64, uint64)
-
-/* signed/float */
-XND_BINARY(multiply, int8, float32, float32)
-XND_BINARY(multiply, int8, float64, float64)
-XND_BINARY(multiply, float32, int8, float32)
-XND_BINARY(multiply, float64, int8, float64)
-
-XND_BINARY(multiply, int16, float32, float32)
-XND_BINARY(multiply, int16, float64, float64)
-XND_BINARY(multiply, float32, int16, float32)
-XND_BINARY(multiply, float64, int16, float64)
-
-XND_BINARY(multiply, int32, float64, float64)
-XND_BINARY(multiply, float64, int32, float64)
-
-/* unsigned/float */
-XND_BINARY(multiply, uint8, float32, float32)
-XND_BINARY(multiply, uint8, float64, float64)
-XND_BINARY(multiply, float32, uint8, float32)
-XND_BINARY(multiply, float64, uint8, float64)
-
-XND_BINARY(multiply, uint16, float32, float32)
-XND_BINARY(multiply, uint16, float64, float64)
-XND_BINARY(multiply, float32, uint16, float32)
-XND_BINARY(multiply, float64, uint16, float64)
-
-XND_BINARY(multiply, uint32, float64, float64)
-XND_BINARY(multiply, float64, uint32, float64)
-
-/* float/float */
-XND_BINARY(multiply, float32, float32, float32)
-XND_BINARY(multiply, float32, float64, float64)
-XND_BINARY(multiply, float64, float32, float64)
-XND_BINARY(multiply, float64, float64, float64)
+#define divide(x, y) x / y
+XND_ALL_BINARY(divide)
 
 
 static const gm_kernel_init_t kernels[] = {
-  /***** Add *****/
-  /* signed */
-  XND_BINARY_INIT(add, int8, int8, int8),
-  XND_BINARY_INIT(add, int8, int16, int16),
-  XND_BINARY_INIT(add, int8, int32, int32),
-  XND_BINARY_INIT(add, int8, int64, int64),
-
-  XND_BINARY_INIT(add, int16, int8, int16),
-  XND_BINARY_INIT(add, int32, int8, int32),
-  XND_BINARY_INIT(add, int64, int8, int64),
-
-  XND_BINARY_INIT(add, int16, int16, int16),
-  XND_BINARY_INIT(add, int16, int32, int32),
-  XND_BINARY_INIT(add, int16, int64, int64),
-  XND_BINARY_INIT(add, int32, int16, int32),
-  XND_BINARY_INIT(add, int64, int16, int64),
-
-  XND_BINARY_INIT(add, int32, int32, int32),
-  XND_BINARY_INIT(add, int32, int64, int64),
-  XND_BINARY_INIT(add, int64, int32, int64),
-
-  XND_BINARY_INIT(add, int64, int64, int64),
-
-  /* unsigned */
-  XND_BINARY_INIT(add, uint8, uint8, uint8),
-  XND_BINARY_INIT(add, uint8, uint16, uint16),
-  XND_BINARY_INIT(add, uint8, uint32, uint32),
-  XND_BINARY_INIT(add, uint8, uint64, uint64),
-  XND_BINARY_INIT(add, uint16, uint8, uint16),
-  XND_BINARY_INIT(add, uint32, uint8, uint32),
-  XND_BINARY_INIT(add, uint64, uint8, uint64),
-
-  XND_BINARY_INIT(add, uint16, uint16, uint16),
-  XND_BINARY_INIT(add, uint16, uint32, uint32),
-  XND_BINARY_INIT(add, uint16, uint64, uint64),
-  XND_BINARY_INIT(add, uint32, uint16, uint32),
-  XND_BINARY_INIT(add, uint64, uint16, uint64),
-
-  XND_BINARY_INIT(add, uint32, uint32, uint32),
-  XND_BINARY_INIT(add, uint32, uint64, uint64),
-  XND_BINARY_INIT(add, uint64, uint32, uint64),
-
-  XND_BINARY_INIT(add, uint64, uint64, uint64),
-
-  /* signed/float */
-  XND_BINARY_INIT(add, int8, float32, float32),
-  XND_BINARY_INIT(add, int8, float64, float64),
-  XND_BINARY_INIT(add, float32, int8, float32),
-  XND_BINARY_INIT(add, float64, int8, float64),
-
-  XND_BINARY_INIT(add, int16, float32, float32),
-  XND_BINARY_INIT(add, int16, float64, float64),
-  XND_BINARY_INIT(add, float32, int16, float32),
-  XND_BINARY_INIT(add, float64, int16, float64),
-
-  XND_BINARY_INIT(add, int32, float64, float64),
-  XND_BINARY_INIT(add, float64, int32, float64),
-
-  /* unsigned/float */
-  XND_BINARY_INIT(add, uint8, float32, float32),
-  XND_BINARY_INIT(add, uint8, float64, float64),
-  XND_BINARY_INIT(add, float32, uint8, float32),
-  XND_BINARY_INIT(add, float64, uint8, float64),
-
-  XND_BINARY_INIT(add, uint16, float32, float32),
-  XND_BINARY_INIT(add, uint16, float64, float64),
-  XND_BINARY_INIT(add, float32, uint16, float32),
-  XND_BINARY_INIT(add, float64, uint16, float64),
-
-  XND_BINARY_INIT(add, uint32, float64, float64),
-  XND_BINARY_INIT(add, float64, uint32, float64),
-
-  /* float/float */
-  XND_BINARY_INIT(add, float32, float32, float32),
-  XND_BINARY_INIT(add, float32, float64, float64),
-  XND_BINARY_INIT(add, float64, float32, float64),
-  XND_BINARY_INIT(add, float64, float64, float64),
-
-
-  /***** Multiply *****/
-  /* signed */
-  XND_BINARY_INIT(multiply, int8, int8, int8),
-  XND_BINARY_INIT(multiply, int8, int16, int16),
-  XND_BINARY_INIT(multiply, int8, int32, int32),
-  XND_BINARY_INIT(multiply, int8, int64, int64),
-
-  XND_BINARY_INIT(multiply, int16, int8, int16),
-  XND_BINARY_INIT(multiply, int32, int8, int32),
-  XND_BINARY_INIT(multiply, int64, int8, int64),
-
-  XND_BINARY_INIT(multiply, int16, int16, int16),
-  XND_BINARY_INIT(multiply, int16, int32, int32),
-  XND_BINARY_INIT(multiply, int16, int64, int64),
-  XND_BINARY_INIT(multiply, int32, int16, int32),
-  XND_BINARY_INIT(multiply, int64, int16, int64),
-
-  XND_BINARY_INIT(multiply, int32, int32, int32),
-  XND_BINARY_INIT(multiply, int32, int64, int64),
-  XND_BINARY_INIT(multiply, int64, int32, int64),
-
-  XND_BINARY_INIT(multiply, int64, int64, int64),
-
-  /* unsigned */
-  XND_BINARY_INIT(multiply, uint8, uint8, uint8),
-  XND_BINARY_INIT(multiply, uint8, uint16, uint16),
-  XND_BINARY_INIT(multiply, uint8, uint32, uint32),
-  XND_BINARY_INIT(multiply, uint8, uint64, uint64),
-  XND_BINARY_INIT(multiply, uint16, uint8, uint16),
-  XND_BINARY_INIT(multiply, uint32, uint8, uint32),
-  XND_BINARY_INIT(multiply, uint64, uint8, uint64),
-
-  XND_BINARY_INIT(multiply, uint16, uint16, uint16),
-  XND_BINARY_INIT(multiply, uint16, uint32, uint32),
-  XND_BINARY_INIT(multiply, uint16, uint64, uint64),
-  XND_BINARY_INIT(multiply, uint32, uint16, uint32),
-  XND_BINARY_INIT(multiply, uint64, uint16, uint64),
-
-  XND_BINARY_INIT(multiply, uint32, uint32, uint32),
-  XND_BINARY_INIT(multiply, uint32, uint64, uint64),
-  XND_BINARY_INIT(multiply, uint64, uint32, uint64),
-
-  XND_BINARY_INIT(multiply, uint64, uint64, uint64),
-
-  /* signed/float */
-  XND_BINARY_INIT(multiply, int8, float32, float32),
-  XND_BINARY_INIT(multiply, int8, float64, float64),
-  XND_BINARY_INIT(multiply, float32, int8, float32),
-  XND_BINARY_INIT(multiply, float64, int8, float64),
-
-  XND_BINARY_INIT(multiply, int16, float32, float32),
-  XND_BINARY_INIT(multiply, int16, float64, float64),
-  XND_BINARY_INIT(multiply, float32, int16, float32),
-  XND_BINARY_INIT(multiply, float64, int16, float64),
-
-  XND_BINARY_INIT(multiply, int32, float64, float64),
-  XND_BINARY_INIT(multiply, float64, int32, float64),
-
-  /* unsigned/float */
-  XND_BINARY_INIT(multiply, uint8, float32, float32),
-  XND_BINARY_INIT(multiply, uint8, float64, float64),
-  XND_BINARY_INIT(multiply, float32, uint8, float32),
-  XND_BINARY_INIT(multiply, float64, uint8, float64),
-
-  XND_BINARY_INIT(multiply, uint16, float32, float32),
-  XND_BINARY_INIT(multiply, uint16, float64, float64),
-  XND_BINARY_INIT(multiply, float32, uint16, float32),
-  XND_BINARY_INIT(multiply, float64, uint16, float64),
-
-  XND_BINARY_INIT(multiply, uint32, float64, float64),
-  XND_BINARY_INIT(multiply, float64, uint32, float64),
-
-  /* float/float */
-  XND_BINARY_INIT(multiply, float32, float32, float32),
-  XND_BINARY_INIT(multiply, float32, float64, float64),
-  XND_BINARY_INIT(multiply, float64, float32, float64),
-  XND_BINARY_INIT(multiply, float64, float64, float64),
+  XND_ALL_BINARY_INIT(add),
+  XND_ALL_BINARY_INIT(subtract),
+  XND_ALL_BINARY_INIT(multiply),
+  XND_ALL_BINARY_INIT(divide),
 
   { .name = NULL, .sig = NULL }
 };
