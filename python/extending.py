@@ -1,6 +1,6 @@
 from xnd import xnd
 from ndtypes import ndt
-import gumath as gm
+import gumath.examples as ex
 
 
 # ==============================================================================
@@ -13,7 +13,7 @@ class Graph(xnd):
        return super().__new__(cls, *args, typedef="graph")
 
    def shortest_paths(self, start):
-       return gm.single_source_shortest_paths(self, start)
+       return ex.single_source_shortest_paths(self, start)
 
 
 class bfloat16(xnd):

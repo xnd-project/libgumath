@@ -32,6 +32,7 @@
 
 import gumath as gm
 import gumath.functions as fn
+import gumath.examples as ex
 from xnd import xnd
 from extending import Graph, bfloat16
 import sys, time
@@ -147,7 +148,7 @@ class TestCall(unittest.TestCase):
                 [-3+10j, -4-2j]]]
 
         x = xnd(lst, type="3 * quaternion64")
-        y = gm.multiply(x, x)
+        y = ex.multiply(x, x)
 
         if np is not None:
             a = np.array(lst, dtype="complex64")
@@ -155,7 +156,7 @@ class TestCall(unittest.TestCase):
             np.testing.assert_equal(y, b)
 
         x = xnd(lst, type="3 * quaternion128")
-        y = gm.multiply(x, x)
+        y = ex.multiply(x, x)
 
         if np is not None:
             a = np.array(lst, dtype="complex128")
@@ -173,7 +174,7 @@ class TestCall(unittest.TestCase):
                 [-3+10j, -4-2j]]]
 
         x = xnd(lst, type="3 * Foo(2 * 2 * complex64)")
-        self.assertRaises(TypeError, gm.multiply, x, x)
+        self.assertRaises(TypeError, ex.multiply, x, x)
 
 
 class TestMissingValues(unittest.TestCase):
@@ -189,7 +190,7 @@ class TestMissingValues(unittest.TestCase):
              {'index': 1, 'name': 'italy', 'value': None}]
 
         z = xnd([x, y], type="2 * 3 * {index: int64, name: string, value: ?int64}")
-        ans = gm.count_valid_missing(z)
+        ans = ex.count_valid_missing(z)
 
         self.assertEqual(ans.value, [{'valid': 2, 'missing': 1}, {'valid': 1, 'missing': 2}])
 
@@ -269,30 +270,30 @@ class TestPdist(unittest.TestCase):
 
     def test_exceptions(self):
         x = xnd([], dtype="float64")
-        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+        self.assertRaises(TypeError, ex.euclidian_pdist, x)
 
         x = xnd([[]], dtype="float64")
-        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+        self.assertRaises(TypeError, ex.euclidian_pdist, x)
 
         x = xnd([[], []], dtype="float64")
-        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+        self.assertRaises(TypeError, ex.euclidian_pdist, x)
 
         x = xnd([[1], [1]], dtype="int64")
-        self.assertRaises(TypeError, gm.euclidian_pdist, x)
+        self.assertRaises(TypeError, ex.euclidian_pdist, x)
 
     def test_pdist(self):
         x = xnd([[1]], dtype="float64")
-        y = gm.euclidian_pdist(x)
+        y = ex.euclidian_pdist(x)
         self.assertEqual(y.value, [])
 
         x = xnd([[1, 2, 3]], dtype="float64")
-        y = gm.euclidian_pdist(x)
+        y = ex.euclidian_pdist(x)
         self.assertEqual(y.value, [])
 
         x = xnd([[-1.2200, -100.5000,   20.1250,  30.1230],
                  [ 2.2200,    2.2720, -122.8400, 122.3330],
                  [ 2.1000,  -25.0000,  100.2000, -99.5000]], dtype="float64")
-        y = gm.euclidian_pdist(x)
+        y = ex.euclidian_pdist(x)
         self.assertEqual(y.value, [198.78529349275314, 170.0746899276903, 315.75385646576035])
 
 
@@ -338,7 +339,7 @@ class TestNumba(unittest.TestCase):
 
         x = xnd(a.tolist(), type="100 * 5 * 10 * int64")
         y = xnd(b.tolist(), type="100 * 5 * int64")
-        z = gm.add_scalar(x, y)
+        z = ex.add_scalar(x, y)
 
         np.testing.assert_equal(z, c)
 
@@ -348,7 +349,7 @@ class TestNumba(unittest.TestCase):
 
         x = xnd(a.tolist(), type="500 * int64")
         y = xnd(b.tolist(), type="int64")
-        z = gm.add_scalar(x, y)
+        z = ex.add_scalar(x, y)
 
         np.testing.assert_equal(z, c)
 

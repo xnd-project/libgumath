@@ -204,6 +204,7 @@ class GmBuildExt(build_ext):
         self.extensions = []
         self.extensions.append(self.gumath_ext())
         self.extensions.append(self.functions_ext())
+        self.extensions.append(self.examples_ext())
         build_ext.build_extensions(self)
 
     def gumath_ext(self):
@@ -236,6 +237,20 @@ class GmBuildExt(build_ext):
             runtime_library_dirs = self.add_runtime_library_dirs
         )
 
+    def examples_ext(self):
+        sources = ["python/gumath/examples.c"]
+
+        return Extension (
+            "gumath.examples",
+            include_dirs = self.add_include_dirs,
+            library_dirs = self.add_library_dirs,
+            depends = self.add_depends,
+            sources = sources,
+            libraries = self.add_libraries,
+            extra_compile_args = self.add_extra_compile_args,
+            extra_link_args = self.add_extra_link_args,
+            runtime_library_dirs = self.add_runtime_library_dirs
+        )
 
 setup (
     name = "gumath",

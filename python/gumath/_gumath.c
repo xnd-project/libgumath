@@ -438,29 +438,6 @@ PyInit__gumath(void)
            return seterr(&ctx);
        }
 
-       /* custom examples */
-       if (gm_init_example_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-
-       /* extending examples */
-#ifndef _MSC_VER
-       if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-#endif
-       if (gm_init_graph_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-#ifndef _MSC_VER
-       if (gm_init_quaternion_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-#endif
-       if (gm_init_pdist_kernels(table, &ctx) < 0) {
-           return seterr(&ctx);
-       }
-
        initialized = 1;
     }
 

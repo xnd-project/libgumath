@@ -168,17 +168,30 @@ gm_var_##func##_1D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)            \
     .sig = "var... * " STRINGIZE(t0) "-> var... * " STRINGIZE(t1),             \
     .Xnd = gm_var_##func##_0D_##t0##_##t1 }
 
+#define XND_ALL_UNARY(name) \
+    XND_UNARY(name##f, float32, float32) \
+    XND_UNARY(name##f, int8, float32)    \
+    XND_UNARY(name##f, int16, float32)   \
+    XND_UNARY(name##f, uint8, float32)   \
+    XND_UNARY(name##f, uint16, float32)  \
+    XND_UNARY(name, float64, float64)    \
+    XND_UNARY(name, int32, float64)      \
+    XND_UNARY(name, uint32, float64)     \
+
+#define XND_ALL_UNARY_INIT(name) \
+    XND_UNARY_INIT(name, name##f, float32, float32), \
+    XND_UNARY_INIT(name, name##f, uint8, float32),   \
+    XND_UNARY_INIT(name, name##f, uint16, float32),  \
+    XND_UNARY_INIT(name, name##f, int8, float32),    \
+    XND_UNARY_INIT(name, name##f, int16, float32),   \
+    XND_UNARY_INIT(name, name, float64, float64),    \
+    XND_UNARY_INIT(name, name, uint32, float64),     \
+    XND_UNARY_INIT(name, name, int32, float64)
 
 
-XND_UNARY(sinf, float32, float32)
-XND_UNARY(sinf, int8, float32)
-XND_UNARY(sinf, int16, float32)
-XND_UNARY(sinf, uint8, float32)
-XND_UNARY(sinf, uint16, float32)
-
-XND_UNARY(sin, float64, float64)
-XND_UNARY(sin, int32, float64)
-XND_UNARY(sin, uint32, float64)
+/*****************************************************************************/
+/*                                   Copy                                    */
+/*****************************************************************************/
 
 #define copy(x) x
 XND_UNARY(copy, int8, int8)
@@ -191,6 +204,87 @@ XND_UNARY(copy, uint32, uint32)
 XND_UNARY(copy, uint64, uint64)
 XND_UNARY(copy, float32, float32)
 XND_UNARY(copy, float64, float64)
+
+
+/*****************************************************************************/
+/*                                Abs functions                              */
+/*****************************************************************************/
+
+XND_ALL_UNARY(fabs)
+
+
+/*****************************************************************************/
+/*                             Exponential functions                         */
+/*****************************************************************************/
+
+XND_ALL_UNARY(exp)
+XND_ALL_UNARY(exp2)
+XND_ALL_UNARY(expm1)
+
+
+/*****************************************************************************/
+/*                              Logarithm functions                          */
+/*****************************************************************************/
+
+XND_ALL_UNARY(log)
+XND_ALL_UNARY(log2)
+XND_ALL_UNARY(log10)
+XND_ALL_UNARY(log1p)
+XND_ALL_UNARY(logb)
+
+
+/*****************************************************************************/
+/*                              Power functions                              */
+/*****************************************************************************/
+
+XND_ALL_UNARY(sqrt)
+XND_ALL_UNARY(cbrt)
+
+
+/*****************************************************************************/
+/*                           Trigonometric functions                         */
+/*****************************************************************************/
+
+XND_ALL_UNARY(sin)
+XND_ALL_UNARY(cos)
+XND_ALL_UNARY(tan)
+XND_ALL_UNARY(asin)
+XND_ALL_UNARY(acos)
+XND_ALL_UNARY(atan)
+
+
+/*****************************************************************************/
+/*                             Hyperbolic functions                          */
+/*****************************************************************************/
+
+XND_ALL_UNARY(sinh)
+XND_ALL_UNARY(cosh)
+XND_ALL_UNARY(tanh)
+XND_ALL_UNARY(asinh)
+XND_ALL_UNARY(acosh)
+XND_ALL_UNARY(atanh)
+
+
+/*****************************************************************************/
+/*                            Error and gamma functions                      */
+/*****************************************************************************/
+
+XND_ALL_UNARY(erf)
+XND_ALL_UNARY(erfc)
+XND_ALL_UNARY(lgamma)
+XND_ALL_UNARY(tgamma)
+
+
+/*****************************************************************************/
+/*                              Ceiling, floor, trunc                        */
+/*****************************************************************************/
+
+XND_ALL_UNARY(ceil)
+XND_ALL_UNARY(floor)
+XND_ALL_UNARY(trunc)
+XND_ALL_UNARY(round)
+XND_ALL_UNARY(nearbyint)
+
 
 
 static const gm_kernel_init_t kernels[] = {
@@ -206,16 +300,53 @@ static const gm_kernel_init_t kernels[] = {
   XND_UNARY_INIT(copy, copy, float32, float32),
   XND_UNARY_INIT(copy, copy, float64, float64),
 
-  /* SIN */
-  XND_UNARY_INIT(sin, sinf, float32, float32),
-  XND_UNARY_INIT(sin, sinf, uint8, float32),
-  XND_UNARY_INIT(sin, sinf, uint16, float32),
-  XND_UNARY_INIT(sin, sinf, int8, float32),
-  XND_UNARY_INIT(sin, sinf, int16, float32),
+  /* ABS */
+  XND_ALL_UNARY_INIT(fabs),
 
-  XND_UNARY_INIT(sin, sin, float64, float64),
-  XND_UNARY_INIT(sin, sin, uint32, float64),
-  XND_UNARY_INIT(sin, sin, int32, float64),
+  /* EXPONENTIAL */
+  XND_ALL_UNARY_INIT(exp),
+  XND_ALL_UNARY_INIT(exp2),
+  XND_ALL_UNARY_INIT(expm1),
+
+  /* LOGARITHM */
+  XND_ALL_UNARY_INIT(log),
+  XND_ALL_UNARY_INIT(log2),
+  XND_ALL_UNARY_INIT(log10),
+  XND_ALL_UNARY_INIT(log1p),
+  XND_ALL_UNARY_INIT(logb),
+
+  /* POWER */
+  XND_ALL_UNARY_INIT(sqrt),
+  XND_ALL_UNARY_INIT(cbrt),
+
+  /* TRIGONOMETRIC */
+  XND_ALL_UNARY_INIT(sin),
+  XND_ALL_UNARY_INIT(cos),
+  XND_ALL_UNARY_INIT(tan),
+  XND_ALL_UNARY_INIT(asin),
+  XND_ALL_UNARY_INIT(acos),
+  XND_ALL_UNARY_INIT(atan),
+
+  /* HYPERBOLIC */
+  XND_ALL_UNARY_INIT(sinh),
+  XND_ALL_UNARY_INIT(cosh),
+  XND_ALL_UNARY_INIT(tanh),
+  XND_ALL_UNARY_INIT(asinh),
+  XND_ALL_UNARY_INIT(acosh),
+  XND_ALL_UNARY_INIT(atanh),
+
+  /* ERROR AND GAMMA */
+  XND_ALL_UNARY_INIT(erf),
+  XND_ALL_UNARY_INIT(erfc),
+  XND_ALL_UNARY_INIT(lgamma),
+  XND_ALL_UNARY_INIT(tgamma),
+
+  /* CEILING, FLOOR, TRUNC */
+  XND_ALL_UNARY_INIT(ceil),
+  XND_ALL_UNARY_INIT(floor),
+  XND_ALL_UNARY_INIT(trunc),
+  XND_ALL_UNARY_INIT(round),
+  XND_ALL_UNARY_INIT(nearbyint),
 
   { .name = NULL, .sig = NULL }
 };
