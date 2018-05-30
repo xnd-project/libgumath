@@ -121,47 +121,6 @@ gm_var_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)       \
     const t1##_t y = *(const t1##_t *)in1->ptr;                                \
     *(t2##_t *)out->ptr = func(x, y);                                          \
     return 0;                                                                  \
-}                                                                              \
-                                                                               \
-static int                                                                     \
-gm_var_##func##_1D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)       \
-{                                                                              \
-    int64_t start[3], step[3];                                                 \
-    int64_t shape, n1, n2;                                                     \
-                                                                               \
-    shape = ndt_var_indices(&start[0], &step[0], stack[0].type,                \
-                            stack[0].index, ctx);                              \
-    if (shape < 0) {                                                           \
-        return -1;                                                             \
-    }                                                                          \
-                                                                               \
-    n1 = ndt_var_indices(&start[1], &step[1], stack[1].type, stack[1].index,   \
-                         ctx);                                                 \
-    if (n1 < 0) {                                                              \
-        return -1;                                                             \
-    }                                                                          \
-                                                                               \
-    n2 = ndt_var_indices(&start[2], &step[2], stack[2].type, stack[2].index,   \
-                         ctx);                                                 \
-    if (n2 < 0) {                                                              \
-        return -1;                                                             \
-    }                                                                          \
-                                                                               \
-    if (n1 != shape || n2 != shape) {                                          \
-        ndt_err_format(ctx, NDT_ValueError, "shape mismatch");                 \
-        return -1;                                                             \
-    }                                                                          \
-                                                                               \
-    for (int64_t i = 0; i < shape; i++) {                                      \
-        const xnd_t in0 = xnd_var_dim_next(&stack[0], start[0], step[0], i);   \
-        const xnd_t in1 = xnd_var_dim_next(&stack[1], start[1], step[1], i);   \
-        xnd_t out = xnd_var_dim_next(&stack[2], start[2], step[2], i);         \
-        const t0##_t x = *(const t0##_t *)in0.ptr;                             \
-        const t1##_t y = *(const t1##_t *)in1.ptr;                             \
-        *(t2##_t *)out.ptr = func(x, y);                                       \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
 }
 
 #define XND_BINARY_INIT(func, t0, t1, t2) \
@@ -173,10 +132,6 @@ gm_var_##func##_1D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)       \
   { .name = STRINGIZE(func),                                                                                     \
     .sig = "... * " STRINGIZE(t0) ", ... * N * " STRINGIZE(t1) "-> ... * " STRINGIZE(t2),                        \
     .Xnd = gm_fixed_##func##_0D_##t0##_##t1##_##t2 },                                                            \
-                                                                                                                 \
-  { .name = STRINGIZE(func),                                                                                     \
-    .sig = "var... * var * " STRINGIZE(t0) ", var... * var * " STRINGIZE(t1) "-> var... * var * " STRINGIZE(t2), \
-    .Xnd = gm_var_##func##_1D_##t0##_##t1##_##t2 },                                                              \
                                                                                                                  \
   { .name = STRINGIZE(func),                                                                                     \
     .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) "-> var... * " STRINGIZE(t2),                   \
