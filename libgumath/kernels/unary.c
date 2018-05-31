@@ -42,7 +42,142 @@
 #include "gumath.h"
 
 
+/****************************************************************************/
+/*                        Optimized dispatch (T -> T)                       */
+/****************************************************************************/
 
+/* Structured kernel locations for fast lookup. */
+static ndt_t *
+infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
+{
+    ndt_t *dtype;
+    enum ndt tag;
+
+    switch (ndt_dtype(in)->tag) {
+    case Int8: *base = 0; tag = Int8; break;
+    case Int16: *base = 3; tag = Int16; break;
+    case Int32: *base = 6; tag = Int32; break;
+    case Int64: *base = 9; tag = Int64; break;
+    case Uint8: *base = 12; tag = Uint8; break;
+    case Uint16: *base = 15; tag = Uint16; break;
+    case Uint32: *base = 18; tag = Uint32; break;
+    case Uint64: *base = 21; tag = Uint64; break;
+    case Float32: *base = 24; tag = Float32; break;
+    case Float64: *base = 27; tag = Float64; break;
+    default:
+        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
+        return NULL;
+    }
+
+    dtype = ndt_primitive(tag, 0, ctx);
+    if (dtype == NULL) {
+        return NULL;
+    }
+
+    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+}
+
+
+/****************************************************************************/
+/*                   Optimized dispatch (float return values)               */
+/****************************************************************************/
+
+/* Structured kernel locations for fast lookup. */
+static ndt_t *
+infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
+{
+    ndt_t *dtype;
+    enum ndt tag;
+
+    switch (ndt_dtype(in)->tag) {
+    case Int8: *base = 0; tag = Float32; break;
+    case Int16: *base = 3; tag = Float32; break;
+    case Uint8: *base = 6; tag = Float32; break;
+    case Uint16: *base = 9; tag = Float32; break;
+    case Float32: *base = 12; tag = Float32; break;
+    case Int32: *base = 15; tag = Float64; break;
+    case Uint32: *base = 18; tag = Float64; break;
+    case Float64: *base = 21; tag = Float64; break;
+    default:
+        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
+        return NULL;
+    }
+
+    dtype = ndt_primitive(tag, 0, ctx);
+    if (dtype == NULL) {
+        return NULL;
+    }
+
+    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+}
+
+
+/****************************************************************************/
+/*                             Optimized typecheck                          */
+/****************************************************************************/
+
+static const gm_kernel_set_t *
+unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                const ndt_t *in[], int nin,
+                ndt_t *(*infer)(int *, const ndt_t *, ndt_context_t *),
+                ndt_context_t *ctx)
+{
+    const ndt_t *t;
+    int n;
+
+    if (nin != 1) {
+        ndt_err_format(ctx, NDT_ValueError,
+            "invalid number of arguments for %s(x). expected 1, got %d",
+            f->name, nin);
+        return NULL;
+    }
+    t = in[0];
+    assert(ndt_is_concrete(t));
+
+    spec->out[0] = infer(&n, t, ctx);
+    if (spec->out[0] == NULL) {
+        return NULL;
+    }
+    spec->nout = 1;
+    spec->nbroadcast = 0;
+
+    switch (t->tag) {
+    case FixedDim:
+        spec->tag = Xnd;
+        if (ndt_is_c_contiguous(t)) {
+            spec->tag = C;
+        }
+        spec->outer_dims = t->ndim - 1;
+        return &f->kernels[n];
+    case VarDim:
+        spec->tag = C;
+        spec->outer_dims = t->ndim;
+        return &f->kernels[n+2];
+    default:
+        assert(t->ndim == 0);
+        spec->tag = C;
+        spec->outer_dims = 0;
+        return &f->kernels[n+1];
+    }
+}
+
+static const gm_kernel_set_t *
+unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                   const ndt_t *in[], int nin,
+                   ndt_context_t *ctx)
+{
+    return unary_typecheck(spec, f, in, nin, infer_id_return, ctx);
+}
+
+static const gm_kernel_set_t *
+unary_float_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                      const ndt_t *in[], int nin,
+                      ndt_context_t *ctx)
+{
+    return unary_typecheck(spec, f, in, nin, infer_float_return, ctx);
+}
+
+ 
 /****************************************************************************/
 /*                           Generated Xnd kernels                          */
 /****************************************************************************/
@@ -59,7 +194,7 @@ apply_index(const xnd_t *x)
 
 #define XND_UNARY(func, t0, t1) \
 static int                                                                   \
-gm_fixed_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)          \
+gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)                \
 {                                                                            \
     const xnd_t *in0 = &stack[0];                                            \
     xnd_t *out = &stack[1];                                                  \
@@ -102,54 +237,21 @@ gm_fixed_##func##_1D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)          \
     }                                                                        \
                                                                              \
     return 0;                                                                \
-}                                                                            \
-                                                                             \
-static int                                                                   \
-gm_var_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)            \
-{                                                                            \
-    const xnd_t *in0 = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                  \
-    (void)ctx;                                                               \
-                                                                             \
-    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
-    *(t1##_t *)out->ptr = func(x);                                           \
-                                                                             \
-    return 0;                                                                \
 }
 
 #define XND_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                               \
-    .sig = "... * N * " STRINGIZE(t0) "-> ... * N * " STRINGIZE(t1),           \
-    .C = gm_fixed_##func##_1D_C_##t0##_##t1,                                   \
-    .Xnd = gm_fixed_##func##_1D_##t0##_##t1 },                                 \
-                                                                               \
-  { .name = STRINGIZE(funcname),                                               \
-    .sig = "... * " STRINGIZE(t0) "-> ... * " STRINGIZE(t1),                   \
-    .Xnd = gm_fixed_##func##_0D_##t0##_##t1 },                                 \
-                                                                               \
-  { .name = STRINGIZE(funcname),                                               \
-    .sig = "var... * " STRINGIZE(t0) "-> var... * " STRINGIZE(t1),             \
-    .Xnd = gm_var_##func##_0D_##t0##_##t1 }
-
-#define XND_ALL_UNARY(name) \
-    XND_UNARY(name##f, float32, float32) \
-    XND_UNARY(name##f, int8, float32)    \
-    XND_UNARY(name##f, int16, float32)   \
-    XND_UNARY(name##f, uint8, float32)   \
-    XND_UNARY(name##f, uint16, float32)  \
-    XND_UNARY(name, float64, float64)    \
-    XND_UNARY(name, int32, float64)      \
-    XND_UNARY(name, uint32, float64)     \
-
-#define XND_ALL_UNARY_INIT(name) \
-    XND_UNARY_INIT(name, name##f, float32, float32), \
-    XND_UNARY_INIT(name, name##f, uint8, float32),   \
-    XND_UNARY_INIT(name, name##f, uint16, float32),  \
-    XND_UNARY_INIT(name, name##f, int8, float32),    \
-    XND_UNARY_INIT(name, name##f, int16, float32),   \
-    XND_UNARY_INIT(name, name, float64, float64),    \
-    XND_UNARY_INIT(name, name, uint32, float64),     \
-    XND_UNARY_INIT(name, name, int32, float64)
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "... * N * " STRINGIZE(t0) " -> ... * N * " STRINGIZE(t1), \
+    .C = gm_fixed_##func##_1D_C_##t0##_##t1,                          \
+    .Xnd = gm_fixed_##func##_1D_##t0##_##t1 },                        \
+                                                                      \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),         \
+    .C = gm_##func##_0D_##t0##_##t1 },                                \
+                                                                      \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),   \
+    .C = gm_##func##_0D_##t0##_##t1 }
 
 
 /*****************************************************************************/
@@ -169,88 +271,7 @@ XND_UNARY(copy, float32, float32)
 XND_UNARY(copy, float64, float64)
 
 
-/*****************************************************************************/
-/*                                Abs functions                              */
-/*****************************************************************************/
-
-XND_ALL_UNARY(fabs)
-
-
-/*****************************************************************************/
-/*                             Exponential functions                         */
-/*****************************************************************************/
-
-XND_ALL_UNARY(exp)
-XND_ALL_UNARY(exp2)
-XND_ALL_UNARY(expm1)
-
-
-/*****************************************************************************/
-/*                              Logarithm functions                          */
-/*****************************************************************************/
-
-XND_ALL_UNARY(log)
-XND_ALL_UNARY(log2)
-XND_ALL_UNARY(log10)
-XND_ALL_UNARY(log1p)
-XND_ALL_UNARY(logb)
-
-
-/*****************************************************************************/
-/*                              Power functions                              */
-/*****************************************************************************/
-
-XND_ALL_UNARY(sqrt)
-XND_ALL_UNARY(cbrt)
-
-
-/*****************************************************************************/
-/*                           Trigonometric functions                         */
-/*****************************************************************************/
-
-XND_ALL_UNARY(sin)
-XND_ALL_UNARY(cos)
-XND_ALL_UNARY(tan)
-XND_ALL_UNARY(asin)
-XND_ALL_UNARY(acos)
-XND_ALL_UNARY(atan)
-
-
-/*****************************************************************************/
-/*                             Hyperbolic functions                          */
-/*****************************************************************************/
-
-XND_ALL_UNARY(sinh)
-XND_ALL_UNARY(cosh)
-XND_ALL_UNARY(tanh)
-XND_ALL_UNARY(asinh)
-XND_ALL_UNARY(acosh)
-XND_ALL_UNARY(atanh)
-
-
-/*****************************************************************************/
-/*                            Error and gamma functions                      */
-/*****************************************************************************/
-
-XND_ALL_UNARY(erf)
-XND_ALL_UNARY(erfc)
-XND_ALL_UNARY(lgamma)
-XND_ALL_UNARY(tgamma)
-
-
-/*****************************************************************************/
-/*                              Ceiling, floor, trunc                        */
-/*****************************************************************************/
-
-XND_ALL_UNARY(ceil)
-XND_ALL_UNARY(floor)
-XND_ALL_UNARY(trunc)
-XND_ALL_UNARY(round)
-XND_ALL_UNARY(nearbyint)
-
-
-
-static const gm_kernel_init_t kernels[] = {
+static const gm_kernel_init_t unary_id[] = {
   /* COPY */
   XND_UNARY_INIT(copy, copy, int8, int8),
   XND_UNARY_INIT(copy, copy, int16, int16),
@@ -261,55 +282,163 @@ static const gm_kernel_init_t kernels[] = {
   XND_UNARY_INIT(copy, copy, uint32, uint32),
   XND_UNARY_INIT(copy, copy, uint64, uint64),
   XND_UNARY_INIT(copy, copy, float32, float32),
-  XND_UNARY_INIT(copy, copy, float64, float64),
+  XND_UNARY_INIT(copy, copy, float64, float64)
+};
 
+
+/*****************************************************************************/
+/*                                   Math                                   */
+/*****************************************************************************/
+
+#define XND_ALL_UNARY_FLOAT(name) \
+    XND_UNARY(name##f, int8, float32)    \
+    XND_UNARY(name##f, int16, float32)   \
+    XND_UNARY(name##f, uint8, float32)   \
+    XND_UNARY(name##f, uint16, float32)  \
+    XND_UNARY(name##f, float32, float32) \
+    XND_UNARY(name, int32, float64)      \
+    XND_UNARY(name, uint32, float64)     \
+    XND_UNARY(name, float64, float64)
+
+#define XND_ALL_UNARY_FLOAT_INIT(name) \
+    XND_UNARY_INIT(name, name##f, int8, float32),    \
+    XND_UNARY_INIT(name, name##f, int16, float32),   \
+    XND_UNARY_INIT(name, name##f, uint8, float32),   \
+    XND_UNARY_INIT(name, name##f, uint16, float32),  \
+    XND_UNARY_INIT(name, name##f, float32, float32), \
+    XND_UNARY_INIT(name, name, uint32, float64),     \
+    XND_UNARY_INIT(name, name, int32, float64),      \
+    XND_UNARY_INIT(name, name, float64, float64)
+
+
+/*****************************************************************************/
+/*                                Abs functions                              */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(fabs)
+
+
+/*****************************************************************************/
+/*                             Exponential functions                         */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(exp)
+XND_ALL_UNARY_FLOAT(exp2)
+XND_ALL_UNARY_FLOAT(expm1)
+
+
+/*****************************************************************************/
+/*                              Logarithm functions                          */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(log)
+XND_ALL_UNARY_FLOAT(log2)
+XND_ALL_UNARY_FLOAT(log10)
+XND_ALL_UNARY_FLOAT(log1p)
+XND_ALL_UNARY_FLOAT(logb)
+
+
+/*****************************************************************************/
+/*                              Power functions                              */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(sqrt)
+XND_ALL_UNARY_FLOAT(cbrt)
+
+
+/*****************************************************************************/
+/*                           Trigonometric functions                         */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(sin)
+XND_ALL_UNARY_FLOAT(cos)
+XND_ALL_UNARY_FLOAT(tan)
+XND_ALL_UNARY_FLOAT(asin)
+XND_ALL_UNARY_FLOAT(acos)
+XND_ALL_UNARY_FLOAT(atan)
+
+
+/*****************************************************************************/
+/*                             Hyperbolic functions                          */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(sinh)
+XND_ALL_UNARY_FLOAT(cosh)
+XND_ALL_UNARY_FLOAT(tanh)
+XND_ALL_UNARY_FLOAT(asinh)
+XND_ALL_UNARY_FLOAT(acosh)
+XND_ALL_UNARY_FLOAT(atanh)
+
+
+/*****************************************************************************/
+/*                            Error and gamma functions                      */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(erf)
+XND_ALL_UNARY_FLOAT(erfc)
+XND_ALL_UNARY_FLOAT(lgamma)
+XND_ALL_UNARY_FLOAT(tgamma)
+
+
+/*****************************************************************************/
+/*                              Ceiling, floor, trunc                        */
+/*****************************************************************************/
+
+XND_ALL_UNARY_FLOAT(ceil)
+XND_ALL_UNARY_FLOAT(floor)
+XND_ALL_UNARY_FLOAT(trunc)
+XND_ALL_UNARY_FLOAT(round)
+XND_ALL_UNARY_FLOAT(nearbyint)
+
+
+static const gm_kernel_init_t unary_float[] = {
   /* ABS */
-  XND_ALL_UNARY_INIT(fabs),
+  XND_ALL_UNARY_FLOAT_INIT(fabs),
 
   /* EXPONENTIAL */
-  XND_ALL_UNARY_INIT(exp),
-  XND_ALL_UNARY_INIT(exp2),
-  XND_ALL_UNARY_INIT(expm1),
+  XND_ALL_UNARY_FLOAT_INIT(exp),
+  XND_ALL_UNARY_FLOAT_INIT(exp2),
+  XND_ALL_UNARY_FLOAT_INIT(expm1),
 
   /* LOGARITHM */
-  XND_ALL_UNARY_INIT(log),
-  XND_ALL_UNARY_INIT(log2),
-  XND_ALL_UNARY_INIT(log10),
-  XND_ALL_UNARY_INIT(log1p),
-  XND_ALL_UNARY_INIT(logb),
+  XND_ALL_UNARY_FLOAT_INIT(log),
+  XND_ALL_UNARY_FLOAT_INIT(log2),
+  XND_ALL_UNARY_FLOAT_INIT(log10),
+  XND_ALL_UNARY_FLOAT_INIT(log1p),
+  XND_ALL_UNARY_FLOAT_INIT(logb),
 
   /* POWER */
-  XND_ALL_UNARY_INIT(sqrt),
-  XND_ALL_UNARY_INIT(cbrt),
+  XND_ALL_UNARY_FLOAT_INIT(sqrt),
+  XND_ALL_UNARY_FLOAT_INIT(cbrt),
 
   /* TRIGONOMETRIC */
-  XND_ALL_UNARY_INIT(sin),
-  XND_ALL_UNARY_INIT(cos),
-  XND_ALL_UNARY_INIT(tan),
-  XND_ALL_UNARY_INIT(asin),
-  XND_ALL_UNARY_INIT(acos),
-  XND_ALL_UNARY_INIT(atan),
+  XND_ALL_UNARY_FLOAT_INIT(sin),
+  XND_ALL_UNARY_FLOAT_INIT(cos),
+  XND_ALL_UNARY_FLOAT_INIT(tan),
+  XND_ALL_UNARY_FLOAT_INIT(asin),
+  XND_ALL_UNARY_FLOAT_INIT(acos),
+  XND_ALL_UNARY_FLOAT_INIT(atan),
 
   /* HYPERBOLIC */
-  XND_ALL_UNARY_INIT(sinh),
-  XND_ALL_UNARY_INIT(cosh),
-  XND_ALL_UNARY_INIT(tanh),
-  XND_ALL_UNARY_INIT(asinh),
-  XND_ALL_UNARY_INIT(acosh),
-  XND_ALL_UNARY_INIT(atanh),
+  XND_ALL_UNARY_FLOAT_INIT(sinh),
+  XND_ALL_UNARY_FLOAT_INIT(cosh),
+  XND_ALL_UNARY_FLOAT_INIT(tanh),
+  XND_ALL_UNARY_FLOAT_INIT(asinh),
+  XND_ALL_UNARY_FLOAT_INIT(acosh),
+  XND_ALL_UNARY_FLOAT_INIT(atanh),
 
   /* ERROR AND GAMMA */
-  XND_ALL_UNARY_INIT(erf),
-  XND_ALL_UNARY_INIT(erfc),
-  XND_ALL_UNARY_INIT(lgamma),
-  XND_ALL_UNARY_INIT(tgamma),
+  XND_ALL_UNARY_FLOAT_INIT(erf),
+  XND_ALL_UNARY_FLOAT_INIT(erfc),
+  XND_ALL_UNARY_FLOAT_INIT(lgamma),
+  XND_ALL_UNARY_FLOAT_INIT(tgamma),
 
   /* CEILING, FLOOR, TRUNC */
-  XND_ALL_UNARY_INIT(ceil),
-  XND_ALL_UNARY_INIT(floor),
-  XND_ALL_UNARY_INIT(trunc),
-  XND_ALL_UNARY_INIT(round),
-  XND_ALL_UNARY_INIT(nearbyint),
+  XND_ALL_UNARY_FLOAT_INIT(ceil),
+  XND_ALL_UNARY_FLOAT_INIT(floor),
+  XND_ALL_UNARY_FLOAT_INIT(trunc),
+  XND_ALL_UNARY_FLOAT_INIT(round),
+  XND_ALL_UNARY_FLOAT_INIT(nearbyint),
 
   { .name = NULL, .sig = NULL }
 };
@@ -324,8 +453,14 @@ gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 {
     const gm_kernel_init_t *k;
 
-    for (k = kernels; k->name != NULL; k++) {
-        if (gm_add_kernel(tbl, k, ctx) < 0) {
+    for (k = unary_id; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_id_typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = unary_float; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_float_typecheck) < 0) {
             return -1;
         }
     }

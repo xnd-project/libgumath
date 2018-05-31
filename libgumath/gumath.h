@@ -112,11 +112,14 @@ typedef struct {
 } gm_kernel_t;
 
 /* Multimethod with associated kernels */
-typedef struct {
+typedef struct gm_func gm_func_t;
+typedef const gm_kernel_set_t *(*gm_typecheck_t)(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[], int nin, ndt_context_t *ctx);
+struct gm_func {
     char *name;
+    gm_typecheck_t typecheck; /* Experimental optimized type-checking, may be NULL. */
     int nkernels;
     gm_kernel_set_t kernels[GM_MAX_KERNELS];
-} gm_func_t;
+};
 
 
 typedef struct _gm_tbl gm_tbl_t;
@@ -131,6 +134,7 @@ GM_API void gm_func_del(gm_func_t *f);
 
 GM_API gm_func_t *gm_add_func(gm_tbl_t *tbl, const char *name, ndt_context_t *ctx);
 GM_API int gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_context_t *ctx);
+GM_API int gm_add_kernel_typecheck(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_context_t *ctx, gm_typecheck_t f);
 
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,

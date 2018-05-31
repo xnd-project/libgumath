@@ -155,6 +155,14 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
         return empty_kernel;
     }
 
+    if (f->typecheck != NULL) {
+        const gm_kernel_set_t *set = f->typecheck(spec, f, in_types, nin, ctx);
+        if (set == NULL) {
+            return empty_kernel;
+        }
+        return select_kernel(spec, set, ctx);
+    }
+
     for (i = 0; i < f->nkernels; i++) {
         const gm_kernel_set_t *set = &f->kernels[i];
         if (ndt_typecheck(spec, set->sig, in_types, nin, set->constraint, args,
