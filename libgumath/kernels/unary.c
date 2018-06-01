@@ -282,7 +282,9 @@ static const gm_kernel_init_t unary_id[] = {
   XND_UNARY_INIT(copy, copy, uint32, uint32),
   XND_UNARY_INIT(copy, copy, uint64, uint64),
   XND_UNARY_INIT(copy, copy, float32, float32),
-  XND_UNARY_INIT(copy, copy, float64, float64)
+  XND_UNARY_INIT(copy, copy, float64, float64),
+
+  { .name = NULL, .sig = NULL }
 };
 
 
