@@ -39,6 +39,7 @@
 #include "xnd.h"
 #include "gumath.h"
 
+static char * input_types_as_string(const ndt_t *in_types[], int nin, ndt_context_t *ctx);
 
 static int
 sum_inner_dimensions(const xnd_t stack[], int nargs, int outer_dims)
@@ -103,11 +104,11 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
               ndt_context_t *ctx)
 {
     gm_kernel_t kernel = {Xnd, NULL};
-
     kernel.set = set;
-
+    char spec_tag = ' ';
     switch (spec->tag) {
     case C:
+        spec_tag = 'C';
         if (set->C != NULL) {
             kernel.tag = C;
             return kernel;
@@ -115,13 +116,16 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         goto TryStrided;
 
     case Fortran:
+        spec_tag = 'F';
         if (set->Fortran != NULL) {
             kernel.tag = Fortran;
             return kernel;
         }
         /* fall through */
 
-    case Strided: TryStrided:
+    case Strided:
+        spec_tag = 'S';
+        TryStrided:
         if (set->Strided != NULL) {
             kernel.tag = Strided;
             return kernel;
@@ -129,6 +133,7 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         /* fall through */
 
     case Xnd:
+        spec_tag = 'X';
         if (set->Xnd != NULL) {
             kernel.tag = Xnd;
             return kernel;
@@ -136,7 +141,19 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
     }
 
     kernel.set = NULL;
-    ndt_err_format(ctx, NDT_RuntimeError, "could not find specialized kernel");
+
+    char tags[] = "    ";
+    if (set->C!=NULL) tags[0] = 'C';
+    if (set->Fortran!=NULL) tags[1] = 'F';
+    if (set->Strided!=NULL) tags[2] = 'S';
+    if (set->Xnd!=NULL) tags[3] = 'X';
+    // TODO: would be nice to show kernel name as well
+    static const char message_template[] = "could not find specialized kernel for `%c'-input (available: `%s')";
+    char* message = ndt_alloc_size(strlen(message_template) + 1 + 4);
+    sprintf(message, message_template, spec_tag, tags);
+    ndt_err_format(ctx, NDT_RuntimeError, message);
+    ndt_free(message);
+    
     return kernel;
 }
 
@@ -173,6 +190,44 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
         return select_kernel(spec, set, ctx);
     }
 
-    ndt_err_format(ctx, NDT_TypeError, "could not find kernel");
+    static const char message_template[] = "could not find `%s' kernel for input `%s'";
+    char* in_types_str = input_types_as_string(in_types, nin, ctx);
+    char* message = ndt_alloc_size(strlen(message_template) + strlen(name) + strlen(in_types_str));
+    sprintf(message, message_template, name, in_types_str);
+    ndt_free(in_types_str);
+    ndt_err_format(ctx, NDT_TypeError, message);
+    ndt_free(message);
+
     return empty_kernel;
+}
+
+static char * input_types_as_string(const ndt_t *in_types[], int nin, ndt_context_t *ctx) {
+    char** in_types_str = ndt_alloc_size(nin);
+    int* in_types_strlen = ndt_alloc_size(nin*sizeof(int));
+    char* buf = NULL;
+    int i, pos = 0;
+    int bufsize = 0;
+    for (i = 0; i < nin; i++) {
+        in_types_str[i] = ndt_as_string(in_types[i], ctx);
+	in_types_strlen[i] = strlen(in_types_str[i]);
+	bufsize += in_types_strlen[i];
+    }
+    bufsize += 2 * (nin - 1) + pos + 1;
+    buf = ndt_alloc_size(bufsize);
+    
+    for (i = 0; i < nin; i++) {
+        memcpy(buf + pos, in_types_str[i], in_types_strlen[i]);
+	pos += in_types_strlen[i];
+	if (i<nin-1) {
+	    buf[pos] = ',';
+	    buf[pos+1] = ' ';
+	    pos += 2;
+	}
+    }
+    assert(pos+1 == bufsize);
+    buf[pos] = '\0';
+    
+    ndt_free(in_types_strlen);
+    ndt_free(in_types_str);
+    return buf;
 }
