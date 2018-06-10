@@ -104,11 +104,11 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
               ndt_context_t *ctx)
 {
     gm_kernel_t kernel = {Xnd, NULL};
+
     kernel.set = set;
-    char spec_tag = ' ';
+
     switch (spec->tag) {
     case C:
-        spec_tag = 'C';
         if (set->C != NULL) {
             kernel.tag = C;
             return kernel;
@@ -116,16 +116,13 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         goto TryStrided;
 
     case Fortran:
-        spec_tag = 'F';
         if (set->Fortran != NULL) {
             kernel.tag = Fortran;
             return kernel;
         }
         /* fall through */
 
-    case Strided:
-        spec_tag = 'S';
-        TryStrided:
+    case Strided: TryStrided:
         if (set->Strided != NULL) {
             kernel.tag = Strided;
             return kernel;
@@ -133,7 +130,6 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         /* fall through */
 
     case Xnd:
-        spec_tag = 'X';
         if (set->Xnd != NULL) {
             kernel.tag = Xnd;
             return kernel;
@@ -141,19 +137,14 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
     }
 
     kernel.set = NULL;
+    ndt_err_format(ctx, NDT_RuntimeError,
+        "could not find specialized kernel for %s-input (available: %s, %s, %s, %s)",
+        ndt_apply_tag_as_string(spec),
+        set->C ? "C" : "_",
+        set->Fortran ? "Fortran" : "_",
+        set->Strided ? "Strided" : "_",
+        set->Xnd ? "Xnd" : "_");
 
-    char tags[] = "    ";
-    if (set->C!=NULL) tags[0] = 'C';
-    if (set->Fortran!=NULL) tags[1] = 'F';
-    if (set->Strided!=NULL) tags[2] = 'S';
-    if (set->Xnd!=NULL) tags[3] = 'X';
-    // TODO: would be nice to show kernel name as well
-    static const char message_template[] = "could not find specialized kernel for `%c'-input (available: `%s')";
-    char* message = ndt_alloc_size(strlen(message_template) + 1 + 4);
-    sprintf(message, message_template, spec_tag, tags);
-    ndt_err_format(ctx, NDT_RuntimeError, message);
-    ndt_free(message);
-    
     return kernel;
 }
 
