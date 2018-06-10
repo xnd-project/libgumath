@@ -163,6 +163,9 @@ class TestCall(unittest.TestCase):
             b = np.einsum("ijk,ikl->ijl", a, a)
             np.testing.assert_equal(y, b)
 
+        x = xnd("xyz")
+        self.assertRaises(TypeError, ex.multiply, x, x)
+
     @unittest.skipIf(sys.platform == "win32", "missing C99 complex support")
     def test_quaternion_error(self):
   

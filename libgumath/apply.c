@@ -39,7 +39,6 @@
 #include "xnd.h"
 #include "gumath.h"
 
-static char * input_types_as_string(const ndt_t *in_types[], int nin, ndt_context_t *ctx);
 
 static int
 sum_inner_dimensions(const xnd_t stack[], int nargs, int outer_dims)
@@ -156,6 +155,7 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
 {
     gm_kernel_t empty_kernel = {Xnd, NULL};
     const gm_func_t *f;
+    char *s;
     int i;
 
     f = gm_tbl_find(tbl, name, ctx);
@@ -181,44 +181,14 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
         return select_kernel(spec, set, ctx);
     }
 
-    static const char message_template[] = "could not find `%s' kernel for input `%s'";
-    char* in_types_str = input_types_as_string(in_types, nin, ctx);
-    char* message = ndt_alloc_size(strlen(message_template) + strlen(name) + strlen(in_types_str));
-    sprintf(message, message_template, name, in_types_str);
-    ndt_free(in_types_str);
-    ndt_err_format(ctx, NDT_TypeError, message);
-    ndt_free(message);
+    s = ndt_list_as_string(in_types, nin, ctx);
+    if (s == NULL) {
+        return empty_kernel;
+    }
+
+    ndt_err_format(ctx, NDT_TypeError,
+        "could not find '%s' kernel for input types '%s'", name, s);
+    ndt_free(s);
 
     return empty_kernel;
-}
-
-static char * input_types_as_string(const ndt_t *in_types[], int nin, ndt_context_t *ctx) {
-    char** in_types_str = ndt_alloc_size(nin);
-    int* in_types_strlen = ndt_alloc_size(nin*sizeof(int));
-    char* buf = NULL;
-    int i, pos = 0;
-    int bufsize = 0;
-    for (i = 0; i < nin; i++) {
-        in_types_str[i] = ndt_as_string(in_types[i], ctx);
-	in_types_strlen[i] = strlen(in_types_str[i]);
-	bufsize += in_types_strlen[i];
-    }
-    bufsize += 2 * (nin - 1) + pos + 1;
-    buf = ndt_alloc_size(bufsize);
-    
-    for (i = 0; i < nin; i++) {
-        memcpy(buf + pos, in_types_str[i], in_types_strlen[i]);
-	pos += in_types_strlen[i];
-	if (i<nin-1) {
-	    buf[pos] = ',';
-	    buf[pos+1] = ' ';
-	    pos += 2;
-	}
-    }
-    assert(pos+1 == bufsize);
-    buf[pos] = '\0';
-    
-    ndt_free(in_types_strlen);
-    ndt_free(in_types_str);
-    return buf;
 }
