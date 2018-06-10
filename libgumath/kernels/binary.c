@@ -80,8 +80,19 @@ gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   \
     t2##_t *out = (t2##_t *)apply_index(&stack[2]);                            \
     int64_t N = xnd_fixed_shape(&stack[0]);                                    \
     (void)ctx;                                                                 \
+    int64_t i;                                                                 \
                                                                                \
-    for (int64_t i = 0; i < N; i++) {                                          \
+    for (i = 0; i < N-7; i += 8) {                                             \
+        out[i] = func(in0[i], in1[i]);                                         \
+        out[i+1] = func(in0[i+1], in1[i+1]);                                   \
+        out[i+2] = func(in0[i+2], in1[i+2]);                                   \
+        out[i+3] = func(in0[i+3], in1[i+3]);                                   \
+        out[i+4] = func(in0[i+4], in1[i+4]);                                   \
+        out[i+5] = func(in0[i+5], in1[i+5]);                                   \
+        out[i+6] = func(in0[i+6], in1[i+6]);                                   \
+        out[i+7] = func(in0[i+7], in1[i+7]);                                   \
+    }                                                                          \
+    for (; i < N; i++) {                                                       \
         out[i] = func(in0[i], in1[i]);                                         \
     }                                                                          \
                                                                                \
