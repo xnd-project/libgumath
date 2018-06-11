@@ -127,7 +127,7 @@ unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 
     if (nin != 1) {
         ndt_err_format(ctx, NDT_ValueError,
-            "invalid number of arguments for %s(x). expected 1, got %d",
+            "invalid number of arguments for %s(x): expected 1, got %d",
             f->name, nin);
         return NULL;
     }
