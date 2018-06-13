@@ -112,7 +112,7 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
             kernel.tag = C;
             return kernel;
         }
-        goto TryStrided;
+        goto TryXnd;
 
     case Fortran:
         if (set->Fortran != NULL) {
@@ -121,18 +121,19 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         }
         /* fall through */
 
-    case Strided: TryStrided:
-        if (set->Strided != NULL) {
-            kernel.tag = Strided;
-            return kernel;
-        }
-        /* fall through */
-
-    case Xnd:
+    case Xnd: TryXnd:
         if (set->Xnd != NULL) {
             kernel.tag = Xnd;
             return kernel;
         }
+        /* fall through */
+
+    case Strided:
+        if (set->Strided != NULL) {
+            kernel.tag = Strided;
+            return kernel;
+        }
+        break;
     }
 
     kernel.set = NULL;
@@ -141,8 +142,8 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         ndt_apply_tag_as_string(spec),
         set->C ? "C" : "_",
         set->Fortran ? "Fortran" : "_",
-        set->Strided ? "Strided" : "_",
-        set->Xnd ? "Xnd" : "_");
+        set->Xnd ? "Xnd" : "_",
+        set->Strided ? "Strided" : "_");
 
     return kernel;
 }
