@@ -364,14 +364,21 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     k.name = name;
     k.sig = sig;
 
-    if (strcmp(tag, "Strided") == 0) {
-        k.Strided = p;
+    if (strcmp(tag, "C") == 0) {
+        k.C = p;
+    }
+    else if (strcmp(tag, "Fortran") == 0) {
+        k.Fortran = p;
     }
     else if (strcmp(tag, "Xnd") == 0) {
         k.Xnd = p;
     }
+    else if (strcmp(tag, "Strided") == 0) {
+        k.Strided = p;
+    }
     else {
-        PyErr_SetString(PyExc_ValueError, "tag must be 'Strided' or 'Xnd'");
+        PyErr_SetString(PyExc_ValueError,
+            "tag must be 'C', 'Fortran', 'Xnd' or 'Strided'");
         return NULL;
     }
 
