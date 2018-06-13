@@ -123,7 +123,7 @@ a *nkernels* associated kernel sets with unique type signatures.
 
 If *typecheck* is *NULL*, the generic libndtypes multimethod dispatch is used
 to locate the kernel. This is an O(N) operation, whose search time is negligible
-for large array operation.
+for large array operations.
 
 The *typecheck* field can be set to an optimized lookup function that has
 internal knowledge of kernel set locations.  The only restriction to the
