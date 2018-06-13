@@ -100,8 +100,8 @@ translation unit contains an array of hundreds of *gm_kernel_init_t* structs
 together with a function that initializes a specific lookup table.
 
 
-Kernel set initialization
--------------------------
+Multimethod struct
+------------------
 
 .. topic:: kernel set initialization
 
