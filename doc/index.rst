@@ -31,12 +31,6 @@ Gumath
 Python module.
 
 
-.. toctree::
-   :maxdepth: 1
-
-   gumath/index.rst
-
-
 Releases
 --------
 

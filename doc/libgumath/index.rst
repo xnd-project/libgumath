@@ -22,5 +22,4 @@ libgumath has a small number of generic math library kernels.
 
    data-structures.rst
    functions.rst
-
-
+   kernels.rst

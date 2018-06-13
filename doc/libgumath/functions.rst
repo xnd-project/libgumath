@@ -28,7 +28,7 @@ belongs to *tbl*.
 Add a kernel to a multimethod
 -----------------------------
 
-.. topic::
+.. topic:: gm_add_kernel
 
 .. code-block:: c
 
@@ -67,7 +67,7 @@ with the multimethod in order to find a match for the input arguments.
 Apply a kernel to input
 -----------------------
 
-.. topic::
+.. topic:: gm_apply
 
 .. code-block:: c
 
