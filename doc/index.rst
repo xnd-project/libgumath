@@ -9,9 +9,9 @@
 gumath
 ======
 
-Gumath is a package for extensible computational kernels that target xnd
-containers.  Kernels can be added at runtime, which allows the use of JIT
-compilers.
+Gumath is a package for extensible dispatch of computational kernels that
+target xnd containers.  Kernels can be added at runtime, which allows the
+use of JIT compilers.
 
 
 Libgumath
@@ -29,6 +29,11 @@ Gumath
 ------
 
 Python module.
+
+.. toctree::
+   :maxdepth: 1
+
+   gumath/index.rst
 
 
 Releases
