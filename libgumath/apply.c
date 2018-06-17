@@ -133,7 +133,11 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
             kernel.tag = Strided;
             return kernel;
         }
-        break;
+    default:
+        if (set->Xnd != NULL) { /* fallback to Xnd */
+            kernel.tag = Xnd;
+            return kernel;
+        }
     }
 
     kernel.set = NULL;
