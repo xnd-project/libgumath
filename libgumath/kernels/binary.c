@@ -236,17 +236,22 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
     if (dtype == NULL) {
         return NULL;
     }
-    ndt_del(dtype); /* temporary until changes in ndtypes */
 
     if (t0->tag == VarDim || t1->tag == VarDim) {
-        n += 2;
+        const gm_kernel_set_t *set = &f->kernels[n+2];
+        ndt_del(dtype); /* temporary */
+        if (ndt_typecheck(spec, set->sig, in, nin, NULL, NULL, ctx) < 0) {
+            return NULL;
+        }
+        return set;
     }
-    else if (t0->ndim == 0 || t1->ndim == 0) {
+
+    if (t0->ndim == 0 && t1->ndim == 0) {
         n += 1;
     }
  
     const gm_kernel_set_t *set = &f->kernels[n];
-    if (ndt_typecheck(spec, set->sig, in, nin, NULL, NULL, ctx) < 0) {
+    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
         return NULL;
     }
 
