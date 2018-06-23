@@ -54,6 +54,9 @@ const void *dummy = NULL;
 /* Function table */
 static gm_tbl_t *table = NULL;
 
+/* Xnd type */
+static PyTypeObject *xnd = NULL;
+
 
 /****************************************************************************/
 /*                               Error handling                             */
@@ -168,7 +171,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_concrete(spec.out[i])) {
-            PyObject *x = Xnd_EmptyFromType(Py_TYPE(a[i]), spec.out[i]);
+            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i]);
             if (x == NULL) {
                 clear_objects(result, i);
                 ndt_apply_spec_clear(&spec);
@@ -191,7 +194,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
             ndt_del(spec.out[i]);
-            PyObject *x = Xnd_FromXnd(Py_TYPE(a[i]), &stack[nin+i]);
+            PyObject *x = Xnd_FromXnd(xnd, &stack[nin+i]);
             stack[nin+i] = xnd_error;
             if (x == NULL) {
                 clear_objects(result, i);
@@ -422,6 +425,7 @@ PyInit__gumath(void)
     PyObject *m = NULL;
     static PyObject *capsule = NULL;
     static int initialized = 0;
+    PyObject *obj = NULL;
 
     if (!initialized) {
        dummy = &xnd_error;
@@ -452,6 +456,16 @@ PyInit__gumath(void)
         return NULL;
     }
 
+    obj = PyImport_ImportModule("xnd");
+    if (obj == NULL) {
+        return NULL;
+    }
+    xnd = (PyTypeObject *)PyObject_GetAttrString(obj, "xnd");
+    Py_CLEAR(obj);
+    if (xnd == NULL) {
+        goto error;
+    }
+
     m = PyModule_Create(&gumath_module);
     if (m == NULL) {
         goto error;
@@ -469,6 +483,7 @@ PyInit__gumath(void)
     return m;
 
 error:
+    Py_CLEAR(xnd);
     Py_CLEAR(m);
     return NULL;
 }

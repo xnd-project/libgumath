@@ -34,6 +34,7 @@ import gumath as gm
 import gumath.functions as fn
 import gumath.examples as ex
 from xnd import xnd
+from ndtypes import ndt
 from extending import Graph, bfloat16
 import sys, time
 import math
@@ -178,6 +179,21 @@ class TestCall(unittest.TestCase):
 
         x = xnd(lst, type="3 * Foo(2 * 2 * complex64)")
         self.assertRaises(TypeError, ex.multiply, x, x)
+
+    def test_void(self):
+
+        x = ex.randint()
+        self.assertEqual(x.type, ndt("int32"))
+
+    def test_multiple_return(self):
+
+        x, y = ex.randtuple()
+        self.assertEqual(x.type, ndt("int32"))
+        self.assertEqual(y.type, ndt("int32"))
+
+        x, y = ex.divmod10(xnd(233))
+        self.assertEqual(x.value, 23)
+        self.assertEqual(y.value, 3)
 
 
 class TestMissingValues(unittest.TestCase):

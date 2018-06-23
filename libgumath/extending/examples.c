@@ -105,12 +105,53 @@ gm_0D_add_scalar(xnd_t stack[], ndt_context_t *ctx)
     return 0;
 }
 
+int
+gm_randint(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *x = &stack[0];
+    (void)ctx;
+
+    *(int32_t *)x->ptr = rand();
+    return 0;
+}
+
+int
+gm_randtuple(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *x = &stack[0];
+    const xnd_t *y = &stack[1];
+    (void)ctx;
+
+    *(int32_t *)x->ptr = rand();
+    *(int32_t *)y->ptr = rand();
+    return 0;
+}
+
+int
+gm_divmod10(xnd_t stack[], ndt_context_t *ctx)
+{
+    const xnd_t *x = &stack[0];
+    int64_t xx = *(int64_t *)x->ptr;
+    const xnd_t *y = &stack[1];
+    const xnd_t *z = &stack[2];
+    (void)ctx;
+
+    *(int64_t *)y->ptr = xx / 10;
+    *(int64_t *)z->ptr = xx % 10;
+    return 0;
+}
+
+
 static const gm_kernel_init_t kernels[] = {
   { .name = "add_scalar", .sig = "... * N * int64, ... * int64 -> ... * N * int64", .Xnd = gm_0D_add_scalar },
 
   { .name = "count_valid_missing",
     .sig = "... * N * {index: int64, name: string, value: ?int64} -> ... * {valid: int64, missing: int64}",
     .Xnd = count_valid_missing },
+
+  { .name = "randint", .sig = "void -> int32", .Xnd = gm_randint },
+  { .name = "randtuple", .sig = "void -> int32, int32", .Xnd = gm_randtuple },
+  { .name = "divmod10", .sig = "int64 -> int64, int64", .Xnd = gm_divmod10 },
 
   { .name = NULL, .sig = NULL }
 };
