@@ -81,17 +81,18 @@ gm_as_ndarray(gm_ndarray_t *a, const xnd_t *x, ndt_context_t *ctx)
     }
 
     if (!ndt_is_ndarray(t)) {
-        if (t->ndim == 0) {
-            a->ndim = 1;
-            a->itemsize = t->datasize;
-            a->nelem = 1;
-            a->shape[0] = 1;
-            a->strides[0] = 0;
-            a->ptr = x->ptr + x->index * t->datasize;
-            return 0;
-        }
         ndt_err_format(ctx, NDT_TypeError, "type is not an ndarray");
         return -1;
+    }
+
+    if (t->ndim == 0) {
+        a->ndim = 1;
+        a->itemsize = t->datasize;
+        a->nelem = 1;
+        a->shape[0] = 1;
+        a->strides[0] = 0;
+        a->ptr = x->ptr + x->index * t->datasize;
+        return 0;
     }
 
     a->ndim = t->ndim;
