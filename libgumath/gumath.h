@@ -107,7 +107,7 @@ typedef struct {
 
 /* Actual kernel selected for application */
 typedef struct {
-    enum ndt_apply tag;
+    uint32_t flag;
     const gm_kernel_set_t *set;
 } gm_kernel_t;
 

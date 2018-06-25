@@ -61,20 +61,20 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
 {
     const int nargs = (int)kernel->set->sig->Function.nargs;
 
-    switch (kernel->tag) {
-    case C: {
+    switch (kernel->flag) {
+    case NDT_C: {
         return gm_xnd_map(kernel->set->C, stack, nargs, outer_dims, ctx);
     }
 
-    case Fortran: {
+    case NDT_FORTRAN: {
         return gm_xnd_map(kernel->set->Fortran, stack, nargs, outer_dims, ctx);
     }
 
-    case Xnd: {
+    case NDT_XND: {
         return gm_xnd_map(kernel->set->Xnd, stack, nargs, outer_dims, ctx);
     }
 
-    case Strided: {
+    case NDT_STRIDED: {
         const int sum_inner = sum_inner_dimensions(stack, nargs, outer_dims);
         const int dims_size = outer_dims + sum_inner;
         const int steps_size = nargs * outer_dims + sum_inner;
@@ -102,48 +102,34 @@ static gm_kernel_t
 select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
               ndt_context_t *ctx)
 {
-    gm_kernel_t kernel = {Xnd, NULL};
+    gm_kernel_t kernel = {0U, NULL};
 
     kernel.set = set;
 
-    switch (spec->tag) {
-    case C:
-        if (set->C != NULL) {
-            kernel.tag = C;
-            return kernel;
-        }
-        goto TryXnd;
+    if (set->C != NULL && (spec->flags&NDT_C)) {
+        kernel.flag = NDT_C;
+        return kernel;
+    }
 
-    case Fortran:
-        if (set->Fortran != NULL) {
-            kernel.tag = Fortran;
-            return kernel;
-        }
-        /* fall through */
+    if (set->Fortran != NULL && (spec->flags&NDT_FORTRAN)) {
+        kernel.flag = NDT_FORTRAN;
+        return kernel;
+    }
 
-    case Xnd: TryXnd:
-        if (set->Xnd != NULL) {
-            kernel.tag = Xnd;
-            return kernel;
-        }
-        /* fall through */
+    if (set->Strided != NULL && (spec->flags&NDT_STRIDED)) {
+        kernel.flag = NDT_STRIDED;
+        return kernel;
+    }
 
-    case Strided:
-        if (set->Strided != NULL) {
-            kernel.tag = Strided;
-            return kernel;
-        }
-    default:
-        if (set->Xnd != NULL) { /* fallback to Xnd */
-            kernel.tag = Xnd;
-            return kernel;
-        }
+    if (set->Xnd != NULL && (spec->flags&NDT_XND)) {
+        kernel.flag = NDT_XND;
+        return kernel;
     }
 
     kernel.set = NULL;
     ndt_err_format(ctx, NDT_RuntimeError,
-        "could not find specialized kernel for %s-input (available: %s, %s, %s, %s)",
-        ndt_apply_tag_as_string(spec),
+        "could not find specialized kernel for '%s' input (available: %s, %s, %s, %s)",
+        ndt_apply_flags_as_string(spec),
         set->C ? "C" : "_",
         set->Fortran ? "Fortran" : "_",
         set->Xnd ? "Xnd" : "_",
@@ -158,7 +144,7 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
           const ndt_t *in_types[], int nin, const xnd_t args[],
           ndt_context_t *ctx)
 {
-    gm_kernel_t empty_kernel = {Xnd, NULL};
+    gm_kernel_t empty_kernel = {0U, NULL};
     const gm_func_t *f;
     char *s;
     int i;

@@ -143,19 +143,19 @@ unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 
     switch (t->tag) {
     case FixedDim:
-        spec->tag = Xnd;
+        spec->flags = NDT_XND;
         if (ndt_is_c_contiguous(t)) {
-            spec->tag = C;
+            spec->flags = NDT_C;
         }
         spec->outer_dims = t->ndim - 1;
         return &f->kernels[n];
     case VarDim:
-        spec->tag = C;
+        spec->flags = NDT_C;
         spec->outer_dims = t->ndim;
         return &f->kernels[n+2];
     default:
         assert(t->ndim == 0);
-        spec->tag = C;
+        spec->flags = NDT_C;
         spec->outer_dims = 0;
         return &f->kernels[n+1];
     }
