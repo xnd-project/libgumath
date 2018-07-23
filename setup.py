@@ -124,6 +124,25 @@ def make_symlinks():
     os.system("ln -sf %s %s" % (LIBSHARED, LIBNAME))
 
 
+if len(sys.argv) == 3 and sys.argv[1] == "install" and \
+    sys.argv[2].startswith("--local"):
+    localdir = sys.argv[2].split("=")[1]
+    sys.argv = sys.argv[:2] + [
+        "--install-base=" + localdir,
+        "--install-purelib=" + localdir,
+        "--install-platlib=" + localdir,
+        "--install-scripts=" + localdir,
+        "--install-data=" + localdir,
+        "--install-headers=" + localdir]
+
+    CONFIGURE_INCLUDES = ["%s/ndtypes" % localdir, "%s/xnd" % localdir]
+    CONFIGURE_LIBS = CONFIGURE_INCLUDES
+    LIBGUMATHDIR = "%s/gumath" % localdir
+    INSTALL_LIBS = True
+
+    if sys.platform == "darwin": # homebrew bug
+        sys.argv.append("--prefix=")
+
 if len(sys.argv) == 2:
     if sys.argv[1] == 'module':
        sys.argv[1] = 'build'
