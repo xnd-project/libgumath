@@ -136,7 +136,7 @@ if len(sys.argv) == 3 and sys.argv[1] == "install" and \
         "--install-headers=" + localdir]
 
     CONFIGURE_INCLUDES = ["%s/ndtypes" % localdir, "%s/xnd" % localdir]
-    CONFIGURE_LIBS = CONFIGURE_INCLUDES
+    INCLUDES = LIBS = CONFIGURE_LIBS = CONFIGURE_INCLUDES
     LIBGUMATHDIR = "%s/gumath" % localdir
     INSTALL_LIBS = True
 
