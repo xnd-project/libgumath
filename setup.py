@@ -193,7 +193,6 @@ class GmBuildExt(build_ext):
                 from distutils.msvc9compiler import MSVCCompiler
                 MSVCCompiler().initialize()
                 os.chdir("vcbuild")
-                os.chdir("vcbuild")
                 os.environ['LIBNDTYPESINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[0])
                 os.environ['LIBNDTYPESDIR'] = os.path.normpath(CONFIGURE_LIBS[0])
                 os.environ['LIBXNDINCLUDE'] = os.path.normpath(CONFIGURE_INCLUDES[1])
