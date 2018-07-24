@@ -295,7 +295,4 @@ setup (
 copy_ext()
 
 if INSTALL_LIBS and sys.platform != "win32" and not "bdist_wheel" in sys.argv:
-    shutil.copy2("python/gumath/%s" % LIBNAME, LIBGUMATHDIR)
-    shutil.copy2("python/gumath/%s" % LIBSONAME, LIBGUMATHDIR)
-    shutil.copy2("python/gumath/%s" % LIBSHARED, LIBGUMATHDIR)
     make_symlinks()
