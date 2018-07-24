@@ -416,7 +416,7 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
     XND_BINARY(name, uint32, int32, int64)      \
     XND_BINARY(name, uint32, int64, int64)      \
     XND_BINARY(name, uint32, uint8, uint32)     \
-    XND_BINARY(name, uint32, uint16, uint16)    \
+    XND_BINARY(name, uint32, uint16, uint32)    \
     XND_BINARY(name, uint32, uint32, uint32)    \
     XND_BINARY(name, uint32, uint64, uint64)    \
     XND_BINARY(name, uint32, float64, float64)  \
@@ -507,7 +507,7 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
     XND_BINARY_INIT(name, uint32, int32, int64),      \
     XND_BINARY_INIT(name, uint32, int64, int64),      \
     XND_BINARY_INIT(name, uint32, uint8, uint32),     \
-    XND_BINARY_INIT(name, uint32, uint16, uint16),    \
+    XND_BINARY_INIT(name, uint32, uint16, uint32),    \
     XND_BINARY_INIT(name, uint32, uint32, uint32),    \
     XND_BINARY_INIT(name, uint32, uint64, uint64),    \
     XND_BINARY_INIT(name, uint32, float64, float64),  \
