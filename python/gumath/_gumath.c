@@ -73,12 +73,6 @@ seterr(ndt_context_t *ctx)
 /*                              Function object                             */
 /****************************************************************************/
 
-typedef struct {
-    PyObject_HEAD
-    const gm_tbl_t *tbl; /* kernel table */
-    char *name;          /* function name */
-} GufuncObject;
-
 static PyTypeObject Gufunc_Type;
 
 static PyObject *

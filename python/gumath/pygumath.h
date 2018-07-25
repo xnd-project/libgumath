@@ -38,8 +38,27 @@ extern "C" {
 #endif
 
 
+#include <Python.h>
 #include "gumath.h"
 
+
+/****************************************************************************/
+/*                               Gufunc Object                              */
+/****************************************************************************/
+
+/* Exposed here for the benefit of Numba. The API should not be regarded
+   stable across versions. */
+
+typedef struct {
+    PyObject_HEAD
+    const gm_tbl_t *tbl; /* kernel table */
+    char *name;          /* function name */
+} GufuncObject;
+
+
+/****************************************************************************/
+/*                                Capsule API                               */
+/****************************************************************************/
 
 #define Gumath_AddFunctions_INDEX 0
 #define Gumath_AddFunctions_RETURN int
