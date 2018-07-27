@@ -59,10 +59,6 @@ matrix:
         - git fetch --unshallow
         - conda build .conda/libgumath -c xnd/label/dev
         - conda build .conda/gumath -c xnd/label/dev
-        - export LIBGUMATH=`conda build --output .conda/libgumath -c xnd/label/dev`
-        - export GUMATH=`conda build --output .conda/gumath -c xnd/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user xnd --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user xnd --label dev; fi
 
     - language: objective-c
       os: osx
@@ -85,11 +81,3 @@ matrix:
         - git fetch --unshallow
         - conda build .conda/libgumath -c xnd/label/dev
         - conda build .conda/gumath -c xnd/label/dev
-        - export LIBGUMATH=`conda build --output .conda/libgumath -c xnd/label/dev`
-        - export GUMATH=`conda build --output .conda/gumath -c xnd/label/dev`
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $LIBGUMATH --user xnd --label dev; fi
-        - if test X"$TRAVIS_BRANCH" = X"master" && test X"$TRAVIS_PULL_REQUEST" = X"false"; then anaconda --token $ANACONDA_TOKEN upload $GUMATH --user xnd --label dev; fi
-
-env:
-  global:
-    - secure: "S2uQndFi5ZbdZ7e82sbgzH+exDMWSu/ogD9kbBuavYFxkSdXKs9PgvlSNGM7d+wQCbkIfgD/D2U+Xpn4fc/1KrqwkiqSsnD4/tWWtklbdgTIoop4UqISdCVxlK36m+FPNMrJ2A4VkFfFVwwaCsJeVzCfYTp8tXNXL2rYk/yZB9NfJO0YS3Y2Ua2zC5FEsxuZadpVsLDyopk5OIcv09EYKmjFIaPTYv8xb4ruESJ4G1guVITDeoOp8OzQKqaC99dtB5NPWftvXRSPo2kjSdeXdjTU34z7Lp9WTTt5ua42ZeIltDIxKOQsEY0RIbSKGOMlxnzm3pkjWoYvg2cfn/CDY30PluJfgktzmjbqHqLdoUmTtzQafDmctpGMOEvAySeDyD26MFex76CYJLmSs5ZHQgFN6qgPCTgJlFqi6Z+t+ptxIoSQTodCknSQNOOq/rFfSN+8AMddqBEs8QVOxV9cqq9nj473P0ZTqiT8HI3fLPd2rPdLBpxY0HujU9RDrxTCJWpP4/qZsopLg/F7K2cFs37H90KwuWNdalE03LxLaLd0ooMUOFMnTxQ66j7OD/tcWnz+wIlCK4h5+3rKOmBo8w6KvbzYTaXoqbBQynmhCo5CCEwgLaR0X61hY6xvkoxZQQRfR1Gde01PUugrgwfkjw70S2Fz4ZkXspQJnxeGDkw="
