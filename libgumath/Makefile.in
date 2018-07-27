@@ -87,7 +87,7 @@ Makefile xndloops.c gumath.h
 
 unary.o:\
 Makefile kernels/unary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c kernels/unary.c
+	$(CC) -I. $(GM_CFLAGS) -Wno-absolute-value -c kernels/unary.c
 
 .objs/unary.o:\
 Makefile kernels/unary.c gumath.h
