@@ -3551,7 +3551,7 @@ case $CC in
         GM_OPT="-O3"
         ;;
     *clang*)
-        GM_WARN="-Wall -Wextra -Wno-absolute-value -std=c11 -pedantic"
+        GM_WARN="-Wall -Wextra -std=c11 -pedantic"
         GM_OPT="-O3"
         ;;
 esac

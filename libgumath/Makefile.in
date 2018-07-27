@@ -91,7 +91,7 @@ Makefile kernels/unary.c gumath.h
 
 .objs/unary.o:\
 Makefile kernels/unary.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/unary.c -o .objs/unary.o
+	$(CC) -I. $(GM_CFLAGS_SHARED) -Wno-absolute-value -c kernels/unary.c -o .objs/unary.o
 
 binary.o:\
 Makefile kernels/binary.c gumath.h
