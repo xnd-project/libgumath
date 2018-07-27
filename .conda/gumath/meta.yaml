@@ -17,6 +17,7 @@ test:
     - libgumath ==0.2.0dev3
     - ndtypes ==0.2.0dev3
     - xnd ==0.2.0dev3
+    - nomkl
     - numpy
     - numba
 
