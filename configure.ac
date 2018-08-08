@@ -53,6 +53,9 @@ AC_SUBST(RANLIB)
 
 # Checks for header files:
 AC_HEADER_STDC
+AC_CHECK_HEADER([pthread.h],
+  [AC_DEFINE([HAVE_PTHREAD_H], 1, [Define to 1 if you have the <pthread.h> header file.])],
+  [])
 
 # Install program:
 AC_PROG_INSTALL

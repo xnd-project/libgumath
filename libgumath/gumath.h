@@ -80,9 +80,10 @@ typedef struct {
     const ndt_constraint_t *constraint;
 
     /* Xnd signatures */
-    gm_xnd_kernel_t C;       /* dispatch ensures c-contiguous */
-    gm_xnd_kernel_t Fortran; /* dispatch ensures f-contiguous */
-    gm_xnd_kernel_t Xnd;     /* selected if non-contiguous or both C and Fortran are NULL */
+    gm_xnd_kernel_t Opt;     /* dispatch ensures elementwise, at least 1D, contiguous in last dimensions */
+    gm_xnd_kernel_t C;       /* dispatch ensures c-contiguous in inner dimensions */
+    gm_xnd_kernel_t Fortran; /* dispatch ensures f-contiguous in inner dimensions */
+    gm_xnd_kernel_t Xnd;     /* selected if non-contiguous or the other fields are NULL */
 
     /* NumPy signature */
     gm_strided_kernel_t Strided;
@@ -99,6 +100,7 @@ typedef struct {
     const char *sig;
     const ndt_constraint_t *constraint;
 
+    gm_xnd_kernel_t Opt;
     gm_xnd_kernel_t C;
     gm_xnd_kernel_t Fortran;
     gm_xnd_kernel_t Xnd;
@@ -140,6 +142,7 @@ GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const 
                              const ndt_t *in_types[], int nin, const xnd_t args[],
                              ndt_context_t *ctx);
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
+GM_API int gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, uint32_t flags, const int64_t nthreads, ndt_context_t *ctx);
 
 
 /******************************************************************************/

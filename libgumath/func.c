@@ -125,6 +125,7 @@ gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t *ctx)
 
     kernel.sig = t;
     kernel.constraint = k->constraint;
+    kernel.Opt = k->Opt;
     kernel.C = k->C;
     kernel.Fortran = k->Fortran;
     kernel.Strided = k->Strided;
@@ -165,6 +166,7 @@ gm_add_kernel_typecheck(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t 
 
     kernel.sig = t;
     kernel.constraint = k->constraint;
+    kernel.Opt = k->Opt;
     kernel.C = k->C;
     kernel.Fortran = k->Fortran;
     kernel.Strided = k->Strided;

@@ -57,6 +57,9 @@ static gm_tbl_t *table = NULL;
 /* Xnd type */
 static PyTypeObject *xnd = NULL;
 
+/* Number of threads: 1 is non-threaded */
+static int64_t nthreads = 1;
+
 
 /****************************************************************************/
 /*                               Error handling                             */
@@ -180,10 +183,18 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
          }
     }
 
-    if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+#ifdef HAVE_PTHREAD_H
+    if (gm_apply_thread(&kernel, stack, spec.outer_dims, spec.flags,
+        nthreads, &ctx) < 0) {
         clear_objects(result, spec.nout);
         return seterr(&ctx);
     }
+#else
+    if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+    }
+#endif
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
@@ -391,6 +402,45 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     return gufunc_new(table, f->name);
 }
 
+static void
+init_nthreads(void)
+{
+    PyObject *os = NULL;
+    PyObject *n = NULL;
+    int64_t i64;
+
+    os = PyImport_ImportModule("os");
+    if (os == NULL) {
+        goto error;
+    }
+
+    n = PyObject_CallMethod(os, "cpu_count", "()");
+    if (n == NULL) {
+        goto error;
+    }
+
+    i64 = PyLong_AsLongLong(n);
+    if (i64 < 1) {
+        goto error;
+    }
+
+    nthreads = i64;
+
+out:
+    Py_XDECREF(os);
+    Py_XDECREF(n);
+    return;
+
+error:
+    if (PyErr_Occurred()) {
+        PyErr_Clear();
+    }
+    PyErr_WarnEx(PyExc_RuntimeWarning,
+        "could not get cpu count: using MAX_CPU==1", 1);
+    goto out;
+}
+
+
 static PyMethodDef gumath_methods [] =
 {
   /* Methods */
@@ -442,6 +492,8 @@ PyInit__gumath(void)
        if (table == NULL) {
            return seterr(&ctx);
        }
+
+       init_nthreads();
 
        initialized = 1;
     }

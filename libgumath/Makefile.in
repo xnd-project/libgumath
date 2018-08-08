@@ -17,7 +17,7 @@ RANLIB = @RANLIB@
 GM_INCLUDES = @CONFIGURE_INCLUDES@
 
 CONFIGURE_CFLAGS = @CONFIGURE_CFLAGS@
-GM_CFLAGS = $(strip -I$(GM_INCLUDES) $(CONFIGURE_CFLAGS) $(CFLAGS))
+GM_CFLAGS = $(strip -I.. -I$(GM_INCLUDES) $(CONFIGURE_CFLAGS) $(CFLAGS))
 GM_CFLAGS_SHARED = $(GM_CFLAGS) -fPIC
 
 CONFIGURE_LDFLAGS = @CONFIGURE_LDFLAGS@
@@ -27,10 +27,10 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o nploops.o tbl.o xndloops.o unary.o binary.o \
+OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o \
        examples.o bfloat16.o graph.o quaternion.o pdist.o
 
-SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/xndloops.o \
+SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
               .objs/unary.o .objs/binary.o .objs/examples.o .objs/bfloat16.o .objs/graph.o \
               .objs/quaternion.o .objs/pdist.o
 
@@ -76,6 +76,14 @@ Makefile tbl.c gumath.h
 .objs/tbl.o:\
 Makefile tbl.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c tbl.c -o .objs/tbl.o
+
+thread.o:\
+Makefile thread.c gumath.h
+	$(CC) $(GM_CFLAGS) -c thread.c
+
+.objs/thread.o:\
+Makefile thread.c gumath.h
+	$(CC) $(GM_CFLAGS_SHARED) -c thread.c -o .objs/thread.o
 
 xndloops.o:\
 Makefile xndloops.c gumath.h

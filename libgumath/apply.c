@@ -62,6 +62,10 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
     const int nargs = (int)kernel->set->sig->Function.nargs;
 
     switch (kernel->flag) {
+    case NDT_ELEMWISE_1D: {
+        return gm_xnd_map(kernel->set->Opt, stack, nargs, outer_dims, ctx);
+    }
+
     case NDT_C: {
         return gm_xnd_map(kernel->set->C, stack, nargs, outer_dims, ctx);
     }
@@ -105,6 +109,11 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
     gm_kernel_t kernel = {0U, NULL};
 
     kernel.set = set;
+
+    if (set->Opt != NULL && (spec->flags&NDT_ELEMWISE_1D)) {
+        kernel.flag = NDT_ELEMWISE_1D;
+        return kernel;
+    }
 
     if (set->C != NULL && (spec->flags&NDT_C)) {
         kernel.flag = NDT_C;

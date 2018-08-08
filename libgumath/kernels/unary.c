@@ -55,15 +55,15 @@ infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 
     switch (ndt_dtype(in)->tag) {
     case Int8: *base = 0; tag = Int8; break;
-    case Int16: *base = 3; tag = Int16; break;
-    case Int32: *base = 6; tag = Int32; break;
-    case Int64: *base = 9; tag = Int64; break;
-    case Uint8: *base = 12; tag = Uint8; break;
-    case Uint16: *base = 15; tag = Uint16; break;
-    case Uint32: *base = 18; tag = Uint32; break;
-    case Uint64: *base = 21; tag = Uint64; break;
-    case Float32: *base = 24; tag = Float32; break;
-    case Float64: *base = 27; tag = Float64; break;
+    case Int16: *base = 2; tag = Int16; break;
+    case Int32: *base = 4; tag = Int32; break;
+    case Int64: *base = 6; tag = Int64; break;
+    case Uint8: *base = 8; tag = Uint8; break;
+    case Uint16: *base = 10; tag = Uint16; break;
+    case Uint32: *base = 12; tag = Uint32; break;
+    case Uint64: *base = 14; tag = Uint64; break;
+    case Float32: *base = 16; tag = Float32; break;
+    case Float64: *base = 18; tag = Float64; break;
     default:
         ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
         return NULL;
@@ -91,13 +91,13 @@ infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 
     switch (ndt_dtype(in)->tag) {
     case Int8: *base = 0; tag = Float32; break;
-    case Int16: *base = 3; tag = Float32; break;
-    case Uint8: *base = 6; tag = Float32; break;
-    case Uint16: *base = 9; tag = Float32; break;
-    case Float32: *base = 12; tag = Float32; break;
-    case Int32: *base = 15; tag = Float64; break;
-    case Uint32: *base = 18; tag = Float64; break;
-    case Float64: *base = 21; tag = Float64; break;
+    case Int16: *base = 2; tag = Float32; break;
+    case Uint8: *base = 4; tag = Float32; break;
+    case Uint16: *base = 6; tag = Float32; break;
+    case Float32: *base = 8; tag = Float32; break;
+    case Int32: *base = 10; tag = Float64; break;
+    case Uint32: *base = 12; tag = Float64; break;
+    case Float64: *base = 14; tag = Float64; break;
     default:
         ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
         return NULL;
@@ -143,21 +143,22 @@ unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 
     switch (t->tag) {
     case FixedDim:
-        spec->flags = NDT_XND;
-        if (ndt_is_c_contiguous(t)) {
-            spec->flags = NDT_C;
+        spec->flags = NDT_C|NDT_STRIDED;
+        spec->outer_dims = t->ndim;
+        if (ndt_is_c_contiguous(ndt_dim_at(t, t->ndim-1))) {
+            spec->flags |= NDT_ELEMWISE_1D;
+            spec->outer_dims = t->ndim - 1;
         }
-        spec->outer_dims = t->ndim - 1;
         return &f->kernels[n];
     case VarDim:
         spec->flags = NDT_C;
         spec->outer_dims = t->ndim;
-        return &f->kernels[n+2];
+        return &f->kernels[n+1];
     default:
         assert(t->ndim == 0);
-        spec->flags = NDT_C;
+        spec->flags = NDT_C|NDT_STRIDED;
         spec->outer_dims = 0;
-        return &f->kernels[n+1];
+        return &f->kernels[n];
     }
 }
 
@@ -219,38 +220,16 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
     }                                                                        \
                                                                              \
     return 0;                                                                \
-}                                                                            \
-                                                                             \
-static int                                                                   \
-gm_fixed_##func##_1D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)          \
-{                                                                            \
-    const xnd_t *in0 = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                  \
-    int64_t N = xnd_fixed_shape(in0);                                        \
-    (void)ctx;                                                               \
-                                                                             \
-    for (int64_t i = 0; i < N; i++) {                                        \
-        const xnd_t v = xnd_fixed_dim_next(in0, i);                          \
-        const xnd_t u = xnd_fixed_dim_next(out, i);                          \
-        const t0##_t x = *(const t0##_t *)v.ptr;                             \
-        *(t1##_t *)u.ptr = func(x);                                          \
-    }                                                                        \
-                                                                             \
-    return 0;                                                                \
 }
 
 #define XND_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "... * N * " STRINGIZE(t0) " -> ... * N * " STRINGIZE(t1), \
-    .C = gm_fixed_##func##_1D_C_##t0##_##t1,                          \
-    .Xnd = gm_fixed_##func##_1D_##t0##_##t1 },                        \
-                                                                      \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),         \
-    .C = gm_##func##_0D_##t0##_##t1 },                                \
-                                                                      \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),   \
+  { .name = STRINGIZE(funcname),                                    \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),       \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                      \
+    .C = gm_##func##_0D_##t0##_##t1 },                              \
+                                                                    \
+  { .name = STRINGIZE(funcname),                                    \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
     .C = gm_##func##_0D_##t0##_##t1 }
 
 
