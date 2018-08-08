@@ -63,7 +63,14 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
 
     switch (kernel->flag) {
     case NDT_ELEMWISE_1D: {
-        return gm_xnd_map(kernel->set->Opt, stack, nargs, outer_dims, ctx);
+        if (outer_dims == 0) {
+            ndt_err_format(ctx, NDT_RuntimeError,
+                "gm_xnd_map: optimized elementwise kernel called with "
+                "outer_dims==0");
+            return -1;
+        }
+
+        return gm_xnd_map(kernel->set->Opt, stack, nargs, outer_dims-1, ctx);
     }
 
     case NDT_C: {

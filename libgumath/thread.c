@@ -101,18 +101,15 @@ gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
     ALLOCA(int, nslices, nrows);
     struct thread_info *tinfo;
     int ncols, tnum;
-    int use_outer;
 
-    use_outer = flags & NDT_ELEMWISE_1D ? outer_dims + 1 : outer_dims;
-
-    if (nthreads <= 1 || nrows == 0 || use_outer == 0 ||
+    if (nthreads <= 1 || nrows == 0 || outer_dims == 0 ||
         !(flags & NDT_STRIDED)) {
         return gm_apply(kernel, stack, outer_dims, ctx);
     }
 
     for (int i = 0; i < nrows; i++) {
         int64_t ncols = nthreads;
-        slices[i] = xnd_split(&stack[i], &ncols, use_outer, ctx);
+        slices[i] = xnd_split(&stack[i], &ncols, outer_dims, ctx);
         if (ndt_err_occurred(ctx)) {
             clear_all_slices(slices, nslices, i);
             return -1;

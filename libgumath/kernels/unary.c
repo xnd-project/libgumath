@@ -147,7 +147,6 @@ unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
         spec->outer_dims = t->ndim;
         if (ndt_is_c_contiguous(ndt_dim_at(t, t->ndim-1))) {
             spec->flags |= NDT_ELEMWISE_1D;
-            spec->outer_dims = t->ndim - 1;
         }
         return &f->kernels[n];
     case VarDim:

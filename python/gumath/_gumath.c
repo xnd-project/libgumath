@@ -195,8 +195,8 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     }
 #else
     if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
-            clear_objects(result, spec.nout);
-            return seterr(&ctx);
+        clear_objects(result, spec.nout);
+        return seterr(&ctx);
     }
 #endif
 

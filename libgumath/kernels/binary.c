@@ -58,139 +58,139 @@ infer_return_type(int *base, const ndt_t *in0, const ndt_t *in1, ndt_context_t *
     case Int8: {
         switch (t1->tag) {
         case Int8: *base = 0; tag = Int8; break;
-        case Int16: *base = 3; tag = Int16; break;
-        case Int32: *base = 6; tag = Int32; break;
-        case Int64: *base = 9; tag = Int64; break;
-        case Uint8: *base = 12; tag = Int16; break;
-        case Uint16: *base = 15; tag = Int32; break;
-        case Uint32: *base = 18; tag = Int64; break;
-        case Float32: *base = 21; tag = Float32; break;
-        case Float64: *base = 24; tag = Float64; break;
+        case Int16: *base = 2; tag = Int16; break;
+        case Int32: *base = 4; tag = Int32; break;
+        case Int64: *base = 6; tag = Int64; break;
+        case Uint8: *base = 8; tag = Int16; break;
+        case Uint16: *base = 10; tag = Int32; break;
+        case Uint32: *base = 12; tag = Int64; break;
+        case Float32: *base = 14; tag = Float32; break;
+        case Float64: *base = 16; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Int16: {
         switch (t1->tag) {
-        case Int8: *base = 27; tag = Int16; break;
-        case Int16: *base = 30; tag = Int16; break;
-        case Int32: *base = 33; tag = Int32; break;
-        case Int64: *base = 36; tag = Int64; break;
-        case Uint8: *base = 39; tag = Int16; break;
-        case Uint16: *base = 42; tag = Int32; break;
-        case Uint32: *base = 45; tag = Int64; break;
-        case Float32: *base = 48; tag = Float32; break;
-        case Float64: *base = 51; tag = Float64; break;
+        case Int8: *base = 18; tag = Int16; break;
+        case Int16: *base = 20; tag = Int16; break;
+        case Int32: *base = 22; tag = Int32; break;
+        case Int64: *base = 24; tag = Int64; break;
+        case Uint8: *base = 26; tag = Int16; break;
+        case Uint16: *base = 28; tag = Int32; break;
+        case Uint32: *base = 30; tag = Int64; break;
+        case Float32: *base = 32; tag = Float32; break;
+        case Float64: *base = 34; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Int32: {
         switch (t1->tag) {
-        case Int8: *base = 54; tag = Int32; break;
-        case Int16: *base = 57; tag = Int32; break;
-        case Int32: *base = 60; tag = Int32; break;
-        case Int64: *base = 63; tag = Int64; break;
-        case Uint8: *base = 66; tag = Int32; break;
-        case Uint16: *base = 69; tag = Int32; break;
-        case Uint32: *base = 72; tag = Int64; break;
-        case Float64: *base = 75; tag = Float64; break;
+        case Int8: *base = 36; tag = Int32; break;
+        case Int16: *base = 38; tag = Int32; break;
+        case Int32: *base = 40; tag = Int32; break;
+        case Int64: *base = 42; tag = Int64; break;
+        case Uint8: *base = 44; tag = Int32; break;
+        case Uint16: *base = 46; tag = Int32; break;
+        case Uint32: *base = 48; tag = Int64; break;
+        case Float64: *base = 50; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Int64: {
         switch (t1->tag) {
-        case Int8: *base = 78; tag = Int64; break;
-        case Int16: *base = 81; tag = Int64; break;
-        case Int32: *base = 83; tag = Int64; break;
-        case Int64: *base = 87; tag = Int64; break;
-        case Uint8: *base = 90; tag = Int64; break;
-        case Uint16: *base = 93; tag = Int64; break;
-        case Uint32: *base = 96; tag = Int64; break;
+        case Int8: *base = 52; tag = Int64; break;
+        case Int16: *base = 54; tag = Int64; break;
+        case Int32: *base = 56; tag = Int64; break;
+        case Int64: *base = 58; tag = Int64; break;
+        case Uint8: *base = 60; tag = Int64; break;
+        case Uint16: *base = 62; tag = Int64; break;
+        case Uint32: *base = 64; tag = Int64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint8: {
         switch (t1->tag) {
-        case Int8: *base = 99; tag = Int16; break;
-        case Int16: *base = 102; tag = Int16; break;
-        case Int32: *base = 105; tag = Int32; break;
-        case Int64: *base = 108; tag = Int64; break;
-        case Uint8: *base = 111; tag = Uint8; break;
-        case Uint16: *base = 114; tag = Uint16; break;
-        case Uint32: *base = 117; tag = Uint32; break;
-        case Uint64: *base = 120; tag = Uint64; break;
-        case Float32: *base = 123; tag = Float32; break;
-        case Float64: *base = 126; tag = Float64; break;
+        case Int8: *base = 66; tag = Int16; break;
+        case Int16: *base = 68; tag = Int16; break;
+        case Int32: *base = 70; tag = Int32; break;
+        case Int64: *base = 72; tag = Int64; break;
+        case Uint8: *base = 74; tag = Uint8; break;
+        case Uint16: *base = 76; tag = Uint16; break;
+        case Uint32: *base = 78; tag = Uint32; break;
+        case Uint64: *base = 80; tag = Uint64; break;
+        case Float32: *base = 82; tag = Float32; break;
+        case Float64: *base = 84; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint16: {
         switch (t1->tag) {
-        case Int8: *base = 129; tag = Int32; break;
-        case Int16: *base = 132; tag = Int32; break;
-        case Int32: *base = 135; tag = Int32; break;
-        case Int64: *base = 138; tag = Int64; break;
-        case Uint8: *base = 141; tag = Uint16; break;
-        case Uint16: *base = 144; tag = Uint32; break;
-        case Uint32: *base = 147; tag = Uint64; break;
-        case Uint64: *base = 150; tag = Uint64; break;
-        case Float32: *base = 153; tag = Float32; break;
-        case Float64: *base = 156; tag = Float64; break;
+        case Int8: *base = 86; tag = Int32; break;
+        case Int16: *base = 88; tag = Int32; break;
+        case Int32: *base = 90; tag = Int32; break;
+        case Int64: *base = 92; tag = Int64; break;
+        case Uint8: *base = 94; tag = Uint16; break;
+        case Uint16: *base = 96; tag = Uint32; break;
+        case Uint32: *base = 98; tag = Uint64; break;
+        case Uint64: *base = 100; tag = Uint64; break;
+        case Float32: *base = 102; tag = Float32; break;
+        case Float64: *base = 104; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint32: {
         switch (t1->tag) {
-        case Int8: *base = 159; tag = Int64; break;
-        case Int16: *base = 162; tag = Int64; break;
-        case Int32: *base = 165; tag = Int64; break;
-        case Int64: *base = 168; tag = Int64; break;
-        case Uint8: *base = 171; tag = Uint32; break;
-        case Uint16: *base = 174; tag = Uint32; break;
-        case Uint32: *base = 177; tag = Uint32; break;
-        case Uint64: *base = 180; tag = Uint64; break;
-        case Float64: *base = 183; tag = Float64; break;
+        case Int8: *base = 106; tag = Int64; break;
+        case Int16: *base = 108; tag = Int64; break;
+        case Int32: *base = 110; tag = Int64; break;
+        case Int64: *base = 112; tag = Int64; break;
+        case Uint8: *base = 114; tag = Uint32; break;
+        case Uint16: *base = 116; tag = Uint32; break;
+        case Uint32: *base = 118; tag = Uint32; break;
+        case Uint64: *base = 120; tag = Uint64; break;
+        case Float64: *base = 122; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint64: {
         switch (t1->tag) {
-        case Uint8: *base = 186; tag = Uint64; break;
-        case Uint16: *base = 189; tag = Uint64; break;
-        case Uint32: *base = 192; tag = Uint64; break;
-        case Uint64: *base = 195; tag = Uint64; break;
+        case Uint8: *base = 124; tag = Uint64; break;
+        case Uint16: *base = 126; tag = Uint64; break;
+        case Uint32: *base = 128; tag = Uint64; break;
+        case Uint64: *base = 130; tag = Uint64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Float32: {
         switch (t1->tag) {
-        case Int8: *base = 198; tag = Float32; break;
-        case Int16: *base = 201; tag = Float32; break;
-        case Uint8: *base = 204; tag = Float32; break;
-        case Uint16: *base = 207; tag = Float32; break;
-        case Float32: *base = 210; tag = Float32; break;
-        case Float64: *base = 213; tag = Float64; break;
+        case Int8: *base = 132; tag = Float32; break;
+        case Int16: *base = 134; tag = Float32; break;
+        case Uint8: *base = 136; tag = Float32; break;
+        case Uint16: *base = 138; tag = Float32; break;
+        case Float32: *base = 140; tag = Float32; break;
+        case Float64: *base = 142; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
     }
     case Float64: {
         switch (t1->tag) {
-        case Int8: *base = 216; tag = Float64; break;
-        case Int16: *base = 219; tag = Float64; break;
-        case Int32: *base = 222; tag = Float64; break;
-        case Uint8: *base = 225; tag = Float64; break;
-        case Uint16: *base = 228; tag = Float64; break;
-        case Uint32: *base = 231; tag = Float64; break;
-        case Float32: *base = 234; tag = Float64; break;
-        case Float64: *base = 237; tag = Float64; break;
+        case Int8: *base = 144; tag = Float64; break;
+        case Int16: *base = 146; tag = Float64; break;
+        case Int32: *base = 148; tag = Float64; break;
+        case Uint8: *base = 150; tag = Float64; break;
+        case Uint16: *base = 152; tag = Float64; break;
+        case Uint32: *base = 154; tag = Float64; break;
+        case Float32: *base = 156; tag = Float64; break;
+        case Float64: *base = 158; tag = Float64; break;
         default: goto invalid_combination;
         }
         break;
@@ -238,18 +238,14 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
     }
 
     if (t0->tag == VarDim || t1->tag == VarDim) {
-        const gm_kernel_set_t *set = &f->kernels[n+2];
-        ndt_del(dtype); /* temporary */
+        const gm_kernel_set_t *set = &f->kernels[n+1];
+        ndt_del(dtype); /* temporary hack */
         if (ndt_typecheck(spec, set->sig, in, nin, NULL, NULL, ctx) < 0) {
             return NULL;
         }
         return set;
     }
 
-    if (t0->ndim == 0 && t1->ndim == 0) {
-        n += 1;
-    }
- 
     const gm_kernel_set_t *set = &f->kernels[n];
     if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
         return NULL;
@@ -302,27 +298,6 @@ gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   \
 }                                                                              \
                                                                                \
 static int                                                                     \
-gm_fixed_##func##_1D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)     \
-{                                                                              \
-    const xnd_t *in0 = &stack[0];                                              \
-    const xnd_t *in1 = &stack[1];                                              \
-    xnd_t *out = &stack[2];                                                    \
-    int64_t N = xnd_fixed_shape(in0);                                          \
-    (void)ctx;                                                                 \
-                                                                               \
-    for (int64_t i = 0; i < N; i++) {                                          \
-        const xnd_t v = xnd_fixed_dim_next(in0, i);                            \
-        const xnd_t u = xnd_fixed_dim_next(in1, i);                            \
-        const xnd_t w = xnd_fixed_dim_next(out, i);                            \
-        const t0##_t x = *(const t0##_t *)v.ptr;                               \
-        const t1##_t y = *(const t1##_t *)u.ptr ;                              \
-        *(t2##_t *)w.ptr = func(x, y);                                         \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
-}                                                                              \
-                                                                               \
-static int                                                                     \
 gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
 {                                                                              \
     const xnd_t *in0 = &stack[0];                                              \
@@ -339,17 +314,13 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
 
 #define XND_BINARY_INIT(func, t0, t1, t2) \
   { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * N * " STRINGIZE(t0) ", ... * N * " STRINGIZE(t1) " -> ... * N * " STRINGIZE(t2), \
-    .C = gm_fixed_##func##_1D_C_##t0##_##t1##_##t2,                                                \
-    .Xnd = gm_fixed_##func##_1D_##t0##_##t1##_##t2 },                                              \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
-    .Xnd = gm_##func##_0D_##t0##_##t1##_##t2 },                                                    \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1##_##t2,                                              \
+    .C = gm_##func##_0D_##t0##_##t1##_##t2 },                                                      \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),    \
-    .Xnd = gm_##func##_0D_##t0##_##t1##_##t2 }
+    .C = gm_##func##_0D_##t0##_##t1##_##t2 }
 
 #define XND_ALL_BINARY(name) \
     XND_BINARY(name, int8, int8, int8)          \
