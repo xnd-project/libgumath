@@ -37,6 +37,7 @@
 #include "xnd.h"
 #include "pyxnd.h"
 #include "gumath.h"
+#include "config.h"
 
 #define GUMATH_MODULE
 #include "pygumath.h"

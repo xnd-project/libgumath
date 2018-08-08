@@ -175,7 +175,7 @@ if len(sys.argv) == 2:
 
 
 def gumath_extensions():
-    add_include_dirs = ["libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
+    add_include_dirs = [".", "libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
     add_library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
     add_depends = []
 
