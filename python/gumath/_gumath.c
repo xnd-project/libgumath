@@ -37,7 +37,10 @@
 #include "xnd.h"
 #include "pyxnd.h"
 #include "gumath.h"
-#include "config.h"
+
+#ifndef _MSC_VER
+  #include "config.h"
+#endif
 
 #define GUMATH_MODULE
 #include "pygumath.h"
