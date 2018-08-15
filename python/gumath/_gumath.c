@@ -376,7 +376,10 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     k.name = name;
     k.sig = sig;
 
-    if (strcmp(tag, "C") == 0) {
+    if (strcmp(tag, "Opt") == 0) {
+        k.Opt = p;
+    }
+    else if (strcmp(tag, "C") == 0) {
         k.C = p;
     }
     else if (strcmp(tag, "Fortran") == 0) {
@@ -390,7 +393,7 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     }
     else {
         PyErr_SetString(PyExc_ValueError,
-            "tag must be 'C', 'Fortran', 'Xnd' or 'Strided'");
+            "tag must be 'Opt', 'C', 'Fortran', 'Xnd' or 'Strided'");
         return NULL;
     }
 
