@@ -473,7 +473,6 @@ PyInit__gumath(void)
     PyObject *m = NULL;
     static PyObject *capsule = NULL;
     static int initialized = 0;
-    PyObject *obj = NULL;
 
     if (!initialized) {
        dummy = &xnd_error;
@@ -506,12 +505,7 @@ PyInit__gumath(void)
         return NULL;
     }
 
-    obj = PyImport_ImportModule("xnd");
-    if (obj == NULL) {
-        return NULL;
-    }
-    xnd = (PyTypeObject *)PyObject_GetAttrString(obj, "xnd");
-    Py_CLEAR(obj);
+    xnd = Xnd_GetType();
     if (xnd == NULL) {
         goto error;
     }
