@@ -45,6 +45,18 @@
 #define GUMATH_MODULE
 #include "pygumath.h"
 
+#ifdef _MSC_VER
+  #ifndef UNUSED
+    #define UNUSED
+  #endif
+#else
+  #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
+    #define UNUSED __attribute__((unused))
+  #else
+    #define UNUSED
+  #endif
+#endif
+
 
 /* libxnd.so is not linked without at least one xnd symbol. The -no-as-needed
  * linker option is difficult to integrate into setup.py. */
@@ -61,8 +73,8 @@ static gm_tbl_t *table = NULL;
 /* Xnd type */
 static PyTypeObject *xnd = NULL;
 
-/* Number of threads: 1 is non-threaded */
-static int64_t nthreads = 1;
+/* Maximum number of threads */
+static int64_t max_threads = 1;
 
 
 /****************************************************************************/
@@ -189,7 +201,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
 #ifdef HAVE_PTHREAD_H
     if (gm_apply_thread(&kernel, stack, spec.outer_dims, spec.flags,
-        nthreads, &ctx) < 0) {
+        max_threads, &ctx) < 0) {
         clear_objects(result, spec.nout);
         return seterr(&ctx);
     }
@@ -410,7 +422,7 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
 }
 
 static void
-init_nthreads(void)
+init_max_threads(void)
 {
     PyObject *os = NULL;
     PyObject *n = NULL;
@@ -431,7 +443,7 @@ init_nthreads(void)
         goto error;
     }
 
-    nthreads = i64;
+    max_threads = i64;
 
 out:
     Py_XDECREF(os);
@@ -443,8 +455,35 @@ error:
         PyErr_Clear();
     }
     PyErr_WarnEx(PyExc_RuntimeWarning,
-        "could not get cpu count: using MAX_CPU==1", 1);
+        "could not get cpu count: using max_threads==1", 1);
     goto out;
+}
+
+static PyObject *
+get_max_threads(PyObject *m UNUSED, PyObject *args UNUSED)
+{
+    return PyLong_FromLongLong(max_threads);
+}
+
+static PyObject *
+set_max_threads(PyObject *m UNUSED, PyObject *obj)
+{
+    int64_t n;
+
+    n = PyLong_AsLongLong(obj);
+    if (n == -1 && PyErr_Occurred()) {
+        return NULL;
+    }
+
+    if (n <= 0) {
+        PyErr_SetString(PyExc_ValueError,
+            "max_threads must be greater than 0");
+        return NULL;
+    }
+
+    max_threads = n;
+
+    Py_RETURN_NONE;
 }
 
 
@@ -452,6 +491,8 @@ static PyMethodDef gumath_methods [] =
 {
   /* Methods */
   { "unsafe_add_kernel", (PyCFunction)unsafe_add_kernel, METH_VARARGS|METH_KEYWORDS, NULL },
+  { "get_max_threads", (PyCFunction)get_max_threads, METH_NOARGS, NULL },
+  { "set_max_threads", (PyCFunction)set_max_threads, METH_O, NULL },
   { NULL, NULL, 1 }
 };
 
@@ -499,7 +540,7 @@ PyInit__gumath(void)
            return seterr(&ctx);
        }
 
-       init_nthreads();
+       init_max_threads();
 
        initialized = 1;
     }
