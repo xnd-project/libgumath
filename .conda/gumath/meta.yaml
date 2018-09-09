@@ -20,6 +20,7 @@ test:
     - nomkl
     - numpy
     - numba
+    - python ==3.7
 
 requirements:
   build:
@@ -28,12 +29,14 @@ requirements:
     - libgumath ==0.2.0dev3
     - ndtypes ==0.2.0dev3
     - xnd ==0.2.0dev3
+    - python ==3.7
   run:
     - libndtypes ==0.2.0dev3
     - libxnd ==0.2.0dev3
     - libgumath ==0.2.0dev3
     - ndtypes ==0.2.0dev3
     - xnd ==0.2.0dev3
+    - python ==3.7
 
 about:
   home: https://github.com/plures/
