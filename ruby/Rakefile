@@ -1,0 +1,105 @@
+require 'rake'
+require 'rake/extensiontask'
+require 'rake/testtask'
+require 'bundler/gem_tasks'
+require 'fileutils'
+require 'gumath/version.rb'
+
+gemspec = eval(IO.read('gumath.gemspec'))
+
+ext_name = "ruby_gumath"
+Rake::ExtensionTask.new(ext_name, gemspec) do |ext|
+  ext.ext_dir = "ext/#{ext_name}"
+  ext.source_pattern = "**/*.{c,h}"
+end
+
+def run *cmd
+  sh(cmd.join(" "))
+end
+
+task :console do
+  cmd = ['irb', "-r './lib/gumath.rb'"]
+  run(*cmd)
+end
+
+task :pry do
+  cmd = ['pry', "-r './lib/gumath.rb'"]
+  run(*cmd)
+end
+
+Rake::TestTask.new(:test) do |t|
+  t.libs << "test"
+  t.libs << "lib"
+  t.test_files = FileList['test/**/test_*.rb']
+end
+
+BASEDIR = Pathname( __FILE__ ).dirname.relative_path_from( Pathname.pwd )
+TESTDIR = BASEDIR + 'test'
+
+VALGRIND_OPTIONS = [
+    "--tool=memcheck",
+    #"--leak-check=yes",
+    "--num-callers=15",
+    #"--error-limit=no",
+    "--partial-loads-ok=yes",
+    "--undef-value-errors=no" #,
+    #"--dsymutil=yes"
+]
+
+VALGRIND_MEMORYFILL_OPTIONS = [
+    "--freelist-vol=100000000",
+    "--malloc-fill=6D",
+    "--free-fill=66 ",
+]
+
+# partial-loads-ok and undef-value-errors necessary to ignore
+# spurious (and eminently ignorable) warnings from the ruby
+# interpreter
+
+desc "Run specs under Valgrind."
+task :valgrind => [ :compile ] do |task|
+  cmd = [ 'valgrind' ] + VALGRIND_OPTIONS
+  cmd += [" rake test "]
+  run( *cmd )
+end
+
+LEAKCHECK_CMD = [ 'ruby', '-Ilib:ext', "#{TESTDIR}/leakcheck.rb" ]
+
+desc "Run leakcheck script."
+task :leakcheck => [ :compile ] do |task|
+  cmd = [ 'valgrind' ] + VALGRIND_OPTIONS
+  cmd += LEAKCHECK_CMD
+  run( *cmd )
+end
+
+task :clobber do |task|
+  [
+    "ext/#{ext_name}/include",
+    "ext/#{ext_name}/share",
+    "ext/#{ext_name}/lib",
+  ].each do |f|
+    puts "deleting folder #{f}..."
+    FileUtils.rm_rf(f)
+  end
+
+  Dir.chdir("ext/#{ext_name}/gumath/libgumath/") do
+    system("make clean")
+  end
+end
+
+task :develop do
+  ext_gumath = "ext/ruby_gumath/gumath"
+  puts "deleting previously created #{ext_gumath} directory..."
+  FileUtils.rm_rf(ext_gumath)
+  Dir.mkdir(ext_gumath)
+
+  puts "cloning gumath repo into ext/ folder..."
+  system("git clone https://github.com/plures/gumath #{ext_gumath}")
+
+  Dir.chdir(ext_gumath) do
+    system("git checkout #{Gumath::COMMIT}")
+  end
+
+  puts "building gem with rake build..."
+  system("rake build")
+end

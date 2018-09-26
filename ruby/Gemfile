@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+gemspec
+
+gem 'ndtypes', path: "/home/sameer/gitrepos/plures-ruby/ndtypes"
+gem 'xnd', path: "/home/sameer/gitrepos/plures-ruby/xnd"
