@@ -38,8 +38,8 @@ typedef struct {
   char *name;                     /* function name */
 } GufuncObject;
 
-const rb_data_type_t GufuncObject_type;
-VALUE cGumath_GufuncObject;
+extern const rb_data_type_t GufuncObject_type;
+extern VALUE cGumath_GufuncObject;
 
 #define GET_GUOBJ(obj, guobj_p) do {                              \
     TypedData_Get_Struct((obj), GufuncObject,                     \
