@@ -33,7 +33,7 @@
 #define RUBY_GUMATH_H
 
 /* Classes */
-VALUE cGumath;
+extern VALUE cGumath;
 
 int rb_gumath_add_functions(VALUE module, const gm_tbl_t *tbl);
 #define GUMATH_FUNCTION_HASH rb_intern("@gumath_functions")

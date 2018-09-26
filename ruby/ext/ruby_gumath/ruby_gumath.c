@@ -43,7 +43,7 @@ static gm_tbl_t *table = NULL;
 /* Maximum number of threads */
 static int64_t max_threads = 1;
 static int initialized = 0;
-extern VALUE cGumath;
+VALUE cGumath;
 
 /****************************************************************************/
 /*                               Error handling                             */

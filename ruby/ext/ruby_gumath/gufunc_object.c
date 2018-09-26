@@ -35,6 +35,8 @@
 /*                               Gufunc Object                              */
 /****************************************************************************/
 
+VALUE cGumath_GufuncObject;
+
 static void
 GufuncObject_dfree(void *self)
 {
