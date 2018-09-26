@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'BSD-3 Clause'
 
   spec.files         = files
+  spec.extensions    = "ext/ruby_gumath/extconf.rb"
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
