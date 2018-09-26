@@ -3,5 +3,9 @@ require 'xnd'
 
 require 'etc'
 
-require 'ruby_gumath.so'
+begin
+  require 'ruby_gumath.so'
+rescue LoadError
+  require 'ruby_gumath/ruby_gumath.so'
+end
 require 'gumath/version'
