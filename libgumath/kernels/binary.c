@@ -47,150 +47,149 @@
 /****************************************************************************/
 
 /* Structured kernel locations for fast lookup. */
-static ndt_t *
-infer_return_type(int *base, const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
+static int
+kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 {
     const ndt_t *t0 = ndt_dtype(in0);
     const ndt_t *t1 = ndt_dtype(in1);
-    enum ndt tag;
 
     switch (t0->tag) {
     case Int8: {
         switch (t1->tag) {
-        case Int8: *base = 0; tag = Int8; break;
-        case Int16: *base = 2; tag = Int16; break;
-        case Int32: *base = 4; tag = Int32; break;
-        case Int64: *base = 6; tag = Int64; break;
-        case Uint8: *base = 8; tag = Int16; break;
-        case Uint16: *base = 10; tag = Int32; break;
-        case Uint32: *base = 12; tag = Int64; break;
-        case Float32: *base = 14; tag = Float32; break;
-        case Float64: *base = 16; tag = Float64; break;
+        case Int8: return 0;
+        case Int16: return 2;
+        case Int32: return 4;
+        case Int64: return 6;
+        case Uint8: return 8;
+        case Uint16: return 10;
+        case Uint32: return 12;
+        case Float32: return 14;
+        case Float64: return 16;
         default: goto invalid_combination;
         }
         break;
     }
     case Int16: {
         switch (t1->tag) {
-        case Int8: *base = 18; tag = Int16; break;
-        case Int16: *base = 20; tag = Int16; break;
-        case Int32: *base = 22; tag = Int32; break;
-        case Int64: *base = 24; tag = Int64; break;
-        case Uint8: *base = 26; tag = Int16; break;
-        case Uint16: *base = 28; tag = Int32; break;
-        case Uint32: *base = 30; tag = Int64; break;
-        case Float32: *base = 32; tag = Float32; break;
-        case Float64: *base = 34; tag = Float64; break;
+        case Int8: return 18;
+        case Int16: return 20;
+        case Int32: return 22;
+        case Int64: return 24;
+        case Uint8: return 26;
+        case Uint16: return 28;
+        case Uint32: return 30;
+        case Float32: return 32;
+        case Float64: return 34;
         default: goto invalid_combination;
         }
         break;
     }
     case Int32: {
         switch (t1->tag) {
-        case Int8: *base = 36; tag = Int32; break;
-        case Int16: *base = 38; tag = Int32; break;
-        case Int32: *base = 40; tag = Int32; break;
-        case Int64: *base = 42; tag = Int64; break;
-        case Uint8: *base = 44; tag = Int32; break;
-        case Uint16: *base = 46; tag = Int32; break;
-        case Uint32: *base = 48; tag = Int64; break;
-        case Float64: *base = 50; tag = Float64; break;
+        case Int8: return 36;
+        case Int16: return 38;
+        case Int32: return 40;
+        case Int64: return 42;
+        case Uint8: return 44;
+        case Uint16: return 46;
+        case Uint32: return 48;
+        case Float64: return 50;
         default: goto invalid_combination;
         }
         break;
     }
     case Int64: {
         switch (t1->tag) {
-        case Int8: *base = 52; tag = Int64; break;
-        case Int16: *base = 54; tag = Int64; break;
-        case Int32: *base = 56; tag = Int64; break;
-        case Int64: *base = 58; tag = Int64; break;
-        case Uint8: *base = 60; tag = Int64; break;
-        case Uint16: *base = 62; tag = Int64; break;
-        case Uint32: *base = 64; tag = Int64; break;
+        case Int8: return 52;
+        case Int16: return 54;
+        case Int32: return 56;
+        case Int64: return 58;
+        case Uint8: return 60;
+        case Uint16: return 62;
+        case Uint32: return 64;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint8: {
         switch (t1->tag) {
-        case Int8: *base = 66; tag = Int16; break;
-        case Int16: *base = 68; tag = Int16; break;
-        case Int32: *base = 70; tag = Int32; break;
-        case Int64: *base = 72; tag = Int64; break;
-        case Uint8: *base = 74; tag = Uint8; break;
-        case Uint16: *base = 76; tag = Uint16; break;
-        case Uint32: *base = 78; tag = Uint32; break;
-        case Uint64: *base = 80; tag = Uint64; break;
-        case Float32: *base = 82; tag = Float32; break;
-        case Float64: *base = 84; tag = Float64; break;
+        case Int8: return 66;
+        case Int16: return 68;
+        case Int32: return 70;
+        case Int64: return 72;
+        case Uint8: return 74;
+        case Uint16: return 76;
+        case Uint32: return 78;
+        case Uint64: return 80;
+        case Float32: return 82;
+        case Float64: return 84;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint16: {
         switch (t1->tag) {
-        case Int8: *base = 86; tag = Int32; break;
-        case Int16: *base = 88; tag = Int32; break;
-        case Int32: *base = 90; tag = Int32; break;
-        case Int64: *base = 92; tag = Int64; break;
-        case Uint8: *base = 94; tag = Uint16; break;
-        case Uint16: *base = 96; tag = Uint32; break;
-        case Uint32: *base = 98; tag = Uint64; break;
-        case Uint64: *base = 100; tag = Uint64; break;
-        case Float32: *base = 102; tag = Float32; break;
-        case Float64: *base = 104; tag = Float64; break;
+        case Int8: return 86;
+        case Int16: return 88;
+        case Int32: return 90;
+        case Int64: return 92;
+        case Uint8: return 94;
+        case Uint16: return 96;
+        case Uint32: return 98;
+        case Uint64: return 100;
+        case Float32: return 102;
+        case Float64: return 104;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint32: {
         switch (t1->tag) {
-        case Int8: *base = 106; tag = Int64; break;
-        case Int16: *base = 108; tag = Int64; break;
-        case Int32: *base = 110; tag = Int64; break;
-        case Int64: *base = 112; tag = Int64; break;
-        case Uint8: *base = 114; tag = Uint32; break;
-        case Uint16: *base = 116; tag = Uint32; break;
-        case Uint32: *base = 118; tag = Uint32; break;
-        case Uint64: *base = 120; tag = Uint64; break;
-        case Float64: *base = 122; tag = Float64; break;
+        case Int8: return 106;
+        case Int16: return 108;
+        case Int32: return 110;
+        case Int64: return 112;
+        case Uint8: return 114;
+        case Uint16: return 116;
+        case Uint32: return 118;
+        case Uint64: return 120;
+        case Float64: return 122;
         default: goto invalid_combination;
         }
         break;
     }
     case Uint64: {
         switch (t1->tag) {
-        case Uint8: *base = 124; tag = Uint64; break;
-        case Uint16: *base = 126; tag = Uint64; break;
-        case Uint32: *base = 128; tag = Uint64; break;
-        case Uint64: *base = 130; tag = Uint64; break;
+        case Uint8: return 124;
+        case Uint16: return 126;
+        case Uint32: return 128;
+        case Uint64: return 130;
         default: goto invalid_combination;
         }
         break;
     }
     case Float32: {
         switch (t1->tag) {
-        case Int8: *base = 132; tag = Float32; break;
-        case Int16: *base = 134; tag = Float32; break;
-        case Uint8: *base = 136; tag = Float32; break;
-        case Uint16: *base = 138; tag = Float32; break;
-        case Float32: *base = 140; tag = Float32; break;
-        case Float64: *base = 142; tag = Float64; break;
+        case Int8: return 132;
+        case Int16: return 134;
+        case Uint8: return 136;
+        case Uint16: return 138;
+        case Float32: return 140;
+        case Float64: return 142;
         default: goto invalid_combination;
         }
         break;
     }
     case Float64: {
         switch (t1->tag) {
-        case Int8: *base = 144; tag = Float64; break;
-        case Int16: *base = 146; tag = Float64; break;
-        case Int32: *base = 148; tag = Float64; break;
-        case Uint8: *base = 150; tag = Float64; break;
-        case Uint16: *base = 152; tag = Float64; break;
-        case Uint32: *base = 154; tag = Float64; break;
-        case Float32: *base = 156; tag = Float64; break;
-        case Float64: *base = 158; tag = Float64; break;
+        case Int8: return 144;
+        case Int16: return 146;
+        case Int32: return 148;
+        case Uint8: return 150;
+        case Uint16: return 152;
+        case Uint32: return 154;
+        case Float32: return 156;
+        case Float64: return 158;
         default: goto invalid_combination;
         }
         break;
@@ -199,11 +198,9 @@ infer_return_type(int *base, const ndt_t *in0, const ndt_t *in1, ndt_context_t *
         goto invalid_combination;
     }
 
-    return ndt_primitive(tag, 0, ctx);
-
 invalid_combination:
     ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
-    return NULL;
+    return -1;
 }
 
 
@@ -232,14 +229,13 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
     assert(ndt_is_concrete(t0));
     assert(ndt_is_concrete(t1));
 
-    dtype = infer_return_type(&n, t0, t1, ctx);
-    if (dtype == NULL) {
+    n = kernel_location(t0, t1, ctx);
+    if (n < 0) {
         return NULL;
     }
 
     if (t0->tag == VarDim || t1->tag == VarDim) {
         const gm_kernel_set_t *set = &f->kernels[n+1];
-        ndt_del(dtype); /* temporary hack */
         if (ndt_typecheck(spec, set->sig, in, nin, NULL, NULL, ctx) < 0) {
             return NULL;
         }
@@ -247,6 +243,13 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
     }
 
     const gm_kernel_set_t *set = &f->kernels[n];
+
+    const ndt_t *t = ndt_dtype(set->sig->Function.types[2]);
+    dtype = ndt_copy(t, ctx);
+    if (dtype == NULL) {
+        return NULL;
+    }
+
     if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
         return NULL;
     }
@@ -269,7 +272,7 @@ apply_index(const xnd_t *x)
 }
 
 
-#define XND_BINARY(func, t0, t1, t2) \
+#define XND_BINARY(func, t0, t1, t2, cast) \
 static int                                                                     \
 gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   \
 {                                                                              \
@@ -281,17 +284,17 @@ gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   \
     int64_t i;                                                                 \
                                                                                \
     for (i = 0; i < N-7; i += 8) {                                             \
-        out[i] = func(in0[i], in1[i]);                                         \
-        out[i+1] = func(in0[i+1], in1[i+1]);                                   \
-        out[i+2] = func(in0[i+2], in1[i+2]);                                   \
-        out[i+3] = func(in0[i+3], in1[i+3]);                                   \
-        out[i+4] = func(in0[i+4], in1[i+4]);                                   \
-        out[i+5] = func(in0[i+5], in1[i+5]);                                   \
-        out[i+6] = func(in0[i+6], in1[i+6]);                                   \
-        out[i+7] = func(in0[i+7], in1[i+7]);                                   \
+        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                     \
+        out[i+1] = func((cast##_t)in0[i+1], (cast##_t)in1[i+1]);               \
+        out[i+2] = func((cast##_t)in0[i+2], (cast##_t)in1[i+2]);               \
+        out[i+3] = func((cast##_t)in0[i+3], (cast##_t)in1[i+3]);               \
+        out[i+4] = func((cast##_t)in0[i+4], (cast##_t)in1[i+4]);               \
+        out[i+5] = func((cast##_t)in0[i+5], (cast##_t)in1[i+5]);               \
+        out[i+6] = func((cast##_t)in0[i+6], (cast##_t)in1[i+6]);               \
+        out[i+7] = func((cast##_t)in0[i+7], (cast##_t)in1[i+7]);               \
     }                                                                          \
     for (; i < N; i++) {                                                       \
-        out[i] = func(in0[i], in1[i]);                                         \
+        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                     \
     }                                                                          \
                                                                                \
     return 0;                                                                  \
@@ -307,7 +310,7 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
                                                                                \
     const t0##_t x = *(const t0##_t *)in0->ptr;                                \
     const t1##_t y = *(const t1##_t *)in1->ptr;                                \
-    *(t2##_t *)out->ptr = func(x, y);                                          \
+    *(t2##_t *)out->ptr = func((cast##_t)x, (cast##_t)y);                      \
                                                                                \
     return 0;                                                                  \
 }
@@ -323,95 +326,95 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
     .C = gm_##func##_0D_##t0##_##t1##_##t2 }
 
 #define XND_ALL_BINARY(name) \
-    XND_BINARY(name, int8, int8, int8)          \
-    XND_BINARY(name, int8, int16, int16)        \
-    XND_BINARY(name, int8, int32, int32)        \
-    XND_BINARY(name, int8, int64, int64)        \
-    XND_BINARY(name, int8, uint8, int16)        \
-    XND_BINARY(name, int8, uint16, int32)       \
-    XND_BINARY(name, int8, uint32, int64)       \
-    XND_BINARY(name, int8, float32, float32)    \
-    XND_BINARY(name, int8, float64, float64)    \
-                                                \
-    XND_BINARY(name, int16, int8, int16)        \
-    XND_BINARY(name, int16, int16, int16)       \
-    XND_BINARY(name, int16, int32, int32)       \
-    XND_BINARY(name, int16, int64, int64)       \
-    XND_BINARY(name, int16, uint8, int16)       \
-    XND_BINARY(name, int16, uint16, int32)      \
-    XND_BINARY(name, int16, uint32, int64)      \
-    XND_BINARY(name, int16, float32, float32)   \
-    XND_BINARY(name, int16, float64, float64)   \
-                                                \
-    XND_BINARY(name, int32, int8, int32)        \
-    XND_BINARY(name, int32, int16, int32)       \
-    XND_BINARY(name, int32, int32, int32)       \
-    XND_BINARY(name, int32, int64, int64)       \
-    XND_BINARY(name, int32, uint8, int32)       \
-    XND_BINARY(name, int32, uint16, int32)      \
-    XND_BINARY(name, int32, uint32, int64)      \
-    XND_BINARY(name, int32, float64, float64)   \
-                                                \
-    XND_BINARY(name, int64, int8, int64)        \
-    XND_BINARY(name, int64, int16, int64)       \
-    XND_BINARY(name, int64, int32, int64)       \
-    XND_BINARY(name, int64, int64, int64)       \
-    XND_BINARY(name, int64, uint8, int64)       \
-    XND_BINARY(name, int64, uint16, int64)      \
-    XND_BINARY(name, int64, uint32, int64)      \
-                                                \
-    XND_BINARY(name, uint8, int8, int16)        \
-    XND_BINARY(name, uint8, int16, int16)       \
-    XND_BINARY(name, uint8, int32, int32)       \
-    XND_BINARY(name, uint8, int64, int64)       \
-    XND_BINARY(name, uint8, uint8, uint8)       \
-    XND_BINARY(name, uint8, uint16, uint16)     \
-    XND_BINARY(name, uint8, uint32, uint32)     \
-    XND_BINARY(name, uint8, uint64, uint64)     \
-    XND_BINARY(name, uint8, float32, float32)   \
-    XND_BINARY(name, uint8, float64, float64)   \
-                                                \
-    XND_BINARY(name, uint16, int8, int32)       \
-    XND_BINARY(name, uint16, int16, int32)      \
-    XND_BINARY(name, uint16, int32, int32)      \
-    XND_BINARY(name, uint16, int64, int64)      \
-    XND_BINARY(name, uint16, uint8, uint16)     \
-    XND_BINARY(name, uint16, uint16, uint16)    \
-    XND_BINARY(name, uint16, uint32, uint32)    \
-    XND_BINARY(name, uint16, uint64, uint64)    \
-    XND_BINARY(name, uint16, float32, float32)  \
-    XND_BINARY(name, uint16, float64, float64)  \
-                                                \
-    XND_BINARY(name, uint32, int8, int64)       \
-    XND_BINARY(name, uint32, int16, int64)      \
-    XND_BINARY(name, uint32, int32, int64)      \
-    XND_BINARY(name, uint32, int64, int64)      \
-    XND_BINARY(name, uint32, uint8, uint32)     \
-    XND_BINARY(name, uint32, uint16, uint32)    \
-    XND_BINARY(name, uint32, uint32, uint32)    \
-    XND_BINARY(name, uint32, uint64, uint64)    \
-    XND_BINARY(name, uint32, float64, float64)  \
-                                                \
-    XND_BINARY(name, uint64, uint8, uint64)     \
-    XND_BINARY(name, uint64, uint16, uint64)    \
-    XND_BINARY(name, uint64, uint32, uint64)    \
-    XND_BINARY(name, uint64, uint64, uint64)    \
-                                                \
-    XND_BINARY(name, float32, int8, float32)    \
-    XND_BINARY(name, float32, int16, float32)   \
-    XND_BINARY(name, float32, uint8, float32)   \
-    XND_BINARY(name, float32, uint16, float32)  \
-    XND_BINARY(name, float32, float32, float32) \
-    XND_BINARY(name, float32, float64, float64) \
-                                                \
-    XND_BINARY(name, float64, int8, float64)    \
-    XND_BINARY(name, float64, int16, float64)   \
-    XND_BINARY(name, float64, int32, float64)   \
-    XND_BINARY(name, float64, uint8, float64)   \
-    XND_BINARY(name, float64, uint16, float64)  \
-    XND_BINARY(name, float64, uint32, float64)  \
-    XND_BINARY(name, float64, float32, float64) \
-    XND_BINARY(name, float64, float64, float64)
+    XND_BINARY(name, int8, int8, int8, int8)             \
+    XND_BINARY(name, int8, int16, int16, int16)          \
+    XND_BINARY(name, int8, int32, int32, int32)          \
+    XND_BINARY(name, int8, int64, int64, int64)          \
+    XND_BINARY(name, int8, uint8, int16, int16)          \
+    XND_BINARY(name, int8, uint16, int32, int32)         \
+    XND_BINARY(name, int8, uint32, int64, int64)         \
+    XND_BINARY(name, int8, float32, float32, float32)    \
+    XND_BINARY(name, int8, float64, float64, float64)    \
+                                                         \
+    XND_BINARY(name, int16, int8, int16, int16)          \
+    XND_BINARY(name, int16, int16, int16, int16)         \
+    XND_BINARY(name, int16, int32, int32, int32)         \
+    XND_BINARY(name, int16, int64, int64, int64)         \
+    XND_BINARY(name, int16, uint8, int16, int16)         \
+    XND_BINARY(name, int16, uint16, int32, int32)        \
+    XND_BINARY(name, int16, uint32, int64, int64)        \
+    XND_BINARY(name, int16, float32, float32, float32)   \
+    XND_BINARY(name, int16, float64, float64, float64)   \
+                                                         \
+    XND_BINARY(name, int32, int8, int32, int32)          \
+    XND_BINARY(name, int32, int16, int32, int32)         \
+    XND_BINARY(name, int32, int32, int32, int32)         \
+    XND_BINARY(name, int32, int64, int64, int64)         \
+    XND_BINARY(name, int32, uint8, int32, int32)         \
+    XND_BINARY(name, int32, uint16, int32, int32)        \
+    XND_BINARY(name, int32, uint32, int64, int64)        \
+    XND_BINARY(name, int32, float64, float64, float64)   \
+                                                         \
+    XND_BINARY(name, int64, int8, int64, int64)          \
+    XND_BINARY(name, int64, int16, int64, int64)         \
+    XND_BINARY(name, int64, int32, int64, int64)         \
+    XND_BINARY(name, int64, int64, int64, int64)         \
+    XND_BINARY(name, int64, uint8, int64, int64)         \
+    XND_BINARY(name, int64, uint16, int64, int64)        \
+    XND_BINARY(name, int64, uint32, int64, int64)        \
+                                                         \
+    XND_BINARY(name, uint8, int8, int16, int16)          \
+    XND_BINARY(name, uint8, int16, int16, int16)         \
+    XND_BINARY(name, uint8, int32, int32, int32)         \
+    XND_BINARY(name, uint8, int64, int64, int64)         \
+    XND_BINARY(name, uint8, uint8, uint8, uint8)         \
+    XND_BINARY(name, uint8, uint16, uint16, uint16)      \
+    XND_BINARY(name, uint8, uint32, uint32, uint32)      \
+    XND_BINARY(name, uint8, uint64, uint64, uint64)      \
+    XND_BINARY(name, uint8, float32, float32, float32)   \
+    XND_BINARY(name, uint8, float64, float64, float64)   \
+                                                         \
+    XND_BINARY(name, uint16, int8, int32, int32)         \
+    XND_BINARY(name, uint16, int16, int32, int32)        \
+    XND_BINARY(name, uint16, int32, int32, int32)        \
+    XND_BINARY(name, uint16, int64, int64, int64)        \
+    XND_BINARY(name, uint16, uint8, uint16, uint16)      \
+    XND_BINARY(name, uint16, uint16, uint16, uint16)     \
+    XND_BINARY(name, uint16, uint32, uint32, uint32)     \
+    XND_BINARY(name, uint16, uint64, uint64, uint64)     \
+    XND_BINARY(name, uint16, float32, float32, float32)  \
+    XND_BINARY(name, uint16, float64, float64, float64)  \
+                                                         \
+    XND_BINARY(name, uint32, int8, int64, int64)         \
+    XND_BINARY(name, uint32, int16, int64, int64)        \
+    XND_BINARY(name, uint32, int32, int64, int64)        \
+    XND_BINARY(name, uint32, int64, int64, int64)        \
+    XND_BINARY(name, uint32, uint8, uint32, uint32)      \
+    XND_BINARY(name, uint32, uint16, uint32, uint32)     \
+    XND_BINARY(name, uint32, uint32, uint32, uint32)     \
+    XND_BINARY(name, uint32, uint64, uint64, uint64)     \
+    XND_BINARY(name, uint32, float64, float64, float64)  \
+                                                         \
+    XND_BINARY(name, uint64, uint8, uint64, uint64)      \
+    XND_BINARY(name, uint64, uint16, uint64, uint64)     \
+    XND_BINARY(name, uint64, uint32, uint64, uint64)     \
+    XND_BINARY(name, uint64, uint64, uint64, uint64)     \
+                                                         \
+    XND_BINARY(name, float32, int8, float32, float32)    \
+    XND_BINARY(name, float32, int16, float32, float32)   \
+    XND_BINARY(name, float32, uint8, float32, float32)   \
+    XND_BINARY(name, float32, uint16, float32, float32)  \
+    XND_BINARY(name, float32, float32, float32, float32) \
+    XND_BINARY(name, float32, float64, float64, float64) \
+                                                         \
+    XND_BINARY(name, float64, int8, float64, float64)    \
+    XND_BINARY(name, float64, int16, float64, float64)   \
+    XND_BINARY(name, float64, int32, float64, float64)   \
+    XND_BINARY(name, float64, uint8, float64, float64)   \
+    XND_BINARY(name, float64, uint16, float64, float64)  \
+    XND_BINARY(name, float64, uint32, float64, float64)  \
+    XND_BINARY(name, float64, float32, float64, float64) \
+    XND_BINARY(name, float64, float64, float64, float64)
 
 #define XND_ALL_BINARY_INIT(name) \
     XND_BINARY_INIT(name, int8, int8, int8),          \
