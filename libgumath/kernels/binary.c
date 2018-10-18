@@ -527,139 +527,96 @@ XND_ALL_BINARY(divide)
  * Comparison
  *************/
 
-#define XND_COMPARISON(func, t0, t1) \
-static int                                                                     \
-gm_fixed_##func##_1D_C_##t0##_##t1##_##bool(xnd_t stack[], ndt_context_t *ctx)   \
-{                                                                              \
-    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);                \
-    const t1##_t *in1 = (const t1##_t *)apply_index(&stack[1]);                \
-    bool *out = (bool *)apply_index(&stack[2]);                            \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                    \
-    (void)ctx;                                                                 \
-    int64_t i;                                                                 \
-                                                                               \
-    for (i = 0; i < N-7; i += 8) {                                             \
-        out[i] = func(in0[i], in1[i]);                                         \
-        out[i+1] = func(in0[i+1], in1[i+1]);                                   \
-        out[i+2] = func(in0[i+2], in1[i+2]);                                   \
-        out[i+3] = func(in0[i+3], in1[i+3]);                                   \
-        out[i+4] = func(in0[i+4], in1[i+4]);                                   \
-        out[i+5] = func(in0[i+5], in1[i+5]);                                   \
-        out[i+6] = func(in0[i+6], in1[i+6]);                                   \
-        out[i+7] = func(in0[i+7], in1[i+7]);                                   \
-    }                                                                          \
-    for (; i < N; i++) {                                                       \
-        out[i] = func(in0[i], in1[i]);                                         \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
-}                                                                              \
-                                                                               \
-static int                                                                     \
-gm_##func##_0D_##t0##_##t1##_##bool(xnd_t stack[], ndt_context_t *ctx)           \
-{                                                                              \
-    const xnd_t *in0 = &stack[0];                                              \
-    const xnd_t *in1 = &stack[1];                                              \
-    xnd_t *out = &stack[2];                                                    \
-    (void)ctx;                                                                 \
-                                                                               \
-    const t0##_t x = *(const t0##_t *)in0->ptr;                                \
-    const t1##_t y = *(const t1##_t *)in1->ptr;                                \
-    *(bool *)out->ptr = func(x, y);                                          \
-                                                                               \
-    return 0;                                                                  \
-}
-
 #define XND_ALL_COMPARISON(name) \
-    XND_COMPARISON(name, int8, int8)            \
-    XND_COMPARISON(name, int8, int16)           \
-    XND_COMPARISON(name, int8, int32)           \
-    XND_COMPARISON(name, int8, int64)           \
-    XND_COMPARISON(name, int8, uint8)           \
-    XND_COMPARISON(name, int8, uint16)          \
-    XND_COMPARISON(name, int8, uint32)          \
-    XND_COMPARISON(name, int8, float32)         \
-    XND_COMPARISON(name, int8, float64)         \
-                                                \
-    XND_COMPARISON(name, int16, int8)           \
-    XND_COMPARISON(name, int16, int16)          \
-    XND_COMPARISON(name, int16, int32)          \
-    XND_COMPARISON(name, int16, int64)          \
-    XND_COMPARISON(name, int16, uint8)          \
-    XND_COMPARISON(name, int16, uint16)         \
-    XND_COMPARISON(name, int16, uint32)         \
-    XND_COMPARISON(name, int16, float32)        \
-    XND_COMPARISON(name, int16, float64)        \
-                                                \
-    XND_COMPARISON(name, int32, int8)           \
-    XND_COMPARISON(name, int32, int16)          \
-    XND_COMPARISON(name, int32, int32)          \
-    XND_COMPARISON(name, int32, int64)          \
-    XND_COMPARISON(name, int32, uint8)          \
-    XND_COMPARISON(name, int32, uint16)         \
-    XND_COMPARISON(name, int32, uint32)         \
-    XND_COMPARISON(name, int32, float64)        \
-                                                \
-    XND_COMPARISON(name, int64, int8)           \
-    XND_COMPARISON(name, int64, int16)          \
-    XND_COMPARISON(name, int64, int32)          \
-    XND_COMPARISON(name, int64, int64)          \
-    XND_COMPARISON(name, int64, uint8)          \
-    XND_COMPARISON(name, int64, uint16)         \
-    XND_COMPARISON(name, int64, uint32)         \
-                                                \
-    XND_COMPARISON(name, uint8, int8)           \
-    XND_COMPARISON(name, uint8, int16)          \
-    XND_COMPARISON(name, uint8, int32)          \
-    XND_COMPARISON(name, uint8, int64)          \
-    XND_COMPARISON(name, uint8, uint8)          \
-    XND_COMPARISON(name, uint8, uint16)         \
-    XND_COMPARISON(name, uint8, uint32)         \
-    XND_COMPARISON(name, uint8, uint64)         \
-    XND_COMPARISON(name, uint8, float32)        \
-    XND_COMPARISON(name, uint8, float64)        \
-                                                \
-    XND_COMPARISON(name, uint16, int8)          \
-    XND_COMPARISON(name, uint16, int16)         \
-    XND_COMPARISON(name, uint16, int32)         \
-    XND_COMPARISON(name, uint16, int64)         \
-    XND_COMPARISON(name, uint16, uint8)         \
-    XND_COMPARISON(name, uint16, uint16)        \
-    XND_COMPARISON(name, uint16, uint32)        \
-    XND_COMPARISON(name, uint16, uint64)        \
-    XND_COMPARISON(name, uint16, float32)       \
-    XND_COMPARISON(name, uint16, float64)       \
-                                                \
-    XND_COMPARISON(name, uint32, int8)          \
-    XND_COMPARISON(name, uint32, int16)         \
-    XND_COMPARISON(name, uint32, int32)         \
-    XND_COMPARISON(name, uint32, int64)         \
-    XND_COMPARISON(name, uint32, uint8)         \
-    XND_COMPARISON(name, uint32, uint16)        \
-    XND_COMPARISON(name, uint32, uint32)        \
-    XND_COMPARISON(name, uint32, uint64)        \
-    XND_COMPARISON(name, uint32, float64)       \
-                                                \
-    XND_COMPARISON(name, uint64, uint8)         \
-    XND_COMPARISON(name, uint64, uint16)        \
-    XND_COMPARISON(name, uint64, uint32)        \
-    XND_COMPARISON(name, uint64, uint64)        \
-                                                \
-    XND_COMPARISON(name, float32, int8)         \
-    XND_COMPARISON(name, float32, int16)        \
-    XND_COMPARISON(name, float32, uint8)        \
-    XND_COMPARISON(name, float32, uint16)       \
-    XND_COMPARISON(name, float32, float32)      \
-    XND_COMPARISON(name, float32, float64)      \
-                                                \
-    XND_COMPARISON(name, float64, int8)         \
-    XND_COMPARISON(name, float64, int16)        \
-    XND_COMPARISON(name, float64, int32)        \
-    XND_COMPARISON(name, float64, uint8)        \
-    XND_COMPARISON(name, float64, uint16)       \
-    XND_COMPARISON(name, float64, uint32)       \
-    XND_COMPARISON(name, float64, float32)      \
-    XND_COMPARISON(name, float64, float64)
+    XND_BINARY(name, int8, int8, bool, int8)             \
+    XND_BINARY(name, int8, int16, bool, int16)          \
+    XND_BINARY(name, int8, int32, bool, int32)          \
+    XND_BINARY(name, int8, int64, bool, int64)          \
+    XND_BINARY(name, int8, uint8, bool, int16)          \
+    XND_BINARY(name, int8, uint16, bool, int32)         \
+    XND_BINARY(name, int8, uint32, bool, int64)         \
+    XND_BINARY(name, int8, float32, bool, float32)    \
+    XND_BINARY(name, int8, float64, bool, float64)    \
+                                                         \
+    XND_BINARY(name, int16, int8, bool, int16)          \
+    XND_BINARY(name, int16, int16, bool, int16)         \
+    XND_BINARY(name, int16, int32, bool, int32)         \
+    XND_BINARY(name, int16, int64, bool, int64)         \
+    XND_BINARY(name, int16, uint8, bool, int16)         \
+    XND_BINARY(name, int16, uint16, bool, int32)        \
+    XND_BINARY(name, int16, uint32, bool, int64)        \
+    XND_BINARY(name, int16, float32, bool, float32)   \
+    XND_BINARY(name, int16, float64, bool, float64)   \
+                                                         \
+    XND_BINARY(name, int32, int8, bool, int32)          \
+    XND_BINARY(name, int32, int16, bool, int32)         \
+    XND_BINARY(name, int32, int32, bool, int32)         \
+    XND_BINARY(name, int32, int64, bool, int64)         \
+    XND_BINARY(name, int32, uint8, bool, int32)         \
+    XND_BINARY(name, int32, uint16, bool, int32)        \
+    XND_BINARY(name, int32, uint32, bool, int64)        \
+    XND_BINARY(name, int32, float64, bool, float64)   \
+                                                         \
+    XND_BINARY(name, int64, int8, bool, int64)          \
+    XND_BINARY(name, int64, int16, bool, int64)         \
+    XND_BINARY(name, int64, int32, bool, int64)         \
+    XND_BINARY(name, int64, int64, bool, int64)         \
+    XND_BINARY(name, int64, uint8, bool, int64)         \
+    XND_BINARY(name, int64, uint16, bool, int64)        \
+    XND_BINARY(name, int64, uint32, bool, int64)        \
+                                                         \
+    XND_BINARY(name, uint8, int8, bool, int16)          \
+    XND_BINARY(name, uint8, int16, bool, int16)         \
+    XND_BINARY(name, uint8, int32, bool, int32)         \
+    XND_BINARY(name, uint8, int64, bool, int64)         \
+    XND_BINARY(name, uint8, uint8, bool, uint8)         \
+    XND_BINARY(name, uint8, uint16, bool, uint16)      \
+    XND_BINARY(name, uint8, uint32, bool, uint32)      \
+    XND_BINARY(name, uint8, uint64, bool, uint64)      \
+    XND_BINARY(name, uint8, float32, bool, float32)   \
+    XND_BINARY(name, uint8, float64, bool, float64)   \
+                                                         \
+    XND_BINARY(name, uint16, int8, bool, int32)         \
+    XND_BINARY(name, uint16, int16, bool, int32)        \
+    XND_BINARY(name, uint16, int32, bool, int32)        \
+    XND_BINARY(name, uint16, int64, bool, int64)        \
+    XND_BINARY(name, uint16, uint8, bool, uint16)      \
+    XND_BINARY(name, uint16, uint16, bool, uint16)     \
+    XND_BINARY(name, uint16, uint32, bool, uint32)     \
+    XND_BINARY(name, uint16, uint64, bool, uint64)     \
+    XND_BINARY(name, uint16, float32, bool, float32)  \
+    XND_BINARY(name, uint16, float64, bool, float64)  \
+                                                         \
+    XND_BINARY(name, uint32, int8, bool, int64)         \
+    XND_BINARY(name, uint32, int16, bool, int64)        \
+    XND_BINARY(name, uint32, int32, bool, int64)        \
+    XND_BINARY(name, uint32, int64, bool, int64)        \
+    XND_BINARY(name, uint32, uint8, bool, uint32)      \
+    XND_BINARY(name, uint32, uint16, bool, uint32)     \
+    XND_BINARY(name, uint32, uint32, bool, uint32)     \
+    XND_BINARY(name, uint32, uint64, bool, uint64)     \
+    XND_BINARY(name, uint32, float64, bool, float64)  \
+                                                         \
+    XND_BINARY(name, uint64, uint8, bool, uint64)      \
+    XND_BINARY(name, uint64, uint16, bool, uint64)     \
+    XND_BINARY(name, uint64, uint32, bool, uint64)     \
+    XND_BINARY(name, uint64, uint64, bool, uint64)     \
+                                                         \
+    XND_BINARY(name, float32, int8, bool, float32)    \
+    XND_BINARY(name, float32, int16, bool, float32)   \
+    XND_BINARY(name, float32, uint8, bool, float32)   \
+    XND_BINARY(name, float32, uint16, bool, float32)  \
+    XND_BINARY(name, float32, float32, bool, float32) \
+    XND_BINARY(name, float32, float64, bool, float64) \
+                                                         \
+    XND_BINARY(name, float64, int8, bool, float64)    \
+    XND_BINARY(name, float64, int16, bool, float64)   \
+    XND_BINARY(name, float64, int32, bool, float64)   \
+    XND_BINARY(name, float64, uint8, bool, float64)   \
+    XND_BINARY(name, float64, uint16, bool, float64)  \
+    XND_BINARY(name, float64, uint32, bool, float64)  \
+    XND_BINARY(name, float64, float32, bool, float64) \
+    XND_BINARY(name, float64, float64, bool, float64)
 
 #define XND_ALL_COMPARISON_INIT(name) \
     XND_BINARY_INIT(name, int8, int8, bool),            \
@@ -751,6 +708,8 @@ gm_##func##_0D_##t0##_##t1##_##bool(xnd_t stack[], ndt_context_t *ctx)          
     XND_BINARY_INIT(name, float64, uint32, bool),       \
     XND_BINARY_INIT(name, float64, float32, bool),      \
     XND_BINARY_INIT(name, float64, float64, bool)
+
+#define bool_t _Bool
 
 #define greater(x, y) x > y
 XND_ALL_COMPARISON(greater)
