@@ -709,6 +709,7 @@ XND_ALL_BINARY(divide)
     XND_BINARY_INIT(name, float64, float32, bool),      \
     XND_BINARY_INIT(name, float64, float64, bool)
 
+#undef bool
 #define bool_t _Bool
 
 #define greater(x, y) x > y
