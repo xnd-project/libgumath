@@ -271,6 +271,9 @@ apply_index(const xnd_t *x)
     return xnd_fixed_apply_index(x);
 }
 
+/*************
+ * Arithmetic
+ *************/
 
 #define XND_BINARY(func, t0, t1, t2, cast) \
 static int                                                                     \
@@ -520,12 +523,217 @@ XND_ALL_BINARY(multiply)
 #define divide(x, y) x / y
 XND_ALL_BINARY(divide)
 
+/*************
+ * Comparison
+ *************/
+
+#define XND_ALL_COMPARISON(name) \
+    XND_BINARY(name, int8, int8, bool, int8)            \
+    XND_BINARY(name, int8, int16, bool, int16)          \
+    XND_BINARY(name, int8, int32, bool, int32)          \
+    XND_BINARY(name, int8, int64, bool, int64)          \
+    XND_BINARY(name, int8, uint8, bool, int16)          \
+    XND_BINARY(name, int8, uint16, bool, int32)         \
+    XND_BINARY(name, int8, uint32, bool, int64)         \
+    XND_BINARY(name, int8, float32, bool, float32)      \
+    XND_BINARY(name, int8, float64, bool, float64)      \
+                                                        \
+    XND_BINARY(name, int16, int8, bool, int16)          \
+    XND_BINARY(name, int16, int16, bool, int16)         \
+    XND_BINARY(name, int16, int32, bool, int32)         \
+    XND_BINARY(name, int16, int64, bool, int64)         \
+    XND_BINARY(name, int16, uint8, bool, int16)         \
+    XND_BINARY(name, int16, uint16, bool, int32)        \
+    XND_BINARY(name, int16, uint32, bool, int64)        \
+    XND_BINARY(name, int16, float32, bool, float32)     \
+    XND_BINARY(name, int16, float64, bool, float64)     \
+                                                        \
+    XND_BINARY(name, int32, int8, bool, int32)          \
+    XND_BINARY(name, int32, int16, bool, int32)         \
+    XND_BINARY(name, int32, int32, bool, int32)         \
+    XND_BINARY(name, int32, int64, bool, int64)         \
+    XND_BINARY(name, int32, uint8, bool, int32)         \
+    XND_BINARY(name, int32, uint16, bool, int32)        \
+    XND_BINARY(name, int32, uint32, bool, int64)        \
+    XND_BINARY(name, int32, float64, bool, float64)     \
+                                                        \
+    XND_BINARY(name, int64, int8, bool, int64)          \
+    XND_BINARY(name, int64, int16, bool, int64)         \
+    XND_BINARY(name, int64, int32, bool, int64)         \
+    XND_BINARY(name, int64, int64, bool, int64)         \
+    XND_BINARY(name, int64, uint8, bool, int64)         \
+    XND_BINARY(name, int64, uint16, bool, int64)        \
+    XND_BINARY(name, int64, uint32, bool, int64)        \
+                                                        \
+    XND_BINARY(name, uint8, int8, bool, int16)          \
+    XND_BINARY(name, uint8, int16, bool, int16)         \
+    XND_BINARY(name, uint8, int32, bool, int32)         \
+    XND_BINARY(name, uint8, int64, bool, int64)         \
+    XND_BINARY(name, uint8, uint8, bool, uint8)         \
+    XND_BINARY(name, uint8, uint16, bool, uint16)       \
+    XND_BINARY(name, uint8, uint32, bool, uint32)       \
+    XND_BINARY(name, uint8, uint64, bool, uint64)       \
+    XND_BINARY(name, uint8, float32, bool, float32)     \
+    XND_BINARY(name, uint8, float64, bool, float64)     \
+                                                        \
+    XND_BINARY(name, uint16, int8, bool, int32)         \
+    XND_BINARY(name, uint16, int16, bool, int32)        \
+    XND_BINARY(name, uint16, int32, bool, int32)        \
+    XND_BINARY(name, uint16, int64, bool, int64)        \
+    XND_BINARY(name, uint16, uint8, bool, uint16)       \
+    XND_BINARY(name, uint16, uint16, bool, uint16)      \
+    XND_BINARY(name, uint16, uint32, bool, uint32)      \
+    XND_BINARY(name, uint16, uint64, bool, uint64)      \
+    XND_BINARY(name, uint16, float32, bool, float32)    \
+    XND_BINARY(name, uint16, float64, bool, float64)    \
+                                                        \
+    XND_BINARY(name, uint32, int8, bool, int64)         \
+    XND_BINARY(name, uint32, int16, bool, int64)        \
+    XND_BINARY(name, uint32, int32, bool, int64)        \
+    XND_BINARY(name, uint32, int64, bool, int64)        \
+    XND_BINARY(name, uint32, uint8, bool, uint32)       \
+    XND_BINARY(name, uint32, uint16, bool, uint32)      \
+    XND_BINARY(name, uint32, uint32, bool, uint32)      \
+    XND_BINARY(name, uint32, uint64, bool, uint64)      \
+    XND_BINARY(name, uint32, float64, bool, float64)    \
+                                                        \
+    XND_BINARY(name, uint64, uint8, bool, uint64)       \
+    XND_BINARY(name, uint64, uint16, bool, uint64)      \
+    XND_BINARY(name, uint64, uint32, bool, uint64)      \
+    XND_BINARY(name, uint64, uint64, bool, uint64)      \
+                                                        \
+    XND_BINARY(name, float32, int8, bool, float32)      \
+    XND_BINARY(name, float32, int16, bool, float32)     \
+    XND_BINARY(name, float32, uint8, bool, float32)     \
+    XND_BINARY(name, float32, uint16, bool, float32)    \
+    XND_BINARY(name, float32, float32, bool, float32)   \
+    XND_BINARY(name, float32, float64, bool, float64)   \
+                                                        \
+    XND_BINARY(name, float64, int8, bool, float64)      \
+    XND_BINARY(name, float64, int16, bool, float64)     \
+    XND_BINARY(name, float64, int32, bool, float64)     \
+    XND_BINARY(name, float64, uint8, bool, float64)     \
+    XND_BINARY(name, float64, uint16, bool, float64)    \
+    XND_BINARY(name, float64, uint32, bool, float64)    \
+    XND_BINARY(name, float64, float32, bool, float64)   \
+    XND_BINARY(name, float64, float64, bool, float64)
+
+#define XND_ALL_COMPARISON_INIT(name) \
+    XND_BINARY_INIT(name, int8, int8, bool),            \
+    XND_BINARY_INIT(name, int8, int16, bool),           \
+    XND_BINARY_INIT(name, int8, int32, bool),           \
+    XND_BINARY_INIT(name, int8, int64, bool),           \
+    XND_BINARY_INIT(name, int8, uint8, bool),           \
+    XND_BINARY_INIT(name, int8, uint16, bool),          \
+    XND_BINARY_INIT(name, int8, uint32, bool),          \
+    XND_BINARY_INIT(name, int8, float32, bool),         \
+    XND_BINARY_INIT(name, int8, float64, bool),         \
+                                                        \
+    XND_BINARY_INIT(name, int16, int8, bool),           \
+    XND_BINARY_INIT(name, int16, int16, bool),          \
+    XND_BINARY_INIT(name, int16, int32, bool),          \
+    XND_BINARY_INIT(name, int16, int64, bool),          \
+    XND_BINARY_INIT(name, int16, uint8, bool),          \
+    XND_BINARY_INIT(name, int16, uint16, bool),         \
+    XND_BINARY_INIT(name, int16, uint32, bool),         \
+    XND_BINARY_INIT(name, int16, float32, bool),        \
+    XND_BINARY_INIT(name, int16, float64, bool),        \
+                                                        \
+    XND_BINARY_INIT(name, int32, int8, bool),           \
+    XND_BINARY_INIT(name, int32, int16, bool),          \
+    XND_BINARY_INIT(name, int32, int32, bool),          \
+    XND_BINARY_INIT(name, int32, int64, bool),          \
+    XND_BINARY_INIT(name, int32, uint8, bool),          \
+    XND_BINARY_INIT(name, int32, uint16, bool),         \
+    XND_BINARY_INIT(name, int32, uint32, bool),         \
+    XND_BINARY_INIT(name, int32, float64, bool),        \
+                                                        \
+    XND_BINARY_INIT(name, int64, int8, bool),           \
+    XND_BINARY_INIT(name, int64, int16, bool),          \
+    XND_BINARY_INIT(name, int64, int32, bool),          \
+    XND_BINARY_INIT(name, int64, int64, bool),          \
+    XND_BINARY_INIT(name, int64, uint8, bool),          \
+    XND_BINARY_INIT(name, int64, uint16, bool),         \
+    XND_BINARY_INIT(name, int64, uint32, bool),         \
+                                                        \
+    XND_BINARY_INIT(name, uint8, int8, bool),           \
+    XND_BINARY_INIT(name, uint8, int16, bool),          \
+    XND_BINARY_INIT(name, uint8, int32, bool),          \
+    XND_BINARY_INIT(name, uint8, int64, bool),          \
+    XND_BINARY_INIT(name, uint8, uint8, bool),          \
+    XND_BINARY_INIT(name, uint8, uint16, bool),         \
+    XND_BINARY_INIT(name, uint8, uint32, bool),         \
+    XND_BINARY_INIT(name, uint8, uint64, bool),         \
+    XND_BINARY_INIT(name, uint8, float32, bool),        \
+    XND_BINARY_INIT(name, uint8, float64, bool),        \
+                                                        \
+    XND_BINARY_INIT(name, uint16, int8, bool),          \
+    XND_BINARY_INIT(name, uint16, int16, bool),         \
+    XND_BINARY_INIT(name, uint16, int32, bool),         \
+    XND_BINARY_INIT(name, uint16, int64, bool),         \
+    XND_BINARY_INIT(name, uint16, uint8, bool),         \
+    XND_BINARY_INIT(name, uint16, uint16, bool),        \
+    XND_BINARY_INIT(name, uint16, uint32, bool),        \
+    XND_BINARY_INIT(name, uint16, uint64, bool),        \
+    XND_BINARY_INIT(name, uint16, float32, bool),       \
+    XND_BINARY_INIT(name, uint16, float64, bool),       \
+                                                        \
+    XND_BINARY_INIT(name, uint32, int8, bool),          \
+    XND_BINARY_INIT(name, uint32, int16, bool),         \
+    XND_BINARY_INIT(name, uint32, int32, bool),         \
+    XND_BINARY_INIT(name, uint32, int64, bool),         \
+    XND_BINARY_INIT(name, uint32, uint8, bool),         \
+    XND_BINARY_INIT(name, uint32, uint16, bool),        \
+    XND_BINARY_INIT(name, uint32, uint32, bool),        \
+    XND_BINARY_INIT(name, uint32, uint64, bool),        \
+    XND_BINARY_INIT(name, uint32, float64, bool),       \
+                                                        \
+    XND_BINARY_INIT(name, uint64, uint8, bool),         \
+    XND_BINARY_INIT(name, uint64, uint16, bool),        \
+    XND_BINARY_INIT(name, uint64, uint32, bool),        \
+    XND_BINARY_INIT(name, uint64, uint64, bool),        \
+                                                        \
+    XND_BINARY_INIT(name, float32, int8, bool),         \
+    XND_BINARY_INIT(name, float32, int16, bool),        \
+    XND_BINARY_INIT(name, float32, uint8, bool),        \
+    XND_BINARY_INIT(name, float32, uint16, bool),       \
+    XND_BINARY_INIT(name, float32, float32, bool),      \
+    XND_BINARY_INIT(name, float32, float64, bool),      \
+                                                        \
+    XND_BINARY_INIT(name, float64, int8, bool),         \
+    XND_BINARY_INIT(name, float64, int16, bool),        \
+    XND_BINARY_INIT(name, float64, int32, bool),        \
+    XND_BINARY_INIT(name, float64, uint8, bool),        \
+    XND_BINARY_INIT(name, float64, uint16, bool),       \
+    XND_BINARY_INIT(name, float64, uint32, bool),       \
+    XND_BINARY_INIT(name, float64, float32, bool),      \
+    XND_BINARY_INIT(name, float64, float64, bool)
+
+#undef bool
+#define bool_t _Bool
+
+#define greater(x, y) x > y
+XND_ALL_COMPARISON(greater)
+
+#define greater_equal(x, y) x >= y
+XND_ALL_COMPARISON(greater_equal)
+
+#define less(x, y) x < y
+XND_ALL_COMPARISON(less)
+
+#define less_equal(x, y) x <= y
+XND_ALL_COMPARISON(less_equal)
+
 
 static const gm_kernel_init_t kernels[] = {
   XND_ALL_BINARY_INIT(add),
   XND_ALL_BINARY_INIT(subtract),
   XND_ALL_BINARY_INIT(multiply),
   XND_ALL_BINARY_INIT(divide),
+  XND_ALL_COMPARISON_INIT(greater),
+  XND_ALL_COMPARISON_INIT(greater_equal),
+  XND_ALL_COMPARISON_INIT(less),
+  XND_ALL_COMPARISON_INIT(less_equal),
 
   { .name = NULL, .sig = NULL }
 };
