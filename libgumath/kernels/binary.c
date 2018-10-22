@@ -724,6 +724,148 @@ XND_ALL_COMPARISON(less)
 #define less_equal(x, y) x <= y
 XND_ALL_COMPARISON(less_equal)
 
+/**********
+ * Bitwise
+ **********/
+
+#define XND_ALL_BITWISE(name) \
+    XND_BINARY(name, int8, int8, int8, int8)             \
+    XND_BINARY(name, int8, int16, int16, int16)          \
+    XND_BINARY(name, int8, int32, int32, int32)          \
+    XND_BINARY(name, int8, int64, int64, int64)          \
+    XND_BINARY(name, int8, uint8, int16, int16)          \
+    XND_BINARY(name, int8, uint16, int32, int32)         \
+    XND_BINARY(name, int8, uint32, int64, int64)         \
+                                                         \
+    XND_BINARY(name, int16, int8, int16, int16)          \
+    XND_BINARY(name, int16, int16, int16, int16)         \
+    XND_BINARY(name, int16, int32, int32, int32)         \
+    XND_BINARY(name, int16, int64, int64, int64)         \
+    XND_BINARY(name, int16, uint8, int16, int16)         \
+    XND_BINARY(name, int16, uint16, int32, int32)        \
+    XND_BINARY(name, int16, uint32, int64, int64)        \
+                                                         \
+    XND_BINARY(name, int32, int8, int32, int32)          \
+    XND_BINARY(name, int32, int16, int32, int32)         \
+    XND_BINARY(name, int32, int32, int32, int32)         \
+    XND_BINARY(name, int32, int64, int64, int64)         \
+    XND_BINARY(name, int32, uint8, int32, int32)         \
+    XND_BINARY(name, int32, uint16, int32, int32)        \
+    XND_BINARY(name, int32, uint32, int64, int64)        \
+                                                         \
+    XND_BINARY(name, int64, int8, int64, int64)          \
+    XND_BINARY(name, int64, int16, int64, int64)         \
+    XND_BINARY(name, int64, int32, int64, int64)         \
+    XND_BINARY(name, int64, int64, int64, int64)         \
+    XND_BINARY(name, int64, uint8, int64, int64)         \
+    XND_BINARY(name, int64, uint16, int64, int64)        \
+    XND_BINARY(name, int64, uint32, int64, int64)        \
+                                                         \
+    XND_BINARY(name, uint8, int8, int16, int16)          \
+    XND_BINARY(name, uint8, int16, int16, int16)         \
+    XND_BINARY(name, uint8, int32, int32, int32)         \
+    XND_BINARY(name, uint8, int64, int64, int64)         \
+    XND_BINARY(name, uint8, uint8, uint8, uint8)         \
+    XND_BINARY(name, uint8, uint16, uint16, uint16)      \
+    XND_BINARY(name, uint8, uint32, uint32, uint32)      \
+    XND_BINARY(name, uint8, uint64, uint64, uint64)      \
+                                                         \
+    XND_BINARY(name, uint16, int8, int32, int32)         \
+    XND_BINARY(name, uint16, int16, int32, int32)        \
+    XND_BINARY(name, uint16, int32, int32, int32)        \
+    XND_BINARY(name, uint16, int64, int64, int64)        \
+    XND_BINARY(name, uint16, uint8, uint16, uint16)      \
+    XND_BINARY(name, uint16, uint16, uint16, uint16)     \
+    XND_BINARY(name, uint16, uint32, uint32, uint32)     \
+    XND_BINARY(name, uint16, uint64, uint64, uint64)     \
+                                                         \
+    XND_BINARY(name, uint32, int8, int64, int64)         \
+    XND_BINARY(name, uint32, int16, int64, int64)        \
+    XND_BINARY(name, uint32, int32, int64, int64)        \
+    XND_BINARY(name, uint32, int64, int64, int64)        \
+    XND_BINARY(name, uint32, uint8, uint32, uint32)      \
+    XND_BINARY(name, uint32, uint16, uint32, uint32)     \
+    XND_BINARY(name, uint32, uint32, uint32, uint32)     \
+    XND_BINARY(name, uint32, uint64, uint64, uint64)     \
+                                                         \
+    XND_BINARY(name, uint64, uint8, uint64, uint64)      \
+    XND_BINARY(name, uint64, uint16, uint64, uint64)     \
+    XND_BINARY(name, uint64, uint32, uint64, uint64)     \
+    XND_BINARY(name, uint64, uint64, uint64, uint64)
+
+#define XND_ALL_BITWISE_INIT(name) \
+    XND_BINARY_INIT(name, int8, int8, int8),          \
+    XND_BINARY_INIT(name, int8, int16, int16),        \
+    XND_BINARY_INIT(name, int8, int32, int32),        \
+    XND_BINARY_INIT(name, int8, int64, int64),        \
+    XND_BINARY_INIT(name, int8, uint8, int16),        \
+    XND_BINARY_INIT(name, int8, uint16, int32),       \
+    XND_BINARY_INIT(name, int8, uint32, int64),       \
+                                                      \
+    XND_BINARY_INIT(name, int16, int8, int16),        \
+    XND_BINARY_INIT(name, int16, int16, int16),       \
+    XND_BINARY_INIT(name, int16, int32, int32),       \
+    XND_BINARY_INIT(name, int16, int64, int64),       \
+    XND_BINARY_INIT(name, int16, uint8, int16),       \
+    XND_BINARY_INIT(name, int16, uint16, int32),      \
+    XND_BINARY_INIT(name, int16, uint32, int64),      \
+                                                      \
+    XND_BINARY_INIT(name, int32, int8, int32),        \
+    XND_BINARY_INIT(name, int32, int16, int32),       \
+    XND_BINARY_INIT(name, int32, int32, int32),       \
+    XND_BINARY_INIT(name, int32, int64, int64),       \
+    XND_BINARY_INIT(name, int32, uint8, int32),       \
+    XND_BINARY_INIT(name, int32, uint16, int32),      \
+    XND_BINARY_INIT(name, int32, uint32, int64),      \
+                                                      \
+    XND_BINARY_INIT(name, int64, int8, int64),        \
+    XND_BINARY_INIT(name, int64, int16, int64),       \
+    XND_BINARY_INIT(name, int64, int32, int64),       \
+    XND_BINARY_INIT(name, int64, int64, int64),       \
+    XND_BINARY_INIT(name, int64, uint8, int64),       \
+    XND_BINARY_INIT(name, int64, uint16, int64),      \
+    XND_BINARY_INIT(name, int64, uint32, int64),      \
+                                                      \
+    XND_BINARY_INIT(name, uint8, int8, int16),        \
+    XND_BINARY_INIT(name, uint8, int16, int16),       \
+    XND_BINARY_INIT(name, uint8, int32, int32),       \
+    XND_BINARY_INIT(name, uint8, int64, int64),       \
+    XND_BINARY_INIT(name, uint8, uint8, uint8),       \
+    XND_BINARY_INIT(name, uint8, uint16, uint16),     \
+    XND_BINARY_INIT(name, uint8, uint32, uint32),     \
+    XND_BINARY_INIT(name, uint8, uint64, uint64),     \
+                                                      \
+    XND_BINARY_INIT(name, uint16, int8, int32),       \
+    XND_BINARY_INIT(name, uint16, int16, int32),      \
+    XND_BINARY_INIT(name, uint16, int32, int32),      \
+    XND_BINARY_INIT(name, uint16, int64, int64),      \
+    XND_BINARY_INIT(name, uint16, uint8, uint16),     \
+    XND_BINARY_INIT(name, uint16, uint16, uint16),    \
+    XND_BINARY_INIT(name, uint16, uint32, uint32),    \
+    XND_BINARY_INIT(name, uint16, uint64, uint64),    \
+                                                      \
+    XND_BINARY_INIT(name, uint32, int8, int64),       \
+    XND_BINARY_INIT(name, uint32, int16, int64),      \
+    XND_BINARY_INIT(name, uint32, int32, int64),      \
+    XND_BINARY_INIT(name, uint32, int64, int64),      \
+    XND_BINARY_INIT(name, uint32, uint8, uint32),     \
+    XND_BINARY_INIT(name, uint32, uint16, uint32),    \
+    XND_BINARY_INIT(name, uint32, uint32, uint32),    \
+    XND_BINARY_INIT(name, uint32, uint64, uint64),    \
+                                                      \
+    XND_BINARY_INIT(name, uint64, uint8, uint64),     \
+    XND_BINARY_INIT(name, uint64, uint16, uint64),    \
+    XND_BINARY_INIT(name, uint64, uint32, uint64),    \
+    XND_BINARY_INIT(name, uint64, uint64, uint64)
+
+#define bitwise_and(x, y) x & y
+XND_ALL_BITWISE(bitwise_and)
+
+#define bitwise_or(x, y) x | y
+XND_ALL_BITWISE(bitwise_or)
+
+#define bitwise_xor(x, y) x ^ y
+XND_ALL_BITWISE(bitwise_xor)
 
 static const gm_kernel_init_t kernels[] = {
   XND_ALL_BINARY_INIT(add),
@@ -734,6 +876,9 @@ static const gm_kernel_init_t kernels[] = {
   XND_ALL_COMPARISON_INIT(greater_equal),
   XND_ALL_COMPARISON_INIT(less),
   XND_ALL_COMPARISON_INIT(less_equal),
+  XND_ALL_BITWISE_INIT(bitwise_and),
+  XND_ALL_BITWISE_INIT(bitwise_or),
+  XND_ALL_BITWISE_INIT(bitwise_xor),
 
   { .name = NULL, .sig = NULL }
 };

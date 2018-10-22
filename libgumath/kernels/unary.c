@@ -248,6 +248,20 @@ XND_UNARY(copy, uint64, uint64)
 XND_UNARY(copy, float32, float32)
 XND_UNARY(copy, float64, float64)
 
+/*****************************************************************************/
+/*                              Bitwise NOT                                  */
+/*****************************************************************************/
+
+#define invert(x) ~x
+XND_UNARY(invert, int8, int8)
+XND_UNARY(invert, int16, int16)
+XND_UNARY(invert, int32, int32)
+XND_UNARY(invert, int64, int64)
+XND_UNARY(invert, uint8, uint8)
+XND_UNARY(invert, uint16, uint16)
+XND_UNARY(invert, uint32, uint32)
+XND_UNARY(invert, uint64, uint64)
+
 
 static const gm_kernel_init_t unary_id[] = {
   /* COPY */
@@ -261,6 +275,16 @@ static const gm_kernel_init_t unary_id[] = {
   XND_UNARY_INIT(copy, copy, uint64, uint64),
   XND_UNARY_INIT(copy, copy, float32, float32),
   XND_UNARY_INIT(copy, copy, float64, float64),
+
+  /* INVERT */
+  XND_UNARY_INIT(invert, invert, int8, int8),
+  XND_UNARY_INIT(invert, invert, int16, int16),
+  XND_UNARY_INIT(invert, invert, int32, int32),
+  XND_UNARY_INIT(invert, invert, int64, int64),
+  XND_UNARY_INIT(invert, invert, uint8, uint8),
+  XND_UNARY_INIT(invert, invert, uint16, uint16),
+  XND_UNARY_INIT(invert, invert, uint32, uint32),
+  XND_UNARY_INIT(invert, invert, uint64, uint64),
 
   { .name = NULL, .sig = NULL }
 };
