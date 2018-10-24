@@ -54,7 +54,7 @@ infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
-    case Bool: *base = 2; tag = Bool; break;
+    case Bool: *base = 0; tag = Bool; break;
     case Int8: *base = 2; tag = Int8; break;
     case Int16: *base = 4; tag = Int16; break;
     case Int32: *base = 6; tag = Int32; break;
