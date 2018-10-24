@@ -41,10 +41,12 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.obj func.obj nploops.obj tbl.obj xndloops.obj \
-       unary.obj binary.obj examples.obj graph.obj pdist.obj
+       unary.obj binary.obj bitwise.obj examples.obj graph.obj \
+	   pdist.obj
 
 SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/nploops.obj .objs/tbl.obj .objs/xndloops.obj \
-              .objs/unary.obj .objs/binary.obj .objs/examples.obj .objs/graph.obj .objs/pdist.obj
+              .objs/unary.obj .objs/binary.obj .objs/bitwise.obj .objs/examples.obj .objs/graph.obj \
+			  .objs/pdist.obj
 
 
 $(LIBSTATIC):\
@@ -116,6 +118,14 @@ Makefile kernels\binary.c gumath.h
 .objs\binary.obj:\
 Makefile kernels\binary.c gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary.c
+
+bitwise.obj:\
+Makefile kernels\bitwise.c gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\bitwise.c
+
+.objs\bitwise.obj:\
+Makefile kernels\bitwise.c gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\bitwise.c
 
 examples.obj:\
 Makefile extending\examples.c gumath.h
