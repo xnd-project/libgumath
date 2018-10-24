@@ -54,16 +54,17 @@ infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
-    case Int8: *base = 0; tag = Int8; break;
-    case Int16: *base = 2; tag = Int16; break;
-    case Int32: *base = 4; tag = Int32; break;
-    case Int64: *base = 6; tag = Int64; break;
-    case Uint8: *base = 8; tag = Uint8; break;
-    case Uint16: *base = 10; tag = Uint16; break;
-    case Uint32: *base = 12; tag = Uint32; break;
-    case Uint64: *base = 14; tag = Uint64; break;
-    case Float32: *base = 16; tag = Float32; break;
-    case Float64: *base = 18; tag = Float64; break;
+    case Bool: *base = 2; tag = Bool; break;
+    case Int8: *base = 2; tag = Int8; break;
+    case Int16: *base = 4; tag = Int16; break;
+    case Int32: *base = 6; tag = Int32; break;
+    case Int64: *base = 8; tag = Int64; break;
+    case Uint8: *base = 10; tag = Uint8; break;
+    case Uint16: *base = 12; tag = Uint16; break;
+    case Uint32: *base = 14; tag = Uint32; break;
+    case Uint64: *base = 16; tag = Uint64; break;
+    case Float32: *base = 18; tag = Float32; break;
+    case Float64: *base = 20; tag = Float64; break;
     default:
         ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
         return NULL;
@@ -231,12 +232,15 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
     .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
     .C = gm_##func##_0D_##t0##_##t1 }
 
+#undef bool
+#define bool_t _Bool
 
 /*****************************************************************************/
 /*                                   Copy                                    */
 /*****************************************************************************/
 
 #define copy(x) x
+XND_UNARY(copy, bool, bool)
 XND_UNARY(copy, int8, int8)
 XND_UNARY(copy, int16, int16)
 XND_UNARY(copy, int32, int32)
@@ -253,6 +257,7 @@ XND_UNARY(copy, float64, float64)
 /*****************************************************************************/
 
 #define invert(x) ~x
+XND_UNARY(invert, bool, bool)
 XND_UNARY(invert, int8, int8)
 XND_UNARY(invert, int16, int16)
 XND_UNARY(invert, int32, int32)
@@ -265,6 +270,7 @@ XND_UNARY(invert, uint64, uint64)
 
 static const gm_kernel_init_t unary_id[] = {
   /* COPY */
+  XND_UNARY_INIT(copy, copy, bool, bool),
   XND_UNARY_INIT(copy, copy, int8, int8),
   XND_UNARY_INIT(copy, copy, int16, int16),
   XND_UNARY_INIT(copy, copy, int32, int32),
@@ -277,6 +283,7 @@ static const gm_kernel_init_t unary_id[] = {
   XND_UNARY_INIT(copy, copy, float64, float64),
 
   /* INVERT */
+  XND_UNARY_INIT(invert, invert, bool, bool),
   XND_UNARY_INIT(invert, invert, int8, int8),
   XND_UNARY_INIT(invert, invert, int16, int16),
   XND_UNARY_INIT(invert, invert, int32, int32),
