@@ -223,13 +223,13 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
         goto error;
     }
 
-    t = ndt_var_dim(t, InternalOffsets, (int32_t)(N+1), ndim1_offsets, 0, NULL, ctx);
+    t = ndt_var_dim(t, InternalOffsets, (int32_t)(N+1), ndim1_offsets, 0, NULL, false, ctx);
     ndim1_offsets = NULL;
     if (t == NULL) {
         goto error;
     }
 
-    t = ndt_var_dim(t, InternalOffsets, 2, ndim2_offsets, 0, NULL, ctx);
+    t = ndt_var_dim(t, InternalOffsets, 2, ndim2_offsets, 0, NULL, false, ctx);
     ndim2_offsets = NULL;
     if (t == NULL) {
         goto error;

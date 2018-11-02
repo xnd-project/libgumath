@@ -147,6 +147,7 @@ gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
                                  &tinfo[tnum]);
         if (ret != 0) {
             clear_all_slices(slices, nslices, nrows);
+            ndt_free(tinfo);
             ndt_err_format(ctx, NDT_RuntimeError, "could not create thread");
             return -1;
         }
@@ -169,6 +170,7 @@ gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
     }
  
     clear_all_slices(slices, nslices, nrows);
+    ndt_free(tinfo);
 
     return ndt_err_occurred(ctx) ? -1 : 0;
 }
