@@ -256,8 +256,10 @@ XND_UNARY(copy, float64, float64)
 /*                              Bitwise NOT                                  */
 /*****************************************************************************/
 
-#define invert(x) ~x
+#define invert(x) !x
 XND_UNARY(invert, bool, bool)
+#undef invert
+#define invert(x) ~x
 XND_UNARY(invert, int8, int8)
 XND_UNARY(invert, int16, int16)
 XND_UNARY(invert, int32, int32)
