@@ -54,16 +54,47 @@ infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
-    case Int8: *base = 0; tag = Int8; break;
-    case Int16: *base = 2; tag = Int16; break;
-    case Int32: *base = 4; tag = Int32; break;
-    case Int64: *base = 6; tag = Int64; break;
-    case Uint8: *base = 8; tag = Uint8; break;
-    case Uint16: *base = 10; tag = Uint16; break;
-    case Uint32: *base = 12; tag = Uint32; break;
-    case Uint64: *base = 14; tag = Uint64; break;
-    case Float32: *base = 16; tag = Float32; break;
-    case Float64: *base = 18; tag = Float64; break;
+    case Bool: *base = 0; tag = Bool; break;
+    case Int8: *base = 2; tag = Int8; break;
+    case Int16: *base = 4; tag = Int16; break;
+    case Int32: *base = 6; tag = Int32; break;
+    case Int64: *base = 8; tag = Int64; break;
+    case Uint8: *base = 10; tag = Uint8; break;
+    case Uint16: *base = 12; tag = Uint16; break;
+    case Uint32: *base = 14; tag = Uint32; break;
+    case Uint64: *base = 16; tag = Uint64; break;
+    case Float32: *base = 18; tag = Float32; break;
+    case Float64: *base = 20; tag = Float64; break;
+    default:
+        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
+        return NULL;
+    }
+
+    dtype = ndt_primitive(tag, 0, ctx);
+    if (dtype == NULL) {
+        return NULL;
+    }
+
+    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+}
+
+/* Structured kernel locations for fast lookup. */
+static ndt_t *
+infer_invert_return(int *base, const ndt_t *in, ndt_context_t *ctx)
+{
+    ndt_t *dtype;
+    enum ndt tag;
+
+    switch (ndt_dtype(in)->tag) {
+    case Bool: *base = 0; tag = Bool; break;
+    case Int8: *base = 2; tag = Int8; break;
+    case Int16: *base = 4; tag = Int16; break;
+    case Int32: *base = 6; tag = Int32; break;
+    case Int64: *base = 8; tag = Int64; break;
+    case Uint8: *base = 10; tag = Uint8; break;
+    case Uint16: *base = 12; tag = Uint16; break;
+    case Uint32: *base = 14; tag = Uint32; break;
+    case Uint64: *base = 16; tag = Uint64; break;
     default:
         ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
         return NULL;
@@ -170,6 +201,14 @@ unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 }
 
 static const gm_kernel_set_t *
+unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                   const ndt_t *in[], int nin,
+                   ndt_context_t *ctx)
+{
+    return unary_typecheck(spec, f, in, nin, infer_invert_return, ctx);
+}
+
+static const gm_kernel_set_t *
 unary_float_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
                       const ndt_t *in[], int nin,
                       ndt_context_t *ctx)
@@ -231,12 +270,15 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
     .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
     .C = gm_##func##_0D_##t0##_##t1 }
 
+#undef bool
+#define bool_t _Bool
 
 /*****************************************************************************/
 /*                                   Copy                                    */
 /*****************************************************************************/
 
 #define copy(x) x
+XND_UNARY(copy, bool, bool)
 XND_UNARY(copy, int8, int8)
 XND_UNARY(copy, int16, int16)
 XND_UNARY(copy, int32, int32)
@@ -248,9 +290,27 @@ XND_UNARY(copy, uint64, uint64)
 XND_UNARY(copy, float32, float32)
 XND_UNARY(copy, float64, float64)
 
+/*****************************************************************************/
+/*                              Bitwise NOT                                  */
+/*****************************************************************************/
+
+#define invert(x) !x
+XND_UNARY(invert, bool, bool)
+#undef invert
+#define invert(x) ~x
+XND_UNARY(invert, int8, int8)
+XND_UNARY(invert, int16, int16)
+XND_UNARY(invert, int32, int32)
+XND_UNARY(invert, int64, int64)
+XND_UNARY(invert, uint8, uint8)
+XND_UNARY(invert, uint16, uint16)
+XND_UNARY(invert, uint32, uint32)
+XND_UNARY(invert, uint64, uint64)
+
 
 static const gm_kernel_init_t unary_id[] = {
   /* COPY */
+  XND_UNARY_INIT(copy, copy, bool, bool),
   XND_UNARY_INIT(copy, copy, int8, int8),
   XND_UNARY_INIT(copy, copy, int16, int16),
   XND_UNARY_INIT(copy, copy, int32, int32),
@@ -261,6 +321,21 @@ static const gm_kernel_init_t unary_id[] = {
   XND_UNARY_INIT(copy, copy, uint64, uint64),
   XND_UNARY_INIT(copy, copy, float32, float32),
   XND_UNARY_INIT(copy, copy, float64, float64),
+
+  { .name = NULL, .sig = NULL }
+};
+
+static const gm_kernel_init_t unary_invert[] = {
+  /* INVERT */
+  XND_UNARY_INIT(invert, invert, bool, bool),
+  XND_UNARY_INIT(invert, invert, int8, int8),
+  XND_UNARY_INIT(invert, invert, int16, int16),
+  XND_UNARY_INIT(invert, invert, int32, int32),
+  XND_UNARY_INIT(invert, invert, int64, int64),
+  XND_UNARY_INIT(invert, invert, uint8, uint8),
+  XND_UNARY_INIT(invert, invert, uint16, uint16),
+  XND_UNARY_INIT(invert, invert, uint32, uint32),
+  XND_UNARY_INIT(invert, invert, uint64, uint64),
 
   { .name = NULL, .sig = NULL }
 };
@@ -435,6 +510,12 @@ gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 
     for (k = unary_id; k->name != NULL; k++) {
         if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_id_typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = unary_invert; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_invert_typecheck) < 0) {
              return -1;
         }
     }

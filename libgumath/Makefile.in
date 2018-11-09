@@ -27,11 +27,11 @@ GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 default: $(LIBSTATIC) $(LIBSHARED)
 
 
-OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o \
+OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o bitwise.o \
        examples.o bfloat16.o graph.o quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
-              .objs/unary.o .objs/binary.o .objs/examples.o .objs/bfloat16.o .objs/graph.o \
+              .objs/unary.o .objs/binary.o .objs/bitwise.o .objs/examples.o .objs/bfloat16.o .objs/graph.o \
               .objs/quaternion.o .objs/pdist.o
 
 
@@ -108,6 +108,14 @@ Makefile kernels/binary.c gumath.h
 .objs/binary.o:\
 Makefile kernels/binary.c gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary.c -o .objs/binary.o
+
+bitwise.o:\
+Makefile kernels/bitwise.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c kernels/bitwise.c
+
+.objs/bitwise.o:\
+Makefile kernels/bitwise.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/bitwise.c -o .objs/bitwise.o
 
 examples.o:\
 Makefile extending/examples.c gumath.h
