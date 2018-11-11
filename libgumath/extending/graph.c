@@ -181,9 +181,10 @@ static xnd_t
 mk_return_array(int32_t p[], const int64_t N, const int32_t u,
                 ndt_context_t *ctx)
 {
-    int32_t *ndim2_offsets = NULL;
-    int32_t *ndim1_offsets = NULL;
-    ndt_t *t;
+    ndt_offsets_t *ndim2_offsets = NULL;
+    ndt_offsets_t *ndim1_offsets = NULL;
+    int32_t *ptr;
+    const ndt_t *t, *type;
     int64_t sum;
     int32_t v;
 
@@ -191,45 +192,48 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
         goto offset_overflow;
     }
 
-    ndim2_offsets = ndt_alloc(2, sizeof *ndim2_offsets);
+    ndim2_offsets = ndt_offsets_new(2, ctx);
     if (ndim2_offsets == NULL) {
-        (void)ndt_memory_error(ctx);
         return xnd_error;
     }
-    ndim2_offsets[0] = 0;
-    ndim2_offsets[1] = (int32_t)N;
+    ptr = (int32_t *)ndim2_offsets->v;
+    ptr[0] = 0;
+    ptr[1] = (int32_t)N;
 
 
-    ndim1_offsets = ndt_alloc(N+1, sizeof *ndim1_offsets);
+    ndim1_offsets = ndt_offsets_new(N+1, ctx);
     if (ndim1_offsets == NULL) {
-        (void)ndt_memory_error(ctx);
+        ndt_decref_offsets(ndim2_offsets);
         return xnd_error;
     }
 
     sum = 0;
+    ptr = (int32_t *)ndim1_offsets->v;
     for (v = 0; v < N; v++) {
-        ndim1_offsets[v] = (int32_t)sum;
+        ptr[v] = (int32_t)sum;
         int64_t n = write_path(NULL, 0, p, N, u, v);
         sum += n;
         if (sum > INT32_MAX) {
             goto offset_overflow;
         }
     }
-    ndim1_offsets[v] = (int32_t)sum;
+    ptr[v] = (int32_t)sum;
 
 
-    t = ndt_from_string("node", ctx);
-    if (t == NULL) {
+    type = ndt_from_string("node", ctx);
+    if (type == NULL) {
         goto error;
     }
 
-    t = ndt_var_dim(t, InternalOffsets, (int32_t)(N+1), ndim1_offsets, 0, NULL, false, ctx);
+    t = ndt_var_dim(type, ndim1_offsets, 0, NULL, false, ctx);
+    ndt_decref_offsets(ndim1_offsets);
     ndim1_offsets = NULL;
     if (t == NULL) {
         goto error;
     }
 
-    t = ndt_var_dim(t, InternalOffsets, 2, ndim2_offsets, 0, NULL, false, ctx);
+    t = ndt_var_dim(t, ndim2_offsets, 0, NULL, false, ctx);
+    ndt_decref_offsets(ndim2_offsets);
     ndim2_offsets = NULL;
     if (t == NULL) {
         goto error;
@@ -244,16 +248,16 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
 
     t = out.type->VarDim.type;
     for (v = 0; v < N; v++) {
-        int32_t shape = t->Concrete.VarDim.offsets[v+1]-t->Concrete.VarDim.offsets[v];
-        char *ptr = out.ptr + t->Concrete.VarDim.offsets[v] * t->Concrete.VarDim.itemsize;
+        int32_t shape = t->Concrete.VarDim.offsets->v[v+1]-t->Concrete.VarDim.offsets->v[v];
+        char *ptr = out.ptr + t->Concrete.VarDim.offsets->v[v] * t->Concrete.VarDim.itemsize;
         (void)write_path((int32_t *)ptr, shape, p, N, u, v);
     }
 
     return out;
 
 error:
-    ndt_free(ndim2_offsets);
-    ndt_free(ndim1_offsets);
+    ndt_decref_offsets(ndim2_offsets);
+    ndt_decref_offsets(ndim1_offsets);
     return xnd_error;
 
 offset_overflow:

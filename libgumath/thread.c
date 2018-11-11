@@ -72,7 +72,7 @@ clear_all_slices(xnd_t *slices[], int *nslices, int stop)
 {
     for (int i = 0; i < stop; i++) {
         for (int k = 0; k < nslices[i]; k++) {
-            ndt_del((ndt_t *)slices[i][k].type);
+            ndt_decref(slices[i][k].type);
         }
         ndt_free(slices[i]);
     }

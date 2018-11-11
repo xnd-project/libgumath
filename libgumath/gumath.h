@@ -76,7 +76,7 @@ typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t 
 
 /* Collection of specialized kernels for a single function signature. */
 typedef struct {
-    ndt_t *sig;
+    const ndt_t *sig;
     const ndt_constraint_t *constraint;
 
     /* Xnd signatures */

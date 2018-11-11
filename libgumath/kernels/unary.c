@@ -47,10 +47,10 @@
 /****************************************************************************/
 
 /* Structured kernel locations for fast lookup. */
-static ndt_t *
+static const ndt_t *
 infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 {
-    ndt_t *dtype;
+    const ndt_t *t, *dtype;
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
@@ -75,14 +75,16 @@ infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
         return NULL;
     }
 
-    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
+    ndt_decref(dtype);
+    return t;
 }
 
 /* Structured kernel locations for fast lookup. */
-static ndt_t *
+static const ndt_t *
 infer_invert_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 {
-    ndt_t *dtype;
+    const ndt_t *t, *dtype;
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
@@ -105,7 +107,9 @@ infer_invert_return(int *base, const ndt_t *in, ndt_context_t *ctx)
         return NULL;
     }
 
-    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
+    ndt_decref(dtype);
+    return t;
 }
 
 
@@ -114,10 +118,10 @@ infer_invert_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 /****************************************************************************/
 
 /* Structured kernel locations for fast lookup. */
-static ndt_t *
+static const ndt_t *
 infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 {
-    ndt_t *dtype;
+    const ndt_t *t, *dtype;
     enum ndt tag;
 
     switch (ndt_dtype(in)->tag) {
@@ -139,7 +143,9 @@ infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
         return NULL;
     }
 
-    return ndt_copy_contiguous_dtype(in, dtype, ctx);
+    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
+    ndt_decref(dtype);
+    return t;
 }
 
 
@@ -150,7 +156,7 @@ infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
 static const gm_kernel_set_t *
 unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
                 const ndt_t *in[], int nin,
-                ndt_t *(*infer)(int *, const ndt_t *, ndt_context_t *),
+                const ndt_t *(*infer)(int *, const ndt_t *, ndt_context_t *),
                 ndt_context_t *ctx)
 {
     const ndt_t *t;

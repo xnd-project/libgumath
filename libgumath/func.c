@@ -73,7 +73,7 @@ gm_func_del(gm_func_t *f)
     ndt_free(f->name);
 
     for (int i = 0; i < f->nkernels; i++) {
-        ndt_del(f->kernels[i].sig);
+        ndt_decref(f->kernels[i].sig);
     }
 
     ndt_free(f);
@@ -101,7 +101,7 @@ gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t *ctx)
 {
     gm_func_t *f = gm_tbl_find(tbl, k->name, ctx);
     gm_kernel_set_t kernel;
-    ndt_t *t;
+    const ndt_t *t;
 
     if (f == NULL) {
         ndt_err_clear(ctx);
@@ -117,7 +117,7 @@ gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t *ctx)
     }
 
     if (f->nkernels == GM_MAX_KERNELS) {
-        ndt_del(t);
+        ndt_decref(t);
         ndt_err_format(ctx, NDT_RuntimeError,
             "%s: maximum number of kernels reached for", f->name);
         return -1;
@@ -141,7 +141,7 @@ gm_add_kernel_typecheck(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t 
 {
     gm_func_t *f = gm_tbl_find(tbl, k->name, ctx);
     gm_kernel_set_t kernel;
-    ndt_t *t;
+    const ndt_t *t;
 
     if (f == NULL) {
         ndt_err_clear(ctx);
@@ -158,7 +158,7 @@ gm_add_kernel_typecheck(gm_tbl_t *tbl, const gm_kernel_init_t *k, ndt_context_t 
     }
 
     if (f->nkernels == GM_MAX_KERNELS) {
-        ndt_del(t);
+        ndt_decref(t);
         ndt_err_format(ctx, NDT_RuntimeError,
             "%s: maximum number of kernels reached for", f->name);
         return -1;

@@ -214,7 +214,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
-            ndt_del(spec.out[i]);
+            ndt_decref(spec.out[i]);
             PyObject *x = Xnd_FromXnd(xnd, &stack[nin+i]);
             stack[nin+i] = xnd_error;
             if (x == NULL) {
@@ -231,7 +231,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     if (spec.nbroadcast > 0) {
         for (i = 0; i < nin; i++) {
-            ndt_del(spec.broadcast[i]);
+            ndt_decref(spec.broadcast[i]);
         }
     }
 

@@ -215,7 +215,7 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 {
     const ndt_t *t0;
     const ndt_t *t1;
-    ndt_t *dtype;
+    const ndt_t *dtype;
     int n;
 
     if (nin != 2) {
@@ -244,12 +244,7 @@ binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 
     const gm_kernel_set_t *set = &f->kernels[n];
 
-    const ndt_t *t = ndt_dtype(set->sig->Function.types[2]);
-    dtype = ndt_copy(t, ctx);
-    if (dtype == NULL) {
-        return NULL;
-    }
-
+    dtype = ndt_dtype(set->sig->Function.types[2]);
     if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
         return NULL;
     }
