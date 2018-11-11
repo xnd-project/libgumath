@@ -201,7 +201,7 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     ptr[1] = (int32_t)N;
 
 
-    ndim1_offsets = ndt_offsets_new(N+1, ctx);
+    ndim1_offsets = ndt_offsets_new((int32_t)(N+1), ctx);
     if (ndim1_offsets == NULL) {
         ndt_decref_offsets(ndim2_offsets);
         return xnd_error;
@@ -249,8 +249,8 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     t = out.type->VarDim.type;
     for (v = 0; v < N; v++) {
         int32_t shape = t->Concrete.VarDim.offsets->v[v+1]-t->Concrete.VarDim.offsets->v[v];
-        char *ptr = out.ptr + t->Concrete.VarDim.offsets->v[v] * t->Concrete.VarDim.itemsize;
-        (void)write_path((int32_t *)ptr, shape, p, N, u, v);
+        char *cp = out.ptr + t->Concrete.VarDim.offsets->v[v] * t->Concrete.VarDim.itemsize;
+        (void)write_path((int32_t *)cp, shape, p, N, u, v);
     }
 
     return out;
