@@ -373,6 +373,109 @@ class TestNumba(unittest.TestCase):
         np.testing.assert_equal(z, c)
 
 
+tinfo = [
+  ("uint8",      (0, 2**8-1)),
+  ("uint16",     (0, 2**16-1)),
+  ("uint32",     (0, 2**32-1)),
+  ("uint64",     (0, 2**64-1)),
+  ("int8",       (-2**7,  2**7-1)),
+  ("int16",      (-2**15, 2**15-1)),
+  ("int32",      (-2**31, 2**31-1)),
+  ("int64",      (-2**63, 2**63-1)),
+  # ("float16",    (-2**11, 2**11)),
+  ("float32",    (-2**24, 2**24)),
+  ("float64",    (-2**53, 2**53)),
+  # ("complex32",  (-2**11, 2**11)),
+  # ("complex64",  (-2**24, 2**24)),
+  # ("complex128", (-2**53, 2**53))
+]
+
+def common_cast(rank1, rank2):
+    min_rank = min(rank1, rank2)
+    max_rank = max(rank1, rank2)
+    t = tinfo[min_rank]
+    u = tinfo[max_rank]
+    for i in range(max_rank, len(tinfo)):
+        w = tinfo[i]
+        if w[1][0] <= t[1][0] and t[1][1] <= w[1][1] and \
+           w[1][0] <= u[1][0] and u[1][1] <= w[1][1]:
+               return w
+    return None
+
+class TestArithmetic(unittest.TestCase):
+
+    def test_add(self):
+        for rank1, t in enumerate(tinfo):
+            for rank2, u in enumerate(tinfo):
+                w = common_cast(rank1, rank2)
+                x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+
+                if w is not None:
+                    z = fn.add(x, y)
+                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, 13, 15])
+                else:
+                    self.assertRaises(ValueError, fn.add, x, y)
+
+    def test_add_opt(self):
+        for rank1, t in enumerate(tinfo):
+            for rank2, u in enumerate(tinfo):
+                w = common_cast(rank1, rank2)
+                x = xnd([0, 1, None, 3, 4, 5, 6, 7], dtype="?" + t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u[0])
+
+                if w is not None:
+                    z = fn.add(x, y)
+                    self.assertEqual(z, [1, 3, None, 7, 9, 11, None, 15])
+                else:
+                    self.assertRaises(ValueError, fn.add, x, y)
+
+
+                x = xnd([0, 1, 2, 3, 4, 5, None, 7], dtype="?" + t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+
+                if w is not None:
+                    z = fn.add(x, y)
+                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, None, 15])
+                else:
+                    self.assertRaises(ValueError, fn.add, x, y)
+
+
+                x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u[0])
+
+                if w is not None:
+                    z = fn.add(x, y)
+                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, None, 15])
+                else:
+                    self.assertRaises(ValueError, fn.add, x, y)
+
+    def test_subtract(self):
+        for rank1, t in enumerate(tinfo):
+            for rank2, u in enumerate(tinfo):
+                w = common_cast(rank1, rank2)
+                x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+
+                if w is not None:
+                    z = fn.subtract(x, y)
+                    self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
+                else:
+                    self.assertRaises(ValueError, fn.subtract, x, y)
+
+    def test_multiply(self):
+        for rank1, t in enumerate(tinfo):
+            for rank2, u in enumerate(tinfo):
+                w = common_cast(rank1, rank2)
+                x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t[0])
+                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+
+                if w is not None:
+                    z = fn.subtract(x, y)
+                    self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
+                else:
+                    self.assertRaises(ValueError, fn.subtract, x, y)
+
 
 ALL_TESTS = [
   TestCall,
@@ -382,6 +485,7 @@ ALL_TESTS = [
   TestBFloat16,
   TestPdist,
   TestNumba,
+  TestArithmetic,
 ]
 
 

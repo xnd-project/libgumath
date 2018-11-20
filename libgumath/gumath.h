@@ -65,7 +65,7 @@
 #endif
 
 
-#define GM_MAX_KERNELS 512
+#define GM_MAX_KERNELS 1024
 
 typedef float float32_t;
 typedef double float64_t;
