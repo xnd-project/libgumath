@@ -41,11 +41,11 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.obj func.obj nploops.obj tbl.obj xndloops.obj unary.obj \
-       binary.obj binary_common.obj bitwise.obj examples.obj graph.obj \
+       binary.obj common.obj bitwise.obj examples.obj graph.obj \
        pdist.obj
 
 SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/nploops.obj .objs/tbl.obj .objs/xndloops.obj \
-              .objs/unary.obj .objs/binary.obj .objs/binary_common.obj .objs/bitwise.obj \
+              .objs/unary.obj .objs/binary.obj .objs/common.obj .objs/bitwise.obj \
               .objs/examples.obj .objs/graph.obj .objs/pdist.obj
 
 
@@ -104,28 +104,28 @@ Makefile xndloops.c gumath.h
 	$(CC) "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c xndloops.c
 
 unary.obj:\
-Makefile kernels\unary.c gumath.h
+Makefile kernels\unary.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\unary.c
 
 .objs\unary.obj:\
-Makefile kernels\unary.c gumath.h
+Makefile kernels\unary.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\unary.c
 
 binary.obj:\
-Makefile kernels\binary.c gumath.h
+Makefile kernels\binary.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\binary.c
 
 .objs\binary.obj:\
-Makefile kernels\binary.c gumath.h
+Makefile kernels\binary.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary.c
 
-binary_common.obj:\
-Makefile kernels\binary_common.c kernels\common.h gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\binary_common.c
+common.obj:\
+Makefile kernels\common.c kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\common.c
 
-.objs\binary_common.obj:\
-Makefile kernels\binary_common.c kernels\common.h gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary_common.c
+.objs\common.obj:\
+Makefile kernels\common.c kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\common.c
 
 bitwise.obj:\
 Makefile kernels\bitwise.c gumath.h

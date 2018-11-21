@@ -373,6 +373,30 @@ class TestNumba(unittest.TestCase):
         np.testing.assert_equal(z, c)
 
 
+class TestUnary(unittest.TestCase):
+
+    def test_acos(self):
+        a = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+        b = [math.acos(x) for x in a]
+
+        x = xnd(a, dtype="float64")
+        y = fn.acos(x)
+        self.assertEqual(y, b)
+
+    def test_acos_opt(self):
+        a = [0, 0.1, 0.2, None, 0.4, 0.5, 0.6, None]
+        b = [math.acos(x) if x is not None else None for x in a]
+
+        x = xnd(a, dtype="?float64")
+        y = fn.acos(x)
+        self.assertEqual(y, b)
+
+    def test_inexact_cast(self):
+        a = [0, 1, 2, 3, 4, 5, 6, 7]
+        x = xnd(a, dtype="int64")
+        self.assertRaises(ValueError, fn.sin, x)
+
+
 tinfo_binary = [
   ("uint8",      (0, 2**8-1)),
   ("uint16",     (0, 2**16-1)),
@@ -427,7 +451,7 @@ def common_cast_bitwise(rank1, rank2):
     return None
 
 
-class TestArithmetic(unittest.TestCase):
+class TestBinary(unittest.TestCase):
 
     def test_add(self):
         for rank1, t in enumerate(tinfo_binary):
@@ -567,7 +591,8 @@ ALL_TESTS = [
   TestBFloat16,
   TestPdist,
   TestNumba,
-  TestArithmetic,
+  TestUnary,
+  TestBinary,
   TestBitwise,
 ]
 

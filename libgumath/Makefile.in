@@ -28,10 +28,10 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o \
-       binary_common.o bitwise.o examples.o bfloat16.o graph.o quaternion.o pdist.o
+       common.o bitwise.o examples.o bfloat16.o graph.o quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
-              .objs/unary.o .objs/binary.o .objs/binary_common.o .objs/bitwise.o .objs/examples.o \
+              .objs/unary.o .objs/binary.o .objs/common.o .objs/bitwise.o .objs/examples.o \
               .objs/bfloat16.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
 
 
@@ -94,28 +94,28 @@ Makefile xndloops.c gumath.h
 	$(CC) $(GM_CFLAGS_SHARED) -c xndloops.c -o .objs/xndloops.o
 
 unary.o:\
-Makefile kernels/unary.c gumath.h
+Makefile kernels/unary.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS) -Wno-absolute-value -c kernels/unary.c
 
 .objs/unary.o:\
-Makefile kernels/unary.c gumath.h
+Makefile kernels/unary.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -Wno-absolute-value -c kernels/unary.c -o .objs/unary.o
 
 binary.o:\
-Makefile kernels/binary.c gumath.h
+Makefile kernels/binary.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS) -c kernels/binary.c
 
 .objs/binary.o:\
-Makefile kernels/binary.c gumath.h
+Makefile kernels/binary.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary.c -o .objs/binary.o
 
-binary_common.o:\
-Makefile kernels/binary_common.c kernels/common.h gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c kernels/binary_common.c
+common.o:\
+Makefile kernels/common.c kernels/common.h gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c kernels/common.c
 
-.objs/binary_common.o:\
-Makefile kernels/binary_common.c kernels/common.h gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary_common.c -o .objs/binary_common.o
+.objs/common.o:\
+Makefile kernels/common.c kernels/common.h gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/common.c -o .objs/common.o
 
 bitwise.o:\
 Makefile kernels/bitwise.c gumath.h

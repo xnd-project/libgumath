@@ -107,42 +107,59 @@ linear_index1D(const xnd_t *x, const int64_t i)
 /*****************************************************************************/
 
 #define XND_UNARY(func, t0, t1) \
-static int                                                                   \
-gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)                \
-{                                                                            \
-    const xnd_t *in0 = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                  \
-    (void)ctx;                                                               \
-                                                                             \
-    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
-    *(t1##_t *)out->ptr = func(x);                                           \
-                                                                             \
-    return 0;                                                                \
-}                                                                            \
-                                                                             \
-static int                                                                   \
-gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
-{                                                                            \
-    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);              \
-    t1##_t *out = (t1##_t *)apply_index(&stack[1]);                          \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                  \
-    (void)ctx;                                                               \
-                                                                             \
-    for (int64_t i = 0; i < N; i++) {                                        \
-        out[i] = func(in0[i]);                                               \
-    }                                                                        \
-                                                                             \
-    return 0;                                                                \
+static int                                                            \
+gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                     \
+    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);       \
+    t1##_t *out = (t1##_t *)apply_index(&stack[1]);                   \
+    int64_t N = xnd_fixed_shape(&stack[0]);                           \
+    (void)ctx;                                                        \
+                                                                      \
+    for (int64_t i = 0; i < N; i++) {                                 \
+        out[i] = func(in0[i]);                                        \
+    }                                                                 \
+                                                                      \
+    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
+        unary_update_bitmap1D(stack);                                 \
+    }                                                                 \
+                                                                      \
+    return 0;                                                         \
+}                                                                     \
+                                                                      \
+static int                                                            \
+gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
+{                                                                     \
+    const xnd_t *in0 = &stack[0];                                     \
+    xnd_t *out = &stack[1];                                           \
+    (void)ctx;                                                        \
+                                                                      \
+    const t0##_t x = *(const t0##_t *)in0->ptr;                       \
+    *(t1##_t *)out->ptr = func(x);                                    \
+                                                                      \
+    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
+        unary_update_bitmap(stack);                                   \
+    }                                                                 \
+                                                                      \
+    return 0;                                                         \
 }
 
 #define XND_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                    \
-    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),       \
-    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                      \
-    .C = gm_##func##_0D_##t0##_##t1 },                              \
-                                                                    \
-  { .name = STRINGIZE(funcname),                                    \
-    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
+  { .name = STRINGIZE(funcname),                                     \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),        \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                       \
+    .C = gm_##func##_0D_##t0##_##t1 },                               \
+                                                                     \
+  { .name = STRINGIZE(funcname),                                     \
+    .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),      \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                       \
+    .C = gm_##func##_0D_##t0##_##t1 },                               \
+                                                                     \
+  { .name = STRINGIZE(funcname),                                     \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),  \
+    .C = gm_##func##_0D_##t0##_##t1 },                               \
+                                                                     \
+  { .name = STRINGIZE(funcname),                                     \
+    .sig = "var... * ?" STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
     .C = gm_##func##_0D_##t0##_##t1 }
 
 
@@ -151,54 +168,54 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
 /*****************************************************************************/
 
 #define XND_BINARY(func, t0, t1, t2, cast) \
-static int                                                                     \
-gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   \
-{                                                                              \
-    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);                \
-    const t1##_t *in1 = (const t1##_t *)apply_index(&stack[1]);                \
-    t2##_t *out = (t2##_t *)apply_index(&stack[2]);                            \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                    \
-    (void)ctx;                                                                 \
-    int64_t i;                                                                 \
-                                                                               \
-    for (i = 0; i < N-7; i += 8) {                                             \
-        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                     \
-        out[i+1] = func((cast##_t)in0[i+1], (cast##_t)in1[i+1]);               \
-        out[i+2] = func((cast##_t)in0[i+2], (cast##_t)in1[i+2]);               \
-        out[i+3] = func((cast##_t)in0[i+3], (cast##_t)in1[i+3]);               \
-        out[i+4] = func((cast##_t)in0[i+4], (cast##_t)in1[i+4]);               \
-        out[i+5] = func((cast##_t)in0[i+5], (cast##_t)in1[i+5]);               \
-        out[i+6] = func((cast##_t)in0[i+6], (cast##_t)in1[i+6]);               \
-        out[i+7] = func((cast##_t)in0[i+7], (cast##_t)in1[i+7]);               \
-    }                                                                          \
-    for (; i < N; i++) {                                                       \
-        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                     \
-    }                                                                          \
-                                                                               \
-    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                           \
-        binary_update_bitmap1D(stack);                                         \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
-}                                                                              \
-                                                                               \
-static int                                                                     \
-gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
-{                                                                              \
-    const xnd_t *in0 = &stack[0];                                              \
-    const xnd_t *in1 = &stack[1];                                              \
-    xnd_t *out = &stack[2];                                                    \
-    (void)ctx;                                                                 \
-                                                                               \
-    const t0##_t x = *(const t0##_t *)in0->ptr;                                \
-    const t1##_t y = *(const t1##_t *)in1->ptr;                                \
-    *(t2##_t *)out->ptr = func((cast##_t)x, (cast##_t)y);                      \
-                                                                               \
-    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                           \
-        binary_update_bitmap(stack);                                           \
-    }                                                                          \
-                                                                               \
-    return 0;                                                                  \
+static int                                                                   \
+gm_fixed_##func##_1D_C_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                            \
+    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);              \
+    const t1##_t *in1 = (const t1##_t *)apply_index(&stack[1]);              \
+    t2##_t *out = (t2##_t *)apply_index(&stack[2]);                          \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                  \
+    (void)ctx;                                                               \
+    int64_t i;                                                               \
+                                                                             \
+    for (i = 0; i < N-7; i += 8) {                                           \
+        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                   \
+        out[i+1] = func((cast##_t)in0[i+1], (cast##_t)in1[i+1]);             \
+        out[i+2] = func((cast##_t)in0[i+2], (cast##_t)in1[i+2]);             \
+        out[i+3] = func((cast##_t)in0[i+3], (cast##_t)in1[i+3]);             \
+        out[i+4] = func((cast##_t)in0[i+4], (cast##_t)in1[i+4]);             \
+        out[i+5] = func((cast##_t)in0[i+5], (cast##_t)in1[i+5]);             \
+        out[i+6] = func((cast##_t)in0[i+6], (cast##_t)in1[i+6]);             \
+        out[i+7] = func((cast##_t)in0[i+7], (cast##_t)in1[i+7]);             \
+    }                                                                        \
+    for (; i < N; i++) {                                                     \
+        out[i] = func((cast##_t)in0[i], (cast##_t)in1[i]);                   \
+    }                                                                        \
+                                                                             \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                         \
+        binary_update_bitmap1D(stack);                                       \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
+{                                                                            \
+    const xnd_t *in0 = &stack[0];                                            \
+    const xnd_t *in1 = &stack[1];                                            \
+    xnd_t *out = &stack[2];                                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
+    const t1##_t y = *(const t1##_t *)in1->ptr;                              \
+    *(t2##_t *)out->ptr = func((cast##_t)x, (cast##_t)y);                    \
+                                                                             \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                         \
+        binary_update_bitmap(stack);                                         \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
 }
 
 #define XND_BINARY_INIT(func, t0, t1, t2) \
@@ -246,11 +263,19 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
 /* LOCAL SCOPE */
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_START)
 
-const gm_kernel_set_t *binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                                        int (*)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
-                                        const ndt_t *in[], int nin, ndt_context_t *ctx);
+void unary_update_bitmap1D(xnd_t stack[]);
+void unary_update_bitmap(xnd_t stack[]);
+
 void binary_update_bitmap1D(xnd_t stack[]);
 void binary_update_bitmap(xnd_t stack[]);
+
+const gm_kernel_set_t *unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+                                       ndt_apply_spec_t *spec, const gm_func_t *f,
+                                       const ndt_t *in[], int nin, ndt_context_t *ctx);
+
+const gm_kernel_set_t *binary_typecheck(int (*kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
+                                        ndt_apply_spec_t *spec, const gm_func_t *f,
+                                        const ndt_t *in[], int nin, ndt_context_t *ctx);
 
 /* END LOCAL SCOPE */
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_END)

@@ -44,196 +44,80 @@
 
 
 /****************************************************************************/
-/*                        Optimized dispatch (T -> T)                       */
+/*                    Kernel locations for optimized lookup                 */
 /****************************************************************************/
 
-/* Structured kernel locations for fast lookup. */
-static const ndt_t *
-infer_id_return(int *base, const ndt_t *in, ndt_context_t *ctx)
+static int
+id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
-    const ndt_t *t, *dtype;
-    enum ndt tag;
-
-    switch (ndt_dtype(in)->tag) {
-    case Bool: *base = 0; tag = Bool; break;
-    case Int8: *base = 2; tag = Int8; break;
-    case Int16: *base = 4; tag = Int16; break;
-    case Int32: *base = 6; tag = Int32; break;
-    case Int64: *base = 8; tag = Int64; break;
-    case Uint8: *base = 10; tag = Uint8; break;
-    case Uint16: *base = 12; tag = Uint16; break;
-    case Uint32: *base = 14; tag = Uint32; break;
-    case Uint64: *base = 16; tag = Uint64; break;
-    case Float32: *base = 18; tag = Float32; break;
-    case Float64: *base = 20; tag = Float64; break;
-    default:
-        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
-        return NULL;
-    }
-
-    dtype = ndt_primitive(tag, 0, ctx);
-    if (dtype == NULL) {
-        return NULL;
-    }
-
-    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
-    ndt_decref(dtype);
-    return t;
-}
-
-/* Structured kernel locations for fast lookup. */
-static const ndt_t *
-infer_invert_return(int *base, const ndt_t *in, ndt_context_t *ctx)
-{
-    const ndt_t *t, *dtype;
-    enum ndt tag;
-
-    switch (ndt_dtype(in)->tag) {
-    case Bool: *base = 0; tag = Bool; break;
-    case Int8: *base = 2; tag = Int8; break;
-    case Int16: *base = 4; tag = Int16; break;
-    case Int32: *base = 6; tag = Int32; break;
-    case Int64: *base = 8; tag = Int64; break;
-    case Uint8: *base = 10; tag = Uint8; break;
-    case Uint16: *base = 12; tag = Uint16; break;
-    case Uint32: *base = 14; tag = Uint32; break;
-    case Uint64: *base = 16; tag = Uint64; break;
-    default:
-        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
-        return NULL;
-    }
-
-    dtype = ndt_primitive(tag, 0, ctx);
-    if (dtype == NULL) {
-        return NULL;
-    }
-
-    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
-    ndt_decref(dtype);
-    return t;
-}
-
-
-/****************************************************************************/
-/*                   Optimized dispatch (float return values)               */
-/****************************************************************************/
-
-/* Structured kernel locations for fast lookup. */
-static const ndt_t *
-infer_float_return(int *base, const ndt_t *in, ndt_context_t *ctx)
-{
-    const ndt_t *t, *dtype;
-    enum ndt tag;
-
-    switch (ndt_dtype(in)->tag) {
-    case Int8: *base = 0; tag = Float32; break;
-    case Int16: *base = 2; tag = Float32; break;
-    case Uint8: *base = 4; tag = Float32; break;
-    case Uint16: *base = 6; tag = Float32; break;
-    case Float32: *base = 8; tag = Float32; break;
-    case Int32: *base = 10; tag = Float64; break;
-    case Uint32: *base = 12; tag = Float64; break;
-    case Float64: *base = 14; tag = Float64; break;
-    default:
-        ndt_err_format(ctx, NDT_RuntimeError, "invalid dtype");
-        return NULL;
-    }
-
-    dtype = ndt_primitive(tag, 0, ctx);
-    if (dtype == NULL) {
-        return NULL;
-    }
-
-    t = ndt_copy_contiguous_dtype(in, dtype, ctx);
-    ndt_decref(dtype);
-    return t;
-}
-
-
-/****************************************************************************/
-/*                             Optimized typecheck                          */
-/****************************************************************************/
-
-static const gm_kernel_set_t *
-unary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                const ndt_t *in[], int nin,
-                const ndt_t *(*infer)(int *, const ndt_t *, ndt_context_t *),
-                ndt_context_t *ctx)
-{
-    const ndt_t *t;
-    int n;
-
-    if (nin != 1) {
-        ndt_err_format(ctx, NDT_ValueError,
-            "invalid number of arguments for %s(x): expected 1, got %d",
-            f->name, nin);
-        return NULL;
-    }
-    t = in[0];
-    assert(ndt_is_concrete(t));
-
-    spec->out[0] = infer(&n, t, ctx);
-    if (spec->out[0] == NULL) {
-        return NULL;
-    }
-    spec->nout = 1;
-    spec->nbroadcast = 0;
+    const ndt_t *t = ndt_dtype(in);
 
     switch (t->tag) {
-    case FixedDim:
-        spec->flags = NDT_C|NDT_STRIDED;
-        spec->outer_dims = t->ndim;
-        if (ndt_is_c_contiguous(ndt_dim_at(t, t->ndim-1))) {
-            spec->flags |= NDT_ELEMWISE_1D;
-        }
-        return &f->kernels[n];
-    case VarDim:
-        spec->flags = NDT_C;
-        spec->outer_dims = t->ndim;
-        return &f->kernels[n+1];
+    case Bool: return 0;
+    case Int8: return 4;
+    case Int16: return 8;
+    case Int32: return 12;
+    case Int64: return 16;
+    case Uint8: return 20;
+    case Uint16: return 24;
+    case Uint32: return 28;
+    case Uint64: return 32;
+    case Float32: return 36;
+    case Float64: return 40;
     default:
-        assert(t->ndim == 0);
-        spec->flags = NDT_C|NDT_STRIDED;
-        spec->outer_dims = 0;
-        return &f->kernels[n];
+        ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
+        return -1;
     }
 }
 
-static const gm_kernel_set_t *
-unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                   const ndt_t *in[], int nin,
-                   ndt_context_t *ctx)
+static int
+invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
-    return unary_typecheck(spec, f, in, nin, infer_id_return, ctx);
+    const ndt_t *t = ndt_dtype(in);
+
+    switch (t->tag) {
+    case Bool: return 0;
+    case Int8: return 4;
+    case Int16: return 8;
+    case Int32: return 12;
+    case Int64: return 16;
+    case Uint8: return 20;
+    case Uint16: return 24;
+    case Uint32: return 28;
+    case Uint64: return 32;
+    default:
+        ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
+        return -1;
+    }
 }
 
-static const gm_kernel_set_t *
-unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                   const ndt_t *in[], int nin,
-                   ndt_context_t *ctx)
+static int
+math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
-    return unary_typecheck(spec, f, in, nin, infer_invert_return, ctx);
+    const ndt_t *t = ndt_dtype(in);
+
+    switch (t->tag) {
+    case Int8: return 0;
+    case Int16: return 4;
+    case Uint8: return 8;
+    case Uint16: return 12;
+    case Float32: return 16;
+    case Int32: return 20;
+    case Uint32: return 24;
+    case Float64: return 28;
+    default:
+        ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
+        return -1;
+    }
 }
 
-static const gm_kernel_set_t *
-unary_float_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                      const ndt_t *in[], int nin,
-                      ndt_context_t *ctx)
-{
-    return unary_typecheck(spec, f, in, nin, infer_float_return, ctx);
-}
-
- 
-/****************************************************************************/
-/*                           Generated Xnd kernels                          */
-/****************************************************************************/
-
-#undef bool
-#define bool_t _Bool
 
 /*****************************************************************************/
 /*                                   Copy                                    */
 /*****************************************************************************/
+
+#undef bool
+#define bool_t _Bool
 
 #define copy(x) x
 XND_UNARY(copy, bool, bool)
@@ -247,6 +131,24 @@ XND_UNARY(copy, uint32, uint32)
 XND_UNARY(copy, uint64, uint64)
 XND_UNARY(copy, float32, float32)
 XND_UNARY(copy, float64, float64)
+
+static const gm_kernel_init_t unary_id[] = {
+  /* COPY */
+  XND_UNARY_INIT(copy, copy, bool, bool),
+  XND_UNARY_INIT(copy, copy, int8, int8),
+  XND_UNARY_INIT(copy, copy, int16, int16),
+  XND_UNARY_INIT(copy, copy, int32, int32),
+  XND_UNARY_INIT(copy, copy, int64, int64),
+  XND_UNARY_INIT(copy, copy, uint8, uint8),
+  XND_UNARY_INIT(copy, copy, uint16, uint16),
+  XND_UNARY_INIT(copy, copy, uint32, uint32),
+  XND_UNARY_INIT(copy, copy, uint64, uint64),
+  XND_UNARY_INIT(copy, copy, float32, float32),
+  XND_UNARY_INIT(copy, copy, float64, float64),
+
+  { .name = NULL, .sig = NULL }
+};
+
 
 /*****************************************************************************/
 /*                              Bitwise NOT                                  */
@@ -265,23 +167,6 @@ XND_UNARY(invert, uint16, uint16)
 XND_UNARY(invert, uint32, uint32)
 XND_UNARY(invert, uint64, uint64)
 
-
-static const gm_kernel_init_t unary_id[] = {
-  /* COPY */
-  XND_UNARY_INIT(copy, copy, bool, bool),
-  XND_UNARY_INIT(copy, copy, int8, int8),
-  XND_UNARY_INIT(copy, copy, int16, int16),
-  XND_UNARY_INIT(copy, copy, int32, int32),
-  XND_UNARY_INIT(copy, copy, int64, int64),
-  XND_UNARY_INIT(copy, copy, uint8, uint8),
-  XND_UNARY_INIT(copy, copy, uint16, uint16),
-  XND_UNARY_INIT(copy, copy, uint32, uint32),
-  XND_UNARY_INIT(copy, copy, uint64, uint64),
-  XND_UNARY_INIT(copy, copy, float32, float32),
-  XND_UNARY_INIT(copy, copy, float64, float64),
-
-  { .name = NULL, .sig = NULL }
-};
 
 static const gm_kernel_init_t unary_invert[] = {
   /* INVERT */
@@ -303,7 +188,7 @@ static const gm_kernel_init_t unary_invert[] = {
 /*                                   Math                                   */
 /*****************************************************************************/
 
-#define XND_ALL_UNARY_FLOAT(name) \
+#define XND_ALL_UNARY_MATH(name) \
     XND_UNARY(name##f, int8, float32)    \
     XND_UNARY(name##f, int16, float32)   \
     XND_UNARY(name##f, uint8, float32)   \
@@ -313,7 +198,7 @@ static const gm_kernel_init_t unary_invert[] = {
     XND_UNARY(name, uint32, float64)     \
     XND_UNARY(name, float64, float64)
 
-#define XND_ALL_UNARY_FLOAT_INIT(name) \
+#define XND_ALL_UNARY_MATH_INIT(name) \
     XND_UNARY_INIT(name, name##f, int8, float32),    \
     XND_UNARY_INIT(name, name##f, int16, float32),   \
     XND_UNARY_INIT(name, name##f, uint8, float32),   \
@@ -328,130 +213,130 @@ static const gm_kernel_init_t unary_invert[] = {
 /*                                Abs functions                              */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(fabs)
+XND_ALL_UNARY_MATH(fabs)
 
 
 /*****************************************************************************/
 /*                             Exponential functions                         */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(exp)
-XND_ALL_UNARY_FLOAT(exp2)
-XND_ALL_UNARY_FLOAT(expm1)
+XND_ALL_UNARY_MATH(exp)
+XND_ALL_UNARY_MATH(exp2)
+XND_ALL_UNARY_MATH(expm1)
 
 
 /*****************************************************************************/
 /*                              Logarithm functions                          */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(log)
-XND_ALL_UNARY_FLOAT(log2)
-XND_ALL_UNARY_FLOAT(log10)
-XND_ALL_UNARY_FLOAT(log1p)
-XND_ALL_UNARY_FLOAT(logb)
+XND_ALL_UNARY_MATH(log)
+XND_ALL_UNARY_MATH(log2)
+XND_ALL_UNARY_MATH(log10)
+XND_ALL_UNARY_MATH(log1p)
+XND_ALL_UNARY_MATH(logb)
 
 
 /*****************************************************************************/
 /*                              Power functions                              */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(sqrt)
-XND_ALL_UNARY_FLOAT(cbrt)
+XND_ALL_UNARY_MATH(sqrt)
+XND_ALL_UNARY_MATH(cbrt)
 
 
 /*****************************************************************************/
 /*                           Trigonometric functions                         */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(sin)
-XND_ALL_UNARY_FLOAT(cos)
-XND_ALL_UNARY_FLOAT(tan)
-XND_ALL_UNARY_FLOAT(asin)
-XND_ALL_UNARY_FLOAT(acos)
-XND_ALL_UNARY_FLOAT(atan)
+XND_ALL_UNARY_MATH(sin)
+XND_ALL_UNARY_MATH(cos)
+XND_ALL_UNARY_MATH(tan)
+XND_ALL_UNARY_MATH(asin)
+XND_ALL_UNARY_MATH(acos)
+XND_ALL_UNARY_MATH(atan)
 
 
 /*****************************************************************************/
 /*                             Hyperbolic functions                          */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(sinh)
-XND_ALL_UNARY_FLOAT(cosh)
-XND_ALL_UNARY_FLOAT(tanh)
-XND_ALL_UNARY_FLOAT(asinh)
-XND_ALL_UNARY_FLOAT(acosh)
-XND_ALL_UNARY_FLOAT(atanh)
+XND_ALL_UNARY_MATH(sinh)
+XND_ALL_UNARY_MATH(cosh)
+XND_ALL_UNARY_MATH(tanh)
+XND_ALL_UNARY_MATH(asinh)
+XND_ALL_UNARY_MATH(acosh)
+XND_ALL_UNARY_MATH(atanh)
 
 
 /*****************************************************************************/
 /*                            Error and gamma functions                      */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(erf)
-XND_ALL_UNARY_FLOAT(erfc)
-XND_ALL_UNARY_FLOAT(lgamma)
-XND_ALL_UNARY_FLOAT(tgamma)
+XND_ALL_UNARY_MATH(erf)
+XND_ALL_UNARY_MATH(erfc)
+XND_ALL_UNARY_MATH(lgamma)
+XND_ALL_UNARY_MATH(tgamma)
 
 
 /*****************************************************************************/
 /*                              Ceiling, floor, trunc                        */
 /*****************************************************************************/
 
-XND_ALL_UNARY_FLOAT(ceil)
-XND_ALL_UNARY_FLOAT(floor)
-XND_ALL_UNARY_FLOAT(trunc)
-XND_ALL_UNARY_FLOAT(round)
-XND_ALL_UNARY_FLOAT(nearbyint)
+XND_ALL_UNARY_MATH(ceil)
+XND_ALL_UNARY_MATH(floor)
+XND_ALL_UNARY_MATH(trunc)
+XND_ALL_UNARY_MATH(round)
+XND_ALL_UNARY_MATH(nearbyint)
 
 
 static const gm_kernel_init_t unary_float[] = {
   /* ABS */
-  XND_ALL_UNARY_FLOAT_INIT(fabs),
+  XND_ALL_UNARY_MATH_INIT(fabs),
 
   /* EXPONENTIAL */
-  XND_ALL_UNARY_FLOAT_INIT(exp),
-  XND_ALL_UNARY_FLOAT_INIT(exp2),
-  XND_ALL_UNARY_FLOAT_INIT(expm1),
+  XND_ALL_UNARY_MATH_INIT(exp),
+  XND_ALL_UNARY_MATH_INIT(exp2),
+  XND_ALL_UNARY_MATH_INIT(expm1),
 
   /* LOGARITHM */
-  XND_ALL_UNARY_FLOAT_INIT(log),
-  XND_ALL_UNARY_FLOAT_INIT(log2),
-  XND_ALL_UNARY_FLOAT_INIT(log10),
-  XND_ALL_UNARY_FLOAT_INIT(log1p),
-  XND_ALL_UNARY_FLOAT_INIT(logb),
+  XND_ALL_UNARY_MATH_INIT(log),
+  XND_ALL_UNARY_MATH_INIT(log2),
+  XND_ALL_UNARY_MATH_INIT(log10),
+  XND_ALL_UNARY_MATH_INIT(log1p),
+  XND_ALL_UNARY_MATH_INIT(logb),
 
   /* POWER */
-  XND_ALL_UNARY_FLOAT_INIT(sqrt),
-  XND_ALL_UNARY_FLOAT_INIT(cbrt),
+  XND_ALL_UNARY_MATH_INIT(sqrt),
+  XND_ALL_UNARY_MATH_INIT(cbrt),
 
   /* TRIGONOMETRIC */
-  XND_ALL_UNARY_FLOAT_INIT(sin),
-  XND_ALL_UNARY_FLOAT_INIT(cos),
-  XND_ALL_UNARY_FLOAT_INIT(tan),
-  XND_ALL_UNARY_FLOAT_INIT(asin),
-  XND_ALL_UNARY_FLOAT_INIT(acos),
-  XND_ALL_UNARY_FLOAT_INIT(atan),
+  XND_ALL_UNARY_MATH_INIT(sin),
+  XND_ALL_UNARY_MATH_INIT(cos),
+  XND_ALL_UNARY_MATH_INIT(tan),
+  XND_ALL_UNARY_MATH_INIT(asin),
+  XND_ALL_UNARY_MATH_INIT(acos),
+  XND_ALL_UNARY_MATH_INIT(atan),
 
   /* HYPERBOLIC */
-  XND_ALL_UNARY_FLOAT_INIT(sinh),
-  XND_ALL_UNARY_FLOAT_INIT(cosh),
-  XND_ALL_UNARY_FLOAT_INIT(tanh),
-  XND_ALL_UNARY_FLOAT_INIT(asinh),
-  XND_ALL_UNARY_FLOAT_INIT(acosh),
-  XND_ALL_UNARY_FLOAT_INIT(atanh),
+  XND_ALL_UNARY_MATH_INIT(sinh),
+  XND_ALL_UNARY_MATH_INIT(cosh),
+  XND_ALL_UNARY_MATH_INIT(tanh),
+  XND_ALL_UNARY_MATH_INIT(asinh),
+  XND_ALL_UNARY_MATH_INIT(acosh),
+  XND_ALL_UNARY_MATH_INIT(atanh),
 
   /* ERROR AND GAMMA */
-  XND_ALL_UNARY_FLOAT_INIT(erf),
-  XND_ALL_UNARY_FLOAT_INIT(erfc),
-  XND_ALL_UNARY_FLOAT_INIT(lgamma),
-  XND_ALL_UNARY_FLOAT_INIT(tgamma),
+  XND_ALL_UNARY_MATH_INIT(erf),
+  XND_ALL_UNARY_MATH_INIT(erfc),
+  XND_ALL_UNARY_MATH_INIT(lgamma),
+  XND_ALL_UNARY_MATH_INIT(tgamma),
 
   /* CEILING, FLOOR, TRUNC */
-  XND_ALL_UNARY_FLOAT_INIT(ceil),
-  XND_ALL_UNARY_FLOAT_INIT(floor),
-  XND_ALL_UNARY_FLOAT_INIT(trunc),
-  XND_ALL_UNARY_FLOAT_INIT(round),
-  XND_ALL_UNARY_FLOAT_INIT(nearbyint),
+  XND_ALL_UNARY_MATH_INIT(ceil),
+  XND_ALL_UNARY_MATH_INIT(floor),
+  XND_ALL_UNARY_MATH_INIT(trunc),
+  XND_ALL_UNARY_MATH_INIT(round),
+  XND_ALL_UNARY_MATH_INIT(nearbyint),
 
   { .name = NULL, .sig = NULL }
 };
@@ -460,6 +345,30 @@ static const gm_kernel_init_t unary_float[] = {
 /****************************************************************************/
 /*                       Initialize kernel table                            */
 /****************************************************************************/
+
+static const gm_kernel_set_t *
+unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                   const ndt_t *in[], int nin,
+                   ndt_context_t *ctx)
+{
+    return unary_typecheck(id_kernel_location, spec, f, in, nin, ctx);
+}
+
+static const gm_kernel_set_t *
+unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                       const ndt_t *in[], int nin,
+                       ndt_context_t *ctx)
+{
+    return unary_typecheck(invert_kernel_location, spec, f, in, nin, ctx);
+}
+
+static const gm_kernel_set_t *
+unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                      const ndt_t *in[], int nin,
+                      ndt_context_t *ctx)
+{
+    return unary_typecheck(math_kernel_location, spec, f, in, nin, ctx);
+}
 
 int
 gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
@@ -479,7 +388,7 @@ gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
     }
 
     for (k = unary_float; k->name != NULL; k++) {
-        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_float_typecheck) < 0) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_math_typecheck) < 0) {
             return -1;
         }
     }
