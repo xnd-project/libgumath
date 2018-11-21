@@ -69,6 +69,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 64;
         case Float64: return 72;
+
         default: goto invalid_combination;
         }
     }
@@ -86,6 +87,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 144;
         case Float64: return 152;
+
         default: goto invalid_combination;
         }
     }
@@ -103,6 +105,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 224;
         case Float64: return 232;
+
         default: goto invalid_combination;
         }
     }
@@ -112,6 +115,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         case Uint16: return 248;
         case Uint32: return 256;
         case Uint64: return 264;
+
         default: goto invalid_combination;
         }
     }
@@ -129,6 +133,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 328;
         case Float64: return 336;
+
         default: goto invalid_combination;
         }
     }
@@ -145,6 +150,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 400;
         case Float64: return 408;
+
         default: goto invalid_combination;
         }
     }
@@ -161,6 +167,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 472;
         case Float64: return 480;
+
         default: goto invalid_combination;
         }
     }
@@ -191,6 +198,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 592;
         case Float64: return 600;
+
         default: goto invalid_combination;
         }
     }
@@ -206,6 +214,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
         case Float32: return 656;
         case Float64: return 664;
+
         default: goto invalid_combination;
         }
     }
