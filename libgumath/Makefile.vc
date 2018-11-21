@@ -120,11 +120,11 @@ Makefile kernels\binary.c gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary.c
 
 binary_common.obj:\
-Makefile kernels\binary_common.c kernels\binary_common.h gumath.h
+Makefile kernels\binary_common.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\binary_common.c
 
 .objs\binary_common.obj:\
-Makefile kernels\binary_common.c kernels\binary_common.h gumath.h
+Makefile kernels\binary_common.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary_common.c
 
 bitwise.obj:\

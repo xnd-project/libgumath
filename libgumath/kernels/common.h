@@ -42,19 +42,28 @@
 #include "gumath.h"
 
 
-#ifndef BINARY_COMMON_H
-#define BINARY_COMMON_H
+#ifndef COMMON_H
+#define COMMON_H
 
 
 #define XSTRINGIZE(v) #v
 #define STRINGIZE(v) XSTRINGIZE(v)
 
 
+/*****************************************************************************/
+/*              Apply linear index to the data pointer (1D kernels)          */
+/*****************************************************************************/
+
 static inline char *
 apply_index(const xnd_t *x)
 {
     return xnd_fixed_apply_index(x);
 }
+
+
+/*****************************************************************************/
+/*                          Optimized bitmap handling                        */
+/*****************************************************************************/
 
 static inline uint8_t *
 get_bitmap(const xnd_t *x)
@@ -92,6 +101,54 @@ linear_index1D(const xnd_t *x, const int64_t i)
     return x->index + step;
 }
 
+
+/*****************************************************************************/
+/*                         Generate unary kernels                            */
+/*****************************************************************************/
+
+#define XND_UNARY(func, t0, t1) \
+static int                                                                   \
+gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)                \
+{                                                                            \
+    const xnd_t *in0 = &stack[0];                                            \
+    xnd_t *out = &stack[1];                                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
+    *(t1##_t *)out->ptr = func(x);                                           \
+                                                                             \
+    return 0;                                                                \
+}                                                                            \
+                                                                             \
+static int                                                                   \
+gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
+{                                                                            \
+    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);              \
+    t1##_t *out = (t1##_t *)apply_index(&stack[1]);                          \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                  \
+    (void)ctx;                                                               \
+                                                                             \
+    for (int64_t i = 0; i < N; i++) {                                        \
+        out[i] = func(in0[i]);                                               \
+    }                                                                        \
+                                                                             \
+    return 0;                                                                \
+}
+
+#define XND_UNARY_INIT(funcname, func, t0, t1) \
+  { .name = STRINGIZE(funcname),                                    \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),       \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                      \
+    .C = gm_##func##_0D_##t0##_##t1 },                              \
+                                                                    \
+  { .name = STRINGIZE(funcname),                                    \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
+    .C = gm_##func##_0D_##t0##_##t1 }
+
+
+/*****************************************************************************/
+/*                         Generate binary kernels                           */
+/*****************************************************************************/
 
 #define XND_BINARY(func, t0, t1, t2, cast) \
 static int                                                                     \
@@ -182,6 +239,10 @@ gm_##func##_0D_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)           \
     .C = gm_##func##_0D_##t0##_##t1##_##t2 }
 
 
+/*****************************************************************************/
+/*                              Binary typecheck                             */
+/*****************************************************************************/
+
 /* LOCAL SCOPE */
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_START)
 
@@ -195,4 +256,4 @@ void binary_update_bitmap(xnd_t stack[]);
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_END)
 
 
-#endif /* BINARY_COMMON_H */
+#endif /* COMMON_H */

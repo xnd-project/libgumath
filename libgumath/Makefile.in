@@ -110,11 +110,11 @@ Makefile kernels/binary.c gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary.c -o .objs/binary.o
 
 binary_common.o:\
-Makefile kernels/binary_common.c kernels/binary_common.h gumath.h
+Makefile kernels/binary_common.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS) -c kernels/binary_common.c
 
 .objs/binary_common.o:\
-Makefile kernels/binary_common.c kernels/binary_common.h gumath.h
+Makefile kernels/binary_common.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/binary_common.c -o .objs/binary_common.o
 
 bitwise.o:\

@@ -40,6 +40,7 @@
 #include "ndtypes.h"
 #include "xnd.h"
 #include "gumath.h"
+#include "common.h"
 
 
 /****************************************************************************/
@@ -226,55 +227,6 @@ unary_float_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 /****************************************************************************/
 /*                           Generated Xnd kernels                          */
 /****************************************************************************/
-
-#define XSTRINGIZE(v) #v
-#define STRINGIZE(v) XSTRINGIZE(v)
-
-static inline char *
-apply_index(const xnd_t *x)
-{
-    return xnd_fixed_apply_index(x);
-}
-
-
-#define XND_UNARY(func, t0, t1) \
-static int                                                                   \
-gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)                \
-{                                                                            \
-    const xnd_t *in0 = &stack[0];                                            \
-    xnd_t *out = &stack[1];                                                  \
-    (void)ctx;                                                               \
-                                                                             \
-    const t0##_t x = *(const t0##_t *)in0->ptr;                              \
-    *(t1##_t *)out->ptr = func(x);                                           \
-                                                                             \
-    return 0;                                                                \
-}                                                                            \
-                                                                             \
-static int                                                                   \
-gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)        \
-{                                                                            \
-    const t0##_t *in0 = (const t0##_t *)apply_index(&stack[0]);              \
-    t1##_t *out = (t1##_t *)apply_index(&stack[1]);                          \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                  \
-    (void)ctx;                                                               \
-                                                                             \
-    for (int64_t i = 0; i < N; i++) {                                        \
-        out[i] = func(in0[i]);                                               \
-    }                                                                        \
-                                                                             \
-    return 0;                                                                \
-}
-
-#define XND_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                    \
-    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),       \
-    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                      \
-    .C = gm_##func##_0D_##t0##_##t1 },                              \
-                                                                    \
-  { .name = STRINGIZE(funcname),                                    \
-    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
-    .C = gm_##func##_0D_##t0##_##t1 }
 
 #undef bool
 #define bool_t _Bool

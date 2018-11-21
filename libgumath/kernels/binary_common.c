@@ -40,7 +40,7 @@
 #include "ndtypes.h"
 #include "xnd.h"
 #include "gumath.h"
-#include "binary_common.h"
+#include "common.h"
 
 
 /****************************************************************************/
