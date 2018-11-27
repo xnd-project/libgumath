@@ -106,7 +106,7 @@ linear_index1D(const xnd_t *x, const int64_t i)
 /*                         Generate unary kernels                            */
 /*****************************************************************************/
 
-#define XND_UNARY(func, t0, t1) \
+#define XND_UNARY(func, t0, cast, t1) \
 static int                                                            \
 gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                     \
@@ -116,7 +116,7 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
     (void)ctx;                                                        \
                                                                       \
     for (int64_t i = 0; i < N; i++) {                                 \
-        out[i] = func(in0[i]);                                        \
+        out[i] = func((cast##_t)in0[i]);                                        \
     }                                                                 \
                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
@@ -134,7 +134,7 @@ gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     (void)ctx;                                                        \
                                                                       \
     const t0##_t x = *(const t0##_t *)in0->ptr;                       \
-    *(t1##_t *)out->ptr = func(x);                                    \
+    *(t1##_t *)out->ptr = func((cast##_t)x);                                    \
                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
         unary_update_bitmap(stack);                                   \
