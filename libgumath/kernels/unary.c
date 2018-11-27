@@ -92,6 +92,27 @@ invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 }
 
 static int
+negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
+{
+    const ndt_t *t = ndt_dtype(in);
+
+    switch (t->tag) {
+    case Int8: return 0;
+    case Int16: return 4;
+    case Int32: return 8;
+    case Int64: return 12;
+    case Uint8: return 16;
+    case Uint16: return 20;
+    case Uint32: return 24;
+    case Float32: return 28;
+    case Float64: return 32;
+    default:
+        ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
+        return -1;
+    }
+}
+
+static int
 math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
@@ -120,17 +141,17 @@ math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 #define bool_t _Bool
 
 #define copy(x) x
-XND_UNARY(copy, bool, bool)
-XND_UNARY(copy, int8, int8)
-XND_UNARY(copy, int16, int16)
-XND_UNARY(copy, int32, int32)
-XND_UNARY(copy, int64, int64)
-XND_UNARY(copy, uint8, uint8)
-XND_UNARY(copy, uint16, uint16)
-XND_UNARY(copy, uint32, uint32)
-XND_UNARY(copy, uint64, uint64)
-XND_UNARY(copy, float32, float32)
-XND_UNARY(copy, float64, float64)
+XND_UNARY(copy, bool, bool, bool)
+XND_UNARY(copy, int8, int8, int8)
+XND_UNARY(copy, int16, int16, int16)
+XND_UNARY(copy, int32, int32, int32)
+XND_UNARY(copy, int64, int64, int64)
+XND_UNARY(copy, uint8, uint8, uint8)
+XND_UNARY(copy, uint16, uint16, uint16)
+XND_UNARY(copy, uint32, uint32, uint32)
+XND_UNARY(copy, uint64, uint64, uint64)
+XND_UNARY(copy, float32, float32, float32)
+XND_UNARY(copy, float64, float64, float64)
 
 static const gm_kernel_init_t unary_id[] = {
   /* COPY */
@@ -155,17 +176,17 @@ static const gm_kernel_init_t unary_id[] = {
 /*****************************************************************************/
 
 #define invert(x) !x
-XND_UNARY(invert, bool, bool)
+XND_UNARY(invert, bool, bool, bool)
 #undef invert
 #define invert(x) ~x
-XND_UNARY(invert, int8, int8)
-XND_UNARY(invert, int16, int16)
-XND_UNARY(invert, int32, int32)
-XND_UNARY(invert, int64, int64)
-XND_UNARY(invert, uint8, uint8)
-XND_UNARY(invert, uint16, uint16)
-XND_UNARY(invert, uint32, uint32)
-XND_UNARY(invert, uint64, uint64)
+XND_UNARY(invert, int8, int8, int8)
+XND_UNARY(invert, int16, int16, int16)
+XND_UNARY(invert, int32, int32, int32)
+XND_UNARY(invert, int64, int64, int64)
+XND_UNARY(invert, uint8, uint8, uint8)
+XND_UNARY(invert, uint16, uint16, uint16)
+XND_UNARY(invert, uint32, uint32, uint32)
+XND_UNARY(invert, uint64, uint64, uint64)
 
 
 static const gm_kernel_init_t unary_invert[] = {
@@ -185,18 +206,51 @@ static const gm_kernel_init_t unary_invert[] = {
 
 
 /*****************************************************************************/
+/*                               Negative                                    */
+/*****************************************************************************/
+
+#define negative(x) -x
+XND_UNARY(negative, int8, int8, int8)
+XND_UNARY(negative, int16, int16, int16)
+XND_UNARY(negative, int32, int32, int32)
+XND_UNARY(negative, int64, int64, int64)
+XND_UNARY(negative, uint8, int16, int16)
+XND_UNARY(negative, uint16, int32, int32)
+XND_UNARY(negative, uint32, int64, int64)
+XND_UNARY(negative, float32, float32, float32)
+XND_UNARY(negative, float64, float64, float64)
+
+
+
+static const gm_kernel_init_t unary_negative[] = {
+  /* INVERT */
+  XND_UNARY_INIT(negative, negative, int8, int8),
+  XND_UNARY_INIT(negative, negative, int16, int16),
+  XND_UNARY_INIT(negative, negative, int32, int32),
+  XND_UNARY_INIT(negative, negative, int64, int64),
+  XND_UNARY_INIT(negative, negative, uint8, int16),
+  XND_UNARY_INIT(negative, negative, uint16, int32),
+  XND_UNARY_INIT(negative, negative, uint32, int64),
+  XND_UNARY_INIT(negative, negative, float32, float32),
+  XND_UNARY_INIT(negative, negative, float64, float64),
+
+  { .name = NULL, .sig = NULL }
+};
+
+
+/*****************************************************************************/
 /*                                   Math                                   */
 /*****************************************************************************/
 
 #define XND_ALL_UNARY_MATH(name) \
-    XND_UNARY(name##f, int8, float32)    \
-    XND_UNARY(name##f, int16, float32)   \
-    XND_UNARY(name##f, uint8, float32)   \
-    XND_UNARY(name##f, uint16, float32)  \
-    XND_UNARY(name##f, float32, float32) \
-    XND_UNARY(name, int32, float64)      \
-    XND_UNARY(name, uint32, float64)     \
-    XND_UNARY(name, float64, float64)
+    XND_UNARY(name##f, int8, float32, float32)    \
+    XND_UNARY(name##f, int16, float32, float32)   \
+    XND_UNARY(name##f, uint8, float32, float32)   \
+    XND_UNARY(name##f, uint16, float32, float32)  \
+    XND_UNARY(name##f, float32, float32, float32) \
+    XND_UNARY(name, int32, float64, float64)      \
+    XND_UNARY(name, uint32, float64, float64)     \
+    XND_UNARY(name, float64, float64, float64)
 
 #define XND_ALL_UNARY_MATH_INIT(name) \
     XND_UNARY_INIT(name, name##f, int8, float32),    \
@@ -363,6 +417,14 @@ unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
 }
 
 static const gm_kernel_set_t *
+unary_negative_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
+                       const ndt_t *in[], int nin,
+                       ndt_context_t *ctx)
+{
+    return unary_typecheck(negative_kernel_location, spec, f, in, nin, ctx);
+}
+
+static const gm_kernel_set_t *
 unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
                       const ndt_t *in[], int nin,
                       ndt_context_t *ctx)
@@ -383,6 +445,12 @@ gm_init_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 
     for (k = unary_invert; k->name != NULL; k++) {
         if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_invert_typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = unary_negative; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_negative_typecheck) < 0) {
              return -1;
         }
     }
