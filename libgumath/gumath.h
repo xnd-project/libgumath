@@ -115,7 +115,9 @@ typedef struct {
 
 /* Multimethod with associated kernels */
 typedef struct gm_func gm_func_t;
-typedef const gm_kernel_set_t *(*gm_typecheck_t)(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[], int nin, ndt_context_t *ctx);
+typedef const gm_kernel_set_t *(*gm_typecheck_t)(ndt_apply_spec_t *spec, const gm_func_t *f,
+                                                 const ndt_t *in[], const int64_t li[], int nin,
+                                                 ndt_context_t *ctx);
 struct gm_func {
     char *name;
     gm_typecheck_t typecheck; /* Experimental optimized type-checking, may be NULL. */
@@ -139,7 +141,7 @@ GM_API int gm_add_kernel(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_cont
 GM_API int gm_add_kernel_typecheck(gm_tbl_t *tbl, const gm_kernel_init_t *kernel, ndt_context_t *ctx, gm_typecheck_t f);
 
 GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
-                             const ndt_t *in_types[], int nin, const xnd_t args[],
+                             const ndt_t *in_types[], const int64_t li[], int nin, const xnd_t args[],
                              ndt_context_t *ctx);
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
 GM_API int gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, uint32_t flags, const int64_t nthreads, ndt_context_t *ctx);

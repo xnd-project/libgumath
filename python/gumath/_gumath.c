@@ -146,6 +146,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     PyObject *result[NDT_MAX_ARGS];
     ndt_apply_spec_t spec = ndt_apply_spec_empty;
     const ndt_t *in_types[NDT_MAX_ARGS];
+    int64_t li[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
     gm_kernel_t kernel;
     int i, k;
@@ -169,9 +170,10 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         }
         stack[i] = *CONST_XND(a[i]);
         in_types[i] = stack[i].type;
+        li[i] = stack[i].index;
     }
 
-    kernel = gm_select(&spec, self->tbl, self->name, in_types, (int)nin, stack, &ctx);
+    kernel = gm_select(&spec, self->tbl, self->name, in_types, li, (int)nin, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }

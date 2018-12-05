@@ -271,11 +271,11 @@ void binary_update_bitmap(xnd_t stack[]);
 
 const gm_kernel_set_t *unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                                        ndt_apply_spec_t *spec, const gm_func_t *f,
-                                       const ndt_t *in[], int nin, ndt_context_t *ctx);
+                                       const ndt_t *in[], const int64_t li[], int nin, ndt_context_t *ctx);
 
 const gm_kernel_set_t *binary_typecheck(int (*kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
                                         ndt_apply_spec_t *spec, const gm_func_t *f,
-                                        const ndt_t *in[], int nin, ndt_context_t *ctx);
+                                        const ndt_t *in[], const int64_t li[], int nin, ndt_context_t *ctx);
 
 /* END LOCAL SCOPE */
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_END)

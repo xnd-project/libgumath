@@ -160,7 +160,7 @@ binary_update_bitmap(xnd_t stack[])
 const gm_kernel_set_t *
 unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                 ndt_apply_spec_t *spec, const gm_func_t *f,
-                const ndt_t *in[], int nin,
+                const ndt_t *in[], const int64_t li[], int nin,
                 ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
@@ -189,7 +189,7 @@ unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     case FixedDim:
         spec->flags = NDT_C|NDT_STRIDED;
         spec->outer_dims = t->ndim;
-        if (ndt_is_c_contiguous(ndt_dim_at(t, t->ndim-1))) {
+        if (ndt_is_c_contiguous(ndt_logical_dim_at(t, t->ndim-1))) {
             spec->flags |= NDT_ELEMWISE_1D;
         }
         break;
@@ -208,7 +208,7 @@ unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     set = &f->kernels[n];
 
     dtype = ndt_dtype(set->sig->Function.types[1]);
-    dtype = ndt_copy_contiguous_dtype(t, dtype, ctx);
+    dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
     if (dtype == NULL) {
         return NULL;
     }
@@ -228,7 +228,7 @@ unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 const gm_kernel_set_t *
 binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
                  ndt_apply_spec_t *spec, const gm_func_t *f,
-                 const ndt_t *in[], int nin,
+                 const ndt_t *in[], const int64_t li[], int nin,
                  ndt_context_t *ctx)
 {
     const ndt_t *t0;
@@ -260,7 +260,7 @@ binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt
 
     if (t0->tag == VarDim || t1->tag == VarDim) {
         const gm_kernel_set_t *set = &f->kernels[n+4];
-        if (ndt_typecheck(spec, set->sig, in, nin, NULL, NULL, ctx) < 0) {
+        if (ndt_typecheck(spec, set->sig, in, li, nin, NULL, NULL, ctx) < 0) {
             return NULL;
         }
         return set;
