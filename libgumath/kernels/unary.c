@@ -223,7 +223,7 @@ XND_UNARY(negative, float64, float64, float64)
 
 
 static const gm_kernel_init_t unary_negative[] = {
-  /* INVERT */
+  /* NEGATIVE */
   XND_UNARY_INIT(negative, negative, int8, int8),
   XND_UNARY_INIT(negative, negative, int16, int16),
   XND_UNARY_INIT(negative, negative, int32, int32),

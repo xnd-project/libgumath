@@ -134,7 +134,7 @@ gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     (void)ctx;                                                        \
                                                                       \
     const t0##_t x = *(const t0##_t *)in0->ptr;                       \
-    *(t1##_t *)out->ptr = func((cast##_t)x);                                    \
+    *(t1##_t *)out->ptr = func((cast##_t)x);                          \
                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
         unary_update_bitmap(stack);                                   \
