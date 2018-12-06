@@ -40,28 +40,17 @@ import sys, time
 import math
 import unittest
 import argparse
+from gumath_aux import *
 
 try:
     import numpy as np
 except ImportError:
     np = None
 
+SKIP_LONG = True
+SKIP_BRUTE_FORCE = True
 
-TEST_CASES = [
-  ([float(i)/100.0 for i in range(2000)], "2000 * float64", "float64"),
-
-  ([[float(i)/100.0 for i in range(1000)], [float(i+1) for i in range(1000)]],
-   "2 * 1000 * float64", "float64"),
-
-  (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float64", "float64"),
-
-  ([float(i)/10.0 for i in range(2000)], "2000 * float32", "float32"),
-
-  ([[float(i)/10.0 for i in range(1000)], [float(i+1) for i in range(1000)]],
-  "2 * 1000 * float32", "float32"),
-
-  (1000 * [[float(i+1) for i in range(2)]], "1000 * 2 * float32", "float32"),
-]
+gm.set_max_threads(1)
 
 
 class TestCall(unittest.TestCase):
@@ -583,6 +572,217 @@ class TestBitwise(unittest.TestCase):
                     self.assertRaises(ValueError, fn.bitwise_and, x, y)
 
 
+class TestSpec(unittest.TestCase):
+
+    def __init__(self, *, constr,
+                 values, value_generator,
+                 indices_generator, indices_generator_args):
+        super().__init__()
+        self.constr = constr
+        self.values = values
+        self.value_generator = value_generator
+        self.indices_generator = indices_generator
+        self.indices_generator_args = indices_generator_args
+        self.indices_stack = [None] * 8
+
+    def log_err(self, value, depth):
+        """Dump an error as a Python script for debugging."""
+        dtype = "?int32" if have_none(value) else "int32"
+
+        sys.stderr.write("\n\nfrom xnd import *\n")
+        sys.stderr.write("import gumath.functions as fn\n")
+        sys.stderr.write("from test_gumath import NDArray\n")
+        sys.stderr.write("lst = %s\n\n" % value)
+        sys.stderr.write("x0 = xnd(lst, dtype=\"%s\")\n" % dtype)
+        sys.stderr.write("y0 = NDArray(lst)\n" % value)
+
+        for i in range(depth+1):
+            sys.stderr.write("x%d = x%d[%s]\n" % (i+1, i, itos(self.indices_stack[i])))
+            sys.stderr.write("y%d = y%d[%s]\n" % (i+1, i, itos(self.indices_stack[i])))
+
+        sys.stderr.write("\n")
+
+    def run_single(self, nd, d, indices):
+        """Run a single test case."""
+
+        self.assertEqual(len(nd), len(d))
+
+        nd_exception = None
+        try:
+            nd_result = nd[indices]
+        except Exception as e:
+            nd_exception =  e
+
+        def_exception = None
+        try:
+            def_result = d[indices]
+        except Exception as e:
+            def_exception = e
+
+        if nd_exception or def_exception:
+            if nd_exception is None and def_exception.__class__ is IndexError:
+                # Example: type = 0 * 0 * int64
+                if len(indices) <= nd.ndim:
+                    return None, None
+
+            self.assertIs(nd_exception.__class__, def_exception.__class__)
+            return None, None
+
+        assert(isinstance(nd_result, xnd))
+
+        x = fn.sin(nd_result)
+        y = fn.multiply(nd_result, nd_result)
+
+        if isinstance(def_result, NDArray):
+            a = def_result.sin()
+            b = def_result * def_result
+        elif isinstance(def_result, int):
+            a = math.sin(def_result)
+            b = def_result * def_result
+        elif def_result is None:
+            a = None
+            b = None
+        else:
+            raise TypeError("unexpected def_result")
+
+        self.assertEqual(x, a)
+        self.assertEqual(y, b)
+
+        return nd_result, def_result
+
+    def run(self):
+        def check(nd, d, value, depth):
+            if depth > 3: # adjust for longer tests
+                return
+
+            g = self.indices_generator(*self.indices_generator_args)
+
+            for indices in g:
+                self.indices_stack[depth] = indices
+
+                try:
+                    next_nd, next_d = self.run_single(nd, d, indices)
+                except Exception as e:
+                    self.log_err(value, depth)
+                    raise e
+
+                if isinstance(next_d, list): # possibly None or scalar
+                    check(next_nd, next_d, value, depth+1)
+
+        for value in self.values:
+            dtype = "?int32" if have_none(value) else "int32"
+            nd = self.constr(value, dtype=dtype)
+            d = NDArray(value)
+            check(nd, d, value, 0)
+
+        for max_ndim in range(1, 5):
+            for min_shape in (0, 1):
+                for max_shape in range(1, 8):
+                    for value in self.value_generator(max_ndim, min_shape, max_shape):
+                        dtype = "?int32" if have_none(value) else "int32"
+                        nd = self.constr(value, dtype=dtype)
+                        d = NDArray(value)
+                        check(nd, d, value, 0)
+
+
+class LongIndexSliceTest(unittest.TestCase):
+
+    def test_subarray(self):
+        # Multidimensional indexing
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=genindices,
+                     indices_generator_args=())
+        t.run()
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_VAR_TEST_CASES,
+                     value_generator=gen_var,
+                     indices_generator=genindices,
+                     indices_generator_args=())
+        t.run()
+
+    def test_slices(self):
+        # Multidimensional slicing
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=randslices,
+                     indices_generator_args=(3,))
+        t.run()
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_VAR_TEST_CASES,
+                     value_generator=gen_var,
+                     indices_generator=randslices,
+                     indices_generator_args=(3,))
+        t.run()
+
+    def test_chained_indices_slices(self):
+        # Multidimensional indexing and slicing, chained
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=gen_indices_or_slices,
+                     indices_generator_args=())
+        t.run()
+
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_VAR_TEST_CASES,
+                     value_generator=gen_var,
+                     indices_generator=gen_indices_or_slices,
+                     indices_generator_args=())
+        t.run()
+
+    def test_fixed_mixed_indices_slices(self):
+        # Multidimensional indexing and slicing, mixed
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=mixed_indices,
+                     indices_generator_args=(3,))
+        t.run()
+
+    def test_var_mixed_indices_slices(self):
+        # Multidimensional indexing and slicing, mixed
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_VAR_TEST_CASES,
+                     value_generator=gen_var,
+                     indices_generator=mixed_indices,
+                     indices_generator_args=(5,))
+        t.run()
+
+    def test_slices_brute_force(self):
+        # Test all possible slices for the given ndim and shape
+        skip_if(SKIP_BRUTE_FORCE, "use --all argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=genslices_ndim,
+                     indices_generator_args=(3, [3,3,3]))
+        t.run()
+
+        t = TestSpec(constr=xnd,
+                     values=SUBSCRIPT_VAR_TEST_CASES,
+                     value_generator=gen_var,
+                     indices_generator=genslices_ndim,
+                     indices_generator_args=(3, [3,3,3]))
+        t.run()
+
+
 ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
@@ -594,6 +794,7 @@ ALL_TESTS = [
   TestUnary,
   TestBinary,
   TestBitwise,
+  LongIndexSliceTest,
 ]
 
 
@@ -601,7 +802,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--failfast", action="store_true",
                         help="stop the test run on first error")
+    parser.add_argument('--long', action="store_true", help="run long slice tests")
+    parser.add_argument('--all', action="store_true", help="run brute force tests")
     args = parser.parse_args()
+    SKIP_LONG = not (args.long or args.all)
+    SKIP_BRUTE_FORCE = not args.all
 
     suite = unittest.TestSuite()
     loader = unittest.TestLoader()

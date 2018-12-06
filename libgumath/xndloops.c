@@ -40,9 +40,55 @@
 #include "gumath.h"
 
 
+static int _gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
+                       const int outer_dims, ndt_context_t *ctx);
+
+static inline bool
+any_stored_index(xnd_t stack[], const int nargs)
+{
+    for (int i = 0; i < nargs; i++) {
+        if (stack[i].ptr == NULL) {
+            continue;
+        }
+
+        const ndt_t *t = stack[i].type;
+        if (have_stored_index(t)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 int
 gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
            const int outer_dims, ndt_context_t *ctx)
+{
+    if (any_stored_index(stack, nargs)) {
+        ALLOCA(xnd_t, next, nargs);
+
+        for (int i = 0; i < nargs; i++) {
+            const ndt_t *t = stack[i].type;
+            if (have_stored_index(t)) {
+                next[i] = apply_stored_indices(&stack[i], ctx);
+                if (xnd_err_occurred(&next[i])) {
+                    return -1;
+                }
+            }
+            else {
+                next[i] = stack[i];
+            }
+        }
+
+        return _gm_xnd_map(f, next, nargs, outer_dims, ctx);
+    }
+
+    return _gm_xnd_map(f, stack, nargs, outer_dims, ctx);
+}
+
+static int
+_gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
+            const int outer_dims, ndt_context_t *ctx)
 {
     ALLOCA(xnd_t, next, nargs);
     const ndt_t *t;

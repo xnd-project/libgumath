@@ -193,9 +193,9 @@ unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
             spec->flags |= NDT_ELEMWISE_1D;
         }
         break;
-    case VarDim:
+    case VarDim: case VarDimElem:
         spec->flags = NDT_C;
-        spec->outer_dims = t->ndim;
+        spec->outer_dims = ndt_logical_ndim(t);
         n += 2;
         break;
     default:
@@ -258,7 +258,8 @@ binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt
         n = n+2;
     }
 
-    if (t0->tag == VarDim || t1->tag == VarDim) {
+    if (t0->tag == VarDim || t0->tag == VarDimElem ||
+        t1->tag == VarDim || t1->tag == VarDimElem) {
         const gm_kernel_set_t *set = &f->kernels[n+4];
         if (ndt_typecheck(spec, set->sig, in, li, nin, NULL, NULL, ctx) < 0) {
             return NULL;

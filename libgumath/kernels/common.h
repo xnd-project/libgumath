@@ -144,22 +144,22 @@ gm_##func##_0D_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
 }
 
 #define XND_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                     \
-    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),        \
-    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                       \
-    .C = gm_##func##_0D_##t0##_##t1 },                               \
-                                                                     \
-  { .name = STRINGIZE(funcname),                                     \
-    .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),      \
-    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                       \
-    .C = gm_##func##_0D_##t0##_##t1 },                               \
-                                                                     \
-  { .name = STRINGIZE(funcname),                                     \
-    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),  \
-    .C = gm_##func##_0D_##t0##_##t1 },                               \
-                                                                     \
-  { .name = STRINGIZE(funcname),                                     \
-    .sig = "var... * ?" STRINGIZE(t0) " -> var... * " STRINGIZE(t1), \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),         \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                        \
+    .C = gm_##func##_0D_##t0##_##t1 },                                \
+                                                                      \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),       \
+    .Opt = gm_fixed_##func##_1D_C_##t0##_##t1,                        \
+    .C = gm_##func##_0D_##t0##_##t1 },                                \
+                                                                      \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),   \
+    .C = gm_##func##_0D_##t0##_##t1 },                                \
+                                                                      \
+  { .name = STRINGIZE(funcname),                                      \
+    .sig = "var... * ?" STRINGIZE(t0) " -> var... * ?" STRINGIZE(t1), \
     .C = gm_##func##_0D_##t0##_##t1 }
 
 
