@@ -36,6 +36,7 @@ from itertools import accumulate, count, product
 from random import randrange
 from collections import namedtuple
 import math
+import unittest
 
 
 def skip_if(condition, reason):
