@@ -56,11 +56,6 @@ PyInit_examples(void)
        }
 
        /* extending examples */
-#ifndef _MSC_VER
-       if (gm_init_bfloat16_kernels(table, &ctx) < 0) {
-           return Ndt_SetError(&ctx);
-       }
-#endif
        if (gm_init_graph_kernels(table, &ctx) < 0) {
            return Ndt_SetError(&ctx);
        }

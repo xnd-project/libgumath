@@ -35,7 +35,7 @@ import gumath.functions as fn
 import gumath.examples as ex
 from xnd import xnd
 from ndtypes import ndt
-from extending import Graph, bfloat16
+from extending import Graph
 import sys, time
 import math
 import unittest
@@ -261,17 +261,6 @@ class TestGraphs(unittest.TestCase):
                [(2, 2.2), (1, 0.1)]]
 
         self.assertRaises(ValueError, Graph, lst)
-
-
-@unittest.skipIf(sys.platform == "win32", "unresolved external symbols")
-class TestBFloat16(unittest.TestCase):
-
-    def test_init(self):
-        lst = [1.2e10, 2.1121, -3e20]
-        ans = [11945377792.0, 2.109375, -2.997595911977802e+20]
-
-        x = bfloat16(lst)
-        self.assertEqual(x.value, ans)
 
 
 class TestPdist(unittest.TestCase):
@@ -788,7 +777,6 @@ ALL_TESTS = [
   TestRaggedArrays,
   TestMissingValues,
   TestGraphs,
-  TestBFloat16,
   TestPdist,
   TestNumba,
   TestUnary,
