@@ -28,11 +28,11 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o \
-       common.o bitwise.o examples.o bfloat16.o graph.o quaternion.o pdist.o
+       common.o bitwise.o examples.o xfloat16.o graph.o quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
               .objs/unary.o .objs/binary.o .objs/common.o .objs/bitwise.o .objs/examples.o \
-              .objs/bfloat16.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
+              .objs/xfloat16.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -133,13 +133,13 @@ Makefile extending/examples.c gumath.h
 Makefile extending/examples.c gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/examples.c -o .objs/examples.o
 
-bfloat16.o:\
-Makefile extending/bfloat16.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c extending/bfloat16.c -o bfloat16.o
+xfloat16.o:\
+Makefile extending/xfloat16.c gumath.h
+	$(CC) -I. $(GM_CFLAGS) -c extending/xfloat16.c -o xfloat16.o
 
-.objs/bfloat16.o:\
-Makefile extending/bfloat16.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/bfloat16.c -o .objs/bfloat16.o
+.objs/xfloat16.o:\
+Makefile extending/xfloat16.c gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/xfloat16.c -o .objs/xfloat16.o
 
 graph.o:\
 Makefile extending/graph.c gumath.h
