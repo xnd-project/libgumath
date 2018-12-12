@@ -34,6 +34,16 @@
 #ifndef GUMATH_H
 #define GUMATH_H
 
+
+#ifdef __cplusplus
+extern "C" {
+  #ifndef __STDC_LIMIT_MACROS
+    #define __STDC_LIMIT_MACROS
+    #define GUMATH_CLEAR_STDC_LIMIT_MACROS
+  #endif
+#endif
+
+
 #include "ndtypes.h"
 #include "xnd.h"
 
@@ -203,6 +213,15 @@ GM_API int gm_init_quaternion_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_pdist_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API void gm_finalize(void);
+
+
+#ifdef __cplusplus
+  #ifdef GUMATH_CLEAR_STDC_LIMIT_MACROS
+    #undef GUMATH_CLEAR_STDC_LIMIT_MACROS
+    #undef __STDC_LIMIT_MACROS
+  #endif
+} /* END extern "C" */
+#endif
 
 
 #endif /* GUMATH_H */
