@@ -173,11 +173,27 @@ if len(sys.argv) == 2:
     else:
         pass
 
+def get_config_vars():
+    f = open("config.h")
+    config_vars = {}
+    for line in f:
+        if line.startswith("#define"):
+            l = line.split()
+            try:
+                config_vars[l[1]] = int(l[2])
+            except ValueError:
+                pass
+        elif line.startswith("/* #undef"):
+            l = line.split()
+            config_vars[l[2]] = 0
+    f.close()
+    return config_vars
 
 def gumath_extensions():
     add_include_dirs = [".", "libgumath", "ndtypes/python/ndtypes", "xnd/python/xnd"] + INCLUDES
     add_library_dirs = ["libgumath", "ndtypes/libndtypes", "xnd/libxnd"] + LIBS
     add_depends = []
+    config_vars = {}
 
     if sys.platform == "win32":
         add_libraries = ["libndtypes-0.2.0dev3.dll", "libxnd-0.2.0dev3.dll", "libgumath-0.2.0dev3.dll"]
@@ -199,6 +215,13 @@ def gumath_extensions():
                  os.system("vcbuild32.bat")
             os.chdir("..")
     else:
+        if BUILD_ALL:
+            cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
+            ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
+            os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
+
+        config_vars = get_config_vars()
+
         add_extra_compile_args = ["-Wextra", "-Wno-missing-field-initializers", "-std=c11"]
         if sys.platform == "darwin":
             add_libraries = ["ndtypes", "xnd", "gumath"]
@@ -206,13 +229,15 @@ def gumath_extensions():
             add_runtime_library_dirs = []
         else:
             add_libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
+            if config_vars["HAVE_CUDA"]:
+                if os.path.isdir("/usr/cuda/lib64"):
+                    add_library_dirs += ["/usr/cuda/lib64"]
+                if os.path.isdir("/usr/local/cuda/lib64"):
+                    add_library_dirs += ["/usr/local/cuda/lib64"]
+                add_libraries += ["cudart"]
+
             add_extra_link_args = []
             add_runtime_library_dirs = ["$ORIGIN"]
-
-        if BUILD_ALL:
-            cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
-            ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
-            os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
 
     def gumath_ext():
         sources = ["python/gumath/_gumath.c"]
@@ -244,6 +269,21 @@ def gumath_extensions():
             runtime_library_dirs = add_runtime_library_dirs
         )
 
+    def cuda_ext():
+        sources = ["python/gumath/cuda.c"]
+
+        return Extension (
+            "gumath.cuda",
+            include_dirs = add_include_dirs,
+            library_dirs = add_library_dirs,
+            depends = add_depends,
+            sources = sources,
+            libraries = add_libraries,
+            extra_compile_args = add_extra_compile_args,
+            extra_link_args = add_extra_link_args,
+            runtime_library_dirs = add_runtime_library_dirs
+        )
+
     def examples_ext():
         sources = ["python/gumath/examples.c"]
 
@@ -259,7 +299,10 @@ def gumath_extensions():
             runtime_library_dirs = add_runtime_library_dirs
         )
 
-    return [gumath_ext(), functions_ext(), examples_ext()]
+    extensions = [gumath_ext(), functions_ext(), examples_ext()]
+    if config_vars["HAVE_CUDA"]:
+        extensions += [cuda_ext()]
+    return extensions
 
 setup (
     name = "gumath",

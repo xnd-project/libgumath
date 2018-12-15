@@ -95,7 +95,7 @@ seterr(ndt_context_t *ctx)
 static PyTypeObject Gufunc_Type;
 
 static PyObject *
-gufunc_new(const gm_tbl_t *tbl, const char *name)
+gufunc_new(const gm_tbl_t *tbl, const char *name, const uint32_t flags)
 {
     NDT_STATIC_CONTEXT(ctx);
     GufuncObject *self;
@@ -111,6 +111,8 @@ gufunc_new(const gm_tbl_t *tbl, const char *name)
     if (self->name == NULL) {
         return seterr(&ctx);
     }
+
+    self->flags = flags;
 
     return (PyObject *)self;
 }
@@ -186,7 +188,8 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_concrete(spec.out[i])) {
-            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i], 0);
+            uint32_t flags = self->flags == GM_CUDA_FUNC ? XND_CUDA_MANAGED : 0;
+            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i], flags);
             if (x == NULL) {
                 clear_objects(result, i);
                 ndt_apply_spec_clear(&spec);
@@ -201,18 +204,48 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
          }
     }
 
-#ifdef HAVE_PTHREAD_H
-    if (gm_apply_thread(&kernel, stack, spec.outer_dims, spec.flags,
-        max_threads, &ctx) < 0) {
+    if (self->flags == GM_CUDA_FUNC) {
+    #if HAVE_CUDA
+        if (xnd_cuda_mem_prefetch_async(stack[0].ptr, stack[0].type->datasize, 0, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+
+        if (xnd_cuda_mem_prefetch_async(stack[1].ptr, stack[1].type->datasize, 0, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+
+        if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+
+        if (xnd_cuda_device_synchronize(&ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+    #else
+        ndt_err_format(&ctx, NDT_RuntimeError,
+           "internal error: GM_CUDA_FUNC set in a build without cuda support");
         clear_objects(result, spec.nout);
         return seterr(&ctx);
+    #endif
     }
-#else
-    if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
-        clear_objects(result, spec.nout);
-        return seterr(&ctx);
+    else {
+    #ifdef HAVE_PTHREAD_H
+        if (gm_apply_thread(&kernel, stack, spec.outer_dims, spec.flags,
+            max_threads, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+    #else
+        if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+            clear_objects(result, spec.nout);
+            return seterr(&ctx);
+        }
+    #endif
     }
-#endif
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_abstract(spec.out[i])) {
@@ -331,7 +364,7 @@ add_function(const gm_func_t *f, void *args)
     struct map_args *a = (struct map_args *)args;
     PyObject *func;
 
-    func = gufunc_new(a->tbl, f->name);
+    func = gufunc_new(a->tbl, f->name, GM_CPU_FUNC);
     if (func == NULL) {
         return -1;
     }
@@ -351,10 +384,37 @@ Gumath_AddFunctions(PyObject *m, const gm_tbl_t *tbl)
     return 0;
 }
 
+static int
+add_cuda_function(const gm_func_t *f, void *args)
+{
+    struct map_args *a = (struct map_args *)args;
+    PyObject *func;
+
+    func = gufunc_new(a->tbl, f->name, GM_CUDA_FUNC);
+    if (func == NULL) {
+        return -1;
+    }
+
+    return PyModule_AddObject(a->module, f->name, func);
+}
+
+static int
+Gumath_AddCudaFunctions(PyObject *m, const gm_tbl_t *tbl)
+{
+    struct map_args args = {m, tbl};
+
+    if (gm_tbl_map(tbl, add_cuda_function, &args) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
 static PyObject *
 init_api(void)
 {
     gumath_api[Gumath_AddFunctions_INDEX] = (void *)Gumath_AddFunctions;
+    gumath_api[Gumath_AddCudaFunctions_INDEX] = (void *)Gumath_AddCudaFunctions;
 
     return PyCapsule_New(gumath_api, "gumath._gumath._API", NULL);
 }
@@ -420,7 +480,7 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
         return seterr(&ctx);
     }
 
-    return gufunc_new(table, f->name);
+    return gufunc_new(table, f->name, GM_CPU_FUNC);
 }
 
 static void

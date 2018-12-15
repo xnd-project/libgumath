@@ -220,6 +220,58 @@ unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     return set;
 }
 
+const gm_kernel_set_t *
+cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+                     ndt_apply_spec_t *spec, const gm_func_t *f,
+                     const ndt_t *in[], const int64_t li[], int nin,
+                     ndt_context_t *ctx)
+{
+    const gm_kernel_set_t *set;
+    const ndt_t *t;
+    const ndt_t *dtype;
+    int n;
+
+    if (nin != 1) {
+        ndt_err_format(ctx, NDT_ValueError,
+            "invalid number of arguments for %s(x): expected 1, got %d",
+            f->name, nin);
+        return NULL;
+    }
+    t = in[0];
+    assert(ndt_is_concrete(t));
+
+    n = kernel_location(t, ctx);
+    if (n < 0) {
+        return NULL;
+    }
+    if (ndt_is_optional(ndt_dtype(t))) {
+        n++;
+    }
+
+    if (!ndt_is_c_contiguous(ndt_logical_dim_at(t, t->ndim-1))) {
+        ndt_err_format(ctx, NDT_NotImplementedError,
+            "cuda %s kernel: input must be contiguous in the last dimension",
+            f->name);
+        return NULL;
+    }
+    spec->flags = NDT_C|NDT_ELEMWISE_1D;
+    spec->outer_dims = t->ndim;
+
+    set = &f->kernels[n];
+
+    dtype = ndt_dtype(set->sig->Function.types[1]);
+    dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
+    if (dtype == NULL) {
+        return NULL;
+    }
+
+    spec->out[0] = dtype;
+    spec->nout = 1;
+    spec->nbroadcast = 0;
+
+    return set;
+}
+
 
 /****************************************************************************/
 /*                        Optimized binary typecheck                        */

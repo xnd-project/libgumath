@@ -49,9 +49,13 @@ extern "C" {
 /* Exposed here for the benefit of Numba. The API should not be regarded
    stable across versions. */
 
+#define GM_CPU_FUNC  0x0001U
+#define GM_CUDA_FUNC 0x0002U
+
 typedef struct {
     PyObject_HEAD
     const gm_tbl_t *tbl; /* kernel table */
+    uint32_t flags;      /* memory target */
     char *name;          /* function name */
 } GufuncObject;
 
@@ -64,16 +68,24 @@ typedef struct {
 #define Gumath_AddFunctions_RETURN int
 #define Gumath_AddFunctions_ARGS (PyObject *, const gm_tbl_t *)
 
-#define GUMATH_MAX_API 1
+#define Gumath_AddCudaFunctions_INDEX 1
+#define Gumath_AddCudaFunctions_RETURN int
+#define Gumath_AddCudaFunctions_ARGS (PyObject *, const gm_tbl_t *)
+
+#define GUMATH_MAX_API 2
 
 
 #ifdef GUMATH_MODULE
 static Gumath_AddFunctions_RETURN Gumath_AddFunctions Gumath_AddFunctions_ARGS;
+static Gumath_AddCudaFunctions_RETURN Gumath_AddCudaFunctions Gumath_AddCudaFunctions_ARGS;
 #else
 static void **_gumath_api;
 
 #define Gumath_AddFunctions \
     (*(Gumath_AddFunctions_RETURN (*)Gumath_AddFunctions_ARGS) _gumath_api[Gumath_AddFunctions_INDEX])
+
+#define Gumath_AddCudaFunctions \
+    (*(Gumath_AddCudaFunctions_RETURN (*)Gumath_AddCudaFunctions_ARGS) _gumath_api[Gumath_AddCudaFunctions_INDEX])
 
 
 static int

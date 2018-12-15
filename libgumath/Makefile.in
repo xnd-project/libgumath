@@ -13,12 +13,17 @@ CC = @CC@
 LD = @LD@
 AR = @AR@
 RANLIB = @RANLIB@
+CUDA_CXX = @CUDA_CXX@
 
 GM_INCLUDES = @CONFIGURE_INCLUDES@
 
 CONFIGURE_CFLAGS = @CONFIGURE_CFLAGS@
 GM_CFLAGS = $(strip -I.. -I$(GM_INCLUDES) $(CONFIGURE_CFLAGS) $(CFLAGS))
 GM_CFLAGS_SHARED = $(GM_CFLAGS) -fPIC
+
+CONFIGURE_CXXFLAGS = @CONFIGURE_CXXFLAGS@
+XND_CXXFLAGS = $(strip -I$(XND_INCLUDES) $(CONFIGURE_CXXFLAGS) $(CXXFLAGS))
+XND_CXXFLAGS_SHARED = $(XND_CXXFLAGS) -fPIC
 
 CONFIGURE_LDFLAGS = @CONFIGURE_LDFLAGS@
 GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
@@ -33,6 +38,11 @@ OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o unary.o binary.o \
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
               .objs/unary.o .objs/binary.o .objs/common.o .objs/bitwise.o .objs/examples.o \
               .objs/graph.o .objs/quaternion.o .objs/pdist.o
+
+ifdef CUDA_CXX
+OBJS += cuda_unary.o cuda_unary_device.o
+SHARED_OBJS += .objs/cuda_unary.o .objs/cuda_unary_device.o
+endif
 
 
 $(LIBSTATIC): Makefile $(OBJS)
@@ -156,6 +166,24 @@ Makefile extending/pdist.c gumath.h
 .objs/pdist.o:\
 Makefile extending/pdist.c gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c extending/pdist.c -o .objs/pdist.o
+
+
+# Cuda
+cuda_unary.o:\
+Makefile kernels/cuda_unary.c kernels/common.h kernels/cuda_unary_device.h gumath.h
+	$(CC) -I. $(GM_CFLAGS) -Wno-absolute-value -c kernels/cuda_unary.c
+
+.objs/cuda_unary.o:\
+Makefile kernels/cuda_unary.c kernels/common.h kernels/cuda_unary_device.h gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -Wno-absolute-value -c kernels/cuda_unary.c -o .objs/cuda_unary.o
+
+cuda_unary_device.o:\
+Makefile kernels/cuda_unary_device.cu kernels/common.h kernels/cuda_unary_device.h gumath.h
+	$(CUDA_CXX) --compiler-options "$(XND_CXXFLAGS)" -std=c++11 -c kernels/cuda_unary_device.cu
+
+.objs/cuda_unary_device.o:\
+Makefile kernels/cuda_unary_device.cu kernels/common.h kernels/cuda_unary_device.h gumath.h
+	$(CUDA_CXX) --compiler-options "$(XND_CXXFLAGS_SHARED)" -std=c++11 -c kernels/cuda_unary_device.cu -o .objs/cuda_unary_device.o
 
 
 # Coverage
