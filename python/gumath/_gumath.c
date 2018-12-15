@@ -186,7 +186,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_concrete(spec.out[i])) {
-            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i]);
+            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i], 0);
             if (x == NULL) {
                 clear_objects(result, i);
                 ndt_apply_spec_clear(&spec);
