@@ -350,35 +350,27 @@ static const gm_kernel_init_t unary_negative[] = {
 /*                                   Math                                   */
 /*****************************************************************************/
 
-#define XND_CUDA_ALL_UNARY_MATH(name) \
-    XND_CUDA_UNARY(name##f, int8, float16)                        \
-    XND_CUDA_UNARY(name##f, uint8, float16)                       \
-    XND_CUDA_UNARY(name##f, float16, float16)                     \
-                                                                  \
-    XND_CUDA_UNARY(name##f, int16, float32)                       \
-    XND_CUDA_UNARY(name##f, uint16, float32)                      \
-    XND_CUDA_UNARY(name##f, float32, float32)                     \
-                                                                  \
-    XND_CUDA_UNARY(name, int32, float64)                          \
-    XND_CUDA_UNARY(name, uint32, float64)                         \
-    XND_CUDA_UNARY(name, float64, float64)                        \
-                                                                  \
+#define ALL_UNARY_REAL_MATH(name) \
+    XND_CUDA_UNARY(name##f, int8, float16)    \
+    XND_CUDA_UNARY(name##f, uint8, float16)   \
+    XND_CUDA_UNARY(name##f, float16, float16) \
+                                              \
+    XND_CUDA_UNARY(name##f, int16, float32)   \
+    XND_CUDA_UNARY(name##f, uint16, float32)  \
+    XND_CUDA_UNARY(name##f, float32, float32) \
+                                              \
+    XND_CUDA_UNARY(name, int32, float64)      \
+    XND_CUDA_UNARY(name, uint32, float64)     \
+    XND_CUDA_UNARY(name, float64, float64)    \
+
+#define XND_CUDA_ALL_UNARY_REAL_MATH(name) \
+    ALL_UNARY_REAL_MATH(name)                                     \
     XND_CUDA_UNARY_COMPLEX_NOT_IMPL(name, complex32, complex32)   \
     XND_CUDA_UNARY_COMPLEX_NOT_IMPL(name, complex64, complex64)   \
     XND_CUDA_UNARY_COMPLEX_NOT_IMPL(name, complex128, complex128)
 
 #define XND_CUDA_ALL_UNARY_COMPLEX_MATH(name) \
-    XND_CUDA_UNARY(name##f, int8, float16)       \
-    XND_CUDA_UNARY(name##f, uint8, float16)      \
-    XND_CUDA_UNARY(name##f, float16, float16)    \
-                                                 \
-    XND_CUDA_UNARY(name##f, int16, float32)      \
-    XND_CUDA_UNARY(name##f, uint16, float32)     \
-    XND_CUDA_UNARY(name##f, float32, float32)    \
-                                                 \
-    XND_CUDA_UNARY(name, int32, float64)         \
-    XND_CUDA_UNARY(name, uint32, float64)        \
-    XND_CUDA_UNARY(name, float64, float64)       \
+    ALL_UNARY_REAL_MATH(name)                    \
                                                  \
     XND_CUDA_UNARY(name, complex32, complex32)   \
     XND_CUDA_UNARY(name, complex64, complex64)   \
@@ -406,7 +398,7 @@ static const gm_kernel_init_t unary_negative[] = {
 /*                                Abs functions                              */
 /*****************************************************************************/
 
-XND_CUDA_ALL_UNARY_MATH(fabs)
+XND_CUDA_ALL_UNARY_REAL_MATH(fabs)
 
 
 /*****************************************************************************/
@@ -414,8 +406,8 @@ XND_CUDA_ALL_UNARY_MATH(fabs)
 /*****************************************************************************/
 
 XND_CUDA_ALL_UNARY_COMPLEX_MATH(exp)
-XND_CUDA_ALL_UNARY_MATH(exp2)
-XND_CUDA_ALL_UNARY_MATH(expm1)
+XND_CUDA_ALL_UNARY_REAL_MATH(exp2)
+XND_CUDA_ALL_UNARY_REAL_MATH(expm1)
 
 
 /*****************************************************************************/
@@ -424,9 +416,9 @@ XND_CUDA_ALL_UNARY_MATH(expm1)
 
 XND_CUDA_ALL_UNARY_COMPLEX_MATH(log)
 XND_CUDA_ALL_UNARY_COMPLEX_MATH(log10)
-XND_CUDA_ALL_UNARY_MATH(log2)
-XND_CUDA_ALL_UNARY_MATH(log1p)
-XND_CUDA_ALL_UNARY_MATH(logb)
+XND_CUDA_ALL_UNARY_REAL_MATH(log2)
+XND_CUDA_ALL_UNARY_REAL_MATH(log1p)
+XND_CUDA_ALL_UNARY_REAL_MATH(logb)
 
 
 /*****************************************************************************/
@@ -434,7 +426,7 @@ XND_CUDA_ALL_UNARY_MATH(logb)
 /*****************************************************************************/
 
 XND_CUDA_ALL_UNARY_COMPLEX_MATH(sqrt)
-XND_CUDA_ALL_UNARY_MATH(cbrt)
+XND_CUDA_ALL_UNARY_REAL_MATH(cbrt)
 
 
 /*****************************************************************************/
@@ -465,21 +457,21 @@ XND_CUDA_ALL_UNARY_COMPLEX_MATH(atanh)
 /*                          Error and gamma functions                        */
 /*****************************************************************************/
 
-XND_CUDA_ALL_UNARY_MATH(erf)
-XND_CUDA_ALL_UNARY_MATH(erfc)
-XND_CUDA_ALL_UNARY_MATH(lgamma)
-XND_CUDA_ALL_UNARY_MATH(tgamma)
+XND_CUDA_ALL_UNARY_REAL_MATH(erf)
+XND_CUDA_ALL_UNARY_REAL_MATH(erfc)
+XND_CUDA_ALL_UNARY_REAL_MATH(lgamma)
+XND_CUDA_ALL_UNARY_REAL_MATH(tgamma)
 
 
 /*****************************************************************************/
 /*                           Ceiling, floor, trunc                           */
 /*****************************************************************************/
 
-XND_CUDA_ALL_UNARY_MATH(ceil)
-XND_CUDA_ALL_UNARY_MATH(floor)
-XND_CUDA_ALL_UNARY_MATH(trunc)
-XND_CUDA_ALL_UNARY_MATH(round)
-XND_CUDA_ALL_UNARY_MATH(nearbyint)
+XND_CUDA_ALL_UNARY_REAL_MATH(ceil)
+XND_CUDA_ALL_UNARY_REAL_MATH(floor)
+XND_CUDA_ALL_UNARY_REAL_MATH(trunc)
+XND_CUDA_ALL_UNARY_REAL_MATH(round)
+XND_CUDA_ALL_UNARY_REAL_MATH(nearbyint)
 
 
 static const gm_kernel_init_t unary_float[] = {

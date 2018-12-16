@@ -67,6 +67,18 @@ c64_to_c32(complex64_t c)
 /*                         Cuda unary device kernels                         */
 /*****************************************************************************/
 
+#define CUDA_EXTERN_UNARY(func, t0, t1) \
+extern "C" void                                                                       \
+gm_cuda_device_fixed_##func##_1D_C_##t0##_##t1(const char *in0, char *out, int64_t N) \
+{                                                                                     \
+    const t0##_t *_in0 = (const t0##_t *)in0;                                         \
+    t1##_t *_out = (t1##_t *)out;                                                     \
+    int blockSize = 256;                                                              \
+    int64_t numBlocks = (N + blockSize - 1) / blockSize;                              \
+    _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(_in0, _out, N);                   \
+}
+
+
 #define CUDA_DEVICE_UNARY(func, t0, t1, cast) \
 static __global__ void                                                                \
 _##func##_##t0##_##t1(const t0##_t *in0, t1##_t *out, int64_t N)                      \
@@ -78,15 +90,8 @@ _##func##_##t0##_##t1(const t0##_t *in0, t1##_t *out, int64_t N)                
     }                                                                                 \
 }                                                                                     \
                                                                                       \
-extern "C" void                                                                       \
-gm_cuda_device_fixed_##func##_1D_C_##t0##_##t1(const char *in0, char *out, int64_t N) \
-{                                                                                     \
-    const t0##_t *_in0 = (const t0##_t *)in0;                                         \
-    t1##_t *_out = (t1##_t *)out;                                                     \
-    int blockSize = 256;                                                              \
-    int64_t numBlocks = (N + blockSize - 1) / blockSize;                              \
-    _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(_in0, _out, N);                   \
-}
+CUDA_EXTERN_UNARY(func, t0, t1)
+
 
 #define CUDA_DEVICE_UNARY_HALF(func, t0, t1, conv) \
 static __global__ void                                                                \
@@ -99,15 +104,8 @@ _##func##_##t0##_##t1(const t0##_t *in0, t1##_t *out, int64_t N)                
     }                                                                                 \
 }                                                                                     \
                                                                                       \
-extern "C" void                                                                       \
-gm_cuda_device_fixed_##func##_1D_C_##t0##_##t1(const char *in0, char *out, int64_t N) \
-{                                                                                     \
-    const t0##_t *_in0 = (const t0##_t *)in0;                                         \
-    t1##_t *_out = (t1##_t *)out;                                                     \
-    int blockSize = 256;                                                              \
-    int64_t numBlocks = (N + blockSize - 1) / blockSize;                              \
-    _##func##_##t0##_##t1<<<numBlocks, blockSize>>>(_in0, _out, N);                   \
-}
+CUDA_EXTERN_UNARY(func, t0, t1)
+
 
 #define CUDA_DEVICE_UNARY_HALF_COMPLEX(func) \
 static __global__ void                                                                        \
@@ -120,15 +118,7 @@ _##func##_complex32_complex32(const complex32_t *in0, complex32_t *out, int64_t 
     }                                                                                         \
 }                                                                                             \
                                                                                               \
-extern "C" void                                                                               \
-gm_cuda_device_fixed_##func##_1D_C_complex32_complex32(const char *in0, char *out, int64_t N) \
-{                                                                                             \
-    const complex32_t *_in0 = (const complex32_t *)in0;                                       \
-    complex32_t *_out = (complex32_t *)out;                                                   \
-    int blockSize = 256;                                                                      \
-    int64_t numBlocks = (N + blockSize - 1) / blockSize;                                      \
-    _##func##_complex32_complex32<<<numBlocks, blockSize>>>(_in0, _out, N);                   \
-}
+CUDA_EXTERN_UNARY(func, complex32, complex32)
 
 
 /*****************************************************************************/
@@ -205,7 +195,7 @@ CUDA_DEVICE_UNARY(negative, complex128, complex128, complex128)
 /*                                   Math                                    */
 /*****************************************************************************/
 
-#define CUDA_DEVICE_ALL_UNARY_MATH(name) \
+#define CUDA_DEVICE_ALL_UNARY_REAL_MATH(name) \
     CUDA_DEVICE_UNARY_HALF(name##f, int8, float16, __short2half_rn)   \
     CUDA_DEVICE_UNARY_HALF(name##f, uint8, float16, __ushort2half_rn) \
     CUDA_DEVICE_UNARY_HALF(name##f, float16, float16, copy)           \
@@ -219,20 +209,10 @@ CUDA_DEVICE_UNARY(negative, complex128, complex128, complex128)
     CUDA_DEVICE_UNARY(name, float64, float64, float64)                \
 
 #define CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(name) \
-    CUDA_DEVICE_UNARY_HALF(name##f, int8, float16, __short2half_rn)   \
-    CUDA_DEVICE_UNARY_HALF(name##f, uint8, float16, __ushort2half_rn) \
-    CUDA_DEVICE_UNARY_HALF(name##f, float16, float16, copy)           \
-                                                                      \
-    CUDA_DEVICE_UNARY(name##f, int16, float32, float32)               \
-    CUDA_DEVICE_UNARY(name##f, uint16, float32, float32)              \
-    CUDA_DEVICE_UNARY(name##f, float32, float32, float32)             \
-                                                                      \
-    CUDA_DEVICE_UNARY(name, int32, float64, float64)                  \
-    CUDA_DEVICE_UNARY(name, uint32, float64, float64)                 \
-    CUDA_DEVICE_UNARY(name, float64, float64, float64)                \
-                                                                      \
-    CUDA_DEVICE_UNARY_HALF_COMPLEX(name)                              \
-    CUDA_DEVICE_UNARY(name, complex64, complex64, complex64)          \
+    CUDA_DEVICE_ALL_UNARY_REAL_MATH(name)                       \
+                                                                \
+    CUDA_DEVICE_UNARY_HALF_COMPLEX(name)                        \
+    CUDA_DEVICE_UNARY(name, complex64, complex64, complex64)    \
     CUDA_DEVICE_UNARY(name, complex128, complex128, complex128)
 
 
@@ -240,7 +220,7 @@ CUDA_DEVICE_UNARY(negative, complex128, complex128, complex128)
 /*                                Abs functions                              */
 /*****************************************************************************/
 
-CUDA_DEVICE_ALL_UNARY_MATH(fabs)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(fabs)
 
 
 /*****************************************************************************/
@@ -248,8 +228,8 @@ CUDA_DEVICE_ALL_UNARY_MATH(fabs)
 /*****************************************************************************/
 
 CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(exp)
-CUDA_DEVICE_ALL_UNARY_MATH(exp2)
-CUDA_DEVICE_ALL_UNARY_MATH(expm1)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(exp2)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(expm1)
 
 
 /*****************************************************************************/
@@ -258,9 +238,9 @@ CUDA_DEVICE_ALL_UNARY_MATH(expm1)
 
 CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(log)
 CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(log10)
-CUDA_DEVICE_ALL_UNARY_MATH(log2)
-CUDA_DEVICE_ALL_UNARY_MATH(log1p)
-CUDA_DEVICE_ALL_UNARY_MATH(logb)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(log2)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(log1p)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(logb)
 
 
 /*****************************************************************************/
@@ -268,7 +248,7 @@ CUDA_DEVICE_ALL_UNARY_MATH(logb)
 /*****************************************************************************/
 
 CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(sqrt)
-CUDA_DEVICE_ALL_UNARY_MATH(cbrt)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(cbrt)
 
 
 /*****************************************************************************/
@@ -299,18 +279,18 @@ CUDA_DEVICE_ALL_UNARY_COMPLEX_MATH(atanh)
 /*                            Error and gamma functions                      */
 /*****************************************************************************/
 
-CUDA_DEVICE_ALL_UNARY_MATH(erf)
-CUDA_DEVICE_ALL_UNARY_MATH(erfc)
-CUDA_DEVICE_ALL_UNARY_MATH(lgamma)
-CUDA_DEVICE_ALL_UNARY_MATH(tgamma)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(erf)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(erfc)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(lgamma)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(tgamma)
 
 
 /*****************************************************************************/
 /*                              Ceiling, floor, trunc                        */
 /*****************************************************************************/
 
-CUDA_DEVICE_ALL_UNARY_MATH(ceil)
-CUDA_DEVICE_ALL_UNARY_MATH(floor)
-CUDA_DEVICE_ALL_UNARY_MATH(trunc)
-CUDA_DEVICE_ALL_UNARY_MATH(round)
-CUDA_DEVICE_ALL_UNARY_MATH(nearbyint)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(ceil)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(floor)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(trunc)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(round)
+CUDA_DEVICE_ALL_UNARY_REAL_MATH(nearbyint)
