@@ -213,6 +213,7 @@ GM_API int gm_init_quaternion_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_pdist_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API int gm_init_cuda_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_cuda_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API void gm_finalize(void);
 

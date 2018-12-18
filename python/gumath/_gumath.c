@@ -206,14 +206,11 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     if (self->flags == GM_CUDA_FUNC) {
     #if HAVE_CUDA
-        if (xnd_cuda_mem_prefetch_async(stack[0].ptr, stack[0].type->datasize, 0, &ctx) < 0) {
-            clear_objects(result, spec.nout);
-            return seterr(&ctx);
-        }
-
-        if (xnd_cuda_mem_prefetch_async(stack[1].ptr, stack[1].type->datasize, 0, &ctx) < 0) {
-            clear_objects(result, spec.nout);
-            return seterr(&ctx);
+        for (i = 0; i < nin+spec.nout; i++) {
+            if (xnd_cuda_mem_prefetch_async(stack[i].ptr, stack[i].type->datasize, 0, &ctx) < 0) {
+                clear_objects(result, spec.nout);
+                return seterr(&ctx);
+            }
         }
 
         if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {

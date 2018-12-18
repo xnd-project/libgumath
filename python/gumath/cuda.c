@@ -54,6 +54,10 @@ PyInit_cuda(void)
            return Ndt_SetError(&ctx);
        }
 
+       if (gm_init_cuda_binary_kernels(table, &ctx) < 0) {
+           return Ndt_SetError(&ctx);
+       }
+
        initialized = 1;
     }
 
