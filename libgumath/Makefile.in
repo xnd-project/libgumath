@@ -41,8 +41,8 @@ SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/threa
               .objs/graph.o .objs/quaternion.o .objs/pdist.o
 
 ifdef CUDA_CXX
-OBJS += cuda_unary_host.o cuda_unary_device.o cuda_binary_host.o cuda_binary_device.o
-SHARED_OBJS += .objs/cuda_unary_host.o .objs/cuda_unary_device.o .objs/cuda_binary_host.o .objs/cuda_binary_device.o
+OBJS += cuda_unary_host.o cuda_unary_device.o cuda_host_binary.o cuda_device_binary.o
+SHARED_OBJS += .objs/cuda_unary_host.o .objs/cuda_unary_device.o .objs/cuda_host_binary.o .objs/cuda_device_binary.o
 endif
 
 
@@ -186,21 +186,21 @@ Makefile kernels/cuda_unary_device.cu kernels/common.h kernels/cuda_unary_device
 Makefile kernels/cuda_unary_device.cu kernels/common.h kernels/cuda_unary_device.h gumath.h
 	$(CUDA_CXX) --compiler-options "$(GM_CXXFLAGS_SHARED)" $(GM_CUDACXXFLAGS) -c kernels/cuda_unary_device.cu -o .objs/cuda_unary_device.o
 
-cuda_binary_host.o:\
-Makefile kernels/cuda_binary_host.c kernels/common.h kernels/cuda_binary_device.h gumath.h
-	$(CC) -I. $(GM_CFLAGS) -Wno-absolute-value -c kernels/cuda_binary_host.c
+cuda_host_binary.o:\
+Makefile kernels/cuda_host_binary.c kernels/common.h kernels/cuda_device_binary.h gumath.h
+	$(CC) -I. $(GM_CFLAGS) -Wno-absolute-value -c kernels/cuda_host_binary.c
 
-.objs/cuda_binary_host.o:\
-Makefile kernels/cuda_binary_host.c kernels/common.h kernels/cuda_binary_device.h gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -Wno-absolute-value -c kernels/cuda_binary_host.c -o .objs/cuda_binary_host.o
+.objs/cuda_host_binary.o:\
+Makefile kernels/cuda_host_binary.c kernels/common.h kernels/cuda_device_binary.h gumath.h
+	$(CC) -I. $(GM_CFLAGS_SHARED) -Wno-absolute-value -c kernels/cuda_host_binary.c -o .objs/cuda_host_binary.o
 
-cuda_binary_device.o:\
-Makefile kernels/cuda_binary_device.cu kernels/common.h kernels/cuda_binary_device.h gumath.h
-	$(CUDA_CXX) --compiler-options "$(GM_CXXFLAGS)" $(GM_CUDACXXFLAGS) -c kernels/cuda_binary_device.cu
+cuda_device_binary.o:\
+Makefile kernels/cuda_device_binary.cu kernels/common.h kernels/cuda_device_binary.h gumath.h
+	$(CUDA_CXX) --compiler-options "$(GM_CXXFLAGS)" $(GM_CUDACXXFLAGS) -c kernels/cuda_device_binary.cu
 
-.objs/cuda_binary_device.o:\
-Makefile kernels/cuda_binary_device.cu kernels/common.h kernels/cuda_binary_device.h gumath.h
-	$(CUDA_CXX) --compiler-options "$(GM_CXXFLAGS_SHARED)" $(GM_CUDACXXFLAGS) -c kernels/cuda_binary_device.cu -o .objs/cuda_binary_device.o
+.objs/cuda_device_binary.o:\
+Makefile kernels/cuda_device_binary.cu kernels/common.h kernels/cuda_device_binary.h gumath.h
+	$(CUDA_CXX) --compiler-options "$(GM_CXXFLAGS_SHARED)" $(GM_CUDACXXFLAGS) -c kernels/cuda_device_binary.cu -o .objs/cuda_device_binary.o
 
 
 # Coverage
