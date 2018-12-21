@@ -41,7 +41,7 @@
 #include "xnd.h"
 #include "gumath.h"
 #include "common.h"
-#include "cuda_unary_device.h"
+#include "cuda_device_unary.h"
 
 
 /****************************************************************************/

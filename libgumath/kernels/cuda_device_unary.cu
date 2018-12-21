@@ -33,7 +33,7 @@
 
 #include <cinttypes>
 #include <thrust/complex.h>
-#include "cuda_unary_device.h"
+#include "cuda_device_unary.h"
 
 
 /*****************************************************************************/
