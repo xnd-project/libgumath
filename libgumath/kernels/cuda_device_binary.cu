@@ -40,10 +40,21 @@
 /*                Lexicographic comparison for complex numbers               */
 /*****************************************************************************/
 
+template <class T>
+static inline __device__ bool
+_isnan(T a)
+{
+    return isnan(a.real()) || isnan(a.imag());
+}
+
 template <class T, class U>
 static inline __device__ bool
 lexorder_le(T a, U b)
 {
+    if (_isnan(a) || _isnan(b)) {
+        return false;
+    }
+
     return a.real() < b.real() || (a.real() == b.real() && a.imag() <= b.imag());
 }
 
@@ -51,6 +62,10 @@ template <class T, class U>
 static inline __device__ bool
 lexorder_lt(T a, U b)
 {
+    if (_isnan(a) || _isnan(b)) {
+        return false;
+    }
+
     return a.real() < b.real() || (a.real() == b.real() && a.imag() < b.imag());
 }
 
@@ -58,6 +73,10 @@ template <class T, class U>
 static inline __device__ bool
 lexorder_ge(T a, U b)
 {
+    if (_isnan(a) || _isnan(b)) {
+        return false;
+    }
+
     return a.real() > b.real() || (a.real() == b.real() && a.imag() >= b.imag());
 }
 
@@ -65,6 +84,10 @@ template <class T, class U>
 static inline __device__ bool
 lexorder_gt(T a, U b)
 {
+    if (_isnan(a) || _isnan(b)) {
+        return false;
+    }
+
     return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
 }
 
