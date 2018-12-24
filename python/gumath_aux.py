@@ -36,7 +36,10 @@ from itertools import accumulate, count, product
 from random import randrange
 from collections import namedtuple
 import math
+import struct
 import unittest
+from randdec import all_unary, all_binary
+from randfloat import un_randfloat, bin_randfloat
 
 
 def skip_if(condition, reason):
@@ -380,3 +383,217 @@ def split_xnd(x, n, max_outer=None):
     return [x[i] for i in indices_list]
 
 
+# ======================================================================
+#                           Generate test cases
+# ======================================================================
+
+tunsigned = ["bool", "uint8", "uint16", "uint32", "uint64"]
+tsigned = ["int8", "int16", "int32", "int64"]
+tfloat = ["float16", "float32", "float64"]
+tcomplex = ["complex32", "complex64", "complex128"]
+
+tinfo = {
+  "bool": (0, 1),
+  "uint8": (0, 2**8-1),
+  "uint16": (0, 2**16-1),
+  "uint32": (0, 2**32-1),
+  "uint64": (0, 2**64-1),
+  "int8": (-2**7,  2**7-1),
+  "int16": (-2**15, 2**15-1),
+  "int32": (-2**31, 2**31-1),
+  "int64": (-2**63, 2**63-1),
+  "float16": (-2**11, 2**11, 15),
+  "float32": (-2**24, 2**24, 127),
+  "float64": (-2**53, 2**53, 1023),
+  "complex32": (-2**11, 2**11, 15),
+  "complex64": (-2**24, 2**24, 127),
+  "complex128": (-2**53, 2**53, 1023)
+}
+
+class Tint(object):
+    def __init__(self, type):
+        if type not in tunsigned + tsigned:
+            raise ValueError("not an integer type: '%s'" % type)
+        self.type = type
+        self.min, self.max = tinfo[type]
+        self.all = (self.type, self.min, self.max)
+    def __repr__(self):
+        return self.type
+    def __eq__(self, other):
+        return isinstance(Tint, other) and self.all == other.all
+    def __hash__(self):
+        return hash(self.all)
+    def testcases(self):
+        yield 0
+        yield self.min
+        yield self.max
+        for i in range(10):
+            yield randrange(self.min, self.max+1)
+    def cpu_noimpl(self):
+        return False
+    def cuda_noimpl(self):
+        return False
+
+class Tfloat(object):
+    def __init__(self, type):
+        if type not in tfloat:
+            raise ValueError("not a float type: '%s'" % type)
+        self.type = type
+        self.min, self.max, self.exp = tinfo[type]
+        self.all = (self.type, self.min, self.max, self.exp)
+    def __repr__(self):
+        return self.type
+    def __eq__(self, other):
+        return isinstance(Tint, other) and self.all == other.all
+    def __hash__(self):
+        return hash(self.all)
+    def testcases(self):
+        yield 0
+        yield self.min
+        yield self.max
+        prec = randrange(1, 10)
+        for v in all_unary(prec, self.exp, 1):
+            yield float(v)
+        for v in un_randfloat():
+            yield float(v)
+    def cpu_noimpl(self):
+        return self.type == "float16"
+    def cuda_noimpl(self):
+        return False
+
+class Tcomplex(object):
+    def __init__(self, type):
+        if type not in tcomplex:
+            raise ValueError("not a complex type: '%s'" % type)
+        self.type = type
+        self.min, self.max, self.exp = tinfo[type]
+        self.all = (self.type, self.min, self.max, self.exp)
+    def __repr__(self):
+        return self.type
+    def __eq__(self, other):
+        return isinstance(Tint, other) and self.all == other.all
+    def __hash__(self):
+        return hash(self.all)
+    def testcases(self):
+        yield 0
+        yield self.min
+        yield self.max
+        prec = randrange(1, 10)
+        for v, w in all_binary(prec, self.exp, 1):
+            yield complex(float(v), float(w))
+        for v, w in bin_randfloat():
+            yield complex(float(v), float(w))
+    def cpu_noimpl(self):
+        return True
+    def cuda_noimpl(self):
+        return self.type == "complex32"
+
+tinfo_binary = [
+  Tint("uint8"),
+  Tint("uint16"),
+  Tint("uint32"),
+  Tint("uint64"),
+  Tint("int8"),
+  Tint("int16"),
+  Tint("int32"),
+  Tint("int64"),
+  Tfloat("float16"),
+  Tfloat("float32"),
+  Tfloat("float64"),
+  Tcomplex("complex32"),
+  Tcomplex("complex64"),
+  Tcomplex("complex128")
+]
+
+tinfo_bitwise = [
+  Tint("bool"),
+  Tint("uint8"),
+  Tint("uint16"),
+  Tint("uint32"),
+  Tint("uint64"),
+  Tint("int8"),
+  Tint("int16"),
+  Tint("int32"),
+  Tint("int64")
+]
+
+implemented_sigs = {"binary": {}, "divide": {}, "comparison": {}, "bitwise": {}}
+exact_sigs = {"binary": {}, "divide": {}, "comparison": {}, "bitwise": {}}
+inexact_sigs = {"binary": {}, "divide": {}, "comparison": {}, "bitwise": {}}
+
+def init_common_cast(func, tinfo, rank1, rank2):
+    min_rank = min(rank1, rank2)
+    max_rank = max(rank1, rank2)
+
+    t = tinfo[min_rank]
+    u = tinfo[max_rank]
+
+    start = max(8, max_rank) if func == "divide" else max_rank
+    smallest_common_cast = False
+
+    for i in range(start, len(tinfo_binary)):
+        common_cast = tinfo_binary[i]
+        w = Tint("bool") if func == "comparison" else common_cast
+        if common_cast.min <= t.min and t.max <= common_cast.max and \
+           common_cast.min <= u.min and u.max <= common_cast.max:
+               if smallest_common_cast:
+                   exact_sigs[func][(t, u)] = w
+               else:
+                   smallest_common_cast = True
+                   implemented_sigs[func][(t, u)] = w
+                   exact_sigs[func][(t, u)] = w
+        else:
+            inexact_sigs[func][(t, u)] = w
+
+def init_cast_tbl(func):
+    if func == "binary" or func == "divide" or func == "comparison":
+        tinfo = tinfo_binary
+    elif func == "bitwise":
+        tinfo = tinfo_bitwise
+    else:
+        raise ValueError("unsupported function type '%s'" % func)
+
+    for rank1, _ in enumerate(tinfo):
+        for rank2, _ in enumerate(tinfo):
+            init_common_cast(func, tinfo, rank1, rank2)
+
+
+init_cast_tbl("binary")
+init_cast_tbl("divide")
+init_cast_tbl("comparison")
+init_cast_tbl("bitwise")
+
+
+_struct_format = {
+  "float16": "e",
+  "float32": "f",
+  "float64": "d",
+  "complex32": "e",
+  "complex64": "f",
+  "complex128": "d"
+}
+
+def roundtrip_ne(v, fmt):
+    if fmt == "e":
+        try:
+            struct.pack(fmt, v)
+        except (OverflowError, struct.error):
+            return True
+        else:
+            return False
+    else:
+        if math.isinf(v):
+            return False
+        s = struct.unpack(fmt, struct.pack(fmt, v))[0]
+        return math.isinf(float(s))
+
+def struct_overflow(v, t):
+    try:
+        fmt = _struct_format[t.type]
+    except KeyError:
+        return False
+
+    if isinstance(t, Tcomplex):
+        return roundtrip_ne(v.real, fmt) or roundtrip_ne(v.imag, fmt)
+    else:
+        return roundtrip_ne(v, fmt)

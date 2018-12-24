@@ -38,12 +38,19 @@ from ndtypes import ndt
 from extending import Graph
 import sys, time
 import math
+import cmath
 import unittest
 import argparse
 from gumath_aux import *
 
 try:
+    import gumath.cuda as cd
+except ImportError:
+    cd = None
+
+try:
     import numpy as np
+    np.warnings.filterwarnings('ignore')
 except ImportError:
     np = None
 
@@ -375,190 +382,238 @@ class TestUnary(unittest.TestCase):
         self.assertRaises(ValueError, fn.sin, x)
 
 
-tinfo_binary = [
-  ("uint8",      (0, 2**8-1)),
-  ("uint16",     (0, 2**16-1)),
-  ("uint32",     (0, 2**32-1)),
-  ("uint64",     (0, 2**64-1)),
-  ("int8",       (-2**7,  2**7-1)),
-  ("int16",      (-2**15, 2**15-1)),
-  ("int32",      (-2**31, 2**31-1)),
-  ("int64",      (-2**63, 2**63-1)),
-  # ("float16",    (-2**11, 2**11)),
-  ("float32",    (-2**24, 2**24)),
-  ("float64",    (-2**53, 2**53)),
-  # ("complex32",  (-2**11, 2**11)),
-  # ("complex64",  (-2**24, 2**24)),
-  # ("complex128", (-2**53, 2**53))
-]
-
-tinfo_bitwise = [
-  ("bool",       (0, 1)),
-  ("uint8",      (0, 2**8-1)),
-  ("uint16",     (0, 2**16-1)),
-  ("uint32",     (0, 2**32-1)),
-  ("uint64",     (0, 2**64-1)),
-  ("int8",       (-2**7,  2**7-1)),
-  ("int16",      (-2**15, 2**15-1)),
-  ("int32",      (-2**31, 2**31-1)),
-  ("int64",      (-2**63, 2**63-1)),
-]
-
-def common_cast_binary(rank1, rank2):
-    min_rank = min(rank1, rank2)
-    max_rank = max(rank1, rank2)
-    t = tinfo_binary[min_rank]
-    u = tinfo_binary[max_rank]
-    for i in range(max_rank, len(tinfo_binary)):
-        w = tinfo_binary[i]
-        if w[1][0] <= t[1][0] and t[1][1] <= w[1][1] and \
-           w[1][0] <= u[1][0] and u[1][1] <= w[1][1]:
-               return w
-    return None
-
-def common_cast_bitwise(rank1, rank2):
-    min_rank = min(rank1, rank2)
-    max_rank = max(rank1, rank2)
-    t = tinfo_bitwise[min_rank]
-    u = tinfo_bitwise[max_rank]
-    for i in range(max_rank, len(tinfo_bitwise)):
-        w = tinfo_bitwise[i]
-        if w[1][0] <= t[1][0] and t[1][1] <= w[1][1] and \
-           w[1][0] <= u[1][0] and u[1][1] <= w[1][1]:
-               return w
-    return None
-
-
 class TestBinary(unittest.TestCase):
 
-    def test_add(self):
-        for rank1, t in enumerate(tinfo_binary):
-            for rank2, u in enumerate(tinfo_binary):
-                w = common_cast_binary(rank1, rank2)
-                x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+    def test_binary(self):
+        for t, u in implemented_sigs["binary"]:
+            w = implemented_sigs["binary"][(t, u)]
 
-                if w is not None:
-                    z = fn.add(x, y)
-                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, 13, 15])
-                else:
-                    self.assertRaises(ValueError, fn.add, x, y)
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
+
+            x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t.type)
+            y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u.type)
+            z = fn.add(x, y)
+            self.assertEqual(z, [1, 3, 5, 7, 9, 11, 13, 15])
 
     def test_add_opt(self):
-        for rank1, t in enumerate(tinfo_binary):
-            for rank2, u in enumerate(tinfo_binary):
-                w = common_cast_binary(rank1, rank2)
-                x = xnd([0, 1, None, 3, 4, 5, 6, 7], dtype="?" + t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u[0])
+        for t, u in implemented_sigs["binary"]:
+            w = implemented_sigs["binary"][(t, u)]
 
-                if w is not None:
-                    z = fn.add(x, y)
-                    self.assertEqual(z, [1, 3, None, 7, 9, 11, None, 15])
-                else:
-                    self.assertRaises(ValueError, fn.add, x, y)
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
 
-
-                x = xnd([0, 1, 2, 3, 4, 5, None, 7], dtype="?" + t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
-
-                if w is not None:
-                    z = fn.add(x, y)
-                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, None, 15])
-                else:
-                    self.assertRaises(ValueError, fn.add, x, y)
-
-
-                x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u[0])
-
-                if w is not None:
-                    z = fn.add(x, y)
-                    self.assertEqual(z, [1, 3, 5, 7, 9, 11, None, 15])
-                else:
-                    self.assertRaises(ValueError, fn.add, x, y)
+            x = xnd([0, 1, None, 3, 4, 5, 6, 7], dtype="?" + t.type)
+            y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u.type)
+            z = fn.add(x, y)
+            self.assertEqual(z, [1, 3, None, 7, 9, 11, None, 15])
 
     def test_subtract(self):
-        for rank1, t in enumerate(tinfo_binary):
-            for rank2, u in enumerate(tinfo_binary):
-                w = common_cast_binary(rank1, rank2)
-                x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+        for t, u in implemented_sigs["binary"]:
+            w = implemented_sigs["binary"][(t, u)]
 
-                if w is not None:
-                    z = fn.subtract(x, y)
-                    self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
-                else:
-                    self.assertRaises(ValueError, fn.subtract, x, y)
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
+
+            x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t.type)
+            y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u.type)
+            z = fn.subtract(x, y)
+            self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
 
     def test_multiply(self):
-        for rank1, t in enumerate(tinfo_binary):
-            for rank2, u in enumerate(tinfo_binary):
-                w = common_cast_binary(rank1, rank2)
-                x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t[0])
-                y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u[0])
+        for t, u in implemented_sigs["binary"]:
+            w = implemented_sigs["binary"][(t, u)]
 
-                if w is not None:
-                    z = fn.subtract(x, y)
-                    self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
-                else:
-                    self.assertRaises(ValueError, fn.subtract, x, y)
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
+
+            x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t.type)
+            y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u.type)
+            z = fn.subtract(x, y)
+            self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
 
 
 class TestBitwise(unittest.TestCase):
 
     def test_and(self):
-        for rank1, t in enumerate(tinfo_bitwise):
-            for rank2, u in enumerate(tinfo_bitwise):
-                w = common_cast_bitwise(rank1, rank2)
-                x = xnd([0, 1, 0, 1, 1, 1, 1, 0], dtype=t[0])
-                y = xnd([1, 0, 0, 0, 1, 1, 1, 1], dtype=u[0])
+        for t, u in implemented_sigs["bitwise"]:
+            w = implemented_sigs["bitwise"][(t, u)]
 
-                if w is not None:
-                    z = fn.bitwise_and(x, y)
-                    self.assertEqual(z, [0, 0, 0, 0, 1, 1, 1, 0])
-                else:
-                    self.assertRaises(ValueError, fn.bitwise_and, x, y)
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
+
+            x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t.type)
+            x = xnd([0, 1, 0, 1, 1, 1, 1, 0], dtype=t.type)
+            y = xnd([1, 0, 0, 0, 1, 1, 1, 1], dtype=u.type)
+            z = fn.bitwise_and(x, y)
+            self.assertEqual(z, [0, 0, 0, 0, 1, 1, 1, 0])
 
     def test_and_opt(self):
-        for rank1, t in enumerate(tinfo_bitwise):
-            for rank2, u in enumerate(tinfo_bitwise):
-                w = common_cast_bitwise(rank1, rank2)
+        for t, u in implemented_sigs["bitwise"]:
+            w = implemented_sigs["bitwise"][(t, u)]
 
-                a = [0, 1, None, 1, 1, 1, 1, 0]
-                b = [1, 1, 1, 1, 1, 1, None, 0]
-                c = [0, 1, None, 1, 1, 1, None, 0]
+            if t.cpu_noimpl() or u.cpu_noimpl():
+                continue
 
-                x = xnd(a, dtype="?" + t[0])
-                y = xnd(b, dtype="?" + u[0])
+            a = [0, 1, None, 1, 1, 1, 1, 0]
+            b = [1, 1, 1, 1, 1, 1, None, 0]
+            c = [0, 1, None, 1, 1, 1, None, 0]
 
-                if w is not None:
-                    z = fn.bitwise_and(x, y)
-                    self.assertEqual(z, c)
-                else:
-                    self.assertRaises(ValueError, fn.bitwise_and, x, y)
+            x = xnd(a, dtype="?" + t.type)
+            y = xnd(b, dtype="?" + u.type)
+            z = fn.bitwise_and(x, y)
+            self.assertEqual(z, c)
 
 
-                a = [0, 1, None, 1, 1, 1, None, 0]
-                b = [1, 1, 1, 1, 1, 1, 1, 0]
-                c = [0, 1, None, 1, 1, 1, None, 0]
+@unittest.skipIf(cd is None or np is None, "test requires cuda and numpy")
+class TestCuda(unittest.TestCase):
 
-                x = xnd(a, dtype="?" + t[0])
-                y = xnd(b, dtype=u[0])
+    def assertRelErrorLess(self, calc, expected, maxerr, msg):
+        if cmath.isnan(calc) or cmath.isnan(expected):
+            return
+        elif cmath.isinf(calc) or cmath.isinf(expected):
+            return
+        elif abs(expected) < 1e-6 and abs(calc) < 1e-6:
+            return
+        else:
+            err = abs((calc-expected) / expected)
+            self.assertLess(err, maxerr, msg)
 
-                if w is not None:
-                    z = fn.bitwise_and(x, y)
-                    self.assertEqual(z, c)
-                else:
-                    self.assertRaises(ValueError, fn.bitwise_and, x, y)
+    def equal(self, calc, expected, msg):
+        if np.isnan(calc) and np.isnan(expected):
+            return
+        else:
+            self.assertEqual(calc, expected, msg)
 
-                x = xnd(b, dtype=t[0])
-                y = xnd(a, dtype="?" + u[0])
+    def assert_equal(self, f, a, t, b, u, w, z1, z2):
+        msg = "%s(%s : %s, %s : %s) -> %s    xnd: %s    np: %s" % \
+              (f, a, t, b, u, w, z1, z2)
 
-                if w is not None:
-                    z = fn.bitwise_and(x, y)
-                    self.assertEqual(z, a)
-                else:
-                    self.assertRaises(ValueError, fn.bitwise_and, x, y)
+        if isinstance(z1, complex):
+            if f in ("multiply", "divide"):
+                self.assertRelErrorLess(z1.real, z2.real, 1e-2, msg)
+                self.assertRelErrorLess(z1.imag, z2.imag, 1e-2, msg)
+            else:
+                self.equal(z1.real, z2.real, msg) and \
+                self.equal(z1.imag, z2.imag, msg)
+        elif f == "divide" and w.type in ("float16", "float32"):
+            self.assertRelErrorLess(z1, z2, 1e-2, msg)
+        else:
+            return self.equal(z1, z2, msg)
+
+    def create_xnd(self, a, t, b, u):
+
+        # Check that struct.pack(v) overflows iff xnd(v) overflows.
+        overflow = struct_overflow(a, t)
+        xnd_overflow = False
+        try:
+            x1 = xnd([a], dtype=t.type, device="cuda:managed")
+        except OverflowError:
+            xnd_overflow = True
+
+        self.assertEqual(xnd_overflow, overflow)
+        if xnd_overflow:
+            return
+
+        # Check that struct.pack(v) overflows iff xnd(v) overflows.
+        overflow = struct_overflow(b, u)
+        xnd_overflow = False
+        try:
+            y1 = xnd([b], dtype=u.type, device="cuda:managed")
+        except OverflowError:
+            xnd_overflow = True
+
+        self.assertEqual(xnd_overflow, overflow)
+        if xnd_overflow:
+           return
+
+        return x1, y1
+
+    def check_binary_not_implemented(self, f, a, t, b, u, w):
+
+        xy = self.create_xnd(a, t, b, u)
+        if xy is None:
+            return
+
+        x1, y1 = xy
+        self.assertRaises(NotImplementedError, getattr(cd, f), x1, y1)
+
+    def check_binary_type_error(self, f, a, t, b, u, w):
+
+        xy = self.create_xnd(a, t, b, u)
+        if xy is None:
+            return
+
+        x1, y1 = xy
+        self.assertRaises(TypeError, getattr(cd, f), x1, y1)
+
+    def check_binary(self, f, a, t, b, u, w):
+
+        xy = self.create_xnd(a, t, b, u)
+        if xy is None:
+            return
+
+        x1, y1 = xy
+        z1 = getattr(cd, f)(x1, y1)
+        self.assertEqual(str(z1[0].type), w.type)
+
+        x2 = np.array([a], dtype=t.type)
+        y2 = np.array([b], dtype=u.type)
+        z2 = getattr(np, f)(x2, y2)
+
+        self.assert_equal(f, a, t, b, u, w, z1[0].value, z2[0])
+
+    def test_binary(self):
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        print("\n")
+
+        for f in ("add", "subtract", "multiply", "divide"):
+            print("testing %s ..." % f)
+
+            key = f if f == "divide" else "binary"
+
+            for t, u in implemented_sigs[key]:
+                w = implemented_sigs[key][(t, u)]
+
+                print("    %s, %s -> %s" % (t, u, w))
+
+                for a in t.testcases():
+                    for b in u.testcases():
+                        if t.cuda_noimpl() or u.cuda_noimpl():
+                            self.check_binary_not_implemented(f, a, t, b, u, w)
+                        else:
+                            self.check_binary(f, a, t, b, u, w)
+
+    def test_comparison(self):
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        print("\n")
+
+        for f in ("less", "less_equal", "greater_equal", "greater"):
+            print("testing %s ..." % f)
+
+            for t, u in implemented_sigs["comparison"]:
+                w = implemented_sigs["comparison"][(t, u)]
+
+                print("    %s, %s -> %s" % (t, u, w))
+
+                for a in t.testcases():
+                    for b in u.testcases():
+                        if t.cuda_noimpl() or u.cuda_noimpl():
+                            self.check_binary_not_implemented(f, a, t, b, u, w)
+                        else:
+                            self.check_binary(f, a, t, b, u, w)
+
+    def test_divide_inexact(self):
+
+        t = Tint("uint8")
+        u = Tint("uint64")
+        w = Tfloat("float64")
+
+        a = next(t.testcases())
+        b = next(u.testcases())
+        self.check_binary_type_error("divide", a, t, b, u, w)
 
 
 class TestSpec(unittest.TestCase):
@@ -782,6 +837,7 @@ ALL_TESTS = [
   TestUnary,
   TestBinary,
   TestBitwise,
+  TestCuda,
   LongIndexSliceTest,
 ]
 
