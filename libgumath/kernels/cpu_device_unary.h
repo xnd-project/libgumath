@@ -37,7 +37,7 @@
 
 #ifdef __cplusplus
 #include <cinttypes>
-#include <complex.h>
+#include <complex>
 typedef std::complex<float> complex64_t;
 typedef std::complex<double> complex128_t;
 #else

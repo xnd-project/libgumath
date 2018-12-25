@@ -32,6 +32,7 @@
 
 
 #include <cinttypes>
+#include <cmath>
 #include <complex>
 #include "cpu_device_unary.h"
 
