@@ -41,12 +41,12 @@ AC_SUBST(host)
 
 # Language and compiler:
 AC_LANG_C
-saved_cflags=$CFLAGS
-saved_cxxflags=$CXXFLAGS
+saved_cflags="$CFLAGS"
+saved_cxxflags="$CXXFLAGS"
 AC_PROG_CC
 AC_PROG_CXX
-CFLAGS=$saved_cflags
-CXXFLAGS=$saved_cxxflags
+CFLAGS="$saved_cflags"
+CXXFLAGS="$saved_cxxflags"
 
 # ar and ranlib:
 AC_CHECK_TOOL(AR, ar, ar)
@@ -66,19 +66,23 @@ AC_SUBST(INSTALL)
 
 # Cuda compiler:
 AC_MSG_CHECKING(for nvcc)
-saved_cflags="$CC"
+saved_cc="$CC"
+saved_cflags="$CFLAGS"
+saved_cxxflags="$CXXFLAGS"
 CC=nvcc
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
-__device__ void
+void
 f(void)
 {
     return;
 }
 ]])],
-[have_nvcc=no],
 [have_nvcc=yes],
+[have_nvcc=no],
 [have_nvcc=undefined])
-CC=$saved_cflags
+CC="$saved_cc"
+CFLAGS="$saved_cflags"
+CXXFLAGS="$saved_cxxflags"
 AC_MSG_RESULT($have_nvcc)
 
 CUDA_CXX=
