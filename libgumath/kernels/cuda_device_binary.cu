@@ -93,7 +93,7 @@ lexorder_gt(T a, U b)
 
 
 /*****************************************************************************/
-/*                         Cuda binary device kernels                        */
+/*                         Cuda device binary kernels                        */
 /*****************************************************************************/
 
 #define CUDA_DEVICE_BINARY(name, func, t0, t1, t2, common) \

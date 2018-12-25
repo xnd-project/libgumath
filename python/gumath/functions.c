@@ -50,7 +50,7 @@ PyInit_functions(void)
            return Ndt_SetError(&ctx);
        }
 
-       if (gm_init_unary_kernels(table, &ctx) < 0) {
+       if (gm_init_cpu_unary_kernels(table, &ctx) < 0) {
            return Ndt_SetError(&ctx);
        }
        if (gm_init_binary_kernels(table, &ctx) < 0) {

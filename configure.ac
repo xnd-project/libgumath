@@ -44,6 +44,7 @@ AC_LANG_C
 saved_cflags=$CFLAGS
 saved_cxxflags=$CXXFLAGS
 AC_PROG_CC
+AC_PROG_CXX
 CFLAGS=$saved_cflags
 CXXFLAGS=$saved_cxxflags
 
@@ -64,16 +65,28 @@ AC_PROG_INSTALL
 AC_SUBST(INSTALL)
 
 # Cuda compiler:
-ac_save_cxx="$CXX"
-CXX=
+AC_MSG_CHECKING(for nvcc)
+saved_cflags="$CC"
+CC=nvcc
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+__device__ void
+f(void)
+{
+    return;
+}
+]])],
+[have_nvcc=no],
+[have_nvcc=yes],
+[have_nvcc=undefined])
+CC=$saved_cflags
+AC_MSG_RESULT($have_nvcc)
+
 CUDA_CXX=
-AC_PROG_CXX([nvcc])
-if test "$CXX" = "nvcc"; then
-  CUDA_CXX="nvcc"
-  AC_DEFINE(HAVE_CUDA, 1, [Define to 1 if you have the nvcc cuda compiler.])
+if test "$have_nvcc" = yes; then
+    CUDA_CXX=nvcc
+    AC_DEFINE(HAVE_CUDA, 1, [Define to 1 if you have the nvcc cuda compiler.])
 fi
 AC_SUBST(CUDA_CXX)
-CXX=$ac_save_cxx
 
 # Add an explicit include directory.
 AC_MSG_CHECKING(for --with-includes)
@@ -169,9 +182,9 @@ else
 fi
 
 if test -z "$CXXFLAGS"; then
-    CONFIGURE_CXXFLAGS="$XND_INCLUDE -Wall -Wextra -O2 -g"
+    CONFIGURE_CXXFLAGS="$XND_INCLUDE -Wall -Wextra -std=c++11 $GM_OPT -g"
 else
-    CONFIGURE_CXXFLAGS="$XND_INCLUDE -Wall -Wextra -O2 -g $CXXFLAGS"
+    CONFIGURE_CXXFLAGS="$XND_INCLUDE -Wall -Wextra -std=c++11 $GM_OPT -g $CXXFLAGS"
 fi
 
 if test -z "$LDFLAGS"; then

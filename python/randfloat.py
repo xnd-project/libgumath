@@ -159,18 +159,18 @@ TESTCASES = [
 ]
 
 def un_randfloat():
-    for i in range(10):
+    for i in range(2):
         l = random.choice(TESTCASES[:6])
         yield random.choice(l)
 
 def bin_randfloat():
-    for i in range(10):
+    for i in range(2):
         l1 = random.choice(TESTCASES)
         l2 = random.choice(TESTCASES)
         yield random.choice(l1), random.choice(l2)
 
 def tern_randfloat():
-    for i in range(10):
+    for i in range(2):
         l1 = random.choice(TESTCASES)
         l2 = random.choice(TESTCASES)
         l3 = random.choice(TESTCASES)

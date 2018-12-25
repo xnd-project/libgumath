@@ -64,7 +64,7 @@ typedef double float64_t;
   void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *in0, char *out, int64_t N);
 #endif
 
-#define CUDA_NOIMPL_DEVICE_DECL(name, t0, t1)
+#define CUDA_DEVICE_NOIMPL_DECL(name, t0, t1)
 
 
 /*****************************************************************************/
@@ -87,7 +87,7 @@ CUDA_DEVICE_UNARY_DECL(copy, float16, float16)
 CUDA_DEVICE_UNARY_DECL(copy, float32, float32)
 CUDA_DEVICE_UNARY_DECL(copy, float64, float64)
 
-CUDA_NOIMPL_DEVICE_DECL(copy, complex32, complex32)
+CUDA_DEVICE_NOIMPL_DECL(copy, complex32, complex32)
 CUDA_DEVICE_UNARY_DECL(copy, complex64, complex64)
 CUDA_DEVICE_UNARY_DECL(copy, complex128, complex128)
 
@@ -126,7 +126,7 @@ CUDA_DEVICE_UNARY_DECL(negative, float16, float16)
 CUDA_DEVICE_UNARY_DECL(negative, float32, float32)
 CUDA_DEVICE_UNARY_DECL(negative, float64, float64)
 
-CUDA_NOIMPL_DEVICE_DECL(negative, complex32, complex32)
+CUDA_DEVICE_NOIMPL_DECL(negative, complex32, complex32)
 CUDA_DEVICE_UNARY_DECL(negative, complex64, complex64)
 CUDA_DEVICE_UNARY_DECL(negative, complex128, complex128)
 

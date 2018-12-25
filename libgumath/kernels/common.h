@@ -116,7 +116,7 @@ gm_fixed_##func##_1D_C_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
     (void)ctx;                                                        \
                                                                       \
     for (int64_t i = 0; i < N; i++) {                                 \
-        out[i] = func((cast##_t)in0[i]);                                        \
+        out[i] = func((cast##_t)in0[i]);                              \
     }                                                                 \
                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                  \
@@ -269,9 +269,9 @@ void unary_update_bitmap(xnd_t stack[]);
 void binary_update_bitmap1D(xnd_t stack[]);
 void binary_update_bitmap(xnd_t stack[]);
 
-const gm_kernel_set_t *unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                                       ndt_apply_spec_t *spec, const gm_func_t *f,
-                                       const ndt_t *in[], const int64_t li[], int nin, ndt_context_t *ctx);
+const gm_kernel_set_t *cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+                                           ndt_apply_spec_t *spec, const gm_func_t *f,
+                                           const ndt_t *in[], const int64_t li[], int nin, ndt_context_t *ctx);
 
 const gm_kernel_set_t *cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                                             ndt_apply_spec_t *spec, const gm_func_t *f,

@@ -158,10 +158,10 @@ binary_update_bitmap(xnd_t stack[])
 /****************************************************************************/
 
 const gm_kernel_set_t *
-unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                ndt_apply_spec_t *spec, const gm_func_t *f,
-                const ndt_t *in[], const int64_t li[], int nin,
-                ndt_context_t *ctx)
+cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+                    ndt_apply_spec_t *spec, const gm_func_t *f,
+                    const ndt_t *in[], const int64_t li[], int nin,
+                    ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
     const ndt_t *t;

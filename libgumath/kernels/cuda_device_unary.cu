@@ -48,7 +48,7 @@ half_abs(half a)
 
 
 /*****************************************************************************/
-/*                         Cuda unary device kernels                         */
+/*                         Cuda device unary kernels                         */
 /*****************************************************************************/
 
 #define CUDA_DEVICE_UNARY(name, func, t0, t1, common) \

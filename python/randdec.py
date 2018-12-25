@@ -482,7 +482,7 @@ def all_unary(prec, exp_range, itr):
     #    yield a
     # for a in logical_un_incr_digits(prec, itr):
     #    yield a
-    for _ in range(100):
+    for _ in range(2):
         yield randdec(prec, exp_range)
 
 def unary_optarg(prec, exp_range, itr):
@@ -503,7 +503,7 @@ def all_binary(prec, exp_range, itr):
     #    yield a, b
     # for a, b in logical_bin_incr_digits(prec, itr):
     #    yield a, b
-    for _ in range(100):
+    for _ in range(2):
         yield randdec(prec, exp_range), randdec(prec, exp_range)
 
 def binary_optarg(prec, exp_range, itr):

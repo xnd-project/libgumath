@@ -385,8 +385,8 @@ class TestUnary(unittest.TestCase):
 class TestBinary(unittest.TestCase):
 
     def test_binary(self):
-        for t, u in implemented_sigs["binary"]:
-            w = implemented_sigs["binary"][(t, u)]
+        for t, u in implemented_sigs["binary"]["default"]:
+            w = implemented_sigs["binary"]["default"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -397,8 +397,8 @@ class TestBinary(unittest.TestCase):
             self.assertEqual(z, [1, 3, 5, 7, 9, 11, 13, 15])
 
     def test_add_opt(self):
-        for t, u in implemented_sigs["binary"]:
-            w = implemented_sigs["binary"][(t, u)]
+        for t, u in implemented_sigs["binary"]["default"]:
+            w = implemented_sigs["binary"]["default"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -409,8 +409,8 @@ class TestBinary(unittest.TestCase):
             self.assertEqual(z, [1, 3, None, 7, 9, 11, None, 15])
 
     def test_subtract(self):
-        for t, u in implemented_sigs["binary"]:
-            w = implemented_sigs["binary"][(t, u)]
+        for t, u in implemented_sigs["binary"]["default"]:
+            w = implemented_sigs["binary"]["default"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -421,8 +421,8 @@ class TestBinary(unittest.TestCase):
             self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
 
     def test_multiply(self):
-        for t, u in implemented_sigs["binary"]:
-            w = implemented_sigs["binary"][(t, u)]
+        for t, u in implemented_sigs["binary"]["default"]:
+            w = implemented_sigs["binary"]["default"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -436,8 +436,8 @@ class TestBinary(unittest.TestCase):
 class TestBitwise(unittest.TestCase):
 
     def test_and(self):
-        for t, u in implemented_sigs["bitwise"]:
-            w = implemented_sigs["bitwise"][(t, u)]
+        for t, u in implemented_sigs["binary"]["bitwise"]:
+            w = implemented_sigs["binary"]["bitwise"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -449,8 +449,8 @@ class TestBitwise(unittest.TestCase):
             self.assertEqual(z, [0, 0, 0, 0, 1, 1, 1, 0])
 
     def test_and_opt(self):
-        for t, u in implemented_sigs["bitwise"]:
-            w = implemented_sigs["bitwise"][(t, u)]
+        for t, u in implemented_sigs["binary"]["bitwise"]:
+            w = implemented_sigs["binary"]["bitwise"][(t, u)]
 
             if t.cpu_noimpl() or u.cpu_noimpl():
                 continue
@@ -485,10 +485,7 @@ class TestCuda(unittest.TestCase):
         else:
             self.assertEqual(calc, expected, msg)
 
-    def assert_equal(self, f, a, t, b, u, w, z1, z2):
-        msg = "%s(%s : %s, %s : %s) -> %s    xnd: %s    np: %s" % \
-              (f, a, t, b, u, w, z1, z2)
-
+    def assert_equal(self, f, z1, z2, msg):
         if isinstance(z1, complex):
             if f in ("multiply", "divide"):
                 self.assertRelErrorLess(z1.real, z2.real, 1e-2, msg)
@@ -501,59 +498,85 @@ class TestCuda(unittest.TestCase):
         else:
             return self.equal(z1, z2, msg)
 
-    def create_xnd(self, a, t, b, u):
+    def create_xnd(self, a, t):
 
-        # Check that struct.pack(v) overflows iff xnd(v) overflows.
+        # Check that struct.pack(a) overflows iff xnd(a) overflows.
         overflow = struct_overflow(a, t)
         xnd_overflow = False
         try:
-            x1 = xnd([a], dtype=t.type, device="cuda:managed")
+            x = xnd([a], dtype=t.type, device="cuda:managed")
         except OverflowError:
             xnd_overflow = True
 
         self.assertEqual(xnd_overflow, overflow)
-        if xnd_overflow:
+
+        return None if xnd_overflow else x
+
+    def check_unary_not_implemented(self, f, a, t):
+
+        x = self.create_xnd(a, t)
+        if x is None:
             return
 
-        # Check that struct.pack(v) overflows iff xnd(v) overflows.
-        overflow = struct_overflow(b, u)
-        xnd_overflow = False
-        try:
-            y1 = xnd([b], dtype=u.type, device="cuda:managed")
-        except OverflowError:
-            xnd_overflow = True
+        self.assertRaises(NotImplementedError, getattr(cd, f), x)
 
-        self.assertEqual(xnd_overflow, overflow)
-        if xnd_overflow:
-           return
+    def check_unary_type_error(self, f, a, t):
 
-        return x1, y1
-
-    def check_binary_not_implemented(self, f, a, t, b, u, w):
-
-        xy = self.create_xnd(a, t, b, u)
-        if xy is None:
+        x = self.create_xnd(a, t)
+        if x is None:
             return
 
-        x1, y1 = xy
+        self.assertRaises(TypeError, getattr(cd, f), x)
+
+    def check_unary(self, f, a, t, u):
+
+        x1 = self.create_xnd(a, t)
+        if x1 is None:
+            return
+
+        y1 = getattr(cd, f)(x1)
+        self.assertEqual(str(y1[0].type), u.type)
+
+        x2 = np.array([a], dtype=t.type)
+        y2 = getattr(np, f)(x2)
+
+        msg = "%s(%s : %s) -> %s    xnd: %s    np: %s" % (f, a, t, u, y1, y2)
+        self.assert_equal(f, y1[0].value, y2[0], msg)
+
+    def check_binary_not_implemented(self, f, a, t, b, u):
+
+        x1 = self.create_xnd(a, t)
+        if x1 is None:
+            return
+
+        y1 = self.create_xnd(b, u)
+        if y1 is None:
+            return
+
         self.assertRaises(NotImplementedError, getattr(cd, f), x1, y1)
 
-    def check_binary_type_error(self, f, a, t, b, u, w):
+    def check_binary_type_error(self, f, a, t, b, u):
 
-        xy = self.create_xnd(a, t, b, u)
-        if xy is None:
+        x1 = self.create_xnd(a, t)
+        if x1 is None:
             return
 
-        x1, y1 = xy
+        y1 = self.create_xnd(b, u)
+        if y1 is None:
+            return
+
         self.assertRaises(TypeError, getattr(cd, f), x1, y1)
 
     def check_binary(self, f, a, t, b, u, w):
 
-        xy = self.create_xnd(a, t, b, u)
-        if xy is None:
+        x1 = self.create_xnd(a, t)
+        if x1 is None:
             return
 
-        x1, y1 = xy
+        y1 = self.create_xnd(b, u)
+        if y1 is None:
+            return
+
         z1 = getattr(cd, f)(x1, y1)
         self.assertEqual(str(z1[0].type), w.type)
 
@@ -561,49 +584,51 @@ class TestCuda(unittest.TestCase):
         y2 = np.array([b], dtype=u.type)
         z2 = getattr(np, f)(x2, y2)
 
-        self.assert_equal(f, a, t, b, u, w, z1[0].value, z2[0])
+        msg = "%s(%s : %s, %s : %s) -> %s    xnd: %s    np: %s" % \
+              (f, a, t, b, u, w, z1, z2)
+        self.assert_equal(f, z1[0].value, z2[0], msg)
+
+    def test_unary(self):
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        print("\n")
+
+        for pattern in ("default", "complex_math_with_half", "complex_math",
+                        "real_math_with_half", "real_math"):
+            for f in functions["unary"][pattern]:
+                print("testing %s ..." % f)
+
+                for t, in implemented_sigs["unary"][pattern]:
+                    u = implemented_sigs["unary"][pattern][(t,)]
+
+                    print("    %s -> %s" % (t, u))
+
+                    for a in t.testcases():
+                        if t.cuda_noimpl() or u.cuda_noimpl():
+                            self.check_unary_not_implemented(f, a, t)
+                        else:
+                            self.check_unary(f, a, t, u)
 
     def test_binary(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         print("\n")
 
-        for f in ("add", "subtract", "multiply", "divide"):
-            print("testing %s ..." % f)
+        for pattern in "default", "float_result", "bool_result":
+            for f in functions["binary"][pattern]:
+                print("testing %s ..." % f)
 
-            key = f if f == "divide" else "binary"
+                for t, u in implemented_sigs["binary"][pattern]:
+                    w = implemented_sigs["binary"][pattern][(t, u)]
 
-            for t, u in implemented_sigs[key]:
-                w = implemented_sigs[key][(t, u)]
+                    print("    %s, %s -> %s" % (t, u, w))
 
-                print("    %s, %s -> %s" % (t, u, w))
-
-                for a in t.testcases():
-                    for b in u.testcases():
-                        if t.cuda_noimpl() or u.cuda_noimpl():
-                            self.check_binary_not_implemented(f, a, t, b, u, w)
-                        else:
-                            self.check_binary(f, a, t, b, u, w)
-
-    def test_comparison(self):
-        skip_if(SKIP_LONG, "use --long argument to enable these tests")
-
-        print("\n")
-
-        for f in ("less", "less_equal", "greater_equal", "greater"):
-            print("testing %s ..." % f)
-
-            for t, u in implemented_sigs["comparison"]:
-                w = implemented_sigs["comparison"][(t, u)]
-
-                print("    %s, %s -> %s" % (t, u, w))
-
-                for a in t.testcases():
-                    for b in u.testcases():
-                        if t.cuda_noimpl() or u.cuda_noimpl():
-                            self.check_binary_not_implemented(f, a, t, b, u, w)
-                        else:
-                            self.check_binary(f, a, t, b, u, w)
+                    for a in t.testcases():
+                        for b in u.testcases():
+                            if t.cuda_noimpl() or u.cuda_noimpl():
+                                self.check_binary_not_implemented(f, a, t, b, u)
+                            else:
+                                self.check_binary(f, a, t, b, u, w)
 
     def test_divide_inexact(self):
 
@@ -613,7 +638,7 @@ class TestCuda(unittest.TestCase):
 
         a = next(t.testcases())
         b = next(u.testcases())
-        self.check_binary_type_error("divide", a, t, b, u, w)
+        self.check_binary_type_error("divide", a, t, b, u)
 
 
 class TestSpec(unittest.TestCase):
