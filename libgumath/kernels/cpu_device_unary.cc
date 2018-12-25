@@ -37,6 +37,15 @@
 #include "cpu_device_unary.h"
 
 
+#ifdef _MSC_VER
+  #define BEGIN_FLOAT_CONTROL_STRICT() __pragma(float_control(strict, on, push))
+  #define END_FLOAT_CONTROL_STRICT() __pragma(float_control(pop))
+#else
+  #define BEGIN_FLOAT_CONTROL_STRICT()
+  #define END_FLOAT_CONTROL_STRICT()
+#endif
+
+
 /*****************************************************************************/
 /*                          CPU device unary kernels                         */
 /*****************************************************************************/
@@ -84,9 +93,11 @@ CPU_DEVICE_UNARY(copy, copy, uint16, uint16, uint16)
 CPU_DEVICE_UNARY(copy, copy, uint32, uint32, uint32)
 CPU_DEVICE_UNARY(copy, copy, uint64, uint64, uint64)
 
+BEGIN_FLOAT_CONTROL_STRICT()
 CPU_DEVICE_NOIMPL(copy, copy, float16, float16, float16)
 CPU_DEVICE_UNARY(copy, copy, float32, float32, float32)
 CPU_DEVICE_UNARY(copy, copy, float64, float64, float64)
+END_FLOAT_CONTROL_STRICT()
 
 CPU_DEVICE_NOIMPL(copy, copy, complex32, complex32, complex32)
 CPU_DEVICE_UNARY(copy, copy, complex64, complex64, complex64)
@@ -118,6 +129,7 @@ CPU_DEVICE_UNARY(invert, invert, uint64, uint64, uint64)
 /*****************************************************************************/
 
 #define negative(x) -x
+
 CPU_DEVICE_UNARY(negative, negative, int8, int8, int8)
 CPU_DEVICE_UNARY(negative, negative, int16, int16, int16)
 CPU_DEVICE_UNARY(negative, negative, int32, int32, int32)
@@ -127,9 +139,11 @@ CPU_DEVICE_UNARY(negative, negative, uint8, int16, int16)
 CPU_DEVICE_UNARY(negative, negative, uint16, int32, int32)
 CPU_DEVICE_UNARY(negative, negative, uint32, int64, int64)
 
+BEGIN_FLOAT_CONTROL_STRICT()
 CPU_DEVICE_NOIMPL(negative, negative, float16, float16, float16)
 CPU_DEVICE_UNARY(negative, negative, float32, float32, float32)
 CPU_DEVICE_UNARY(negative, negative, float64, float64, float64)
+END_FLOAT_CONTROL_STRICT()
 
 CPU_DEVICE_NOIMPL(negative, negative, complex32, complex32, complex32)
 CPU_DEVICE_UNARY(negative, negative, complex64, complex64, complex64)
@@ -141,12 +155,14 @@ CPU_DEVICE_UNARY(negative, negative, complex128, complex128, complex128)
 /*****************************************************************************/
 
 #define CPU_DEVICE_UNARY_ALL_REAL_MATH(name) \
+    BEGIN_FLOAT_CONTROL_STRICT()                                  \
     CPU_DEVICE_UNARY(name##f, name##f, int16, float32, float32)   \
     CPU_DEVICE_UNARY(name##f, name##f, uint16, float32, float32)  \
     CPU_DEVICE_UNARY(name##f, name##f, float32, float32, float32) \
     CPU_DEVICE_UNARY(name, name, int32, float64, float64)         \
     CPU_DEVICE_UNARY(name, name, uint32, float64, float64)        \
-    CPU_DEVICE_UNARY(name, name, float64, float64, float64)
+    CPU_DEVICE_UNARY(name, name, float64, float64, float64)       \
+    END_FLOAT_CONTROL_STRICT()
 
 #define CPU_DEVICE_UNARY_ALL_COMPLEX_MATH(name) \
     CPU_DEVICE_UNARY_ALL_REAL_MATH(name)                             \
