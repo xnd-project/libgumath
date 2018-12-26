@@ -408,7 +408,7 @@ static const gm_kernel_set_t *
 typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[],
           const int64_t li[], int nin, ndt_context_t *ctx)
 {
-    return binary_typecheck(kernel_location, spec, f, in, li, nin, ctx);
+    return cpu_binary_typecheck(kernel_location, spec, f, in, li, nin, ctx);
 }
 
 

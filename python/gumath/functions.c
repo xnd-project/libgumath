@@ -53,7 +53,7 @@ PyInit_functions(void)
        if (gm_init_cpu_unary_kernels(table, &ctx) < 0) {
            return Ndt_SetError(&ctx);
        }
-       if (gm_init_binary_kernels(table, &ctx) < 0) {
+       if (gm_init_cpu_binary_kernels(table, &ctx) < 0) {
            return Ndt_SetError(&ctx);
        }
        if (gm_init_bitwise_kernels(table, &ctx) < 0) {

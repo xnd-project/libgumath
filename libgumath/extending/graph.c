@@ -226,13 +226,16 @@ mk_return_array(int32_t p[], const int64_t N, const int32_t u,
     }
 
     t = ndt_var_dim(type, ndim1_offsets, 0, NULL, false, ctx);
+    ndt_decref(type);
     ndt_decref_offsets(ndim1_offsets);
     ndim1_offsets = NULL;
     if (t == NULL) {
         goto error;
     }
+    type = t;
 
-    t = ndt_var_dim(t, ndim2_offsets, 0, NULL, false, ctx);
+    t = ndt_var_dim(type, ndim2_offsets, 0, NULL, false, ctx);
+    ndt_decref(type);
     ndt_decref_offsets(ndim2_offsets);
     ndim2_offsets = NULL;
     if (t == NULL) {

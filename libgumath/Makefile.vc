@@ -41,12 +41,13 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 
 OBJS = apply.obj func.obj nploops.obj tbl.obj xndloops.obj cpu_host_unary.obj \
-       cpu_device_unary.obj binary.obj common.obj bitwise.obj examples.obj graph.obj \
-       pdist.obj
+       cpu_device_unary.obj cpu_host_binary.obj cpu_device_binary.obj common.obj \
+       bitwise.obj examples.obj graph.obj pdist.obj
 
 SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/nploops.obj .objs/tbl.obj .objs/xndloops.obj \
-              .objs/cpu_host_unary.obj .objs/cpu_device_unary.obj .objs/binary.obj .objs/common.obj \
-              .objs/bitwise.obj .objs/examples.obj .objs/graph.obj .objs/pdist.obj
+              .objs/cpu_host_unary.obj .objs/cpu_device_unary.obj .objs/cpu_host_binary.obj \
+              .objs/cpu_device_binary.obj .objs/common.obj .objs/bitwise.obj .objs/examples.obj \
+              .objs/graph.obj .objs/pdist.obj
 
 
 $(LIBSTATIC):\
@@ -119,13 +120,21 @@ Makefile kernels\cpu_device_unary.cc kernels\common.h gumath.h
 Makefile kernels\cpu_device_unary.cc kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\cpu_device_unary.cc
 
-binary.obj:\
-Makefile kernels\binary.c kernels\common.h gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\binary.c
+cpu_host_binary.obj:\
+Makefile kernels\cpu_host_binary.c kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\cpu_host_binary.c
 
-.objs\binary.obj:\
-Makefile kernels\binary.c kernels\common.h gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\binary.c
+.objs\cpu_host_binary.obj:\
+Makefile kernels\cpu_host_binary.c kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\cpu_host_binary.c
+
+cpu_device_binary.obj:\
+Makefile kernels\cpu_device_binary.cc kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\cpu_device_binary.cc
+
+.objs\cpu_device_binary.obj:\
+Makefile kernels\cpu_device_binary.cc kernels\common.h gumath.h
+	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\cpu_device_binary.cc
 
 common.obj:\
 Makefile kernels\common.c kernels\common.h gumath.h

@@ -75,7 +75,7 @@ extern "C" {
 #endif
 
 
-#define GM_MAX_KERNELS 1024
+#define GM_MAX_KERNELS 2048
 
 typedef float float32_t;
 typedef double float64_t;
@@ -204,16 +204,16 @@ GM_API int gm_tbl_map(const gm_tbl_t *tbl, int (*f)(const gm_func_t *, void *sta
 
 GM_API void gm_init(void);
 GM_API int gm_init_cpu_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_cpu_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_bitwise_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_example_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_bfloat16_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_graph_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_quaternion_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
-GM_API int gm_init_pdist_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API int gm_init_cuda_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 GM_API int gm_init_cuda_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+
+GM_API int gm_init_example_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_graph_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_quaternion_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
+GM_API int gm_init_pdist_kernels(gm_tbl_t *tbl, ndt_context_t *ctx);
 
 GM_API void gm_finalize(void);
 

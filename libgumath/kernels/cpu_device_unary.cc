@@ -66,10 +66,8 @@ gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(                    \
 extern "C" void                                                   \
 gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
 {                                                                 \
-    const t0##_t *_in0 = (const t0##_t *)in0;                     \
-    t1##_t *_out = (t1##_t *)out;                                 \
-                                                                  \
-    _out[0] = func((common##_t)_in0[0]);                          \
+    const t0##_t x = *((const t0##_t *)in0);                      \
+    *((t1##_t *)out) = func((common##_t)x);                       \
 }
 
 #define CPU_DEVICE_NOIMPL(name, func, t0, t1, common)
