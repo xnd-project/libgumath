@@ -25,8 +25,8 @@ LIBXNDINCLUDE = ..\xnd\libxnd
 LIBXNDDIR = ..\xnd\libxnd
 !endif
 
-OPT = /MT /Ox /GS /EHsc
-OPT_SHARED = /DGM_EXPORT /DNDT_IMPORT /DXND_IMPORT /MD /Ox /GS /EHsc /Fo.objs^\
+OPT = /MT /Ox /GS /EHsc /fp:strict
+OPT_SHARED = /DGM_EXPORT /DNDT_IMPORT /DXND_IMPORT /MD /Ox /GS /EHsc /fp:strict /Fo.objs^\
 
 COMMON_CFLAGS = /nologo /W4 /wd4200 /wd4201 /wd4204
 CFLAGS = $(COMMON_CFLAGS) $(OPT)
