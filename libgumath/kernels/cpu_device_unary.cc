@@ -37,20 +37,6 @@
 #include "cpu_device_unary.h"
 
 
-/*
- * Starting with Visual Studio 2015 Update 3, the complex code does not
- * compile with /fp:strict. Use pragmas to reduce and restore correctness
- * settings temporarily. 
- */
-#ifdef _MSC_VER
-  #define BEGIN_FLOAT_CONTROL_COMPLEX() __pragma(float_control(precise, on, push))
-  #define END_FLOAT_CONTROL_COMPLEX() __pragma(float_control(pop))
-#else
-  #define BEGIN_FLOAT_CONTROL_COMPLEX()
-  #define END_FLOAT_CONTROL_COMPLEX()
-#endif
-
-
 /*****************************************************************************/
 /*                          CPU device unary kernels                         */
 /*****************************************************************************/
@@ -75,7 +61,15 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
     *((t1##_t *)out) = func((common##_t)x);                       \
 }
 
+#ifdef _MSC_VER
+  #define CPU_DEVICE_UNARYC(name, func, t0, t1, common)
+#else
+  #define CPU_DEVICE_UNARYC(name, func, t0, t1, common) \
+    CPU_DEVICE_UNARY(name, func, t0, t1, common)
+#endif
+
 #define CPU_DEVICE_NOIMPL(name, func, t0, t1, common)
+
 
 
 /*****************************************************************************/
@@ -100,11 +94,9 @@ CPU_DEVICE_NOIMPL(copy, copy, float16, float16, float16)
 CPU_DEVICE_UNARY(copy, copy, float32, float32, float32)
 CPU_DEVICE_UNARY(copy, copy, float64, float64, float64)
 
-BEGIN_FLOAT_CONTROL_COMPLEX()
 CPU_DEVICE_NOIMPL(copy, copy, complex32, complex32, complex32)
-CPU_DEVICE_UNARY(copy, copy, complex64, complex64, complex64)
-CPU_DEVICE_UNARY(copy, copy, complex128, complex128, complex128)
-END_FLOAT_CONTROL_COMPLEX()
+CPU_DEVICE_UNARYC(copy, copy, complex64, complex64, complex64)
+CPU_DEVICE_UNARYC(copy, copy, complex128, complex128, complex128)
 
 
 /*****************************************************************************/
@@ -146,11 +138,9 @@ CPU_DEVICE_NOIMPL(negative, negative, float16, float16, float16)
 CPU_DEVICE_UNARY(negative, negative, float32, float32, float32)
 CPU_DEVICE_UNARY(negative, negative, float64, float64, float64)
 
-BEGIN_FLOAT_CONTROL_COMPLEX()
 CPU_DEVICE_NOIMPL(negative, negative, complex32, complex32, complex32)
-CPU_DEVICE_UNARY(negative, negative, complex64, complex64, complex64)
-CPU_DEVICE_UNARY(negative, negative, complex128, complex128, complex128)
-END_FLOAT_CONTROL_COMPLEX()
+CPU_DEVICE_UNARYC(negative, negative, complex64, complex64, complex64)
+CPU_DEVICE_UNARYC(negative, negative, complex128, complex128, complex128)
 
 
 /*****************************************************************************/
@@ -166,12 +156,10 @@ END_FLOAT_CONTROL_COMPLEX()
     CPU_DEVICE_UNARY(name, name, float64, float64, float64)
 
 #define CPU_DEVICE_UNARY_ALL_COMPLEX_MATH(name) \
-    CPU_DEVICE_UNARY_ALL_REAL_MATH(name)                             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                    \
-    CPU_DEVICE_NOIMPL(name, name, complex32, complex32, complex32)   \
-    CPU_DEVICE_UNARY(name, name, complex64, complex64, complex64)    \
-    CPU_DEVICE_UNARY(name, name, complex128, complex128, complex128) \
-    END_FLOAT_CONTROL_COMPLEX()
+    CPU_DEVICE_UNARY_ALL_REAL_MATH(name)                              \
+    CPU_DEVICE_NOIMPL(name, name, complex32, complex32, complex32)    \
+    CPU_DEVICE_UNARYC(name, name, complex64, complex64, complex64)    \
+    CPU_DEVICE_UNARYC(name, name, complex128, complex128, complex128) \
 
 #define CPU_DEVICE_UNARY_ALL_HALF_MATH(name, hfunc) \
     CPU_DEVICE_UNARY(name##f16, hfunc, int8, float16, float16)    \

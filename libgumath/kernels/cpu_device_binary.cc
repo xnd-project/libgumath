@@ -37,20 +37,6 @@
 #include "cpu_device_binary.h"
 
 
-/*
- * Starting with Visual Studio 2015 Update 3, the complex code does not
- * compile with /fp:strict. Use pragmas to reduce and restore correctness
- * settings temporarily. 
- */
-#ifdef _MSC_VER
-  #define BEGIN_FLOAT_CONTROL_COMPLEX() __pragma(float_control(precise, on, push))
-  #define END_FLOAT_CONTROL_COMPLEX() __pragma(float_control(pop))
-#else
-  #define BEGIN_FLOAT_CONTROL_COMPLEX()
-  #define END_FLOAT_CONTROL_COMPLEX()
-#endif
-
-
 /*****************************************************************************/
 /*                Lexicographic comparison for complex numbers               */
 /*****************************************************************************/
@@ -145,6 +131,13 @@ gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(                            \
     *(t2##_t *)out = func((common##_t)x, (common##_t)y);                 \
 }
 
+#ifdef _MSC_VER
+  #define CPU_DEVICE_BINARYC(name, func, t0, t1, t2, common)
+#else
+  #define CPU_DEVICE_BINARYC(name, func, t0, t1, t2, common) \
+    CPU_DEVICE_BINARY(name, func, t0, t1, t2, common)
+#endif
+
 #define CPU_DEVICE_NOIMPL(name, func, t0, t1, t2, common)
 #define CPU_DEVICE_NOKERN(name, func, t0, t1, t2, common)
 
@@ -154,410 +147,362 @@ gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(                            \
 /*****************************************************************************/
 
 #define CPU_DEVICE_ALL_BINARY(name, func, hfunc) \
-    CPU_DEVICE_BINARY(name, func, uint8, uint8, uint8, uint8)                     \
-    CPU_DEVICE_BINARY(name, func, uint8, uint16, uint16, uint16)                  \
-    CPU_DEVICE_BINARY(name, func, uint8, uint32, uint32, uint32)                  \
-    CPU_DEVICE_BINARY(name, func, uint8, uint64, uint64, uint64)                  \
-    CPU_DEVICE_BINARY(name, func, uint8, int8, int16, int16)                      \
-    CPU_DEVICE_BINARY(name, func, uint8, int16, int16, int16)                     \
-    CPU_DEVICE_BINARY(name, func, uint8, int32, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, uint8, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)              \
-    CPU_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32, complex32)         \
-    CPU_DEVICE_BINARY(name, func, uint8, complex64, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, uint8, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, uint16, uint8, uint16, uint16)                  \
-    CPU_DEVICE_BINARY(name, func, uint16, uint16, uint16, uint16)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, uint32, uint32, uint32)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, uint64, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, int8, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, uint16, int16, int32, int32)                    \
-    CPU_DEVICE_BINARY(name, func, uint16, int32, int32, int32)                    \
-    CPU_DEVICE_BINARY(name, func, uint16, int64, int64, int64)                    \
-    CPU_DEVICE_NOIMPL(name, func, uint16, float16, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint16, complex32, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, uint16, complex64, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, uint16, complex128, complex128, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, uint32, uint8, uint32, uint32)                  \
-    CPU_DEVICE_BINARY(name, func, uint32, uint16, uint32, uint32)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, uint32, uint32, uint32)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, uint64, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, int8, int64, int64)                     \
-    CPU_DEVICE_BINARY(name, func, uint32, int16, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, uint32, int32, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, uint32, int64, int64, int64)                    \
-    CPU_DEVICE_NOIMPL(name, func, uint32, float16, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint32, complex32, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, uint32, complex64, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, uint32, complex128, complex128, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, uint64, uint8, uint64, uint64)                  \
-    CPU_DEVICE_BINARY(name, func, uint64, uint16, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint64, uint32, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint64, uint64, uint64, uint64)                 \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int8, uint8, int16, int16)                      \
-    CPU_DEVICE_BINARY(name, func, int8, uint16, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, int8, uint32, int64, int64)                     \
-    CPU_DEVICE_BINARY(name, func, int8, int8, int8, int8)                         \
-    CPU_DEVICE_BINARY(name, func, int8, int16, int16, int16)                      \
-    CPU_DEVICE_BINARY(name, func, int8, int32, int32, int32)                      \
-    CPU_DEVICE_BINARY(name, func, int8, int64, int64, int64)                      \
-    CPU_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)               \
-    CPU_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32, complex32)          \
-    CPU_DEVICE_BINARY(name, func, int8, complex64, complex64, complex64)          \
-    CPU_DEVICE_BINARY(name, func, int8, complex128, complex128, complex128)       \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int16, uint8, int16, int16)                     \
-    CPU_DEVICE_BINARY(name, func, int16, uint16, int32, int32)                    \
-    CPU_DEVICE_BINARY(name, func, int16, uint32, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, int16, int8, int16, int16)                      \
-    CPU_DEVICE_BINARY(name, func, int16, int16, int16, int16)                     \
-    CPU_DEVICE_BINARY(name, func, int16, int32, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, int16, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, func, int16, float16, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int16, complex32, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, int16, complex64, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, int16, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int32, uint8, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, int32, uint16, int32, int32)                    \
-    CPU_DEVICE_BINARY(name, func, int32, uint32, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, int32, int8, int32, int32)                      \
-    CPU_DEVICE_BINARY(name, func, int32, int16, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, int32, int32, int32, int32)                     \
-    CPU_DEVICE_BINARY(name, func, int32, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, func, int32, float16, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int32, complex32, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, int32, complex64, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, int32, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int64, uint8, int64, int64)                     \
-    CPU_DEVICE_BINARY(name, func, int64, uint16, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, int64, uint32, int64, int64)                    \
-    CPU_DEVICE_BINARY(name, func, int64, int8, int64, int64)                      \
-    CPU_DEVICE_BINARY(name, func, int64, int16, int64, int64)                     \
-    CPU_DEVICE_BINARY(name, func, int64, int32, int64, int64)                     \
-    CPU_DEVICE_BINARY(name, func, int64, int64, int64, int64)                     \
-                                                                                  \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)              \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint16, float32, float32)              \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint32, float64, float64)              \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)               \
-    CPU_DEVICE_NOIMPL(name, func, float16, int16, float32, float32)               \
-    CPU_DEVICE_NOIMPL(name, func, float16, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)            \
-    CPU_DEVICE_NOIMPL(name, func, float16, float32, float32, float32)             \
-    CPU_DEVICE_NOIMPL(name, func, float16, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex32, complex32, complex32)       \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex64, complex64, complex64)       \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, float32, uint8, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, float32, uint16, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, float32, uint32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, func, float32, float16, float32, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float32, complex32, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, float32, complex64, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, float32, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, float64, uint8, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, float64, uint16, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float64, uint32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, func, float64, float16, float64, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float64, complex32, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, float64, complex64, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, float64, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint8, complex32, complex32)         \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint16, complex64, complex64)        \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint32, complex128, complex128)      \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)          \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)         \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32, complex32)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64, complex64)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_BINARY(name, func, complex64, uint8, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, complex64, uint16, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, complex64, uint32, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex64, int8, complex64, complex64)          \
-    CPU_DEVICE_BINARY(name, func, complex64, int16, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, complex64, int32, complex128, complex128)       \
-    CPU_DEVICE_NOIMPL(name, func, complex64, float16, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, complex64, float32, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, complex64, float64, complex128, complex128)     \
-    CPU_DEVICE_NOIMPL(name, func, complex64, complex32, complex64, complex64)     \
-    CPU_DEVICE_BINARY(name, func, complex64, complex64, complex64, complex64)     \
-    CPU_DEVICE_BINARY(name, func, complex64, complex128, complex128, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_BINARY(name, func, complex128, uint8, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex128, uint16, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, complex128, uint32, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, complex128, int8, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, complex128, int16, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex128, int32, complex128, complex128)      \
-    CPU_DEVICE_NOIMPL(name, func, complex128, float16, complex128, complex128)    \
-    CPU_DEVICE_BINARY(name, func, complex128, float32, complex128, complex128)    \
-    CPU_DEVICE_BINARY(name, func, complex128, float64, complex128, complex128)    \
-    CPU_DEVICE_NOIMPL(name, func, complex128, complex32, complex128, complex128)  \
-    CPU_DEVICE_BINARY(name, func, complex128, complex64, complex128, complex128)  \
-    CPU_DEVICE_BINARY(name, func, complex128, complex128, complex128, complex128) \
-    END_FLOAT_CONTROL_COMPLEX()
+    CPU_DEVICE_BINARY(name, func, uint8, uint8, uint8, uint8)                      \
+    CPU_DEVICE_BINARY(name, func, uint8, uint16, uint16, uint16)                   \
+    CPU_DEVICE_BINARY(name, func, uint8, uint32, uint32, uint32)                   \
+    CPU_DEVICE_BINARY(name, func, uint8, uint64, uint64, uint64)                   \
+    CPU_DEVICE_BINARY(name, func, uint8, int8, int16, int16)                       \
+    CPU_DEVICE_BINARY(name, func, uint8, int16, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, uint8, int32, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, uint8, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)               \
+    CPU_DEVICE_BINARY(name, func, uint8, float32, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, uint8, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32, complex32)          \
+    CPU_DEVICE_BINARYC(name, func, uint8, complex64, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, uint8, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, uint16, uint8, uint16, uint16)                   \
+    CPU_DEVICE_BINARY(name, func, uint16, uint16, uint16, uint16)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, uint32, uint32, uint32)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, uint64, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, int8, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, uint16, int16, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, uint16, int32, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, uint16, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, uint16, float16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, uint16, float32, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, uint16, float64, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, uint16, complex32, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, uint16, complex64, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, uint16, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, uint32, uint8, uint32, uint32)                   \
+    CPU_DEVICE_BINARY(name, func, uint32, uint16, uint32, uint32)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, uint32, uint32, uint32)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, uint64, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, int8, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, uint32, int16, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, uint32, int32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, uint32, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, uint32, float16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, uint32, float32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, uint32, float64, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, uint32, complex32, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, uint32, complex64, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, uint32, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, uint64, uint8, uint64, uint64)                   \
+    CPU_DEVICE_BINARY(name, func, uint64, uint16, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint64, uint32, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint64, uint64, uint64, uint64)                  \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int8, uint8, int16, int16)                       \
+    CPU_DEVICE_BINARY(name, func, int8, uint16, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int8, uint32, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, int8, int8, int8, int8)                          \
+    CPU_DEVICE_BINARY(name, func, int8, int16, int16, int16)                       \
+    CPU_DEVICE_BINARY(name, func, int8, int32, int32, int32)                       \
+    CPU_DEVICE_BINARY(name, func, int8, int64, int64, int64)                       \
+    CPU_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)                \
+    CPU_DEVICE_BINARY(name, func, int8, float32, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, int8, float64, float64, float64)                 \
+    CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32, complex32)           \
+    CPU_DEVICE_BINARYC(name, func, int8, complex64, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, int8, complex128, complex128, complex128)       \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int16, uint8, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, int16, uint16, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int16, uint32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int16, int8, int16, int16)                       \
+    CPU_DEVICE_BINARY(name, func, int16, int16, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, int16, int32, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int16, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, func, int16, float16, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, int16, float32, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, int16, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, int16, complex32, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, int16, complex64, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, int16, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int32, uint8, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int32, uint16, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int32, uint32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int32, int8, int32, int32)                       \
+    CPU_DEVICE_BINARY(name, func, int32, int16, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int32, int32, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int32, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, func, int32, float16, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, int32, float32, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, int32, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, int32, complex32, complex128, complex128)        \
+    CPU_DEVICE_BINARYC(name, func, int32, complex64, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, int32, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int64, uint8, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, int64, uint16, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int64, uint32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int64, int8, int64, int64)                       \
+    CPU_DEVICE_BINARY(name, func, int64, int16, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, int64, int32, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, int64, int64, int64, int64)                      \
+                                                                                   \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint16, float32, float32)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint32, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)                \
+    CPU_DEVICE_NOIMPL(name, func, float16, int16, float32, float32)                \
+    CPU_DEVICE_NOIMPL(name, func, float16, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)             \
+    CPU_DEVICE_NOIMPL(name, func, float16, float32, float32, float32)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex32, complex32, complex32)        \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex64, complex64, complex64)        \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, float32, uint8, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, float32, uint16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, float32, uint32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float32, int8, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, float32, int16, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, float32, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, float32, float16, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, float32, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float32, complex32, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, float32, complex64, complex64, complex64)       \
+    CPU_DEVICE_BINARYC(name, func, float32, complex128, complex128, complex128)    \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, float64, uint8, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, float64, uint16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, uint32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, int8, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, float64, int16, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, float64, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, float64, float16, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, float32, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float64, complex32, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, float64, complex64, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, float64, complex128, complex128, complex128)    \
+                                                                                   \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint8, complex32, complex32)          \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint16, complex64, complex64)         \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint32, complex128, complex128)       \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)           \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)          \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32, complex32)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64, complex64)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128, complex128)   \
+                                                                                   \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint8, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint16, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint32, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex64, int8, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, complex64, int16, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, complex64, int32, complex128, complex128)       \
+    CPU_DEVICE_NOIMPL(name, func, complex64, float16, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, complex64, float32, complex64, complex64)       \
+    CPU_DEVICE_BINARYC(name, func, complex64, float64, complex128, complex128)     \
+    CPU_DEVICE_NOIMPL(name, func, complex64, complex32, complex64, complex64)      \
+    CPU_DEVICE_BINARYC(name, func, complex64, complex64, complex64, complex64)     \
+    CPU_DEVICE_BINARYC(name, func, complex64, complex128, complex128, complex128)  \
+                                                                                   \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint8, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint16, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint32, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, int8, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, complex128, int16, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex128, int32, complex128, complex128)      \
+    CPU_DEVICE_NOIMPL(name, func, complex128, float16, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, float32, complex128, complex128)    \
+    CPU_DEVICE_BINARYC(name, func, complex128, float64, complex128, complex128)    \
+    CPU_DEVICE_NOIMPL(name, func, complex128, complex32, complex128, complex128)   \
+    CPU_DEVICE_BINARYC(name, func, complex128, complex64, complex128, complex128)  \
+    CPU_DEVICE_BINARYC(name, func, complex128, complex128, complex128, complex128) \
 
 #define CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(name, func, hfunc) \
-    CPU_DEVICE_NOIMPL(name, hfunc, uint8, uint8, float16, float16)                \
-    CPU_DEVICE_BINARY(name, func, uint8, uint16, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, uint8, uint32, float64, float64)                \
-    CPU_DEVICE_NOKERN(name, func, uint8, uint64, uint64, uint64)                  \
-    CPU_DEVICE_NOIMPL(name, hfunc, uint8, int8, float16, float16)                 \
-    CPU_DEVICE_BINARY(name, func, uint8, int16, float32, float32)                 \
-    CPU_DEVICE_BINARY(name, func, uint8, int32, float64, float64)                 \
-    CPU_DEVICE_NOKERN(name, func, uint8, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)              \
-    CPU_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32, complex32)         \
-    CPU_DEVICE_BINARY(name, func, uint8, complex64, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, uint8, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, uint16, uint8, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, uint16, uint16, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, uint16, uint32, float64, float64)               \
-    CPU_DEVICE_NOKERN(name, func, uint16, uint64, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, int8, float32, float32)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, int16, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, uint16, int32, float64, float64)                \
-    CPU_DEVICE_NOKERN(name, func, uint16, int64, int64, int64)                    \
-    CPU_DEVICE_NOIMPL(name, func, uint16, float16, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint16, complex32, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, uint16, complex64, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, uint16, complex128, complex128, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, uint32, uint8, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, uint32, uint16, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, uint32, uint32, float64, float64)               \
-    CPU_DEVICE_NOKERN(name, func, uint32, uint64, uint64, uint64)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, int8, float64, float64)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, int16, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, uint32, int32, float64, float64)                \
-    CPU_DEVICE_NOKERN(name, func, uint32, int64, int64, int64)                    \
-    CPU_DEVICE_NOIMPL(name, func, uint32, float16, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, uint32, complex32, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, uint32, complex64, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, uint32, complex128, complex128, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_NOKERN(name, func, uint64, uint8, uint64, uint64)                  \
-    CPU_DEVICE_NOKERN(name, func, uint64, uint16, uint64, uint64)                 \
-    CPU_DEVICE_NOKERN(name, func, uint64, uint32, uint64, uint64)                 \
-    CPU_DEVICE_NOKERN(name, func, uint64, uint64, uint64, uint64)                 \
-                                                                                  \
-    CPU_DEVICE_NOIMPL(name, hfunc, int8, uint8, float16, float16)                 \
-    CPU_DEVICE_BINARY(name, func, int8, uint16, float32, float32)                 \
-    CPU_DEVICE_BINARY(name, func, int8, uint32, float64, float64)                 \
-    CPU_DEVICE_NOIMPL(name, hfunc, int8, int8, float16, float16)                  \
-    CPU_DEVICE_BINARY(name, func, int8, int16, float32, float32)                  \
-    CPU_DEVICE_BINARY(name, func, int8, int32, float64, float64)                  \
-    CPU_DEVICE_NOKERN(name, func, int8, int64, int64, int64)                      \
-    CPU_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)               \
-    CPU_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32, complex32)          \
-    CPU_DEVICE_BINARY(name, func, int8, complex64, complex64, complex64)          \
-    CPU_DEVICE_BINARY(name, func, int8, complex128, complex128, complex128)       \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int16, uint8, float32, float32)                 \
-    CPU_DEVICE_BINARY(name, func, int16, uint16, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, int16, uint32, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, int16, int8, float32, float32)                  \
-    CPU_DEVICE_BINARY(name, func, int16, int16, float32, float32)                 \
-    CPU_DEVICE_BINARY(name, func, int16, int32, float64, float64)                 \
-    CPU_DEVICE_NOKERN(name, func, int16, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, func, int16, float16, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int16, complex32, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, int16, complex64, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, int16, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, int32, uint8, float64, float64)                 \
-    CPU_DEVICE_BINARY(name, func, int32, uint16, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, int32, uint32, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, int32, int8, float64, float64)                  \
-    CPU_DEVICE_BINARY(name, func, int32, int16, float64, float64)                 \
-    CPU_DEVICE_BINARY(name, func, int32, int32, float64, float64)                 \
-    CPU_DEVICE_NOKERN(name, func, int32, int64, int64, int64)                     \
-    CPU_DEVICE_NOIMPL(name, func, int32, float16, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, int32, complex32, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, int32, complex64, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, int32, complex128, complex128, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_NOKERN(name, func, int64, uint8, int64, int64)                     \
-    CPU_DEVICE_NOKERN(name, func, int64, uint16, int64, int64)                    \
-    CPU_DEVICE_NOKERN(name, func, int64, uint32, int64, int64)                    \
-    CPU_DEVICE_NOKERN(name, func, int64, int8, int64, int64)                      \
-    CPU_DEVICE_NOKERN(name, func, int64, int16, int64, int64)                     \
-    CPU_DEVICE_NOKERN(name, func, int64, int32, int64, int64)                     \
-    CPU_DEVICE_NOKERN(name, func, int64, int64, int64, int64)                     \
-                                                                                  \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)              \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint16, float32, float32)              \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint32, float64, float64)              \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)               \
-    CPU_DEVICE_NOIMPL(name, func, float16, int16, float32, float32)               \
-    CPU_DEVICE_NOIMPL(name, func, float16, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)            \
-    CPU_DEVICE_NOIMPL(name, func, float16, float32, float32, float32)             \
-    CPU_DEVICE_NOIMPL(name, func, float16, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex32, complex32, complex32)       \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex64, complex64, complex64)       \
-    CPU_DEVICE_NOIMPL(name, func, float16, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, float32, uint8, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, float32, uint16, float32, float32)              \
-    CPU_DEVICE_BINARY(name, func, float32, uint32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
-    CPU_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
-    CPU_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, func, float32, float16, float32, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float32, complex32, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, float32, complex64, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, float32, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    CPU_DEVICE_BINARY(name, func, float64, uint8, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, float64, uint16, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float64, uint32, float64, float64)              \
-    CPU_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
-    CPU_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
-    CPU_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
-    CPU_DEVICE_NOIMPL(name, func, float64, float16, float64, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, float64, complex32, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, float64, complex64, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, float64, complex128, complex128, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint8, complex32, complex32)         \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint16, complex64, complex64)        \
-    CPU_DEVICE_NOIMPL(name, func, complex32, uint32, complex128, complex128)      \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)          \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)         \
-    CPU_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)       \
-    CPU_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32, complex32)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64, complex64)     \
-    CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_BINARY(name, func, complex64, uint8, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, complex64, uint16, complex64, complex64)        \
-    CPU_DEVICE_BINARY(name, func, complex64, uint32, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex64, int8, complex64, complex64)          \
-    CPU_DEVICE_BINARY(name, func, complex64, int16, complex64, complex64)         \
-    CPU_DEVICE_BINARY(name, func, complex64, int32, complex128, complex128)       \
-    CPU_DEVICE_NOIMPL(name, func, complex64, float16, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, complex64, float32, complex64, complex64)       \
-    CPU_DEVICE_BINARY(name, func, complex64, float64, complex128, complex128)     \
-    CPU_DEVICE_NOIMPL(name, func, complex64, complex32, complex64, complex64)     \
-    CPU_DEVICE_BINARY(name, func, complex64, complex64, complex64, complex64)     \
-    CPU_DEVICE_BINARY(name, func, complex64, complex128, complex128, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                                   \
-                                                                                  \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                                 \
-    CPU_DEVICE_BINARY(name, func, complex128, uint8, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex128, uint16, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, complex128, uint32, complex128, complex128)     \
-    CPU_DEVICE_BINARY(name, func, complex128, int8, complex128, complex128)       \
-    CPU_DEVICE_BINARY(name, func, complex128, int16, complex128, complex128)      \
-    CPU_DEVICE_BINARY(name, func, complex128, int32, complex128, complex128)      \
-    CPU_DEVICE_NOIMPL(name, func, complex128, float16, complex128, complex128)    \
-    CPU_DEVICE_BINARY(name, func, complex128, float32, complex128, complex128)    \
-    CPU_DEVICE_BINARY(name, func, complex128, float64, complex128, complex128)    \
-    CPU_DEVICE_NOIMPL(name, func, complex128, complex32, complex128, complex128)  \
-    CPU_DEVICE_BINARY(name, func, complex128, complex64, complex128, complex128)  \
-    CPU_DEVICE_BINARY(name, func, complex128, complex128, complex128, complex128) \
-    END_FLOAT_CONTROL_COMPLEX()
+    CPU_DEVICE_NOIMPL(name, hfunc, uint8, uint8, float16, float16)                 \
+    CPU_DEVICE_BINARY(name, func, uint8, uint16, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, uint8, uint32, float64, float64)                 \
+    CPU_DEVICE_NOKERN(name, func, uint8, uint64, uint64, uint64)                   \
+    CPU_DEVICE_NOIMPL(name, hfunc, uint8, int8, float16, float16)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, int16, float32, float32)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, int32, float64, float64)                  \
+    CPU_DEVICE_NOKERN(name, func, uint8, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)               \
+    CPU_DEVICE_BINARY(name, func, uint8, float32, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, uint8, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32, complex32)          \
+    CPU_DEVICE_BINARYC(name, func, uint8, complex64, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, uint8, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, uint16, uint8, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, uint16, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, uint16, uint32, float64, float64)                \
+    CPU_DEVICE_NOKERN(name, func, uint16, uint64, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, int8, float32, float32)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, int16, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, int32, float64, float64)                 \
+    CPU_DEVICE_NOKERN(name, func, uint16, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, uint16, float16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, uint16, float32, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, uint16, float64, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, uint16, complex32, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, uint16, complex64, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, uint16, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, uint32, uint8, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, uint16, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, uint32, uint32, float64, float64)                \
+    CPU_DEVICE_NOKERN(name, func, uint32, uint64, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, int8, float64, float64)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, int16, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, int32, float64, float64)                 \
+    CPU_DEVICE_NOKERN(name, func, uint32, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, uint32, float16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, uint32, float32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, uint32, float64, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, uint32, complex32, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, uint32, complex64, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, uint32, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_NOKERN(name, func, uint64, uint8, uint64, uint64)                   \
+    CPU_DEVICE_NOKERN(name, func, uint64, uint16, uint64, uint64)                  \
+    CPU_DEVICE_NOKERN(name, func, uint64, uint32, uint64, uint64)                  \
+    CPU_DEVICE_NOKERN(name, func, uint64, uint64, uint64, uint64)                  \
+                                                                                   \
+    CPU_DEVICE_NOIMPL(name, hfunc, int8, uint8, float16, float16)                  \
+    CPU_DEVICE_BINARY(name, func, int8, uint16, float32, float32)                  \
+    CPU_DEVICE_BINARY(name, func, int8, uint32, float64, float64)                  \
+    CPU_DEVICE_NOIMPL(name, hfunc, int8, int8, float16, float16)                   \
+    CPU_DEVICE_BINARY(name, func, int8, int16, float32, float32)                   \
+    CPU_DEVICE_BINARY(name, func, int8, int32, float64, float64)                   \
+    CPU_DEVICE_NOKERN(name, func, int8, int64, int64, int64)                       \
+    CPU_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)                \
+    CPU_DEVICE_BINARY(name, func, int8, float32, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, int8, float64, float64, float64)                 \
+    CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32, complex32)           \
+    CPU_DEVICE_BINARYC(name, func, int8, complex64, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, int8, complex128, complex128, complex128)       \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int16, uint8, float32, float32)                  \
+    CPU_DEVICE_BINARY(name, func, int16, uint16, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, int16, uint32, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, int16, int8, float32, float32)                   \
+    CPU_DEVICE_BINARY(name, func, int16, int16, float32, float32)                  \
+    CPU_DEVICE_BINARY(name, func, int16, int32, float64, float64)                  \
+    CPU_DEVICE_NOKERN(name, func, int16, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, func, int16, float16, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, int16, float32, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, int16, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, int16, complex32, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, int16, complex64, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, int16, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, int32, uint8, float64, float64)                  \
+    CPU_DEVICE_BINARY(name, func, int32, uint16, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, int32, uint32, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, int32, int8, float64, float64)                   \
+    CPU_DEVICE_BINARY(name, func, int32, int16, float64, float64)                  \
+    CPU_DEVICE_BINARY(name, func, int32, int32, float64, float64)                  \
+    CPU_DEVICE_NOKERN(name, func, int32, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, func, int32, float16, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, int32, float32, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, int32, float64, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, int32, complex32, complex128, complex128)        \
+    CPU_DEVICE_BINARYC(name, func, int32, complex64, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, int32, complex128, complex128, complex128)      \
+                                                                                   \
+    CPU_DEVICE_NOKERN(name, func, int64, uint8, int64, int64)                      \
+    CPU_DEVICE_NOKERN(name, func, int64, uint16, int64, int64)                     \
+    CPU_DEVICE_NOKERN(name, func, int64, uint32, int64, int64)                     \
+    CPU_DEVICE_NOKERN(name, func, int64, int8, int64, int64)                       \
+    CPU_DEVICE_NOKERN(name, func, int64, int16, int64, int64)                      \
+    CPU_DEVICE_NOKERN(name, func, int64, int32, int64, int64)                      \
+    CPU_DEVICE_NOKERN(name, func, int64, int64, int64, int64)                      \
+                                                                                   \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint16, float32, float32)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint32, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)                \
+    CPU_DEVICE_NOIMPL(name, func, float16, int16, float32, float32)                \
+    CPU_DEVICE_NOIMPL(name, func, float16, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)             \
+    CPU_DEVICE_NOIMPL(name, func, float16, float32, float32, float32)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex32, complex32, complex32)        \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex64, complex64, complex64)        \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex128, complex128, complex128)     \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, float32, uint8, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, float32, uint16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, float32, uint32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float32, int8, float32, float32)                 \
+    CPU_DEVICE_BINARY(name, func, float32, int16, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, float32, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, float32, float16, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, float32, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float32, complex32, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, float32, complex64, complex64, complex64)       \
+    CPU_DEVICE_BINARYC(name, func, float32, complex128, complex128, complex128)    \
+                                                                                   \
+    CPU_DEVICE_BINARY(name, func, float64, uint8, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, float64, uint16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, uint32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, int8, float64, float64)                 \
+    CPU_DEVICE_BINARY(name, func, float64, int16, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, float64, int32, float64, float64)                \
+    CPU_DEVICE_NOIMPL(name, func, float64, float16, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, float32, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, float64, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float64, complex32, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, float64, complex64, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, float64, complex128, complex128, complex128)    \
+                                                                                   \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint8, complex32, complex32)          \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint16, complex64, complex64)         \
+    CPU_DEVICE_NOIMPL(name, func, complex32, uint32, complex128, complex128)       \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)           \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)          \
+    CPU_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)        \
+    CPU_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32, complex32)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64, complex64)      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128, complex128)   \
+                                                                                   \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint8, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint16, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, complex64, uint32, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex64, int8, complex64, complex64)          \
+    CPU_DEVICE_BINARYC(name, func, complex64, int16, complex64, complex64)         \
+    CPU_DEVICE_BINARYC(name, func, complex64, int32, complex128, complex128)       \
+    CPU_DEVICE_NOIMPL(name, func, complex64, float16, complex64, complex64)        \
+    CPU_DEVICE_BINARYC(name, func, complex64, float32, complex64, complex64)       \
+    CPU_DEVICE_BINARYC(name, func, complex64, float64, complex128, complex128)     \
+    CPU_DEVICE_NOIMPL(name, func, complex64, complex32, complex64, complex64)      \
+    CPU_DEVICE_BINARYC(name, func, complex64, complex64, complex64, complex64)     \
+    CPU_DEVICE_BINARYC(name, func, complex64, complex128, complex128, complex128)  \
+                                                                                   \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint8, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint16, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, uint32, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, int8, complex128, complex128)       \
+    CPU_DEVICE_BINARYC(name, func, complex128, int16, complex128, complex128)      \
+    CPU_DEVICE_BINARYC(name, func, complex128, int32, complex128, complex128)      \
+    CPU_DEVICE_NOIMPL(name, func, complex128, float16, complex128, complex128)     \
+    CPU_DEVICE_BINARYC(name, func, complex128, float32, complex128, complex128)    \
+    CPU_DEVICE_BINARYC(name, func, complex128, float64, complex128, complex128)    \
+    CPU_DEVICE_NOIMPL(name, func, complex128, complex32, complex128, complex128)   \
+    CPU_DEVICE_BINARYC(name, func, complex128, complex64, complex128, complex128)  \
+    CPU_DEVICE_BINARYC(name, func, complex128, complex128, complex128, complex128) \
 
 #define add(x, y) x + y
 CPU_DEVICE_ALL_BINARY(add, add, add)
@@ -577,207 +522,183 @@ CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, divide)
 /*****************************************************************************/
 
 #define CPU_DEVICE_ALL_COMPARISON(name, func, hfunc, cfunc) \
-    CPU_DEVICE_BINARY(name, func, uint8, uint8, bool, uint8)                 \
-    CPU_DEVICE_BINARY(name, func, uint8, uint16, bool, uint16)               \
-    CPU_DEVICE_BINARY(name, func, uint8, uint32, bool, uint32)               \
-    CPU_DEVICE_BINARY(name, func, uint8, uint64, bool, uint64)               \
-    CPU_DEVICE_BINARY(name, func, uint8, int8, bool, int16)                  \
-    CPU_DEVICE_BINARY(name, func, uint8, int16, bool, int16)                 \
-    CPU_DEVICE_BINARY(name, func, uint8, int32, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, uint8, int64, bool, int64)                 \
-    CPU_DEVICE_NOIMPL(name, func, uint8, float16, bool, float16)             \
-    CPU_DEVICE_BINARY(name, func, uint8, float32, bool, float32)             \
-    CPU_DEVICE_BINARY(name, func, uint8, float64, bool, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, uint8, complex32, bool, complex32)        \
-    CPU_DEVICE_BINARY(name, cfunc, uint8, complex64, bool, complex64)        \
-    CPU_DEVICE_BINARY(name, cfunc, uint8, complex128, bool, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, uint16, uint8, bool, uint16)               \
-    CPU_DEVICE_BINARY(name, func, uint16, uint16, bool, uint16)              \
-    CPU_DEVICE_BINARY(name, func, uint16, uint32, bool, uint32)              \
-    CPU_DEVICE_BINARY(name, func, uint16, uint64, bool, uint64)              \
-    CPU_DEVICE_BINARY(name, func, uint16, int8, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, uint16, int16, bool, int32)                \
-    CPU_DEVICE_BINARY(name, func, uint16, int32, bool, int32)                \
-    CPU_DEVICE_BINARY(name, func, uint16, int64, bool, int64)                \
-    CPU_DEVICE_NOIMPL(name, func, uint16, float16, bool, float32)            \
-    CPU_DEVICE_BINARY(name, func, uint16, float32, bool, float32)            \
-    CPU_DEVICE_BINARY(name, func, uint16, float64, bool, float64)            \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, uint16, complex32, bool, complex64)       \
-    CPU_DEVICE_BINARY(name, cfunc, uint16, complex64, bool, complex64)       \
-    CPU_DEVICE_BINARY(name, cfunc, uint16, complex128, bool, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, uint32, uint8, bool, uint32)               \
-    CPU_DEVICE_BINARY(name, func, uint32, uint16, bool, uint32)              \
-    CPU_DEVICE_BINARY(name, func, uint32, uint32, bool, uint32)              \
-    CPU_DEVICE_BINARY(name, func, uint32, uint64, bool, uint64)              \
-    CPU_DEVICE_BINARY(name, func, uint32, int8, bool, int64)                 \
-    CPU_DEVICE_BINARY(name, func, uint32, int16, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, uint32, int32, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, uint32, int64, bool, int64)                \
-    CPU_DEVICE_NOIMPL(name, func, uint32, float16, bool, float64)            \
-    CPU_DEVICE_BINARY(name, func, uint32, float32, bool, float64)            \
-    CPU_DEVICE_BINARY(name, func, uint32, float64, bool, float64)            \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, uint32, complex32, bool, complex128)      \
-    CPU_DEVICE_BINARY(name, cfunc, uint32, complex64, bool, complex128)      \
-    CPU_DEVICE_BINARY(name, cfunc, uint32, complex128, bool, complex128)     \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, uint64, uint8, bool, uint64)               \
-    CPU_DEVICE_BINARY(name, func, uint64, uint16, bool, uint64)              \
-    CPU_DEVICE_BINARY(name, func, uint64, uint32, bool, uint64)              \
-    CPU_DEVICE_BINARY(name, func, uint64, uint64, bool, uint64)              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, int8, uint8, bool, int16)                  \
-    CPU_DEVICE_BINARY(name, func, int8, uint16, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, int8, uint32, bool, int64)                 \
-    CPU_DEVICE_BINARY(name, func, int8, int8, bool, int8)                    \
-    CPU_DEVICE_BINARY(name, func, int8, int16, bool, int16)                  \
-    CPU_DEVICE_BINARY(name, func, int8, int32, bool, int32)                  \
-    CPU_DEVICE_BINARY(name, func, int8, int64, bool, int64)                  \
-    CPU_DEVICE_NOIMPL(name, func, int8, float16, bool, float16)              \
-    CPU_DEVICE_BINARY(name, func, int8, float32, bool, float32)              \
-    CPU_DEVICE_BINARY(name, func, int8, float64, bool, float64)              \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, int8, complex32, bool, complex32)         \
-    CPU_DEVICE_BINARY(name, cfunc, int8, complex64, bool, complex64)         \
-    CPU_DEVICE_BINARY(name, cfunc, int8, complex128, bool, complex128)       \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, int16, uint8, bool, int16)                 \
-    CPU_DEVICE_BINARY(name, func, int16, uint16, bool, int32)                \
-    CPU_DEVICE_BINARY(name, func, int16, uint32, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, int16, int8, bool, int16)                  \
-    CPU_DEVICE_BINARY(name, func, int16, int16, bool, int16)                 \
-    CPU_DEVICE_BINARY(name, func, int16, int32, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, int16, int64, bool, int64)                 \
-    CPU_DEVICE_NOIMPL(name, func, int16, float16, bool, float32)             \
-    CPU_DEVICE_BINARY(name, func, int16, float32, bool, float32)             \
-    CPU_DEVICE_BINARY(name, func, int16, float64, bool, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, int16, complex32, bool, complex64)        \
-    CPU_DEVICE_BINARY(name, cfunc, int16, complex64, bool, complex64)        \
-    CPU_DEVICE_BINARY(name, cfunc, int16, complex128, bool, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, int32, uint8, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, int32, uint16, bool, int32)                \
-    CPU_DEVICE_BINARY(name, func, int32, uint32, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, int32, int8, bool, int32)                  \
-    CPU_DEVICE_BINARY(name, func, int32, int16, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, int32, int32, bool, int32)                 \
-    CPU_DEVICE_BINARY(name, func, int32, int64, bool, int64)                 \
-    CPU_DEVICE_NOIMPL(name, func, int32, float16, bool, float64)             \
-    CPU_DEVICE_BINARY(name, func, int32, float32, bool, float64)             \
-    CPU_DEVICE_BINARY(name, func, int32, float64, bool, float64)             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, int32, complex32, bool, complex128)       \
-    CPU_DEVICE_BINARY(name, cfunc, int32, complex64, bool, complex128)       \
-    CPU_DEVICE_BINARY(name, cfunc, int32, complex128, bool, complex128)      \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, int64, uint8, bool, int64)                 \
-    CPU_DEVICE_BINARY(name, func, int64, uint16, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, int64, uint32, bool, int64)                \
-    CPU_DEVICE_BINARY(name, func, int64, int8, bool, int64)                  \
-    CPU_DEVICE_BINARY(name, func, int64, int16, bool, int64)                 \
-    CPU_DEVICE_BINARY(name, func, int64, int32, bool, int64)                 \
-    CPU_DEVICE_BINARY(name, func, int64, int64, bool, int64)                 \
-                                                                             \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint8, bool, float16)             \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint16, bool, float32)            \
-    CPU_DEVICE_NOIMPL(name, func, float16, uint32, bool, float64)            \
-    CPU_DEVICE_NOIMPL(name, func, float16, int8, bool, float16)              \
-    CPU_DEVICE_NOIMPL(name, func, float16, int16, bool, float32)             \
-    CPU_DEVICE_NOIMPL(name, func, float16, int32, bool, float64)             \
-    CPU_DEVICE_NOIMPL(name, func, float16, float16, bool, float16)           \
-    CPU_DEVICE_NOIMPL(name, func, float16, float32, bool, float32)           \
-    CPU_DEVICE_NOIMPL(name, func, float16, float64, bool, float64)           \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex32, bool, complex32)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex64, bool, complex64)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex128, bool, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, float32, uint8, bool, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, uint16, bool, float32)            \
-    CPU_DEVICE_BINARY(name, func, float32, uint32, bool, float64)            \
-    CPU_DEVICE_BINARY(name, func, float32, int8, bool, float32)              \
-    CPU_DEVICE_BINARY(name, func, float32, int16, bool, float32)             \
-    CPU_DEVICE_BINARY(name, func, float32, int32, bool, float64)             \
-    CPU_DEVICE_NOIMPL(name, func, float32, float16, bool, float32)           \
-    CPU_DEVICE_BINARY(name, func, float32, float32, bool, float32)           \
-    CPU_DEVICE_BINARY(name, func, float32, float64, bool, float64)           \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, float32, complex32, bool, complex64)      \
-    CPU_DEVICE_BINARY(name, cfunc, float32, complex64, bool, complex64)      \
-    CPU_DEVICE_BINARY(name, cfunc, float32, complex128, bool, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    CPU_DEVICE_BINARY(name, func, float64, uint8, bool, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, uint16, bool, float64)            \
-    CPU_DEVICE_BINARY(name, func, float64, uint32, bool, float64)            \
-    CPU_DEVICE_BINARY(name, func, float64, int8, bool, float64)              \
-    CPU_DEVICE_BINARY(name, func, float64, int16, bool, float64)             \
-    CPU_DEVICE_BINARY(name, func, float64, int32, bool, float64)             \
-    CPU_DEVICE_NOIMPL(name, func, float64, float16, bool, float64)           \
-    CPU_DEVICE_BINARY(name, func, float64, float32, bool, float64)           \
-    CPU_DEVICE_BINARY(name, func, float64, float64, bool, float64)           \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, float64, complex32, bool, complex128)     \
-    CPU_DEVICE_BINARY(name, cfunc, float64, complex64, bool, complex128)     \
-    CPU_DEVICE_BINARY(name, cfunc, float64, complex128, bool, complex128)    \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint8, bool, complex32)        \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint16, bool, complex64)       \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint32, bool, complex128)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int8, bool, complex32)         \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int16, bool, complex64)        \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int32, bool, complex128)       \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float16, bool, complex32)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float32, bool, complex64)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float64, bool, complex128)     \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex32, bool, complex32)    \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex64, bool, complex64)    \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex128, bool, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, uint8, bool, complex64)        \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, uint16, bool, complex64)       \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, uint32, bool, complex128)      \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, int8, bool, complex64)         \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, int16, bool, complex64)        \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, int32, bool, complex128)       \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex64, float16, bool, complex64)      \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, float32, bool, complex64)      \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, float64, bool, complex128)     \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex64, complex32, bool, complex64)    \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, complex64, bool, complex64)    \
-    CPU_DEVICE_BINARY(name, cfunc, complex64, complex128, bool, complex128)  \
-    END_FLOAT_CONTROL_COMPLEX()                                              \
-                                                                             \
-    BEGIN_FLOAT_CONTROL_COMPLEX()                                            \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, uint8, bool, complex128)      \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, uint16, bool, complex128)     \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, uint32, bool, complex128)     \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, int8, bool, complex128)       \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, int16, bool, complex128)      \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, int32, bool, complex128)      \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex128, float16, bool, complex128)    \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, float32, bool, complex128)    \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, float64, bool, complex128)    \
-    CPU_DEVICE_NOIMPL(name, cfunc, complex128, complex32, bool, complex128)  \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, complex64, bool, complex128)  \
-    CPU_DEVICE_BINARY(name, cfunc, complex128, complex128, bool, complex128) \
-    END_FLOAT_CONTROL_COMPLEX()
+    CPU_DEVICE_BINARY(name, func, uint8, uint8, bool, uint8)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, uint16, bool, uint16)                \
+    CPU_DEVICE_BINARY(name, func, uint8, uint32, bool, uint32)                \
+    CPU_DEVICE_BINARY(name, func, uint8, uint64, bool, uint64)                \
+    CPU_DEVICE_BINARY(name, func, uint8, int8, bool, int16)                   \
+    CPU_DEVICE_BINARY(name, func, uint8, int16, bool, int16)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, int32, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, int64, bool, int64)                  \
+    CPU_DEVICE_NOIMPL(name, func, uint8, float16, bool, float16)              \
+    CPU_DEVICE_BINARY(name, func, uint8, float32, bool, float32)              \
+    CPU_DEVICE_BINARY(name, func, uint8, float64, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, cfunc, uint8, complex32, bool, complex32)         \
+    CPU_DEVICE_BINARYC(name, cfunc, uint8, complex64, bool, complex64)        \
+    CPU_DEVICE_BINARYC(name, cfunc, uint8, complex128, bool, complex128)      \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, uint16, uint8, bool, uint16)                \
+    CPU_DEVICE_BINARY(name, func, uint16, uint16, bool, uint16)               \
+    CPU_DEVICE_BINARY(name, func, uint16, uint32, bool, uint32)               \
+    CPU_DEVICE_BINARY(name, func, uint16, uint64, bool, uint64)               \
+    CPU_DEVICE_BINARY(name, func, uint16, int8, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, int16, bool, int32)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, int32, bool, int32)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, int64, bool, int64)                 \
+    CPU_DEVICE_NOIMPL(name, func, uint16, float16, bool, float32)             \
+    CPU_DEVICE_BINARY(name, func, uint16, float32, bool, float32)             \
+    CPU_DEVICE_BINARY(name, func, uint16, float64, bool, float64)             \
+    CPU_DEVICE_NOIMPL(name, cfunc, uint16, complex32, bool, complex64)        \
+    CPU_DEVICE_BINARYC(name, cfunc, uint16, complex64, bool, complex64)       \
+    CPU_DEVICE_BINARYC(name, cfunc, uint16, complex128, bool, complex128)     \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, uint32, uint8, bool, uint32)                \
+    CPU_DEVICE_BINARY(name, func, uint32, uint16, bool, uint32)               \
+    CPU_DEVICE_BINARY(name, func, uint32, uint32, bool, uint32)               \
+    CPU_DEVICE_BINARY(name, func, uint32, uint64, bool, uint64)               \
+    CPU_DEVICE_BINARY(name, func, uint32, int8, bool, int64)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, int16, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, int32, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, int64, bool, int64)                 \
+    CPU_DEVICE_NOIMPL(name, func, uint32, float16, bool, float64)             \
+    CPU_DEVICE_BINARY(name, func, uint32, float32, bool, float64)             \
+    CPU_DEVICE_BINARY(name, func, uint32, float64, bool, float64)             \
+    CPU_DEVICE_NOIMPL(name, cfunc, uint32, complex32, bool, complex128)       \
+    CPU_DEVICE_BINARYC(name, cfunc, uint32, complex64, bool, complex128)      \
+    CPU_DEVICE_BINARYC(name, cfunc, uint32, complex128, bool, complex128)     \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, uint64, uint8, bool, uint64)                \
+    CPU_DEVICE_BINARY(name, func, uint64, uint16, bool, uint64)               \
+    CPU_DEVICE_BINARY(name, func, uint64, uint32, bool, uint64)               \
+    CPU_DEVICE_BINARY(name, func, uint64, uint64, bool, uint64)               \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, int8, uint8, bool, int16)                   \
+    CPU_DEVICE_BINARY(name, func, int8, uint16, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, int8, uint32, bool, int64)                  \
+    CPU_DEVICE_BINARY(name, func, int8, int8, bool, int8)                     \
+    CPU_DEVICE_BINARY(name, func, int8, int16, bool, int16)                   \
+    CPU_DEVICE_BINARY(name, func, int8, int32, bool, int32)                   \
+    CPU_DEVICE_BINARY(name, func, int8, int64, bool, int64)                   \
+    CPU_DEVICE_NOIMPL(name, func, int8, float16, bool, float16)               \
+    CPU_DEVICE_BINARY(name, func, int8, float32, bool, float32)               \
+    CPU_DEVICE_BINARY(name, func, int8, float64, bool, float64)               \
+    CPU_DEVICE_NOIMPL(name, cfunc, int8, complex32, bool, complex32)          \
+    CPU_DEVICE_BINARYC(name, cfunc, int8, complex64, bool, complex64)         \
+    CPU_DEVICE_BINARYC(name, cfunc, int8, complex128, bool, complex128)       \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, int16, uint8, bool, int16)                  \
+    CPU_DEVICE_BINARY(name, func, int16, uint16, bool, int32)                 \
+    CPU_DEVICE_BINARY(name, func, int16, uint32, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, int16, int8, bool, int16)                   \
+    CPU_DEVICE_BINARY(name, func, int16, int16, bool, int16)                  \
+    CPU_DEVICE_BINARY(name, func, int16, int32, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, int16, int64, bool, int64)                  \
+    CPU_DEVICE_NOIMPL(name, func, int16, float16, bool, float32)              \
+    CPU_DEVICE_BINARY(name, func, int16, float32, bool, float32)              \
+    CPU_DEVICE_BINARY(name, func, int16, float64, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, cfunc, int16, complex32, bool, complex64)         \
+    CPU_DEVICE_BINARYC(name, cfunc, int16, complex64, bool, complex64)        \
+    CPU_DEVICE_BINARYC(name, cfunc, int16, complex128, bool, complex128)      \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, int32, uint8, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, int32, uint16, bool, int32)                 \
+    CPU_DEVICE_BINARY(name, func, int32, uint32, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, int32, int8, bool, int32)                   \
+    CPU_DEVICE_BINARY(name, func, int32, int16, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, int32, int32, bool, int32)                  \
+    CPU_DEVICE_BINARY(name, func, int32, int64, bool, int64)                  \
+    CPU_DEVICE_NOIMPL(name, func, int32, float16, bool, float64)              \
+    CPU_DEVICE_BINARY(name, func, int32, float32, bool, float64)              \
+    CPU_DEVICE_BINARY(name, func, int32, float64, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, cfunc, int32, complex32, bool, complex128)        \
+    CPU_DEVICE_BINARYC(name, cfunc, int32, complex64, bool, complex128)       \
+    CPU_DEVICE_BINARYC(name, cfunc, int32, complex128, bool, complex128)      \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, int64, uint8, bool, int64)                  \
+    CPU_DEVICE_BINARY(name, func, int64, uint16, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, int64, uint32, bool, int64)                 \
+    CPU_DEVICE_BINARY(name, func, int64, int8, bool, int64)                   \
+    CPU_DEVICE_BINARY(name, func, int64, int16, bool, int64)                  \
+    CPU_DEVICE_BINARY(name, func, int64, int32, bool, int64)                  \
+    CPU_DEVICE_BINARY(name, func, int64, int64, bool, int64)                  \
+                                                                              \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint8, bool, float16)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint16, bool, float32)             \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint32, bool, float64)             \
+    CPU_DEVICE_NOIMPL(name, func, float16, int8, bool, float16)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, int16, bool, float32)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, int32, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, float16, bool, float16)            \
+    CPU_DEVICE_NOIMPL(name, func, float16, float32, bool, float32)            \
+    CPU_DEVICE_NOIMPL(name, func, float16, float64, bool, float64)            \
+    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex32, bool, complex32)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex64, bool, complex64)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, float16, complex128, bool, complex128)     \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, float32, uint8, bool, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, uint16, bool, float32)             \
+    CPU_DEVICE_BINARY(name, func, float32, uint32, bool, float64)             \
+    CPU_DEVICE_BINARY(name, func, float32, int8, bool, float32)               \
+    CPU_DEVICE_BINARY(name, func, float32, int16, bool, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, int32, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float32, float16, bool, float32)            \
+    CPU_DEVICE_BINARY(name, func, float32, float32, bool, float32)            \
+    CPU_DEVICE_BINARY(name, func, float32, float64, bool, float64)            \
+    CPU_DEVICE_NOIMPL(name, cfunc, float32, complex32, bool, complex64)       \
+    CPU_DEVICE_BINARYC(name, cfunc, float32, complex64, bool, complex64)      \
+    CPU_DEVICE_BINARYC(name, cfunc, float32, complex128, bool, complex128)    \
+                                                                              \
+    CPU_DEVICE_BINARY(name, func, float64, uint8, bool, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, uint16, bool, float64)             \
+    CPU_DEVICE_BINARY(name, func, float64, uint32, bool, float64)             \
+    CPU_DEVICE_BINARY(name, func, float64, int8, bool, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, int16, bool, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, int32, bool, float64)              \
+    CPU_DEVICE_NOIMPL(name, func, float64, float16, bool, float64)            \
+    CPU_DEVICE_BINARY(name, func, float64, float32, bool, float64)            \
+    CPU_DEVICE_BINARY(name, func, float64, float64, bool, float64)            \
+    CPU_DEVICE_NOIMPL(name, cfunc, float64, complex32, bool, complex128)      \
+    CPU_DEVICE_BINARYC(name, cfunc, float64, complex64, bool, complex128)     \
+    CPU_DEVICE_BINARYC(name, cfunc, float64, complex128, bool, complex128)    \
+                                                                              \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint8, bool, complex32)         \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint16, bool, complex64)        \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, uint32, bool, complex128)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int8, bool, complex32)          \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int16, bool, complex64)         \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, int32, bool, complex128)        \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float16, bool, complex32)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float32, bool, complex64)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, float64, bool, complex128)      \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex32, bool, complex32)     \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex64, bool, complex64)     \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex32, complex128, bool, complex128)   \
+                                                                              \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, uint8, bool, complex64)        \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, uint16, bool, complex64)       \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, uint32, bool, complex128)      \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, int8, bool, complex64)         \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, int16, bool, complex64)        \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, int32, bool, complex128)       \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex64, float16, bool, complex64)       \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, float32, bool, complex64)      \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, float64, bool, complex128)     \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex64, complex32, bool, complex64)     \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, complex64, bool, complex64)    \
+    CPU_DEVICE_BINARYC(name, cfunc, complex64, complex128, bool, complex128)  \
+                                                                              \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, uint8, bool, complex128)      \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, uint16, bool, complex128)     \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, uint32, bool, complex128)     \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, int8, bool, complex128)       \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, int16, bool, complex128)      \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, int32, bool, complex128)      \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex128, float16, bool, complex128)     \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, float32, bool, complex128)    \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, float64, bool, complex128)    \
+    CPU_DEVICE_NOIMPL(name, cfunc, complex128, complex32, bool, complex128)   \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, complex64, bool, complex128)  \
+    CPU_DEVICE_BINARYC(name, cfunc, complex128, complex128, bool, complex128) \
 
 
 #define less(x, y) x < y
