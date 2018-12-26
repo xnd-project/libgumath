@@ -1,7 +1,7 @@
 skip_tags: true
 
-matrix:
-  fast_finish: true
+image:
+  - Visual Studio 2017
 
 environment:
   matrix:
