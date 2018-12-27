@@ -717,6 +717,35 @@ class TestFunctions(unittest.TestCase):
         self.check_binary_type_error("divide", a, t, b, u)
 
 
+@unittest.skipIf(cd is None, "test requires cuda")
+class TestCudaManaged(unittest.TestCase):
+
+    def test_mixed_functions(self):
+
+        x = xnd([1,2,3])
+        y = xnd([1,2,3])
+
+        a = xnd([1,2,3], device="cuda:managed")
+        b = xnd([1,2,3], device="cuda:managed")
+
+        z = fn.multiply(x, y)
+        c = cd.multiply(a, b)
+        self.assertEqual(z, c)
+
+        z = fn.multiply(a, b)
+        self.assertEqual(z, c)
+
+        z = fn.multiply(x, b)
+        self.assertEqual(z, c)
+
+        z = fn.multiply(a, y)
+        self.assertEqual(z, c)
+
+        self.assertRaises(ValueError, cd.multiply, x, y)
+        self.assertRaises(ValueError, cd.multiply, x, b)
+        self.assertRaises(ValueError, cd.multiply, a, y)
+
+
 class TestSpec(unittest.TestCase):
 
     def __init__(self, *, constr,
@@ -939,6 +968,7 @@ ALL_TESTS = [
   TestBinary,
   TestBitwise,
   TestFunctions,
+  TestCudaManaged,
   LongIndexSliceTest,
 ]
 

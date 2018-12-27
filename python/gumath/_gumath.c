@@ -159,6 +159,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     int64_t li[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
     gm_kernel_t kernel;
+    bool have_cpu_device = false;
     int i, k;
 
     if (kwds && PyDict_Size(kwds) > 0) {
@@ -178,9 +179,23 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
             PyErr_SetString(PyExc_TypeError, "arguments must be xnd");
             return NULL;
         }
+
+        const XndObject *x = (XndObject *)a[i];
+        if (!(x->mblock->xnd->flags&XND_CUDA_MANAGED)) {
+            have_cpu_device = true;
+        }
+
         stack[i] = *CONST_XND(a[i]);
         in_types[i] = stack[i].type;
         li[i] = stack[i].index;
+    }
+
+    if (have_cpu_device) {
+        if (self->flags & GM_CUDA_MANAGED_FUNC) {
+            PyErr_SetString(PyExc_ValueError,
+                "running a cuda function on cpu memory is not supported");
+            return NULL;
+        }
     }
 
     kernel = gm_select(&spec, self->tbl, self->name, in_types, li, (int)nin, stack, &ctx);
