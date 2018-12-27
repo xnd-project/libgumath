@@ -51,6 +51,7 @@
     #define UNUSED
   #endif
   #include <float.h>
+  #include <fenv.h>
   #pragma fenv_access(on)
 #else
   #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
