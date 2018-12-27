@@ -85,15 +85,15 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(                      \
 
 CUDA_DEVICE_UNARY(copy, copy, bool, bool, bool)
 
-CUDA_DEVICE_UNARY(copy, copy, int8, int8, int8)
-CUDA_DEVICE_UNARY(copy, copy, int16, int16, int16)
-CUDA_DEVICE_UNARY(copy, copy, int32, int32, int32)
-CUDA_DEVICE_UNARY(copy, copy, int64, int64, int64)
-
 CUDA_DEVICE_UNARY(copy, copy, uint8, uint8, uint8)
 CUDA_DEVICE_UNARY(copy, copy, uint16, uint16, uint16)
 CUDA_DEVICE_UNARY(copy, copy, uint32, uint32, uint32)
 CUDA_DEVICE_UNARY(copy, copy, uint64, uint64, uint64)
+
+CUDA_DEVICE_UNARY(copy, copy, int8, int8, int8)
+CUDA_DEVICE_UNARY(copy, copy, int16, int16, int16)
+CUDA_DEVICE_UNARY(copy, copy, int32, int32, int32)
+CUDA_DEVICE_UNARY(copy, copy, int64, int64, int64)
 
 CUDA_DEVICE_UNARY(copy, copy, float16, float16, float16)
 CUDA_DEVICE_UNARY(copy, copy, float32, float32, float32)
@@ -113,15 +113,15 @@ CUDA_DEVICE_UNARY(invert, invert, bool, bool, bool)
 #undef invert
 
 #define invert(x) ~x
-CUDA_DEVICE_UNARY(invert, invert, int8, int8, int8)
-CUDA_DEVICE_UNARY(invert, invert, int16, int16, int16)
-CUDA_DEVICE_UNARY(invert, invert, int32, int32, int32)
-CUDA_DEVICE_UNARY(invert, invert, int64, int64, int64)
-
 CUDA_DEVICE_UNARY(invert, invert, uint8, uint8, uint8)
 CUDA_DEVICE_UNARY(invert, invert, uint16, uint16, uint16)
 CUDA_DEVICE_UNARY(invert, invert, uint32, uint32, uint32)
 CUDA_DEVICE_UNARY(invert, invert, uint64, uint64, uint64)
+
+CUDA_DEVICE_UNARY(invert, invert, int8, int8, int8)
+CUDA_DEVICE_UNARY(invert, invert, int16, int16, int16)
+CUDA_DEVICE_UNARY(invert, invert, int32, int32, int32)
+CUDA_DEVICE_UNARY(invert, invert, int64, int64, int64)
 
 
 /*****************************************************************************/
@@ -129,14 +129,14 @@ CUDA_DEVICE_UNARY(invert, invert, uint64, uint64, uint64)
 /*****************************************************************************/
 
 #define negative(x) -x
+CUDA_DEVICE_UNARY(negative, negative, uint8, int16, int16)
+CUDA_DEVICE_UNARY(negative, negative, uint16, int32, int32)
+CUDA_DEVICE_UNARY(negative, negative, uint32, int64, int64)
+
 CUDA_DEVICE_UNARY(negative, negative, int8, int8, int8)
 CUDA_DEVICE_UNARY(negative, negative, int16, int16, int16)
 CUDA_DEVICE_UNARY(negative, negative, int32, int32, int32)
 CUDA_DEVICE_UNARY(negative, negative, int64, int64, int64)
-
-CUDA_DEVICE_UNARY(negative, negative, uint8, int16, int16)
-CUDA_DEVICE_UNARY(negative, negative, uint16, int32, int32)
-CUDA_DEVICE_UNARY(negative, negative, uint32, int64, int64)
 
 CUDA_DEVICE_UNARY(negative, __hneg, float16, float16, float16)
 CUDA_DEVICE_UNARY(negative, negative, float32, float32, float32)
@@ -152,8 +152,8 @@ CUDA_DEVICE_UNARY(negative, negative, complex128, complex128, complex128)
 /*****************************************************************************/
 
 #define CUDA_DEVICE_UNARY_ALL_REAL_MATH(name) \
-    CUDA_DEVICE_UNARY(name##f, name##f, int16, float32, float32)   \
     CUDA_DEVICE_UNARY(name##f, name##f, uint16, float32, float32)  \
+    CUDA_DEVICE_UNARY(name##f, name##f, int16, float32, float32)   \
     CUDA_DEVICE_UNARY(name##f, name##f, float32, float32, float32) \
     CUDA_DEVICE_UNARY(name, name, int32, float64, float64)         \
     CUDA_DEVICE_UNARY(name, name, uint32, float64, float64)        \
@@ -166,8 +166,8 @@ CUDA_DEVICE_UNARY(negative, negative, complex128, complex128, complex128)
     CUDA_DEVICE_UNARY(name, name, complex128, complex128, complex128)
 
 #define CUDA_DEVICE_UNARY_ALL_HALF_MATH(name, hfunc) \
-    CUDA_DEVICE_UNARY(name##f16, hfunc, int8, float16, float16)    \
     CUDA_DEVICE_UNARY(name##f16, hfunc, uint8, float16, float16)   \
+    CUDA_DEVICE_UNARY(name##f16, hfunc, int8, float16, float16)    \
     CUDA_DEVICE_UNARY(name##f16, hfunc, float16, float16, float16)
 
 #define CUDA_DEVICE_UNARY_ALL_REAL_MATH_WITH_HALF(name, hfunc) \

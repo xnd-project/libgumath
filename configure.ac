@@ -171,7 +171,7 @@ esac
 
 # Substitute variables and generate output:
 if test -z "$LD"; then
-    LD="$CC"
+    LD="$CXX"
 fi
 AC_SUBST(LD)
 AC_SUBST(AR)

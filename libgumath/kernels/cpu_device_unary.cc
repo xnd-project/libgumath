@@ -80,15 +80,15 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
 
 CPU_DEVICE_UNARY(copy, copy, bool, bool, bool)
 
-CPU_DEVICE_UNARY(copy, copy, int8, int8, int8)
-CPU_DEVICE_UNARY(copy, copy, int16, int16, int16)
-CPU_DEVICE_UNARY(copy, copy, int32, int32, int32)
-CPU_DEVICE_UNARY(copy, copy, int64, int64, int64)
-
 CPU_DEVICE_UNARY(copy, copy, uint8, uint8, uint8)
 CPU_DEVICE_UNARY(copy, copy, uint16, uint16, uint16)
 CPU_DEVICE_UNARY(copy, copy, uint32, uint32, uint32)
 CPU_DEVICE_UNARY(copy, copy, uint64, uint64, uint64)
+
+CPU_DEVICE_UNARY(copy, copy, int8, int8, int8)
+CPU_DEVICE_UNARY(copy, copy, int16, int16, int16)
+CPU_DEVICE_UNARY(copy, copy, int32, int32, int32)
+CPU_DEVICE_UNARY(copy, copy, int64, int64, int64)
 
 CPU_DEVICE_NOIMPL(copy, copy, float16, float16, float16)
 CPU_DEVICE_UNARY(copy, copy, float32, float32, float32)
@@ -108,15 +108,15 @@ CPU_DEVICE_UNARY(invert, invert, bool, bool, bool)
 #undef invert
 
 #define invert(x) ~x
-CPU_DEVICE_UNARY(invert, invert, int8, int8, int8)
-CPU_DEVICE_UNARY(invert, invert, int16, int16, int16)
-CPU_DEVICE_UNARY(invert, invert, int32, int32, int32)
-CPU_DEVICE_UNARY(invert, invert, int64, int64, int64)
-
 CPU_DEVICE_UNARY(invert, invert, uint8, uint8, uint8)
 CPU_DEVICE_UNARY(invert, invert, uint16, uint16, uint16)
 CPU_DEVICE_UNARY(invert, invert, uint32, uint32, uint32)
 CPU_DEVICE_UNARY(invert, invert, uint64, uint64, uint64)
+
+CPU_DEVICE_UNARY(invert, invert, int8, int8, int8)
+CPU_DEVICE_UNARY(invert, invert, int16, int16, int16)
+CPU_DEVICE_UNARY(invert, invert, int32, int32, int32)
+CPU_DEVICE_UNARY(invert, invert, int64, int64, int64)
 
 
 /*****************************************************************************/
@@ -125,14 +125,14 @@ CPU_DEVICE_UNARY(invert, invert, uint64, uint64, uint64)
 
 #define negative(x) -x
 
+CPU_DEVICE_UNARY(negative, negative, uint8, int16, int16)
+CPU_DEVICE_UNARY(negative, negative, uint16, int32, int32)
+CPU_DEVICE_UNARY(negative, negative, uint32, int64, int64)
+
 CPU_DEVICE_UNARY(negative, negative, int8, int8, int8)
 CPU_DEVICE_UNARY(negative, negative, int16, int16, int16)
 CPU_DEVICE_UNARY(negative, negative, int32, int32, int32)
 CPU_DEVICE_UNARY(negative, negative, int64, int64, int64)
-
-CPU_DEVICE_UNARY(negative, negative, uint8, int16, int16)
-CPU_DEVICE_UNARY(negative, negative, uint16, int32, int32)
-CPU_DEVICE_UNARY(negative, negative, uint32, int64, int64)
 
 CPU_DEVICE_NOIMPL(negative, negative, float16, float16, float16)
 CPU_DEVICE_UNARY(negative, negative, float32, float32, float32)
@@ -148,11 +148,11 @@ CPU_DEVICE_UNARYC(negative, negative, complex128, complex128, complex128)
 /*****************************************************************************/
 
 #define CPU_DEVICE_UNARY_ALL_REAL_MATH(name) \
-    CPU_DEVICE_UNARY(name##f, name##f, int16, float32, float32)   \
     CPU_DEVICE_UNARY(name##f, name##f, uint16, float32, float32)  \
+    CPU_DEVICE_UNARY(name##f, name##f, int16, float32, float32)   \
     CPU_DEVICE_UNARY(name##f, name##f, float32, float32, float32) \
-    CPU_DEVICE_UNARY(name, name, int32, float64, float64)         \
     CPU_DEVICE_UNARY(name, name, uint32, float64, float64)        \
+    CPU_DEVICE_UNARY(name, name, int32, float64, float64)         \
     CPU_DEVICE_UNARY(name, name, float64, float64, float64)
 
 #define CPU_DEVICE_UNARY_ALL_COMPLEX_MATH(name) \
@@ -162,8 +162,8 @@ CPU_DEVICE_UNARYC(negative, negative, complex128, complex128, complex128)
     CPU_DEVICE_UNARYC(name, name, complex128, complex128, complex128) \
 
 #define CPU_DEVICE_UNARY_ALL_HALF_MATH(name, hfunc) \
-    CPU_DEVICE_UNARY(name##f16, hfunc, int8, float16, float16)    \
     CPU_DEVICE_UNARY(name##f16, hfunc, uint8, float16, float16)   \
+    CPU_DEVICE_UNARY(name##f16, hfunc, int8, float16, float16)    \
     CPU_DEVICE_UNARY(name##f16, hfunc, float16, float16, float16)
 
 #define CPU_DEVICE_UNARY_ALL_REAL_MATH_WITH_HALF(name, hfunc) \

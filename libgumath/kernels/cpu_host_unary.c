@@ -55,15 +55,15 @@ id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     switch (t->tag) {
     case Bool: return 0;
 
-    case Int8: return 4;
-    case Int16: return 8;
-    case Int32: return 12;
-    case Int64: return 16;
+    case Uint8: return 4;
+    case Uint16: return 8;
+    case Uint32: return 12;
+    case Uint64: return 16;
 
-    case Uint8: return 20;
-    case Uint16: return 24;
-    case Uint32: return 28;
-    case Uint64: return 32;
+    case Int8: return 20;
+    case Int16: return 24;
+    case Int32: return 28;
+    case Int64: return 32;
 
     case Float16: return 36;
     case Float32: return 40;
@@ -87,15 +87,16 @@ invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     switch (t->tag) {
     case Bool: return 0;
 
-    case Int8: return 4;
-    case Int16: return 8;
-    case Int32: return 12;
-    case Int64: return 16;
+    case Uint8: return 4;
+    case Uint16: return 8;
+    case Uint32: return 12;
+    case Uint64: return 16;
 
-    case Uint8: return 20;
-    case Uint16: return 24;
-    case Uint32: return 28;
-    case Uint64: return 32;
+    case Int8: return 20;
+    case Int16: return 24;
+    case Int32: return 28;
+    case Int64: return 32;
+
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
         return -1;
@@ -108,14 +109,14 @@ negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     const ndt_t *t = ndt_dtype(in);
 
     switch (t->tag) {
-    case Int8: return 0;
-    case Int16: return 4;
-    case Int32: return 8;
-    case Int64: return 12;
+    case Uint8: return 0;
+    case Uint16: return 4;
+    case Uint32: return 8;
 
-    case Uint8: return 16;
-    case Uint16: return 20;
-    case Uint32: return 24;
+    case Int8: return 12;
+    case Int16: return 16;
+    case Int32: return 20;
+    case Int64: return 24;
 
     case Float16: return 28;
     case Float32: return 32;
@@ -137,16 +138,16 @@ math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     const ndt_t *t = ndt_dtype(in);
 
     switch (t->tag) {
-    case Int8: return 0;
-    case Uint8: return 4;
+    case Uint8: return 0;
+    case Int8: return 4;
     case Float16: return 8;
 
-    case Int16: return 12;
-    case Uint16: return 16;
+    case Uint16: return 12;
+    case Int16: return 16;
     case Float32: return 20;
 
-    case Int32: return 24;
-    case Uint32: return 28;
+    case Uint32: return 24;
+    case Int32: return 28;
     case Float64: return 32;
 
     case Complex32: return 36;
@@ -256,15 +257,15 @@ gm_cpu_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
 #define copy(x) x
 CPU_UNARY_HOST(copy, bool, bool)
 
-CPU_UNARY_HOST(copy, int8, int8)
-CPU_UNARY_HOST(copy, int16, int16)
-CPU_UNARY_HOST(copy, int32, int32)
-CPU_UNARY_HOST(copy, int64, int64)
-
 CPU_UNARY_HOST(copy, uint8, uint8)
 CPU_UNARY_HOST(copy, uint16, uint16)
 CPU_UNARY_HOST(copy, uint32, uint32)
 CPU_UNARY_HOST(copy, uint64, uint64)
+
+CPU_UNARY_HOST(copy, int8, int8)
+CPU_UNARY_HOST(copy, int16, int16)
+CPU_UNARY_HOST(copy, int32, int32)
+CPU_UNARY_HOST(copy, int64, int64)
 
 CPU_NOIMPL_HOST(copy, float16, float16)
 CPU_UNARY_HOST(copy, float32, float32)
@@ -279,15 +280,15 @@ static const gm_kernel_init_t unary_id[] = {
   /* COPY */
   CPU_UNARY_HOST_INIT(copy, copy, bool, bool),
 
-  CPU_UNARY_HOST_INIT(copy, copy, int8, int8),
-  CPU_UNARY_HOST_INIT(copy, copy, int16, int16),
-  CPU_UNARY_HOST_INIT(copy, copy, int32, int32),
-  CPU_UNARY_HOST_INIT(copy, copy, int64, int64),
-
   CPU_UNARY_HOST_INIT(copy, copy, uint8, uint8),
   CPU_UNARY_HOST_INIT(copy, copy, uint16, uint16),
   CPU_UNARY_HOST_INIT(copy, copy, uint32, uint32),
   CPU_UNARY_HOST_INIT(copy, copy, uint64, uint64),
+
+  CPU_UNARY_HOST_INIT(copy, copy, int8, int8),
+  CPU_UNARY_HOST_INIT(copy, copy, int16, int16),
+  CPU_UNARY_HOST_INIT(copy, copy, int32, int32),
+  CPU_UNARY_HOST_INIT(copy, copy, int64, int64),
 
   CPU_UNARY_HOST_INIT(copy, copy, float16, float16),
   CPU_UNARY_HOST_INIT(copy, copy, float32, float32),
@@ -310,30 +311,30 @@ CPU_UNARY_HOST(invert, bool, bool)
 
 #undef invert
 #define invert(x) ~x
-CPU_UNARY_HOST(invert, int8, int8)
-CPU_UNARY_HOST(invert, int16, int16)
-CPU_UNARY_HOST(invert, int32, int32)
-CPU_UNARY_HOST(invert, int64, int64)
-
 CPU_UNARY_HOST(invert, uint8, uint8)
 CPU_UNARY_HOST(invert, uint16, uint16)
 CPU_UNARY_HOST(invert, uint32, uint32)
 CPU_UNARY_HOST(invert, uint64, uint64)
+
+CPU_UNARY_HOST(invert, int8, int8)
+CPU_UNARY_HOST(invert, int16, int16)
+CPU_UNARY_HOST(invert, int32, int32)
+CPU_UNARY_HOST(invert, int64, int64)
 
 
 static const gm_kernel_init_t unary_invert[] = {
   /* INVERT */
   CPU_UNARY_HOST_INIT(invert, invert, bool, bool),
 
-  CPU_UNARY_HOST_INIT(invert, invert, int8, int8),
-  CPU_UNARY_HOST_INIT(invert, invert, int16, int16),
-  CPU_UNARY_HOST_INIT(invert, invert, int32, int32),
-  CPU_UNARY_HOST_INIT(invert, invert, int64, int64),
-
   CPU_UNARY_HOST_INIT(invert, invert, uint8, uint8),
   CPU_UNARY_HOST_INIT(invert, invert, uint16, uint16),
   CPU_UNARY_HOST_INIT(invert, invert, uint32, uint32),
   CPU_UNARY_HOST_INIT(invert, invert, uint64, uint64),
+
+  CPU_UNARY_HOST_INIT(invert, invert, int8, int8),
+  CPU_UNARY_HOST_INIT(invert, invert, int16, int16),
+  CPU_UNARY_HOST_INIT(invert, invert, int32, int32),
+  CPU_UNARY_HOST_INIT(invert, invert, int64, int64),
 
   { .name = NULL, .sig = NULL }
 };
@@ -344,14 +345,14 @@ static const gm_kernel_init_t unary_invert[] = {
 /*****************************************************************************/
 
 #define negative(x) -x
+CPU_UNARY_HOST(negative, uint8, int16)
+CPU_UNARY_HOST(negative, uint16, int32)
+CPU_UNARY_HOST(negative, uint32, int64)
+
 CPU_UNARY_HOST(negative, int8, int8)
 CPU_UNARY_HOST(negative, int16, int16)
 CPU_UNARY_HOST(negative, int32, int32)
 CPU_UNARY_HOST(negative, int64, int64)
-
-CPU_UNARY_HOST(negative, uint8, int16)
-CPU_UNARY_HOST(negative, uint16, int32)
-CPU_UNARY_HOST(negative, uint32, int64)
 
 CPU_NOIMPL_HOST(negative, float16, float16)
 CPU_UNARY_HOST(negative, float32, float32)
@@ -364,14 +365,14 @@ CPU_UNARY_HOST(negative, complex128, complex128)
 
 static const gm_kernel_init_t unary_negative[] = {
   /* NEGATIVE */
+  CPU_UNARY_HOST_INIT(negative, negative, uint8, int16),
+  CPU_UNARY_HOST_INIT(negative, negative, uint16, int32),
+  CPU_UNARY_HOST_INIT(negative, negative, uint32, int64),
+
   CPU_UNARY_HOST_INIT(negative, negative, int8, int8),
   CPU_UNARY_HOST_INIT(negative, negative, int16, int16),
   CPU_UNARY_HOST_INIT(negative, negative, int32, int32),
   CPU_UNARY_HOST_INIT(negative, negative, int64, int64),
-
-  CPU_UNARY_HOST_INIT(negative, negative, uint8, int16),
-  CPU_UNARY_HOST_INIT(negative, negative, uint16, int32),
-  CPU_UNARY_HOST_INIT(negative, negative, uint32, int64),
 
   CPU_UNARY_HOST_INIT(negative, negative, float16, float16),
   CPU_UNARY_HOST_INIT(negative, negative, float32, float32),
@@ -390,13 +391,13 @@ static const gm_kernel_init_t unary_negative[] = {
 /*****************************************************************************/
 
 #define _CPU_ALL_HALF_MATH(name) \
-    CPU_UNARY_HOST(name##f16, int8, float16)    \
     CPU_UNARY_HOST(name##f16, uint8, float16)   \
+    CPU_UNARY_HOST(name##f16, int8, float16)    \
     CPU_UNARY_HOST(name##f16, float16, float16)
 
 #define _CPU_ALL_HALF_MATH_NOIMPL(name) \
-    CPU_NOIMPL_HOST(name##f16, int8, float16)    \
     CPU_NOIMPL_HOST(name##f16, uint8, float16)   \
+    CPU_NOIMPL_HOST(name##f16, int8, float16)    \
     CPU_NOIMPL_HOST(name##f16, float16, float16)
 
 #define _CPU_ALL_COMPLEX_MATH(name) \
@@ -410,11 +411,11 @@ static const gm_kernel_init_t unary_negative[] = {
     CPU_NOIMPL_HOST(name, complex128, complex128)
 
 #define _CPU_ALL_REAL_MATH(name) \
-    CPU_UNARY_HOST(name##f, int16, float32)   \
     CPU_UNARY_HOST(name##f, uint16, float32)  \
+    CPU_UNARY_HOST(name##f, int16, float32)   \
     CPU_UNARY_HOST(name##f, float32, float32) \
-    CPU_UNARY_HOST(name, int32, float64)      \
     CPU_UNARY_HOST(name, uint32, float64)     \
+    CPU_UNARY_HOST(name, int32, float64)      \
     CPU_UNARY_HOST(name, float64, float64)    \
 
 #define CPU_ALL_REAL_MATH(name) \
@@ -439,12 +440,12 @@ static const gm_kernel_init_t unary_negative[] = {
 
 
 #define CPU_ALL_UNARY_MATH_INIT(name) \
-    CPU_UNARY_HOST_INIT(name, name##f16, int8, float16),    \
     CPU_UNARY_HOST_INIT(name, name##f16, uint8, float16),   \
+    CPU_UNARY_HOST_INIT(name, name##f16, int8, float16),    \
     CPU_UNARY_HOST_INIT(name, name##f16, float16, float16), \
                                                              \
-    CPU_UNARY_HOST_INIT(name, name##f, int16, float32),     \
     CPU_UNARY_HOST_INIT(name, name##f, uint16, float32),    \
+    CPU_UNARY_HOST_INIT(name, name##f, int16, float32),     \
     CPU_UNARY_HOST_INIT(name, name##f, float32, float32),   \
                                                              \
     CPU_UNARY_HOST_INIT(name, name, uint32, float64),       \

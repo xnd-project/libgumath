@@ -45,15 +45,22 @@
 #define GUMATH_MODULE
 #include "pygumath.h"
 
+
 #ifdef _MSC_VER
   #ifndef UNUSED
     #define UNUSED
   #endif
+  #include <float.h>
+  #pragma fenv_access(on)
 #else
   #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
     #define UNUSED __attribute__((unused))
   #else
     #define UNUSED
+  #endif
+  #include <fenv.h>
+  #if 0 /* Not supported by gcc and clang. */
+    #pragma STDC FENV_ACCESS ON
   #endif
 #endif
 
@@ -206,7 +213,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     if (self->flags == GM_CUDA_FUNC) {
     #if HAVE_CUDA
-        int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
+        const int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
 
         if (xnd_cuda_device_synchronize(&ctx) < 0 || ret < 0) {
             clear_objects(result, spec.nout);
@@ -223,14 +230,27 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
     }
     else {
     #ifdef HAVE_PTHREAD_H
-        if (gm_apply_thread(&kernel, stack, spec.outer_dims, spec.flags,
-            max_threads, &ctx) < 0) {
+        const int rounding = fegetround();
+        fesetround(FE_TONEAREST);
+
+        const int ret = gm_apply_thread(&kernel, stack, spec.outer_dims,
+                                        spec.flags, max_threads, &ctx);
+        fesetround(rounding);
+
+        if (ret < 0) {
             clear_objects(result, spec.nout);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);
         }
     #else
-        if (gm_apply(&kernel, stack, spec.outer_dims, &ctx) < 0) {
+        const int rounding = fegetround();
+        fesetround(FE_TONEAREST);
+
+        const int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
+
+        fesetround(rounding);
+
+        if (ret < 0) {
             clear_objects(result, spec.nout);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);

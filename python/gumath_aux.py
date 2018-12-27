@@ -40,6 +40,7 @@ import struct
 import unittest
 from randdec import all_unary, all_binary
 from randfloat import un_randfloat, bin_randfloat
+import numpy as np
 
 
 def skip_if(condition, reason):
@@ -387,6 +388,34 @@ def split_xnd(x, n, max_outer=None):
 #                           Generate test cases
 # ======================================================================
 
+functions = {
+  "unary": {
+    "default": ["copy"],
+    "arith": ["negative"],
+    "complex_math_with_half": ["exp", "log", "log10", "sqrt", "sin", "cos"],
+    "complex_math": ["tan", "asin", "acos", "atan", "sinh", "cosh", "tanh",
+                     "asinh", "acosh", "atanh"],
+    "real_math_with_half": ["fabs", "exp2", "log2"],
+    "real_math": ["expm1", "log1p", "logb", "cbrt", "erf", "erfc", "lgamma",
+                  "tgamma", "ceil", "floor", "trunc", "round", "nearbyint"],
+    "bitwise": ["invert"],
+  },
+  "binary": {
+    "default": ["add", "subtract", "multiply"],
+    "float_result": ["divide"],
+    "bool_result": ["less_equal", "less", "greater_equal", "greater"],
+    "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
+  }
+}
+
+def complex_noimpl(name):
+    return name in functions["unary"]["real_math"] or \
+           name in functions["unary"]["real_math_with_half"]
+
+def half_noimpl(name):
+    return name in functions["unary"]["real_math"] or \
+           name in functions["unary"]["complex_math"]
+
 tunsigned = ["bool", "uint8", "uint16", "uint32", "uint64"]
 tsigned = ["int8", "int16", "int32", "int64"]
 tfloat = ["float16", "float32", "float64"]
@@ -429,9 +458,9 @@ class Tint(object):
         yield self.max
         for i in range(10):
             yield randrange(self.min, self.max+1)
-    def cpu_noimpl(self):
+    def cpu_noimpl(self, f=None):
         return False
-    def cuda_noimpl(self):
+    def cuda_noimpl(self, f=None):
         return False
 
 class Tfloat(object):
@@ -449,6 +478,8 @@ class Tfloat(object):
         return hash(self.all)
     def testcases(self):
         yield 0
+        yield 0.5
+        yield -0.5
         yield self.min
         yield self.max
         prec = randrange(1, 10)
@@ -456,10 +487,11 @@ class Tfloat(object):
             yield float(v)
         for v in un_randfloat():
             yield float(v)
-    def cpu_noimpl(self):
+    def cpu_noimpl(self, f=None):
         return self.type == "float16"
-    def cuda_noimpl(self):
-        return False
+    def cuda_noimpl(self, f=None):
+        if self.type == "float16":
+            return half_noimpl(f)
 
 class Tcomplex(object):
     def __init__(self, type):
@@ -476,6 +508,10 @@ class Tcomplex(object):
         return hash(self.all)
     def testcases(self):
         yield 0
+        yield 0.5
+        yield -0.5
+        yield 0.5j
+        yield -0.5j
         yield self.min
         yield self.max
         prec = randrange(1, 10)
@@ -483,10 +519,14 @@ class Tcomplex(object):
             yield complex(float(v), float(w))
         for v, w in bin_randfloat():
             yield complex(float(v), float(w))
-    def cpu_noimpl(self):
-        return True
-    def cuda_noimpl(self):
-        return self.type == "complex32"
+    def cpu_noimpl(self, f=None):
+        if self.type == "complex32":
+            return True
+        return complex_noimpl(f)
+    def cuda_noimpl(self, f=None):
+        if self.type == "complex32":
+            return True
+        return complex_noimpl(f)
 
 tinfo_default = [
   Tint("uint8"),
@@ -519,7 +559,7 @@ tinfo_bitwise = [
 
 implemented_sigs = {
   "unary": {
-    "default": {}, "arith": {}, "float_result": {}, "bitwise": {}
+    "default": {}, "float_result": {}
   },
   "binary": {
     "default": {}, "float_result": {}, "bool_result": {}, "bitwise": {}
@@ -528,7 +568,7 @@ implemented_sigs = {
 
 exact_sigs = {
   "unary": {
-    "default": {}, "float_result": {},
+    "default": {}, "float_result": {}
   },
   "binary": {
     "default": {}, "float_result": {}, "bool_result": {}, "bitwise": {}
@@ -537,7 +577,7 @@ exact_sigs = {
 
 inexact_sigs = {
   "unary": {
-    "default": {}, "float_result": {},
+    "default": {}, "float_result": {}
   },
   "binary": {
     "default": {}, "float_result": {}, "bool_result": {}, "bitwise": {}
@@ -655,22 +695,25 @@ init_binary_cast_tbl("bool_result")
 init_binary_cast_tbl("bitwise")
 
 
-functions = {
-  "unary": {
-    "default": ["copy"],
-    "arith": ["negative"],
-    "complex_math_with_half": ["exp", "log", "log10", "sqrt", "sin", "cos"],
-    "complex_math": ["tan", "asin", "acos", "atan", "sinh", "cosh", "tanh",
-                     "asinh", "acosh", "atanh"],
-    "real_math_with_half": ["fabs", "exp2", "log2"],
-    "real_math": ["expm1", "log1p", "logb", "cbrt", "erf", "erfc", "lgamma",
-                  "tgamma", "ceil", "floor", "trunc", "round", "nearbyint"],
-    "bitwise": ["invert"],
-  },
-  "binary": {
-    "default": ["add", "subtract", "multiply"],
-    "float_result": ["divide"],
-    "bool_result": ["less_equal", "less", "greater_equal", "greater"],
-    "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
-  }
+_np_names = {
+  "asin" : "arcsin",
+  "acos" : "arccos",
+  "atan" : "arctan",
+  "asinh" : "arcsinh",
+  "acosh" : "arccosh",
+  "atanh" : "arctanh",
+  "nearbyint" : "round",
 }
+
+def np_function(name):
+    return _np_names.get(name, name)
+
+def np_noimpl(name):
+    if name == "round":
+        # np.round == gumath.nerbyint
+        return True
+    try:
+        getattr(np, name)
+        return False
+    except AttributeError:
+        return True

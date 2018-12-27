@@ -73,15 +73,15 @@ typedef double float64_t;
 
 CUDA_DEVICE_UNARY_DECL(copy, bool, bool)
 
-CUDA_DEVICE_UNARY_DECL(copy, int8, int8)
-CUDA_DEVICE_UNARY_DECL(copy, int16, int16)
-CUDA_DEVICE_UNARY_DECL(copy, int32, int32)
-CUDA_DEVICE_UNARY_DECL(copy, int64, int64)
-
 CUDA_DEVICE_UNARY_DECL(copy, uint8, uint8)
 CUDA_DEVICE_UNARY_DECL(copy, uint16, uint16)
 CUDA_DEVICE_UNARY_DECL(copy, uint32, uint32)
 CUDA_DEVICE_UNARY_DECL(copy, uint64, uint64)
+
+CUDA_DEVICE_UNARY_DECL(copy, int8, int8)
+CUDA_DEVICE_UNARY_DECL(copy, int16, int16)
+CUDA_DEVICE_UNARY_DECL(copy, int32, int32)
+CUDA_DEVICE_UNARY_DECL(copy, int64, int64)
 
 CUDA_DEVICE_UNARY_DECL(copy, float16, float16)
 CUDA_DEVICE_UNARY_DECL(copy, float32, float32)
@@ -98,29 +98,29 @@ CUDA_DEVICE_UNARY_DECL(copy, complex128, complex128)
 
 CUDA_DEVICE_UNARY_DECL(invert, bool, bool)
 
-CUDA_DEVICE_UNARY_DECL(invert, int8, int8)
-CUDA_DEVICE_UNARY_DECL(invert, int16, int16)
-CUDA_DEVICE_UNARY_DECL(invert, int32, int32)
-CUDA_DEVICE_UNARY_DECL(invert, int64, int64)
-
 CUDA_DEVICE_UNARY_DECL(invert, uint8, uint8)
 CUDA_DEVICE_UNARY_DECL(invert, uint16, uint16)
 CUDA_DEVICE_UNARY_DECL(invert, uint32, uint32)
 CUDA_DEVICE_UNARY_DECL(invert, uint64, uint64)
+
+CUDA_DEVICE_UNARY_DECL(invert, int8, int8)
+CUDA_DEVICE_UNARY_DECL(invert, int16, int16)
+CUDA_DEVICE_UNARY_DECL(invert, int32, int32)
+CUDA_DEVICE_UNARY_DECL(invert, int64, int64)
 
 
 /*****************************************************************************/
 /*                                 Negative                                  */
 /*****************************************************************************/
 
+CUDA_DEVICE_UNARY_DECL(negative, uint8, int16)
+CUDA_DEVICE_UNARY_DECL(negative, uint16, int32)
+CUDA_DEVICE_UNARY_DECL(negative, uint32, int64)
+
 CUDA_DEVICE_UNARY_DECL(negative, int8, int8)
 CUDA_DEVICE_UNARY_DECL(negative, int16, int16)
 CUDA_DEVICE_UNARY_DECL(negative, int32, int32)
 CUDA_DEVICE_UNARY_DECL(negative, int64, int64)
-
-CUDA_DEVICE_UNARY_DECL(negative, uint8, int16)
-CUDA_DEVICE_UNARY_DECL(negative, uint16, int32)
-CUDA_DEVICE_UNARY_DECL(negative, uint32, int64)
 
 CUDA_DEVICE_UNARY_DECL(negative, float16, float16)
 CUDA_DEVICE_UNARY_DECL(negative, float32, float32)
@@ -136,11 +136,11 @@ CUDA_DEVICE_UNARY_DECL(negative, complex128, complex128)
 /*****************************************************************************/
 
 #define CUDA_DEVICE_UNARY_ALL_REAL_MATH_DECL(name) \
-    CUDA_DEVICE_UNARY_DECL(name##f, int16, float32)   \
     CUDA_DEVICE_UNARY_DECL(name##f, uint16, float32)  \
+    CUDA_DEVICE_UNARY_DECL(name##f, int16, float32)   \
     CUDA_DEVICE_UNARY_DECL(name##f, float32, float32) \
-    CUDA_DEVICE_UNARY_DECL(name, int32, float64)      \
     CUDA_DEVICE_UNARY_DECL(name, uint32, float64)     \
+    CUDA_DEVICE_UNARY_DECL(name, int32, float64)      \
     CUDA_DEVICE_UNARY_DECL(name, float64, float64)
 
 #define CUDA_DEVICE_UNARY_ALL_COMPLEX_MATH_DECL(name) \
@@ -150,8 +150,8 @@ CUDA_DEVICE_UNARY_DECL(negative, complex128, complex128)
     CUDA_DEVICE_UNARY_DECL(name, complex128, complex128)
 
 #define CUDA_DEVICE_UNARY_ALL_HALF_MATH_DECL(name) \
-    CUDA_DEVICE_UNARY_DECL(name##f16, int8, float16)    \
     CUDA_DEVICE_UNARY_DECL(name##f16, uint8, float16)   \
+    CUDA_DEVICE_UNARY_DECL(name##f16, int8, float16)    \
     CUDA_DEVICE_UNARY_DECL(name##f16, float16, float16)
 
 #define CUDA_DEVICE_UNARY_ALL_REAL_MATH_WITH_HALF_DECL(name) \

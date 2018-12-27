@@ -4100,7 +4100,7 @@ esac
 
 # Substitute variables and generate output:
 if test -z "$LD"; then
-    LD="$CC"
+    LD="$CXX"
 fi
 
 
