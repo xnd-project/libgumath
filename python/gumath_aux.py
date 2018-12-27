@@ -710,7 +710,7 @@ def np_function(name):
 
 def np_noimpl(name):
     if name == "round":
-        # np.round == gumath.nerbyint
+        # np.round == gumath.nearbyint
         return True
     try:
         getattr(np, name)
