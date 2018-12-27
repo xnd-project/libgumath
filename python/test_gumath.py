@@ -57,6 +57,8 @@ except ImportError:
 SKIP_LONG = True
 SKIP_BRUTE_FORCE = True
 
+ARCH = platform.architecture()[0]
+
 gm.set_max_threads(1)
 
 
@@ -598,6 +600,7 @@ class TestFunctions(unittest.TestCase):
         self.assert_equal(f, v1, v2, w, msg)
 
     @unittest.skipIf(sys.platform == "darwin", "complex trigonometry errors too large")
+    @unittest.skipIf(sys.platform == "win32" and ARCH == "32bit", "complex trigonometry errors too large")
     def test_unary_cpu(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
