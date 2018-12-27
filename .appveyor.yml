@@ -9,6 +9,9 @@ environment:
     - PLATFORM: "x86"
       PYTHON: "C:\\Python37"
 
+install:
+  - "%PYTHON%\\python.exe -m pip install numpy"
+
 build_script:
   - git clone https://github.com/plures/ndtypes.git
   - git clone https://github.com/plures/xnd.git
