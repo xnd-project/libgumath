@@ -37,6 +37,7 @@ from xnd import xnd
 from ndtypes import ndt
 from extending import Graph
 import sys, time
+import platform
 import math
 import cmath
 import unittest
