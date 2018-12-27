@@ -600,7 +600,7 @@ class TestFunctions(unittest.TestCase):
     def test_unary_cpu(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
-        print("\n")
+        print("\n", flush=True)
 
         for pattern, return_type in [
               ("default", "default"),
@@ -611,12 +611,12 @@ class TestFunctions(unittest.TestCase):
                 if np_noimpl(f):
                     continue
 
-                print("testing %s ..." % f)
+                print("testing %s ..." % f, flush=True)
 
                 for t, in implemented_sigs["unary"][return_type]:
                     u = implemented_sigs["unary"][return_type][(t,)]
 
-                    print("    %s -> %s" % (t, u))
+                    print("    %s -> %s" % (t, u), flush=True)
 
                     for a in t.testcases():
                         if t.cpu_noimpl(f) or u.cpu_noimpl(f):
@@ -627,16 +627,16 @@ class TestFunctions(unittest.TestCase):
     def test_binary_cpu(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
-        print("\n")
+        print("\n", flush=True)
 
         for pattern in "default", "float_result", "bool_result":
             for f in functions["binary"][pattern]:
-                print("testing %s ..." % f)
+                print("testing %s ..." % f, flush=True)
 
                 for t, u in implemented_sigs["binary"][pattern]:
                     w = implemented_sigs["binary"][pattern][(t, u)]
 
-                    print("    %s, %s -> %s" % (t, u, w))
+                    print("    %s, %s -> %s" % (t, u, w), flush=True)
 
                     for a in t.testcases():
                         for b in u.testcases():
@@ -649,7 +649,7 @@ class TestFunctions(unittest.TestCase):
     def test_unary_cuda(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
-        print("\n")
+        print("\n", flush=True)
 
         for pattern, return_type in [
               ("default", "default"),
@@ -662,12 +662,12 @@ class TestFunctions(unittest.TestCase):
                 if np_noimpl(f):
                     continue
 
-                print("testing %s ..." % f)
+                print("testing %s ..." % f, flush=True)
 
                 for t, in implemented_sigs["unary"][return_type]:
                     u = implemented_sigs["unary"][return_type][(t,)]
 
-                    print("    %s -> %s" % (t, u))
+                    print("    %s -> %s" % (t, u), flush=True)
 
                     for a in t.testcases():
                         if t.cuda_noimpl(f) or u.cuda_noimpl(f):
@@ -681,16 +681,16 @@ class TestFunctions(unittest.TestCase):
     def test_binary_cuda(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
-        print("\n")
+        print("\n", flush=True)
 
         for pattern in "default", "float_result", "bool_result":
             for f in functions["binary"][pattern]:
-                print("testing %s ..." % f)
+                print("testing %s ..." % f, flush=True)
 
                 for t, u in implemented_sigs["binary"][pattern]:
                     w = implemented_sigs["binary"][pattern][(t, u)]
 
-                    print("    %s, %s -> %s" % (t, u, w))
+                    print("    %s, %s -> %s" % (t, u, w), flush=True)
 
                     for a in t.testcases():
                         for b in u.testcases():
