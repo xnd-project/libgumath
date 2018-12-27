@@ -50,7 +50,7 @@ extern "C" {
    stable across versions. */
 
 #define GM_CPU_FUNC  0x0001U
-#define GM_CUDA_FUNC 0x0002U
+#define GM_CUDA_MANAGED_FUNC 0x0002U
 
 typedef struct {
     PyObject_HEAD

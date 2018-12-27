@@ -196,7 +196,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < spec.nout; i++) {
         if (ndt_is_concrete(spec.out[i])) {
-            uint32_t flags = self->flags == GM_CUDA_FUNC ? XND_CUDA_MANAGED : 0;
+            uint32_t flags = self->flags == GM_CUDA_MANAGED_FUNC ? XND_CUDA_MANAGED : 0;
             PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i], flags);
             if (x == NULL) {
                 clear_objects(result, i);
@@ -212,7 +212,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
          }
     }
 
-    if (self->flags == GM_CUDA_FUNC) {
+    if (self->flags == GM_CUDA_MANAGED_FUNC) {
     #if HAVE_CUDA
         const int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
 
@@ -223,7 +223,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         }
     #else
         ndt_err_format(&ctx, NDT_RuntimeError,
-           "internal error: GM_CUDA_FUNC set in a build without cuda support");
+           "internal error: GM_CUDA_MANAGED_FUNC set in a build without cuda support");
         clear_objects(result, spec.nout);
         ndt_apply_spec_clear(&spec);
         return seterr(&ctx);
@@ -399,7 +399,7 @@ add_cuda_function(const gm_func_t *f, void *args)
     struct map_args *a = (struct map_args *)args;
     PyObject *func;
 
-    func = gufunc_new(a->tbl, f->name, GM_CUDA_FUNC);
+    func = gufunc_new(a->tbl, f->name, GM_CUDA_MANAGED_FUNC);
     if (func == NULL) {
         return -1;
     }
