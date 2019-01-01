@@ -138,93 +138,210 @@ gufunc_dealloc(GufuncObject *self)
 /****************************************************************************/
 
 static void
-clear_objects(PyObject **a, Py_ssize_t len)
+clear_pystack(PyObject *pystack[], Py_ssize_t len)
 {
-    Py_ssize_t i;
-
-    for (i = 0; i < len; i++) {
-        Py_CLEAR(a[i]);
+    for (Py_ssize_t i = 0; i < len; i++) {
+        Py_CLEAR(pystack[i]);
     }
 }
 
 static PyObject *
-gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
+get_item_with_error(PyObject *d, const char *key)
 {
-    NDT_STATIC_CONTEXT(ctx);
-    const Py_ssize_t nin = PyTuple_GET_SIZE(args);
-    PyObject **a = &PyTuple_GET_ITEM(args, 0);
-    PyObject *result[NDT_MAX_ARGS];
-    ndt_apply_spec_t spec = ndt_apply_spec_empty;
-    const ndt_t *in_types[NDT_MAX_ARGS];
-    int64_t li[NDT_MAX_ARGS];
-    xnd_t stack[NDT_MAX_ARGS];
-    gm_kernel_t kernel;
-    bool have_cpu_device = false;
-    int i, k;
+    PyObject *s, *v;
 
-    if (kwds && PyDict_Size(kwds) > 0) {
-        PyErr_SetString(PyExc_TypeError,
-            "gufunc calls do not support keywords");
+    s = PyUnicode_FromString(key);
+    if (s == NULL) {
         return NULL;
     }
 
+    v = PyDict_GetItemWithError(d, s);
+    Py_DECREF(s);
+    return v;
+}
+
+static int
+parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_nargs,
+           PyObject *args, PyObject *kwargs)
+{
+    Py_ssize_t nin;
+    Py_ssize_t nout;
+
+    if (!args || !PyTuple_Check(args)) {
+        const char *tuple = args ? Py_TYPE(args)->tp_name : "NULL";
+        PyErr_Format(PyExc_SystemError,
+            "internal error: expected tuple, got '%.200s'",
+            tuple);
+        return -1;
+    }
+
+    if (kwargs && !PyDict_Check(kwargs)) {
+        PyErr_Format(PyExc_SystemError,
+            "internal error: expected dict, got '%.200s'",
+            Py_TYPE(kwargs)->tp_name);
+        return -1;
+    }
+
+    nin = PyTuple_GET_SIZE(args);
     if (nin > NDT_MAX_ARGS) {
-        PyErr_SetString(PyExc_TypeError,
-            "invalid number of arguments");
-        return NULL;
+        PyErr_Format(PyExc_TypeError,
+            "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin);
+        return -1;
     }
 
-    for (i = 0; i < nin; i++) {
-        if (!Xnd_Check(a[i])) {
-            PyErr_SetString(PyExc_TypeError, "arguments must be xnd");
-            return NULL;
+    for (Py_ssize_t i = 0; i < nin; i++) {
+        PyObject *v = PyTuple_GET_ITEM(args, i);
+        if (!Xnd_Check(v)) {
+            PyErr_Format(PyExc_TypeError,
+                "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
+            return -1;
         }
 
-        const XndObject *x = (XndObject *)a[i];
+        pystack[i] = v;
+    }
+
+    if (kwargs == NULL || PyDict_Size(kwargs) == 0) {
+        nout = 0;
+    }
+    else if (PyDict_Size(kwargs) == 1) {
+        PyObject *out = get_item_with_error(kwargs, "out");
+        if (out == NULL) {
+            if (PyErr_Occurred()) {
+                return -1;
+            }
+            PyErr_SetString(PyExc_TypeError,
+                "the only supported keyword argument is 'out'");
+            return -1;
+        }
+
+        if (out == Py_None) {
+            nout = 0;
+        }
+        else if (Xnd_Check(out)) {
+            nout = 1;
+            if (nin+nout > NDT_MAX_ARGS) {
+                PyErr_Format(PyExc_TypeError,
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin);
+                return -1;
+            }
+
+            pystack[nin] = out;
+        }
+        else if (PyTuple_Check(out)) {
+            nout = PyTuple_GET_SIZE(out);
+            if (nout > NDT_MAX_ARGS || nout+nin > NDT_MAX_ARGS) {
+                PyErr_Format(PyExc_TypeError,
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin);
+                return -1;
+            }
+
+            for (Py_ssize_t i = 0; i < nout; i++) {
+                PyObject *v = PyTuple_GET_ITEM(args, i);
+                if (!Xnd_Check(v)) {
+                    PyErr_Format(PyExc_TypeError,
+                        "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
+                    return -1;
+                }
+
+                pystack[nin+i] = v;
+            }
+        }
+        else {
+            PyErr_Format(PyExc_TypeError,
+                "'out' argument must be xnd or a tuple of xnd, got '%.200s'",
+                Py_TYPE(out)->tp_name);
+            return -1;
+        }
+    }
+    else {
+        PyErr_SetString(PyExc_TypeError,
+            "the only supported keyword argument is 'out'");
+        return -1;
+    }
+
+    for (int i = 0; i < nin+nout; i++) {
+        Py_INCREF(pystack[i]);
+    }
+
+    *py_nin = (int)nin;
+    *py_nout = (int)nout;
+    *py_nargs = (int)nin+(int)nout;
+
+    return 0;
+}
+
+static PyObject *
+gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
+{
+    NDT_STATIC_CONTEXT(ctx);
+    PyObject *pystack[NDT_MAX_ARGS];
+    xnd_t stack[NDT_MAX_ARGS];
+    const ndt_t *types[NDT_MAX_ARGS];
+    int64_t li[NDT_MAX_ARGS];
+    ndt_apply_spec_t spec = ndt_apply_spec_empty;
+    gm_kernel_t kernel;
+    bool have_cpu_device = false;
+    int nin, nout, nargs;
+
+    if (parse_args(pystack, &nin, &nout, &nargs, args, kwargs) < 0) {
+        return NULL;
+    }
+
+    for (int i = 0; i < nargs; i++) {
+        const XndObject *x = (XndObject *)pystack[i];
         if (!(x->mblock->xnd->flags&XND_CUDA_MANAGED)) {
             have_cpu_device = true;
         }
 
-        stack[i] = *CONST_XND(a[i]);
-        in_types[i] = stack[i].type;
+        stack[i] = *CONST_XND((PyObject *)x);
+        types[i] = stack[i].type;
         li[i] = stack[i].index;
     }
 
     if (have_cpu_device) {
         if (self->flags & GM_CUDA_MANAGED_FUNC) {
             PyErr_SetString(PyExc_ValueError,
-                "running a cuda function on cpu memory is not supported");
+                "cannot run a cuda function on xnd objects with cpu memory");
+            clear_pystack(pystack, nargs);
             return NULL;
         }
     }
 
-    kernel = gm_select(&spec, self->tbl, self->name, in_types, li, (int)nin, stack, &ctx);
+    kernel = gm_select(&spec, self->tbl, self->name, types, li, nin, nout, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
 
-    if (spec.nbroadcast > 0) {
-        for (i = 0; i < nin; i++) {
-            stack[i].type = spec.broadcast[i];
-        }
+    /*
+     * Replace args/kwargs types with types after substitution and broadcasting.
+     * This includes 'out' types, if explicitly passed as kwargs.
+     */
+    for (int i = 0; i < spec.nargs; i++) {
+        stack[i].type = spec.types[i];
     }
 
-    for (i = 0; i < spec.nout; i++) {
-        if (ndt_is_concrete(spec.out[i])) {
-            uint32_t flags = self->flags == GM_CUDA_MANAGED_FUNC ? XND_CUDA_MANAGED : 0;
-            PyObject *x = Xnd_EmptyFromType(xnd, spec.out[i], flags);
-            if (x == NULL) {
-                clear_objects(result, i);
-                ndt_apply_spec_clear(&spec);
+    if (nout == 0) {
+        /* 'out' types have been inferred, create new XndObjects. */
+        for (int i = 0; i < spec.nout; i++) {
+            if (ndt_is_concrete(spec.types[nin+i])) {
+                uint32_t flags = self->flags == GM_CUDA_MANAGED_FUNC ? XND_CUDA_MANAGED : 0;
+                PyObject *x = Xnd_EmptyFromType(xnd, spec.types[nin+i], flags);
+                if (x == NULL) {
+                    clear_pystack(pystack, nin+i);
+                    ndt_apply_spec_clear(&spec);
                 return NULL;
             }
-            result[i] = x;
+            pystack[nin+i] = x;
             stack[nin+i] = *CONST_XND(x);
-         }
-         else {
-            result[i] = NULL;
-            stack[nin+i] = xnd_error;
-         }
+            }
+            else {
+                clear_pystack(pystack, nin+i);
+                ndt_apply_spec_clear(&spec);
+                PyErr_SetString(PyExc_ValueError,
+                    "arguments with abstract types are temporarily disabled");
+                return NULL;
+            }
+        }
     }
 
     if (self->flags == GM_CUDA_MANAGED_FUNC) {
@@ -232,14 +349,14 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         const int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
 
         if (xnd_cuda_device_synchronize(&ctx) < 0 || ret < 0) {
-            clear_objects(result, spec.nout);
+            clear_pystack(pystack, spec.nargs);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);
         }
     #else
         ndt_err_format(&ctx, NDT_RuntimeError,
            "internal error: GM_CUDA_MANAGED_FUNC set in a build without cuda support");
-        clear_objects(result, spec.nout);
+        clear_pystack(result, spec.nargs);
         ndt_apply_spec_clear(&spec);
         return seterr(&ctx);
     #endif
@@ -254,7 +371,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         fesetround(rounding);
 
         if (ret < 0) {
-            clear_objects(result, spec.nout);
+            clear_pystack(pystack, spec.nargs);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);
         }
@@ -267,44 +384,35 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwds)
         fesetround(rounding);
 
         if (ret < 0) {
-            clear_objects(result, spec.nout);
+            clear_pystack(result, spec.nargs);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);
         }
     #endif
     }
 
-    for (i = 0; i < spec.nout; i++) {
-        if (ndt_is_abstract(spec.out[i])) {
-            PyObject *x = Xnd_FromXnd(xnd, &stack[nin+i]);
-            stack[nin+i] = xnd_error;
-            if (x == NULL) {
-                clear_objects(result, i);
-                ndt_apply_spec_clear(&spec);
-                for (k = i+1; k < spec.nout; k++) {
-                    if (ndt_is_abstract(spec.out[k])) {
-                        xnd_del_buffer(&stack[nin+k], XND_OWN_ALL);
-                    }
-                }
-            }
-            result[i] = x;
-        }
-    }
-
-    int nout = spec.nout;
+    nin = spec.nin;
+    nout = spec.nout;
+    nargs = spec.nargs;
     ndt_apply_spec_clear(&spec);
 
     switch (nout) {
-    case 0: Py_RETURN_NONE;
-    case 1: return result[0];
+    case 0: {
+        clear_pystack(pystack, nargs);
+        Py_RETURN_NONE;
+    }
+    case 1: {
+        clear_pystack(pystack, nin);
+        return pystack[nin];
+    }
     default: {
         PyObject *tuple = PyTuple_New(nout);
         if (tuple == NULL) {
-            clear_objects(result, nout);
+            clear_pystack(pystack, nargs);
             return NULL;
         }
-        for (i = 0; i < nout; i++) {
-            PyTuple_SET_ITEM(tuple, i, result[i]);
+        for (int i = 0; i < nout; i++) {
+            PyTuple_SET_ITEM(tuple, i, pystack[nin+i]);
         }
         return tuple;
       }

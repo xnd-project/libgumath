@@ -157,8 +157,8 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
 /* Look up a multimethod by name and select a kernel. */
 gm_kernel_t
 gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
-          const ndt_t *in_types[], const int64_t li[], int nin, const xnd_t args[],
-          ndt_context_t *ctx)
+          const ndt_t *types[], const int64_t li[], int nin, int nout,
+          const xnd_t args[], ndt_context_t *ctx)
 {
     gm_kernel_t empty_kernel = {0U, NULL};
     const gm_func_t *f;
@@ -171,7 +171,8 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
     }
 
     if (f->typecheck != NULL) {
-        const gm_kernel_set_t *set = f->typecheck(spec, f, in_types, li, nin, ctx);
+        const gm_kernel_set_t *set = f->typecheck(spec, f, types, li, nin, nout,
+                                                  ctx);
         if (set == NULL) {
             return empty_kernel;
         }
@@ -180,15 +181,15 @@ gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const char *name,
 
     for (i = 0; i < f->nkernels; i++) {
         const gm_kernel_set_t *set = &f->kernels[i];
-        if (ndt_typecheck(spec, set->sig, in_types, li, nin, set->constraint, args,
-                          ctx) < 0) {
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
+                          set->constraint, args, ctx) < 0) {
             ndt_err_clear(ctx);
             continue;
         }
         return select_kernel(spec, set, ctx);
     }
 
-    s = ndt_list_as_string(in_types, nin, ctx);
+    s = ndt_list_as_string(types, nin, ctx);
     if (s == NULL) {
         return empty_kernel;
     }

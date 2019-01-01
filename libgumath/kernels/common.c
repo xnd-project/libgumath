@@ -160,7 +160,7 @@ binary_update_bitmap(xnd_t stack[])
 const gm_kernel_set_t *
 cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                     ndt_apply_spec_t *spec, const gm_func_t *f,
-                    const ndt_t *in[], const int64_t li[], int nin,
+                    const ndt_t *types[], const int64_t li[], int nin, int nout,
                     ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
@@ -173,8 +173,17 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
             "invalid number of arguments for %s(x): expected 1, got %d",
             f->name, nin);
         return NULL;
+
     }
-    t = in[0];
+
+    if (nout && nout != 1) {
+        ndt_err_format(ctx, NDT_ValueError,
+            "invalid number of arguments for %s(x, out=y): expected 1, got %d",
+            f->name, nout);
+        return NULL;
+    }
+
+    t = types[0];
     assert(ndt_is_concrete(t));
 
     n = kernel_location(t, ctx);
@@ -210,12 +219,27 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     dtype = ndt_dtype(set->sig->Function.types[1]);
     dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
     if (dtype == NULL) {
+        ndt_apply_spec_clear(spec);
         return NULL;
     }
 
-    spec->out[0] = dtype;
+    if (nout) {
+        if (!ndt_equal(types[1], dtype)) {
+            ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
+            ndt_apply_spec_clear(spec);
+            return NULL;
+        }
+        ndt_decref(dtype);
+    }
+    else {
+        spec->types[1] = dtype;
+    }
+
+    ndt_incref(types[0]);
+    spec->types[0] = types[0];
+    spec->nin = 1;
     spec->nout = 1;
-    spec->nbroadcast = 0;
+    spec->nargs = 2;
 
     return set;
 }
@@ -223,7 +247,7 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 const gm_kernel_set_t *
 cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                      ndt_apply_spec_t *spec, const gm_func_t *f,
-                     const ndt_t *in[], const int64_t li[], int nin,
+                     const ndt_t *types[], const int64_t li[], int nin, int nout,
                      ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
@@ -237,7 +261,15 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
             f->name, nin);
         return NULL;
     }
-    t = in[0];
+
+    if (nout && nout != 1) {
+        ndt_err_format(ctx, NDT_ValueError,
+            "invalid number of arguments for %s(x, out=y): expected 1, got %d",
+            f->name, nout);
+        return NULL;
+    }
+
+    t = types[0];
     assert(ndt_is_concrete(t));
 
     n = kernel_location(t, ctx);
@@ -262,12 +294,27 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     dtype = ndt_dtype(set->sig->Function.types[1]);
     dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
     if (dtype == NULL) {
+        ndt_apply_spec_clear(spec);
         return NULL;
     }
 
-    spec->out[0] = dtype;
+    if (nout) {
+        if (!ndt_equal(types[1], dtype)) {
+            ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
+            ndt_apply_spec_clear(spec);
+            return NULL;
+        }
+        ndt_decref(dtype);
+    }
+    else {
+        spec->types[1] = dtype;
+    }
+
+    ndt_incref(types[0]);
+    spec->types[0] = types[0];
+    spec->nin = 1;
     spec->nout = 1;
-    spec->nbroadcast = 0;
+    spec->nargs = 2;
 
     return set;
 }
@@ -280,13 +327,18 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 const gm_kernel_set_t *
 cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
                      ndt_apply_spec_t *spec, const gm_func_t *f,
-                     const ndt_t *in[], const int64_t li[], int nin,
+                     const ndt_t *types[], const int64_t li[], int nin, int nout,
                      ndt_context_t *ctx)
 {
     const ndt_t *t0;
     const ndt_t *t1;
-    const ndt_t *dtype;
     int n;
+
+    assert(spec->flags == 0);
+    assert(spec->outer_dims == 0);
+    assert(spec->nin == 0);
+    assert(spec->nout == 0);
+    assert(spec->nargs == 0);
 
     if (nin != 2) {
         ndt_err_format(ctx, NDT_ValueError,
@@ -294,8 +346,9 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
             f->name, nin);
         return NULL;
     }
-    t0 = in[0];
-    t1 = in[1];
+
+    t0 = types[0];
+    t1 = types[1];
     assert(ndt_is_concrete(t0));
     assert(ndt_is_concrete(t1));
 
@@ -313,7 +366,8 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
     if (t0->tag == VarDim || t0->tag == VarDimElem ||
         t1->tag == VarDim || t1->tag == VarDimElem) {
         const gm_kernel_set_t *set = &f->kernels[n+4];
-        if (ndt_typecheck(spec, set->sig, in, li, nin, NULL, NULL, ctx) < 0) {
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout, NULL, NULL,
+                          ctx) < 0) {
             return NULL;
         }
         return set;
@@ -321,8 +375,7 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
 
     const gm_kernel_set_t *set = &f->kernels[n];
 
-    dtype = ndt_dtype(set->sig->Function.types[2]);
-    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
+    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout, ctx) < 0) {
         return NULL;
     }
 
@@ -332,12 +385,11 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
 const gm_kernel_set_t *
 cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
                       ndt_apply_spec_t *spec, const gm_func_t *f,
-                      const ndt_t *in[], const int64_t li[], int nin,
+                      const ndt_t *in[], const int64_t li[], int nin, int nout,
                       ndt_context_t *ctx)
 {
     const ndt_t *t0;
     const ndt_t *t1;
-    const ndt_t *dtype;
     int n;
     (void)li;
 
@@ -379,8 +431,7 @@ cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1
 
     const gm_kernel_set_t *set = &f->kernels[n];
 
-    dtype = ndt_dtype(set->sig->Function.types[2]);
-    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, dtype, ctx) < 0) {
+    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, nout, ctx) < 0) {
         return NULL;
     }
 

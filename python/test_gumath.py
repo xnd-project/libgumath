@@ -238,6 +238,7 @@ class TestRaggedArrays(unittest.TestCase):
 
 class TestGraphs(unittest.TestCase):
 
+    @unittest.skipIf(True, "abstract return types are temporarily disabled")
     def test_shortest_path(self):
         graphs = [[[(1, 1.2), (2, 4.4)],
                    [(2, 2.2)],

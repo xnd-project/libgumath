@@ -559,34 +559,34 @@ static const gm_kernel_init_t unary_float[] = {
 
 static const gm_kernel_set_t *
 unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                   const ndt_t *in[], const int64_t li[], int nin,
+                   const ndt_t *types[], const int64_t li[], int nin, int nout,
                    ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(id_kernel_location, spec, f, in, li, nin, ctx);
+    return cuda_unary_typecheck(id_kernel_location, spec, f, types, li, nin, nout, ctx);
 }
 
 static const gm_kernel_set_t *
 unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                       const ndt_t *in[], const int64_t li[], int nin,
+                       const ndt_t *types[], const int64_t li[], int nin, int nout,
                        ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(invert_kernel_location, spec, f, in, li, nin, ctx);
+    return cuda_unary_typecheck(invert_kernel_location, spec, f, types, li, nin, nout, ctx);
 }
 
 static const gm_kernel_set_t *
 unary_negative_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                       const ndt_t *in[], const int64_t li[], int nin,
+                       const ndt_t *types[], const int64_t li[], int nin, int nout,
                        ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(negative_kernel_location, spec, f, in, li, nin, ctx);
+    return cuda_unary_typecheck(negative_kernel_location, spec, f, types, li, nin, nout, ctx);
 }
 
 static const gm_kernel_set_t *
 unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                      const ndt_t *in[], const int64_t li[], int nin,
+                      const ndt_t *types[], const int64_t li[], int nin, int nout,
                       ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(math_kernel_location, spec, f, in, li, nin, ctx);
+    return cuda_unary_typecheck(math_kernel_location, spec, f, types, li, nin, nout, ctx);
 }
 
 int

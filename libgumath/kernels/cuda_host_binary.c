@@ -1572,11 +1572,10 @@ static const gm_kernel_init_t kernels[] = {
 /****************************************************************************/
 
 static const gm_kernel_set_t *
-typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[],
-          const int64_t li[], int nin, ndt_context_t *ctx)
+typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+          const int64_t li[], int nin, int nout, ndt_context_t *ctx)
 {
-    return cuda_binary_typecheck(kernel_location, spec, f, in, li, nin, ctx);
-
+    return cuda_binary_typecheck(kernel_location, spec, f, types, li, nin, nout, ctx);
 }
 
 int
