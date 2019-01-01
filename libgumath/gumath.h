@@ -37,12 +37,13 @@
 
 #ifdef __cplusplus
 extern "C" {
-  #ifndef __STDC_LIMIT_MACROS
-    #define __STDC_LIMIT_MACROS
-    #define GUMATH_CLEAR_STDC_LIMIT_MACROS
-  #endif
 #endif
 
+#ifdef __cplusplus
+  #include <cstdint>
+#else
+  #include <stdint.h>
+#endif
 
 #include "ndtypes.h"
 #include "xnd.h"
@@ -219,10 +220,6 @@ GM_API void gm_finalize(void);
 
 
 #ifdef __cplusplus
-  #ifdef GUMATH_CLEAR_STDC_LIMIT_MACROS
-    #undef GUMATH_CLEAR_STDC_LIMIT_MACROS
-    #undef __STDC_LIMIT_MACROS
-  #endif
 } /* END extern "C" */
 #endif
 
