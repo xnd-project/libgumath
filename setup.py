@@ -228,12 +228,8 @@ def gumath_extensions():
         if BUILD_ALL:
             cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
             ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
-            if PARALLEL:
-                os.system("./configure CFLAGS=%s LDFLAGS=%s && make -j%d" %
-                          (cflags, ldflags, int(PARALLEL)))
-            else:
-                os.system("./configure CFLAGS=%s LDFLAGS=%s && make" %
-                          (cflags, ldflags))
+            make = "make -j%d" % int(PARALLEL) if PARALLEL else "make"
+            os.system("./configure CFLAGS=%s LDFLAGS=%s && %s" % (cflags, ldflags, make))
 
         config_vars = get_config_vars()
 
