@@ -362,6 +362,61 @@ class TestNumba(unittest.TestCase):
         np.testing.assert_equal(z, c)
 
 
+class TestOut(unittest.TestCase):
+
+    def test_api_cpu(self):
+        x = xnd([1, 2, 3])
+        y = xnd.empty("3 * int64")
+        z = fn.negative(x, out=y)
+
+        self.assertIs(z, y)
+        self.assertEqual(y, xnd([-1, -2, -3]))
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_api_cuda(self):
+        x = xnd([1, 2, 3], device="cuda:managed")
+        y = xnd.empty("3 * int64", device="cuda:managed")
+        z = cd.negative(x, out=y)
+
+        self.assertIs(z, y)
+        self.assertEqual(y, xnd([-1, -2, -3]))
+
+    def test_broadcast_cpu(self):
+        x = xnd([1, 2, 3])
+        y = xnd([2])
+        z = xnd.empty("3 * int64")
+        ans = fn.multiply(x, y, out=z)
+
+        self.assertIs(ans, z)
+        self.assertEqual(ans, xnd([2, 4, 6]))
+
+        x = xnd([1, 2, 3])
+        y = xnd(2)
+        z = xnd.empty("3 * int64")
+        ans = fn.multiply(x, y, out=z)
+
+        self.assertIs(ans, z)
+        self.assertEqual(ans, xnd([2, 4, 6]))
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_broadcast_cuda(self):
+        x = xnd([1, 2, 3], device="cuda:managed")
+        y = xnd([2], device="cuda:managed")
+        z = xnd.empty("3 * int64", device="cuda:managed")
+        ans = fn.multiply(x, y, out=z)
+
+        self.assertIs(ans, z)
+        self.assertEqual(ans, xnd([2, 4, 6]))
+
+        x = xnd([1, 2, 3], device="cuda:managed")
+        y = xnd(2, device="cuda:managed")
+        z = xnd.empty("3 * int64", device="cuda:managed")
+        ans = fn.multiply(x, y, out=z)
+
+        self.assertIs(ans, z)
+        self.assertEqual(ans, xnd([2, 4, 6]))
+
+
 class TestUnary(unittest.TestCase):
 
     def test_acos(self):
@@ -965,6 +1020,7 @@ ALL_TESTS = [
   TestGraphs,
   TestPdist,
   TestNumba,
+  TestOut,
   TestUnary,
   TestBinary,
   TestBitwise,

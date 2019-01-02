@@ -227,16 +227,14 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
         if (!ndt_equal(types[1], dtype)) {
             ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
             ndt_apply_spec_clear(spec);
+            ndt_decref(dtype);
             return NULL;
         }
-        ndt_decref(dtype);
-    }
-    else {
-        spec->types[1] = dtype;
     }
 
     ndt_incref(types[0]);
     spec->types[0] = types[0];
+    spec->types[1] = dtype;
     spec->nin = 1;
     spec->nout = 1;
     spec->nargs = 2;
@@ -302,16 +300,14 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
         if (!ndt_equal(types[1], dtype)) {
             ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
             ndt_apply_spec_clear(spec);
+            ndt_decref(dtype);
             return NULL;
         }
-        ndt_decref(dtype);
-    }
-    else {
-        spec->types[1] = dtype;
     }
 
     ndt_incref(types[0]);
     spec->types[0] = types[0];
+    spec->types[1] = dtype;
     spec->nin = 1;
     spec->nout = 1;
     spec->nargs = 2;
