@@ -839,7 +839,7 @@ class TestFunctions(unittest.TestCase):
                                 self.check_binary(f, a, t, b, u, w,
                                     mod=cd, dev="cuda:managed")
 
-    def test_divide_inexact(self):
+    def test_divide_inexact_cpu(self):
 
         t = Tint("uint8")
         u = Tint("uint64")
@@ -848,6 +848,18 @@ class TestFunctions(unittest.TestCase):
         a = next(t.testcases())
         b = next(u.testcases())
         self.check_binary_type_error("divide", a, t, b, u)
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_divide_inexact_cuda(self):
+
+        t = Tint("uint8")
+        u = Tint("uint64")
+        w = Tfloat("float64")
+
+        a = next(t.testcases())
+        b = next(u.testcases())
+        self.check_binary_type_error("divide", a, t, b, u,
+                                     mod=cd, dev="cuda:managed")
 
 
 @unittest.skipIf(cd is None, "test requires cuda")
