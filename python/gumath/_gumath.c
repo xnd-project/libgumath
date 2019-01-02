@@ -356,7 +356,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
     #else
         ndt_err_format(&ctx, NDT_RuntimeError,
            "internal error: GM_CUDA_MANAGED_FUNC set in a build without cuda support");
-        clear_pystack(result, spec.nargs);
+        clear_pystack(pystack, spec.nargs);
         ndt_apply_spec_clear(&spec);
         return seterr(&ctx);
     #endif
@@ -384,7 +384,7 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
         fesetround(rounding);
 
         if (ret < 0) {
-            clear_pystack(result, spec.nargs);
+            clear_pystack(pystack, spec.nargs);
             ndt_apply_spec_clear(&spec);
             return seterr(&ctx);
         }
