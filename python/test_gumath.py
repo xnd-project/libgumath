@@ -778,7 +778,9 @@ class TestFunctions(unittest.TestCase):
 
                     for a in t.testcases():
                         for b in u.testcases():
-                            if t.cpu_noimpl() or u.cpu_noimpl() or w.cpu_noimpl():
+                            if t.cpu_nokern(f) or u.cpu_nokern(f) or w.cpu_nokern(f):
+                                self.check_binary_type_error(f, a, t, b, u)
+                            elif t.cpu_noimpl(f) or u.cpu_noimpl(f) or w.cpu_noimpl(f):
                                 self.check_binary_not_implemented(f, a, t, b, u)
                             else:
                                 self.check_binary(f, a, t, b, u, w)
@@ -832,7 +834,10 @@ class TestFunctions(unittest.TestCase):
 
                     for a in t.testcases():
                         for b in u.testcases():
-                            if t.cuda_noimpl() or u.cuda_noimpl() or w.cuda_noimpl():
+                            if t.cuda_nokern(f) or u.cuda_nokern(f) or w.cuda_nokern(f):
+                                self.check_binary_type_error(f, a, t, b, u,
+                                    mod=cd, dev="cuda:managed")
+                            elif t.type == "complex32" or u.type == "complex32" or w.cuda_noimpl(f):
                                 self.check_binary_not_implemented(f, a, t, b, u,
                                     mod=cd, dev="cuda:managed")
                             else:

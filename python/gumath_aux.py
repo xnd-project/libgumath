@@ -401,7 +401,7 @@ functions = {
     "bitwise": ["invert"],
   },
   "binary": {
-    "default": ["add", "subtract", "multiply"],
+    "default": ["add", "subtract", "multiply", "floor_divide", "remainder"],
     "float_result": ["divide"],
     "bool_result": ["less_equal", "less", "greater_equal", "greater"],
     "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
@@ -414,7 +414,8 @@ def complex_noimpl(name):
 
 def half_noimpl(name):
     return name in functions["unary"]["real_math"] or \
-           name in functions["unary"]["complex_math"]
+           name in functions["unary"]["complex_math"] or \
+           name in ("floor_divide", "remainder")
 
 tunsigned = ["bool", "uint8", "uint16", "uint32", "uint64"]
 tsigned = ["int8", "int16", "int32", "int64"]
@@ -460,7 +461,11 @@ class Tint(object):
             yield randrange(self.min, self.max+1)
     def cpu_noimpl(self, f=None):
         return False
+    def cpu_nokern(self, f=None):
+        return False
     def cuda_noimpl(self, f=None):
+        return False
+    def cuda_nokern(self, f=None):
         return False
 
 class Tfloat(object):
@@ -489,9 +494,13 @@ class Tfloat(object):
             yield float(v)
     def cpu_noimpl(self, f=None):
         return self.type == "float16"
+    def cpu_nokern(self, f=None):
+        return False
     def cuda_noimpl(self, f=None):
         if self.type == "float16":
             return half_noimpl(f)
+    def cuda_nokern(self, f=None):
+        return False
 
 class Tcomplex(object):
     def __init__(self, type):
@@ -523,10 +532,15 @@ class Tcomplex(object):
         if self.type == "complex32":
             return True
         return complex_noimpl(f)
+    def cpu_nokern(self, f=None):
+        return f in ("floor_divide", "remainder")
     def cuda_noimpl(self, f=None):
         if self.type == "complex32":
             return True
         return complex_noimpl(f)
+    def cuda_nokern(self, f=None):
+        return f in ("floor_divide", "remainder")
+
 
 tinfo_default = [
   Tint("uint8"),

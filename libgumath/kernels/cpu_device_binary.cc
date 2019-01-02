@@ -32,9 +32,166 @@
 
 
 #include <cinttypes>
-#include <cmath>
 #include <complex>
+#include <cmath>
 #include "cpu_device_binary.h"
+
+
+/*****************************************************************************/
+/*                                   Divmod                                  */
+/*****************************************************************************/
+
+/* Python: floatobject.c */
+static inline void
+_divmod(double *q, double *r, double vx, double wx)
+{
+    double div, mod, floordiv;
+
+    mod = fmod(vx, wx);
+    /* fmod is typically exact, so vx-mod is *mathematically* an
+       exact multiple of wx.  But this is fp arithmetic, and fp
+       vx - mod is an approximation; the result is that div may
+       not be an exact integral value after the division, although
+       it will always be very close to one.
+    */
+    div = (vx - mod) / wx;
+    if (mod) {
+        /* ensure the remainder has the same sign as the denominator */
+        if ((wx < 0) != (mod < 0)) {
+            mod += wx;
+            div -= 1.0;
+        }
+    }
+    else {
+        /* the remainder is zero, and in the presence of signed zeroes
+           fmod returns different results across platforms; ensure
+           it has the same sign as the denominator. */
+        mod = copysign(0.0, wx);
+    }
+    /* snap quotient to nearest integral value */
+    if (div) {
+        floordiv = floor(div);
+        if (div - floordiv > 0.5)
+            floordiv += 1.0;
+    }
+    else {
+        /* div is zero - get the same sign as the true quotient */
+        floordiv = copysign(0.0, vx / wx); /* zero w/ sign of vx/wx */
+    }
+
+    *q = floordiv;
+    *r = mod;
+}
+
+static inline void
+_divmod(float *q, float *r, float vx, float wx)
+{
+    float div, mod, floordiv;
+
+    mod = fmodf(vx, wx);
+    /* fmod is typically exact, so vx-mod is *mathematically* an
+       exact multiple of wx.  But this is fp arithmetic, and fp
+       vx - mod is an approximation; the result is that div may
+       not be an exact integral value after the division, although
+       it will always be very close to one.
+    */
+    div = (vx - mod) / wx;
+    if (mod) {
+        /* ensure the remainder has the same sign as the denominator */
+        if ((wx < 0) != (mod < 0)) {
+            mod += wx;
+            div -= 1.0;
+        }
+    }
+    else {
+        /* the remainder is zero, and in the presence of signed zeroes
+           fmod returns different results across platforms; ensure
+           it has the same sign as the denominator. */
+        mod = copysignf(0.0, wx);
+    }
+    /* snap quotient to nearest integral value */
+    if (div) {
+        floordiv = floorf(div);
+        if (div - floordiv > 0.5)
+            floordiv += 1.0;
+    }
+    else {
+        /* div is zero - get the same sign as the true quotient */
+        floordiv = copysignf(0.0, vx / wx); /* zero w/ sign of vx/wx */
+    }
+
+    *q = floordiv;
+    *r = mod;
+}
+
+#define divmod_unsigned(T) \
+static inline void \
+_divmod(T *q, T *r, T a, T b) \
+{                             \
+   if (b == 0) {              \
+        *q = 0;               \
+        *r = 0;               \
+   }                          \
+   else {                     \
+       *q = a / b;            \
+       *r = a % b;            \
+   }                          \
+}
+
+divmod_unsigned(uint8_t)
+divmod_unsigned(uint16_t)
+divmod_unsigned(uint32_t)
+divmod_unsigned(uint64_t)
+
+#define divmod_signed(T, MIN) \
+static inline void                                 \
+_divmod(T *q, T *r, T a, T b)                      \
+{                                                  \
+    if (b == 0) {                                  \
+        *q = 0;                                    \
+        *r = 0;                                    \
+    }                                              \
+    else if (a == MIN && b == -1) {                \
+        *q = MIN;                                  \
+        *r = 0;                                    \
+    }                                              \
+    else {                                         \
+        int64_t qq = a / b;                        \
+        int64_t rr = a % b;                        \
+                                                   \
+        *q = rr ? (qq - ((a < 0) ^ (b < 0))) : qq; \
+        *r = a - *q * b;                           \
+    }                                              \
+}
+
+divmod_signed(int8_t, INT8_MIN)
+divmod_signed(int16_t, INT16_MIN)
+divmod_signed(int32_t, INT32_MIN)
+divmod_signed(int64_t, INT64_MIN)
+
+template <class T>
+static inline T
+_floor_divide(T a, T b)
+{
+    T q;
+    T r;
+
+    _divmod(&q, &r, a, b);
+
+    return q;
+}
+
+template <class T>
+static inline T
+_remainder(T a, T b)
+{
+    T q;
+    T r;
+
+    _divmod(&q, &r, a, b);
+
+    return r;
+}
 
 
 /*****************************************************************************/
@@ -50,17 +207,6 @@ _isnan(T a)
 
 template <class T, class U>
 static inline bool
-lexorder_le(T a, U b)
-{
-    if (_isnan(a) || _isnan(b)) {
-        return false;
-    }
-
-    return a.real() < b.real() || (a.real() == b.real() && a.imag() <= b.imag());
-}
-
-template <class T, class U>
-static inline bool
 lexorder_lt(T a, U b)
 {
     if (_isnan(a) || _isnan(b)) {
@@ -68,6 +214,17 @@ lexorder_lt(T a, U b)
     }
 
     return a.real() < b.real() || (a.real() == b.real() && a.imag() < b.imag());
+}
+
+template <class T, class U>
+static inline bool
+lexorder_le(T a, U b)
+{
+    if (_isnan(a) || _isnan(b)) {
+        return false;
+    }
+
+    return a.real() < b.real() || (a.real() == b.real() && a.imag() <= b.imag());
 }
 
 template <class T, class U>
@@ -325,6 +482,185 @@ gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(                            \
     CPU_DEVICE_BINARYC(name, func, complex128, complex64, complex128, complex128)  \
     CPU_DEVICE_BINARYC(name, func, complex128, complex128, complex128, complex128) \
 
+#define CPU_DEVICE_ALL_BINARY_NO_COMPLEX(name, func, hfunc) \
+    CPU_DEVICE_BINARY(name, func, uint8, uint8, uint8, uint8)                     \
+    CPU_DEVICE_BINARY(name, func, uint8, uint16, uint16, uint16)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, uint32, uint32, uint32)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, uint64, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint8, int8, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, uint8, int16, int16, int16)                     \
+    CPU_DEVICE_BINARY(name, func, uint8, int32, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, uint8, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)              \
+    CPU_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
+    CPU_DEVICE_NOKERN(name, func, uint8, complex32, complex32, complex32)         \
+    CPU_DEVICE_NOKERN(name, func, uint8, complex64, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, uint8, complex128, complex128, complex128)      \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, uint16, uint8, uint16, uint16)                  \
+    CPU_DEVICE_BINARY(name, func, uint16, uint16, uint16, uint16)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, uint32, uint32, uint32)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, uint64, uint64, uint64)                 \
+    CPU_DEVICE_BINARY(name, func, uint16, int8, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, uint16, int16, int32, int32)                    \
+    CPU_DEVICE_BINARY(name, func, uint16, int32, int32, int32)                    \
+    CPU_DEVICE_BINARY(name, func, uint16, int64, int64, int64)                    \
+    CPU_DEVICE_NOIMPL(name, func, uint16, float16, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
+    CPU_DEVICE_NOKERN(name, func, uint16, complex32, complex64, complex64)        \
+    CPU_DEVICE_NOKERN(name, func, uint16, complex64, complex64, complex64)        \
+    CPU_DEVICE_NOKERN(name, func, uint16, complex128, complex128, complex128)     \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, uint32, uint8, uint32, uint32)                  \
+    CPU_DEVICE_BINARY(name, func, uint32, uint16, uint32, uint32)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, uint32, uint32, uint32)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, uint64, uint64, uint64)                 \
+    CPU_DEVICE_BINARY(name, func, uint32, int8, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, uint32, int16, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, uint32, int32, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, uint32, int64, int64, int64)                    \
+    CPU_DEVICE_NOIMPL(name, func, uint32, float16, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
+    CPU_DEVICE_NOKERN(name, func, uint32, complex32, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, uint32, complex64, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, uint32, complex128, complex128, complex128)     \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, uint64, uint8, uint64, uint64)                  \
+    CPU_DEVICE_BINARY(name, func, uint64, uint16, uint64, uint64)                 \
+    CPU_DEVICE_BINARY(name, func, uint64, uint32, uint64, uint64)                 \
+    CPU_DEVICE_BINARY(name, func, uint64, uint64, uint64, uint64)                 \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, int8, uint8, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, int8, uint16, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int8, uint32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int8, int8, int8, int8)                         \
+    CPU_DEVICE_BINARY(name, func, int8, int16, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, int8, int32, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int8, int64, int64, int64)                      \
+    CPU_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)               \
+    CPU_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
+    CPU_DEVICE_NOKERN(name, func, int8, complex32, complex32, complex32)          \
+    CPU_DEVICE_NOKERN(name, func, int8, complex64, complex64, complex64)          \
+    CPU_DEVICE_NOKERN(name, func, int8, complex128, complex128, complex128)       \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, int16, uint8, int16, int16)                     \
+    CPU_DEVICE_BINARY(name, func, int16, uint16, int32, int32)                    \
+    CPU_DEVICE_BINARY(name, func, int16, uint32, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, int16, int8, int16, int16)                      \
+    CPU_DEVICE_BINARY(name, func, int16, int16, int16, int16)                     \
+    CPU_DEVICE_BINARY(name, func, int16, int32, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int16, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, int16, float16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
+    CPU_DEVICE_NOKERN(name, func, int16, complex32, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, int16, complex64, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, int16, complex128, complex128, complex128)      \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, int32, uint8, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int32, uint16, int32, int32)                    \
+    CPU_DEVICE_BINARY(name, func, int32, uint32, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, int32, int8, int32, int32)                      \
+    CPU_DEVICE_BINARY(name, func, int32, int16, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int32, int32, int32, int32)                     \
+    CPU_DEVICE_BINARY(name, func, int32, int64, int64, int64)                     \
+    CPU_DEVICE_NOIMPL(name, func, int32, float16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
+    CPU_DEVICE_NOKERN(name, func, int32, complex32, complex128, complex128)       \
+    CPU_DEVICE_NOKERN(name, func, int32, complex64, complex128, complex128)       \
+    CPU_DEVICE_NOKERN(name, func, int32, complex128, complex128, complex128)      \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, int64, uint8, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int64, uint16, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, int64, uint32, int64, int64)                    \
+    CPU_DEVICE_BINARY(name, func, int64, int8, int64, int64)                      \
+    CPU_DEVICE_BINARY(name, func, int64, int16, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int64, int32, int64, int64)                     \
+    CPU_DEVICE_BINARY(name, func, int64, int64, int64, int64)                     \
+                                                                                  \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint16, float32, float32)              \
+    CPU_DEVICE_NOIMPL(name, func, float16, uint32, float64, float64)              \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, int16, float32, float32)               \
+    CPU_DEVICE_NOIMPL(name, func, float16, int32, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)            \
+    CPU_DEVICE_NOIMPL(name, func, float16, float32, float32, float32)             \
+    CPU_DEVICE_NOIMPL(name, func, float16, float64, float64, float64)             \
+    CPU_DEVICE_NOKERN(name, func, float16, complex32, complex32, complex32)       \
+    CPU_DEVICE_NOKERN(name, func, float16, complex64, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, float16, complex128, complex128, complex128)    \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, float32, uint8, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, float32, uint16, float32, float32)              \
+    CPU_DEVICE_BINARY(name, func, float32, uint32, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
+    CPU_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
+    CPU_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, float32, float16, float32, float32)             \
+    CPU_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
+    CPU_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
+    CPU_DEVICE_NOKERN(name, func, float32, complex32, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, float32, complex64, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, float32, complex128, complex128, complex128)    \
+                                                                                  \
+    CPU_DEVICE_BINARY(name, func, float64, uint8, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, uint16, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, uint32, float64, float64)              \
+    CPU_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
+    CPU_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
+    CPU_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
+    CPU_DEVICE_NOIMPL(name, func, float64, float16, float64, float64)             \
+    CPU_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
+    CPU_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
+    CPU_DEVICE_NOKERN(name, func, float64, complex32, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, float64, complex64, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, float64, complex128, complex128, complex128)    \
+                                                                                  \
+    CPU_DEVICE_NOKERN(name, func, complex32, uint8, complex32, complex32)         \
+    CPU_DEVICE_NOKERN(name, func, complex32, uint16, complex64, complex64)        \
+    CPU_DEVICE_NOKERN(name, func, complex32, uint32, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, complex32, int8, complex32, complex32)          \
+    CPU_DEVICE_NOKERN(name, func, complex32, int16, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, complex32, int32, complex128, complex128)       \
+    CPU_DEVICE_NOKERN(name, func, complex32, float16, complex32, complex32)       \
+    CPU_DEVICE_NOKERN(name, func, complex32, float32, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, complex32, float64, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, complex32, complex32, complex32, complex32)     \
+    CPU_DEVICE_NOKERN(name, func, complex32, complex64, complex64, complex64)     \
+    CPU_DEVICE_NOKERN(name, func, complex32, complex128, complex128, complex128)  \
+                                                                                  \
+    CPU_DEVICE_NOKERN(name, func, complex64, uint8, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, complex64, uint16, complex64, complex64)        \
+    CPU_DEVICE_NOKERN(name, func, complex64, uint32, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, complex64, int8, complex64, complex64)          \
+    CPU_DEVICE_NOKERN(name, func, complex64, int16, complex64, complex64)         \
+    CPU_DEVICE_NOKERN(name, func, complex64, int32, complex128, complex128)       \
+    CPU_DEVICE_NOKERN(name, func, complex64, float16, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, complex64, float32, complex64, complex64)       \
+    CPU_DEVICE_NOKERN(name, func, complex64, float64, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, complex64, complex32, complex64, complex64)     \
+    CPU_DEVICE_NOKERN(name, func, complex64, complex64, complex64, complex64)     \
+    CPU_DEVICE_NOKERN(name, func, complex64, complex128, complex128, complex128)  \
+                                                                                  \
+    CPU_DEVICE_NOKERN(name, func, complex128, uint8, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, complex128, uint16, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, complex128, uint32, complex128, complex128)     \
+    CPU_DEVICE_NOKERN(name, func, complex128, int8, complex128, complex128)       \
+    CPU_DEVICE_NOKERN(name, func, complex128, int16, complex128, complex128)      \
+    CPU_DEVICE_NOKERN(name, func, complex128, int32, complex128, complex128)      \
+    CPU_DEVICE_NOIMPL(name, func, complex128, float16, complex128, complex128)    \
+    CPU_DEVICE_NOKERN(name, func, complex128, float32, complex128, complex128)    \
+    CPU_DEVICE_NOKERN(name, func, complex128, float64, complex128, complex128)    \
+    CPU_DEVICE_NOKERN(name, func, complex128, complex32, complex128, complex128)  \
+    CPU_DEVICE_NOKERN(name, func, complex128, complex64, complex128, complex128)  \
+    CPU_DEVICE_NOKERN(name, func, complex128, complex128, complex128, complex128) \
+
 #define CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(name, func, hfunc) \
     CPU_DEVICE_NOIMPL(name, hfunc, uint8, uint8, float16, float16)                 \
     CPU_DEVICE_BINARY(name, func, uint8, uint16, float32, float32)                 \
@@ -512,6 +848,12 @@ CPU_DEVICE_ALL_BINARY(subtract, subtract, sub)
 
 #define multiply(x, y) x * y
 CPU_DEVICE_ALL_BINARY(multiply, multiply, multiply)
+
+#define floor_divide(x, y) x / y
+CPU_DEVICE_ALL_BINARY_NO_COMPLEX(floor_divide, _floor_divide, _floor_divide)
+
+#define remainder(x, y) x % y
+CPU_DEVICE_ALL_BINARY_NO_COMPLEX(remainder, _remainder, _remainder)
 
 #define divide(x, y) x / y
 CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, divide)

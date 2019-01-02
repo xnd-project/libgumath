@@ -261,15 +261,194 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, complex128, complex64, complex128)  \
     CUDA_DEVICE_BINARY_DECL(name, complex128, complex128, complex128)
 
+#define CUDA_DEVICE_BINARY_ARITHMETIC_NO_COMPLEX_DECL(name) \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, uint8, uint8)                \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, uint16, uint16)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, uint32, uint32)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, uint64, uint64)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, int8, int16)                 \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, int16, int16)                \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, int32, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, int64, int64)                \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint8, float16, float16)            \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, float32, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, uint8, float64, float64)            \
+    CUDA_DEVICE_NOKERN_DECL(name, uint8, complex32, complex32)        \
+    CUDA_DEVICE_NOKERN_DECL(name, uint8, complex64, complex64)        \
+    CUDA_DEVICE_NOKERN_DECL(name, uint8, complex128, complex128)      \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, uint8, uint16)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, uint16, uint16)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, uint32, uint32)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, uint64, uint64)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, int8, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, int16, int32)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, int32, int32)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, int64, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, float16, float32)           \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, float32, float32)           \
+    CUDA_DEVICE_BINARY_DECL(name, uint16, float64, float64)           \
+    CUDA_DEVICE_NOKERN_DECL(name, uint16, complex32, complex64)       \
+    CUDA_DEVICE_NOKERN_DECL(name, uint16, complex64, complex64)       \
+    CUDA_DEVICE_NOKERN_DECL(name, uint16, complex128, complex128)     \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, uint8, uint32)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, uint16, uint32)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, uint32, uint32)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, uint64, uint64)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, int8, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, int16, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, int32, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, int64, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, float16, float64)           \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, float32, float64)           \
+    CUDA_DEVICE_BINARY_DECL(name, uint32, float64, float64)           \
+    CUDA_DEVICE_NOKERN_DECL(name, uint32, complex32, complex128)      \
+    CUDA_DEVICE_NOKERN_DECL(name, uint32, complex64, complex128)      \
+    CUDA_DEVICE_NOKERN_DECL(name, uint32, complex128, complex128)     \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, uint64, uint8, uint64)              \
+    CUDA_DEVICE_BINARY_DECL(name, uint64, uint16, uint64)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint64, uint32, uint64)             \
+    CUDA_DEVICE_BINARY_DECL(name, uint64, uint64, uint64)             \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, int8, uint8, int16)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int8, uint16, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, int8, uint32, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int8, int8, int8)                   \
+    CUDA_DEVICE_BINARY_DECL(name, int8, int16, int16)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int8, int32, int32)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int8, int64, int64)                 \
+    CUDA_DEVICE_NOIMPL_DECL(name, int8, float16, float16)             \
+    CUDA_DEVICE_BINARY_DECL(name, int8, float32, float32)             \
+    CUDA_DEVICE_BINARY_DECL(name, int8, float64, float64)             \
+    CUDA_DEVICE_NOKERN_DECL(name, int8, complex32, complex32)         \
+    CUDA_DEVICE_NOKERN_DECL(name, int8, complex64, complex64)         \
+    CUDA_DEVICE_NOKERN_DECL(name, int8, complex128, complex128)       \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, int16, uint8, int16)                \
+    CUDA_DEVICE_BINARY_DECL(name, int16, uint16, int32)               \
+    CUDA_DEVICE_BINARY_DECL(name, int16, uint32, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, int16, int8, int16)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int16, int16, int16)                \
+    CUDA_DEVICE_BINARY_DECL(name, int16, int32, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, int16, int64, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int16, float16, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, int16, float32, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, int16, float64, float64)            \
+    CUDA_DEVICE_NOKERN_DECL(name, int16, complex32, complex64)        \
+    CUDA_DEVICE_NOKERN_DECL(name, int16, complex64, complex64)        \
+    CUDA_DEVICE_NOKERN_DECL(name, int16, complex128, complex128)      \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, int32, uint8, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, int32, uint16, int32)               \
+    CUDA_DEVICE_BINARY_DECL(name, int32, uint32, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, int32, int8, int32)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int32, int16, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, int32, int32, int32)                \
+    CUDA_DEVICE_BINARY_DECL(name, int32, int64, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int32, float16, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, int32, float32, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, int32, float64, float64)            \
+    CUDA_DEVICE_NOKERN_DECL(name, int32, complex32, complex128)       \
+    CUDA_DEVICE_NOKERN_DECL(name, int32, complex64, complex128)       \
+    CUDA_DEVICE_NOKERN_DECL(name, int32, complex128, complex128)      \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, int64, uint8, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int64, uint16, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, int64, uint32, int64)               \
+    CUDA_DEVICE_BINARY_DECL(name, int64, int8, int64)                 \
+    CUDA_DEVICE_BINARY_DECL(name, int64, int16, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int64, int32, int64)                \
+    CUDA_DEVICE_BINARY_DECL(name, int64, int64, int64)                \
+                                                                      \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, uint8, float16)            \
+    CUDA_DEVICE_BINARY_DECL(name, float16, uint16, float32)           \
+    CUDA_DEVICE_BINARY_DECL(name, float16, uint32, float64)           \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, int8, float16)             \
+    CUDA_DEVICE_BINARY_DECL(name, float16, int16, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, float16, int32, float64)            \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, float16, float16)          \
+    CUDA_DEVICE_BINARY_DECL(name, float16, float32, float32)          \
+    CUDA_DEVICE_BINARY_DECL(name, float16, float64, float64)          \
+    CUDA_DEVICE_NOKERN_DECL(name, float16, complex32, complex32)      \
+    CUDA_DEVICE_NOKERN_DECL(name, float16, complex64, complex64)      \
+    CUDA_DEVICE_NOKERN_DECL(name, float16, complex128, complex128)    \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, float32, uint8, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, float32, uint16, float32)           \
+    CUDA_DEVICE_BINARY_DECL(name, float32, uint32, float64)           \
+    CUDA_DEVICE_BINARY_DECL(name, float32, int8, float32)             \
+    CUDA_DEVICE_BINARY_DECL(name, float32, int16, float32)            \
+    CUDA_DEVICE_BINARY_DECL(name, float32, int32, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, float32, float16, float32)          \
+    CUDA_DEVICE_BINARY_DECL(name, float32, float32, float32)          \
+    CUDA_DEVICE_BINARY_DECL(name, float32, float64, float64)          \
+    CUDA_DEVICE_NOKERN_DECL(name, float32, complex32, complex64)      \
+    CUDA_DEVICE_NOKERN_DECL(name, float32, complex64, complex64)      \
+    CUDA_DEVICE_NOKERN_DECL(name, float32, complex128, complex128)    \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, float64, uint8, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, float64, uint16, float64)           \
+    CUDA_DEVICE_BINARY_DECL(name, float64, uint32, float64)           \
+    CUDA_DEVICE_BINARY_DECL(name, float64, int8, float64)             \
+    CUDA_DEVICE_BINARY_DECL(name, float64, int16, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, float64, int32, float64)            \
+    CUDA_DEVICE_BINARY_DECL(name, float64, float16, float64)          \
+    CUDA_DEVICE_BINARY_DECL(name, float64, float32, float64)          \
+    CUDA_DEVICE_BINARY_DECL(name, float64, float64, float64)          \
+    CUDA_DEVICE_NOKERN_DECL(name, float64, complex32, complex128)     \
+    CUDA_DEVICE_NOKERN_DECL(name, float64, complex64, complex128)     \
+    CUDA_DEVICE_NOKERN_DECL(name, float64, complex128, complex128)    \
+                                                                      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint8, complex32)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint16, complex64)       \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint32, complex128)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, int8, complex32)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, int16, complex64)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, int32, complex128)       \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, float16, complex32)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, float32, complex64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, float64, complex128)     \
+    CUDA_DEVICE_NOKERN_DECL(name, complex32, complex32, complex32)    \
+    CUDA_DEVICE_NOKERN_DECL(name, complex32, complex64, complex64)    \
+    CUDA_DEVICE_NOKERN_DECL(name, complex32, complex128, complex128)  \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, uint8, complex64)        \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, uint16, complex64)       \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, uint32, complex128)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, int8, complex64)         \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, int16, complex64)        \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, int32, complex128)       \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, float16, complex64)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, float32, complex64)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex64, float64, complex128)     \
+    CUDA_DEVICE_NOKERN_DECL(name, complex64, complex32, complex64)    \
+    CUDA_DEVICE_NOKERN_DECL(name, complex64, complex64, complex64)    \
+    CUDA_DEVICE_NOKERN_DECL(name, complex64, complex128, complex128)  \
+                                                                      \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, uint8, complex128)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, uint16, complex128)     \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, uint32, complex128)     \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, int8, complex128)       \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, int16, complex128)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, int32, complex128)      \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, float16, complex128)    \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, float32, complex128)    \
+    CUDA_DEVICE_BINARY_DECL(name, complex128, float64, complex128)    \
+    CUDA_DEVICE_NOKERN_DECL(name, complex128, complex32, complex128)  \
+    CUDA_DEVICE_NOKERN_DECL(name, complex128, complex64, complex128)  \
+    CUDA_DEVICE_NOKERN_DECL(name, complex128, complex128, complex128)
+
 #define CUDA_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(name) \
     CUDA_DEVICE_BINARY_DECL(name, uint8, uint8, float16)             \
     CUDA_DEVICE_BINARY_DECL(name, uint8, uint16, float32)             \
     CUDA_DEVICE_BINARY_DECL(name, uint8, uint32, float64)             \
-    CUDA_DEVICE_NOKERN_DECL(name, uint8, uint64, uint64)               \
+    CUDA_DEVICE_NOKERN_DECL(name, uint8, uint64, uint64)              \
     CUDA_DEVICE_BINARY_DECL(name, uint8, int8, float16)               \
     CUDA_DEVICE_BINARY_DECL(name, uint8, int16, float32)              \
     CUDA_DEVICE_BINARY_DECL(name, uint8, int32, float64)              \
-    CUDA_DEVICE_NOKERN_DECL(name, uint8, int64, int64)                 \
+    CUDA_DEVICE_NOKERN_DECL(name, uint8, int64, int64)                \
     CUDA_DEVICE_BINARY_DECL(name, uint8, float16, float16)            \
     CUDA_DEVICE_BINARY_DECL(name, uint8, float32, float32)            \
     CUDA_DEVICE_BINARY_DECL(name, uint8, float64, float64)            \
@@ -280,11 +459,11 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, uint16, uint8, float32)             \
     CUDA_DEVICE_BINARY_DECL(name, uint16, uint16, float32)            \
     CUDA_DEVICE_BINARY_DECL(name, uint16, uint32, float64)            \
-    CUDA_DEVICE_NOKERN_DECL(name, uint16, uint64, uint64)              \
+    CUDA_DEVICE_NOKERN_DECL(name, uint16, uint64, uint64)             \
     CUDA_DEVICE_BINARY_DECL(name, uint16, int8, float32)              \
     CUDA_DEVICE_BINARY_DECL(name, uint16, int16, float32)             \
     CUDA_DEVICE_BINARY_DECL(name, uint16, int32, float64)             \
-    CUDA_DEVICE_NOKERN_DECL(name, uint16, int64, int64)                \
+    CUDA_DEVICE_NOKERN_DECL(name, uint16, int64, int64)               \
     CUDA_DEVICE_BINARY_DECL(name, uint16, float16, float32)           \
     CUDA_DEVICE_BINARY_DECL(name, uint16, float32, float32)           \
     CUDA_DEVICE_BINARY_DECL(name, uint16, float64, float64)           \
@@ -295,11 +474,11 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, uint32, uint8, float64)             \
     CUDA_DEVICE_BINARY_DECL(name, uint32, uint16, float64)            \
     CUDA_DEVICE_BINARY_DECL(name, uint32, uint32, float64)            \
-    CUDA_DEVICE_NOKERN_DECL(name, uint32, uint64, uint64)              \
+    CUDA_DEVICE_NOKERN_DECL(name, uint32, uint64, uint64)             \
     CUDA_DEVICE_BINARY_DECL(name, uint32, int8, float64)              \
     CUDA_DEVICE_BINARY_DECL(name, uint32, int16, float64)             \
     CUDA_DEVICE_BINARY_DECL(name, uint32, int32, float64)             \
-    CUDA_DEVICE_NOKERN_DECL(name, uint32, int64, int64)                \
+    CUDA_DEVICE_NOKERN_DECL(name, uint32, int64, int64)               \
     CUDA_DEVICE_BINARY_DECL(name, uint32, float16, float64)           \
     CUDA_DEVICE_BINARY_DECL(name, uint32, float32, float64)           \
     CUDA_DEVICE_BINARY_DECL(name, uint32, float64, float64)           \
@@ -307,10 +486,10 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, uint32, complex64, complex128)      \
     CUDA_DEVICE_BINARY_DECL(name, uint32, complex128, complex128)     \
                                                                       \
-    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint8, uint64)               \
-    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint16, uint64)              \
-    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint32, uint64)              \
-    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint64, uint64)              \
+    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint8, uint64)              \
+    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint16, uint64)             \
+    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint32, uint64)             \
+    CUDA_DEVICE_NOKERN_DECL(name, uint64, uint64, uint64)             \
                                                                       \
     CUDA_DEVICE_BINARY_DECL(name, int8, uint8, float16)               \
     CUDA_DEVICE_BINARY_DECL(name, int8, uint16, float32)              \
@@ -318,7 +497,7 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, int8, int8, float16)                \
     CUDA_DEVICE_BINARY_DECL(name, int8, int16, float32)               \
     CUDA_DEVICE_BINARY_DECL(name, int8, int32, float64)               \
-    CUDA_DEVICE_NOKERN_DECL(name, int8, int64, int64)                  \
+    CUDA_DEVICE_NOKERN_DECL(name, int8, int64, int64)                 \
     CUDA_DEVICE_BINARY_DECL(name, int8, float16, float16)             \
     CUDA_DEVICE_BINARY_DECL(name, int8, float32, float32)             \
     CUDA_DEVICE_BINARY_DECL(name, int8, float64, float64)             \
@@ -332,7 +511,7 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, int16, int8, float32)               \
     CUDA_DEVICE_BINARY_DECL(name, int16, int16, float32)              \
     CUDA_DEVICE_BINARY_DECL(name, int16, int32, float64)              \
-    CUDA_DEVICE_NOKERN_DECL(name, int16, int64, int64)                 \
+    CUDA_DEVICE_NOKERN_DECL(name, int16, int64, int64)                \
     CUDA_DEVICE_BINARY_DECL(name, int16, float16, float32)            \
     CUDA_DEVICE_BINARY_DECL(name, int16, float32, float32)            \
     CUDA_DEVICE_BINARY_DECL(name, int16, float64, float64)            \
@@ -346,7 +525,7 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, int32, int8, float64)               \
     CUDA_DEVICE_BINARY_DECL(name, int32, int16, float64)              \
     CUDA_DEVICE_BINARY_DECL(name, int32, int32, float64)              \
-    CUDA_DEVICE_NOKERN_DECL(name, int32, int64, int64)                 \
+    CUDA_DEVICE_NOKERN_DECL(name, int32, int64, int64)                \
     CUDA_DEVICE_BINARY_DECL(name, int32, float16, float64)            \
     CUDA_DEVICE_BINARY_DECL(name, int32, float32, float64)            \
     CUDA_DEVICE_BINARY_DECL(name, int32, float64, float64)            \
@@ -354,13 +533,13 @@ enum cuda_binary {
     CUDA_DEVICE_BINARY_DECL(name, int32, complex64, complex128)       \
     CUDA_DEVICE_BINARY_DECL(name, int32, complex128, complex128)      \
                                                                       \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, uint8, int64)                 \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, uint16, int64)                \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, uint32, int64)                \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, int8, int64)                  \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, int16, int64)                 \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, int32, int64)                 \
-    CUDA_DEVICE_NOKERN_DECL(name, int64, int64, int64)                 \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, uint8, int64)                \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, uint16, int64)               \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, uint32, int64)               \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, int8, int64)                 \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, int16, int64)                \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, int32, int64)                \
+    CUDA_DEVICE_NOKERN_DECL(name, int64, int64, int64)                \
                                                                       \
     CUDA_DEVICE_BINARY_DECL(name, float16, uint8, float16)            \
     CUDA_DEVICE_BINARY_DECL(name, float16, uint16, float32)           \
@@ -400,7 +579,7 @@ enum cuda_binary {
     CUDA_DEVICE_NOIMPL_DECL(name, float64, complex32, complex128)     \
     CUDA_DEVICE_BINARY_DECL(name, float64, complex64, complex128)     \
     CUDA_DEVICE_BINARY_DECL(name, float64, complex128, complex128)    \
-                                                          \
+                                                                      \
     CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint8, complex32)        \
     CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint16, complex64)       \
     CUDA_DEVICE_NOIMPL_DECL(name, complex32, uint32, complex128)      \
@@ -444,6 +623,8 @@ enum cuda_binary {
 CUDA_DEVICE_BINARY_ARITHMETIC_DECL(add)
 CUDA_DEVICE_BINARY_ARITHMETIC_DECL(subtract)
 CUDA_DEVICE_BINARY_ARITHMETIC_DECL(multiply)
+CUDA_DEVICE_BINARY_ARITHMETIC_NO_COMPLEX_DECL(floor_divide)
+CUDA_DEVICE_BINARY_ARITHMETIC_NO_COMPLEX_DECL(remainder)
 CUDA_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
 
 
@@ -631,8 +812,8 @@ CUDA_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CUDA_DEVICE_BINARY_DECL(name, complex128, complex128, bool)
 
 
-CUDA_DEVICE_ALL_COMPARISON_DECL(less_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(less)
+CUDA_DEVICE_ALL_COMPARISON_DECL(less_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater)
 
