@@ -417,7 +417,7 @@ class TestOut(unittest.TestCase):
         self.assertEqual(ans, xnd([2, 4, 6]))
 
 
-class TestUnary(unittest.TestCase):
+class TestUnaryCPU(unittest.TestCase):
 
     def test_acos(self):
         a = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
@@ -439,6 +439,31 @@ class TestUnary(unittest.TestCase):
         a = [0, 1, 2, 3, 4, 5, 6, 7]
         x = xnd(a, dtype="int64")
         self.assertRaises(ValueError, fn.sin, x)
+
+
+@unittest.skipIf(cd is None, "test requires cuda")
+class TestUnaryCUDA(unittest.TestCase):
+
+    def test_cos(self):
+        a = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7]
+        b = [math.cos(x) for x in a]
+
+        x = xnd(a, dtype="float64", device="cuda:managed")
+        y = cd.cos(x)
+        self.assertEqual(y, b)
+
+    def test_cos_opt(self):
+        a = [0, 0.1, 0.2, None, 0.4, 0.5, 0.6, None]
+        b = [math.cos(x) if x is not None else None for x in a]
+
+        x = xnd(a, dtype="?float64", device="cuda:managed")
+        y = cd.cos(x)
+        self.assertEqual(y, b)
+
+    def test_inexact_cast(self):
+        a = [0, 1, 2, 3, 4, 5, 6, 7]
+        x = xnd(a, dtype="int64", device="cuda:managed")
+        self.assertRaises(ValueError, cd.sin, x)
 
 
 class TestBinary(unittest.TestCase):
@@ -1021,7 +1046,8 @@ ALL_TESTS = [
   TestPdist,
   TestNumba,
   TestOut,
-  TestUnary,
+  TestUnaryCPU,
+  TestUnaryCUDA,
   TestBinary,
   TestBitwise,
   TestFunctions,
