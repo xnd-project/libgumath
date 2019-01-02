@@ -24,7 +24,7 @@ matrix:
         - python3 setup.py install --local=$PWD/../python
         - cd ..
       script:
-        - python3 setup.py build
+        - python3 setup.py build -j2
         - python3 setup.py test
 
     - language: objective-c
@@ -43,5 +43,5 @@ matrix:
         - python3 setup.py install --local=$PWD/../python
         - cd ..
       script:
-        - python3 setup.py build
+        - python3 setup.py build -j2
         - python3 setup.py test

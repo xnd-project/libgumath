@@ -43,6 +43,7 @@ from glob import glob
 import platform
 import subprocess
 import shutil
+import argparse
 import warnings
 
 
@@ -54,6 +55,15 @@ LONG_DESCRIPTION = """\
 """
 
 warnings.simplefilter("ignore", UserWarning)
+
+
+# Pre-parse and remove the '-j' argument from sys.argv.
+parser = argparse.ArgumentParser()
+parser.add_argument('-j', default=None)
+values, rest = parser.parse_known_args()
+PARALLEL = values.j
+sys.argv = sys.argv[:1] + rest
+
 
 if sys.platform == "darwin":
     LIBNAME = "libgumath.dylib"
@@ -218,7 +228,12 @@ def gumath_extensions():
         if BUILD_ALL:
             cflags = '"-I%s -I%s"' % tuple(CONFIGURE_INCLUDES)
             ldflags = '"-L%s -L%s"' % tuple(CONFIGURE_LIBS)
-            os.system("./configure CFLAGS=%s LDFLAGS=%s && make" % (cflags, ldflags))
+            if PARALLEL:
+                os.system("./configure CFLAGS=%s LDFLAGS=%s && make -j%d" %
+                          (cflags, ldflags, int(PARALLEL)))
+            else:
+                os.system("./configure CFLAGS=%s LDFLAGS=%s && make" %
+                          (cflags, ldflags))
 
         config_vars = get_config_vars()
 
