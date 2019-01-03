@@ -888,6 +888,7 @@ class TestFunctions(unittest.TestCase):
                                 self.check_binary(f, a, t, b, u, w,
                                     mod=cd, dev="cuda:managed")
 
+    @unittest.skipIf(cd is None, "test requires cuda")
     def test_binary_mv_cuda(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
