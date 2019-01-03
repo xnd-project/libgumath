@@ -79,6 +79,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Uint16: {
         switch (t1->tag) {
         case Uint8: return 112;
@@ -102,6 +103,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Uint32: {
         switch (t1->tag) {
         case Uint8: return 224;
@@ -125,6 +127,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Uint64: {
         switch (t1->tag) {
         case Uint8: return 336;
@@ -158,6 +161,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Int16: {
         switch (t1->tag) {
         case Uint8: return 472;
@@ -180,6 +184,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Int32: {
         switch (t1->tag) {
         case Uint8: return 576;
@@ -202,6 +207,7 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
     case Int64: {
         switch (t1->tag) {
         case Uint8: return 680;
@@ -1799,6 +1805,68 @@ static const gm_kernel_init_t kernels[] = {
 
 
 /****************************************************************************/
+/*                               Two return values                          */
+/****************************************************************************/
+
+#define CPU_HOST_BINARY_MV(name, t0, t1, t2, t3) \
+static int                                                                              \
+gm_cpu_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                       \
+    const char *in0 = apply_index(&stack[0]);                                           \
+    const char *in1 = apply_index(&stack[1]);                                           \
+    char *out0 = apply_index(&stack[2]);                                                \
+    char *out1 = apply_index(&stack[3]);                                                \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                             \
+    (void)ctx;                                                                          \
+                                                                                        \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(                        \
+        in0, in1, out0, out1, N);                                                       \
+                                                                                        \
+    return 0;                                                                           \
+}
+
+#define CPU_HOST_BINARY_MV_INIT(func, t0, t1, t2, t3) \
+  { .name = STRINGIZE(func),                                      \
+    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> " \
+           "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),       \
+    .Opt = gm_cpu_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3,  \
+    .C = NULL }
+
+#define CPU_HOST_ALL_BINARY_MV(name) \
+    CPU_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)         \
+    CPU_HOST_BINARY_MV(name, uint16, uint16, uint16, uint16)     \
+    CPU_HOST_BINARY_MV(name, uint32, uint32, uint32, uint32)     \
+    CPU_HOST_BINARY_MV(name, uint64, uint64, uint64, uint64)     \
+    CPU_HOST_BINARY_MV(name, int8, int8, int8, int8)             \
+    CPU_HOST_BINARY_MV(name, int16, int16, int16, int16)         \
+    CPU_HOST_BINARY_MV(name, int32, int32, int32, int32)         \
+    CPU_HOST_BINARY_MV(name, int64, int64, int64, int64)         \
+    CPU_HOST_BINARY_MV(name, float32, float32, float32, float32) \
+    CPU_HOST_BINARY_MV(name, float64, float64, float64, float64)
+
+#define CPU_HOST_ALL_BINARY_MV_INIT(name) \
+    CPU_HOST_BINARY_MV_INIT(name, uint8, uint8, uint8, uint8),         \
+    CPU_HOST_BINARY_MV_INIT(name, uint16, uint16, uint16, uint16),     \
+    CPU_HOST_BINARY_MV_INIT(name, uint32, uint32, uint32, uint32),     \
+    CPU_HOST_BINARY_MV_INIT(name, uint64, uint64, uint64, uint64),     \
+    CPU_HOST_BINARY_MV_INIT(name, int8, int8, int8, int8),             \
+    CPU_HOST_BINARY_MV_INIT(name, int16, int16, int16, int16),         \
+    CPU_HOST_BINARY_MV_INIT(name, int32, int32, int32, int32),         \
+    CPU_HOST_BINARY_MV_INIT(name, int64, int64, int64, int64),         \
+    CPU_HOST_BINARY_MV_INIT(name, float32, float32, float32, float32), \
+    CPU_HOST_BINARY_MV_INIT(name, float64, float64, float64, float64)
+
+CPU_HOST_ALL_BINARY_MV(divmod)
+
+
+static const gm_kernel_init_t kernels_mv[] = {
+  CPU_HOST_ALL_BINARY_MV_INIT(divmod),
+
+  { .name = NULL, .sig = NULL }
+};
+
+
+/****************************************************************************/
 /*                       Initialize kernel table                            */
 /****************************************************************************/
 
@@ -1816,6 +1884,12 @@ gm_init_cpu_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 
     for (k = kernels; k->name != NULL; k++) {
         if (gm_add_kernel_typecheck(tbl, k, ctx, &typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = kernels_mv; k->name != NULL; k++) {
+        if (gm_add_kernel(tbl, k, ctx) < 0) {
              return -1;
         }
     }

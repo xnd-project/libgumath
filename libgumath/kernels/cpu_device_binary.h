@@ -60,12 +60,24 @@ typedef double float64_t;
                      const char *in0, const char *in1, char *out, int64_t N); \
   extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(               \
                      const char *in0, const char *in1, char *out);
+
+  #define CPU_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
+  extern "C" void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
+                 const char *in0, const char *in1, char *out0, char *out1, int64_t N); \
+  extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(                 \
+                 const char *in0, const char *in1, char *out0, char *out1);
 #else
   #define CPU_DEVICE_BINARY_DECL(name, t0, t1, t2) \
-  void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(        \
-           const char *in0, const char *in1, char *out, int64_t N); \
-  void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(                \
-           const char *in0, const char *in1, char *out);
+  void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(   \
+      const char *in0, const char *in1, char *out, int64_t N); \
+  void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(           \
+      const char *in0, const char *in1, char *out);
+
+  #define CPU_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
+  void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
+      const char *in0, const char *in1, char *out0, char *out1, int64_t N); \
+  void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(                 \
+      const char *in0, const char *in1, char *out0, char *out1);
 #endif
 
 #define CPU_DEVICE_NOKERN_DECL(name, t0, t1, t2)
@@ -810,6 +822,25 @@ CPU_DEVICE_ALL_COMPARISON_DECL(less)
 CPU_DEVICE_ALL_COMPARISON_DECL(less_equal)
 CPU_DEVICE_ALL_COMPARISON_DECL(greater_equal)
 CPU_DEVICE_ALL_COMPARISON_DECL(greater)
+
+
+/*****************************************************************************/
+/*                             Two return values                             */
+/*****************************************************************************/
+
+#define CPU_DEVICE_ALL_BINARY_MV_DECL(name) \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint8, uint8, uint8, uint8)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint16, uint16, uint16, uint16)     \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint32, uint32, uint32, uint32)     \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint64, uint64, uint64, uint64)     \
+    CPU_DEVICE_BINARY_MV_DECL(name, int8, int8, int8, int8)             \
+    CPU_DEVICE_BINARY_MV_DECL(name, int16, int16, int16, int16)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, int32, int32, int32, int32)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, int64, int64, int64, int64)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, float32, float32, float32, float32) \
+    CPU_DEVICE_BINARY_MV_DECL(name, float64, float64, float64, float64)
+
+CPU_DEVICE_ALL_BINARY_MV_DECL(divmod)
 
 
 #endif /* CPU_DEVICE_BINARY_H */

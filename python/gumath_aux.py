@@ -405,6 +405,9 @@ functions = {
     "float_result": ["divide"],
     "bool_result": ["less_equal", "less", "greater_equal", "greater"],
     "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
+  },
+  "binary_mv": {
+    "default": ["divmod"],
   }
 }
 
@@ -577,6 +580,20 @@ implemented_sigs = {
   },
   "binary": {
     "default": {}, "float_result": {}, "bool_result": {}, "bitwise": {}
+  },
+  "binary_mv": {
+    "default": {
+       (Tint("uint8"), Tint("uint8")): (Tint("uint8"), Tint("uint8")),
+       (Tint("uint16"), Tint("uint16")): (Tint("uint16"), Tint("uint16")),
+       (Tint("uint32"), Tint("uint32")): (Tint("uint32"), Tint("uint32")),
+       (Tint("uint64"), Tint("uint64")): (Tint("uint64"), Tint("uint64")),
+       (Tint("int8"), Tint("int8")): (Tint("int8"), Tint("int8")),
+       (Tint("int16"), Tint("int16")): (Tint("int16"), Tint("int16")),
+       (Tint("int32"), Tint("int32")): (Tint("int32"), Tint("int32")),
+       (Tint("int64"), Tint("int64")): (Tint("int64"), Tint("int64")),
+       (Tfloat("float32"), Tfloat("float32")): (Tfloat("float32"), Tfloat("float32")),
+       (Tfloat("float64"), Tfloat("float64")): (Tfloat("float64"), Tfloat("float64"))
+    },
   }
 }
 

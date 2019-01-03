@@ -1054,3 +1054,50 @@ CPU_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, greater_equal, lexorder_
 
 #define greater(x, y) x > y
 CPU_DEVICE_ALL_COMPARISON(greater, greater, greater, lexorder_gt)
+
+
+/*****************************************************************************/
+/*                              Two return values                            */
+/*****************************************************************************/
+
+#define CPU_DEVICE_BINARY_MV(name, func, t0, t1, t2, t3) \
+extern "C" void                                                          \
+gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(             \
+    const char *in0, const char *in1, char *out0, char *out1, int64_t N) \
+{                                                                        \
+    const t0##_t *_in0 = (const t0##_t *)in0;                            \
+    const t1##_t *_in1 = (const t1##_t *)in1;                            \
+    t2##_t *_out0 = (t2##_t *)out0;                                      \
+    t3##_t *_out1 = (t3##_t *)out1;                                      \
+    int64_t i;                                                           \
+                                                                         \
+    for (i = 0; i < N; i++) {                                            \
+        func(&_out0[i], &_out1[i], _in0[i], _in1[i]);                    \
+    }                                                                    \
+}                                                                        \
+                                                                         \
+extern "C" void                                                          \
+gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(                     \
+    const char *in0, const char *in1, char *out0, char *out1)            \
+{                                                                        \
+    const t0##_t x = *(const t0##_t *)in0;                               \
+    const t1##_t y = *(const t1##_t *)in1;                               \
+    t2##_t *a = (t2##_t *)out0;                                          \
+    t3##_t *b = (t3##_t *)out1;                                          \
+                                                                         \
+    func(a, b, x, y);                                                    \
+}
+
+#define CPU_DEVICE_ALL_BINARY_MV(name, func) \
+    CPU_DEVICE_BINARY_MV(name, func, uint8, uint8, uint8, uint8)         \
+    CPU_DEVICE_BINARY_MV(name, func, uint16, uint16, uint16, uint16)     \
+    CPU_DEVICE_BINARY_MV(name, func, uint32, uint32, uint32, uint32)     \
+    CPU_DEVICE_BINARY_MV(name, func, uint64, uint64, uint64, uint64)     \
+    CPU_DEVICE_BINARY_MV(name, func, int8, int8, int8, int8)             \
+    CPU_DEVICE_BINARY_MV(name, func, int16, int16, int16, int16)         \
+    CPU_DEVICE_BINARY_MV(name, func, int32, int32, int32, int32)         \
+    CPU_DEVICE_BINARY_MV(name, func, int64, int64, int64, int64)         \
+    CPU_DEVICE_BINARY_MV(name, func, float32, float32, float32, float32) \
+    CPU_DEVICE_BINARY_MV(name, func, float64, float64, float64, float64)
+
+CPU_DEVICE_ALL_BINARY_MV(divmod, _divmod)

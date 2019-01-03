@@ -1060,3 +1060,71 @@ CUDA_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, __hge, lexorder_ge)
 
 #define greater(x, y) x > y
 CUDA_DEVICE_ALL_COMPARISON(greater, greater, __hgt, lexorder_gt)
+
+
+/*****************************************************************************/
+/*                             Two return values                             */
+/*****************************************************************************/
+
+#define CUDA_DEVICE_BINARY_MV(name, func, t0, t1, t2, t3) \
+static __global__ void                                                \
+_##name##_##t0##_##t1##_##t2##_##t3(                                  \
+    const t0##_t* in0, const t1##_t* in1, t2##_t* out0, t2##_t* out1, \
+    int64_t N, enum cuda_binary tag)                                  \
+{                                                                     \
+    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;            \
+    int64_t stride = blockDim.x * gridDim.x;                          \
+                                                                      \
+    switch (tag) {                                                    \
+    case ZeroStepNone:                                                \
+        for (int64_t i = index; i < N; i += stride) {                 \
+            func(&out0[i], &out1[i], in0[i], in1[i]);                 \
+        }                                                             \
+        break;                                                        \
+    case ZeroStepIn0:                                                 \
+        for (int64_t i = index; i < N; i += stride) {                 \
+            func(&out0[i], &out1[i], in0[0], in1[i]);                 \
+        }                                                             \
+        break;                                                        \
+    case ZeroStepIn1:                                                 \
+        for (int64_t i = index; i < N; i += stride) {                 \
+            func(&out0[i], &out1[i], in0[i], in1[0]);                 \
+        }                                                             \
+        break;                                                        \
+    case ZeroStepIn0In1:                                              \
+        for (int64_t i = index; i < N; i += stride) {                 \
+            func(&out0[i], &out1[i], in0[0], in1[0]);                 \
+        }                                                             \
+        break;                                                        \
+    }                                                                 \
+}                                                                     \
+                                                                      \
+extern "C" void                                                       \
+gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(         \
+    const char *in0, const char *in1, char *out0, char *out1,         \
+    int64_t N, enum cuda_binary tag)                                  \
+{                                                                     \
+    const t0##_t *_in0 = (const t0##_t *)in0;                         \
+    const t1##_t *_in1 = (const t1##_t *)in1;                         \
+    t2##_t *_out0 = (t2##_t *)out0;                                   \
+    t3##_t *_out1 = (t3##_t *)out1;                                   \
+    int blockSize = 256;                                              \
+    int64_t numBlocks = (N + blockSize - 1) / blockSize;              \
+                                                                      \
+    _##name##_##t0##_##t1##_##t2##_##t3<<<numBlocks, blockSize>>>(    \
+        _in0, _in1, _out0, _out1, N, tag);                            \
+}
+
+#define CUDA_DEVICE_ALL_BINARY_MV(name, func) \
+    CUDA_DEVICE_BINARY_MV(name, func, uint8, uint8, uint8, uint8)         \
+    CUDA_DEVICE_BINARY_MV(name, func, uint16, uint16, uint16, uint16)     \
+    CUDA_DEVICE_BINARY_MV(name, func, uint32, uint32, uint32, uint32)     \
+    CUDA_DEVICE_BINARY_MV(name, func, uint64, uint64, uint64, uint64)     \
+    CUDA_DEVICE_BINARY_MV(name, func, int8, int8, int8, int8)             \
+    CUDA_DEVICE_BINARY_MV(name, func, int16, int16, int16, int16)         \
+    CUDA_DEVICE_BINARY_MV(name, func, int32, int32, int32, int32)         \
+    CUDA_DEVICE_BINARY_MV(name, func, int64, int64, int64, int64)         \
+    CUDA_DEVICE_BINARY_MV(name, func, float32, float32, float32, float32) \
+    CUDA_DEVICE_BINARY_MV(name, func, float64, float64, float64, float64)
+
+CUDA_DEVICE_ALL_BINARY_MV(divmod, _divmod)

@@ -67,11 +67,17 @@ enum cuda_binary {
 #ifdef __cplusplus
   #define CUDA_DEVICE_BINARY_DECL(name, t0, t1, t2) \
   extern "C" void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2( \
-                     const char *in0, const char *in1, char *out, int64_t N, enum cuda_binary tag);
+                 const char *in0, const char *in1, char *out, int64_t N, enum cuda_binary tag);
+  #define CUDA_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
+  extern "C" void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
+                 const char *in0, const char *in1, char *out0, char *out1, int64_t N, enum cuda_binary tag);
 #else
   #define CUDA_DEVICE_BINARY_DECL(name, t0, t1, t2) \
   void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2( \
-           const char *in0, const char *in1, char *out, int64_t N, enum cuda_binary tag);
+      const char *in0, const char *in1, char *out, int64_t N, enum cuda_binary tag);
+  #define CUDA_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
+  void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
+      const char *in0, const char *in1, char *out0, char *out1, int64_t N, enum cuda_binary tag);
 #endif
 
 #define CUDA_DEVICE_NOKERN_DECL(name, t0, t1, t2)
@@ -816,6 +822,25 @@ CUDA_DEVICE_ALL_COMPARISON_DECL(less)
 CUDA_DEVICE_ALL_COMPARISON_DECL(less_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater)
+
+
+/*****************************************************************************/
+/*                             Two return values                             */
+/*****************************************************************************/
+
+#define CUDA_DEVICE_ALL_BINARY_MV_DECL(name) \
+    CUDA_DEVICE_BINARY_MV_DECL(name, uint8, uint8, uint8, uint8)         \
+    CUDA_DEVICE_BINARY_MV_DECL(name, uint16, uint16, uint16, uint16)     \
+    CUDA_DEVICE_BINARY_MV_DECL(name, uint32, uint32, uint32, uint32)     \
+    CUDA_DEVICE_BINARY_MV_DECL(name, uint64, uint64, uint64, uint64)     \
+    CUDA_DEVICE_BINARY_MV_DECL(name, int8, int8, int8, int8)             \
+    CUDA_DEVICE_BINARY_MV_DECL(name, int16, int16, int16, int16)         \
+    CUDA_DEVICE_BINARY_MV_DECL(name, int32, int32, int32, int32)         \
+    CUDA_DEVICE_BINARY_MV_DECL(name, int64, int64, int64, int64)         \
+    CUDA_DEVICE_BINARY_MV_DECL(name, float32, float32, float32, float32) \
+    CUDA_DEVICE_BINARY_MV_DECL(name, float64, float64, float64, float64)
+
+CUDA_DEVICE_ALL_BINARY_MV_DECL(divmod)
 
 
 #endif /* CUDA_DEVICE_BINARY_H */
