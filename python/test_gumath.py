@@ -372,6 +372,18 @@ class TestOut(unittest.TestCase):
         self.assertIs(z, y)
         self.assertEqual(y, xnd([-1, -2, -3]))
 
+        x = xnd([10, 20, 30])
+        y = xnd([7, 8, 9])
+        a = xnd.empty("3 * int64")
+        b = xnd.empty("3 * int64")
+        q, r = fn.divmod(x, y, out=(a, b))
+
+        self.assertIs(q, a)
+        self.assertIs(r, b)
+
+        self.assertEqual(q, xnd([1, 2, 3]))
+        self.assertEqual(r, xnd([3, 4, 3]))
+
     @unittest.skipIf(cd is None, "test requires cuda")
     def test_api_cuda(self):
         x = xnd([1, 2, 3], device="cuda:managed")
@@ -380,6 +392,18 @@ class TestOut(unittest.TestCase):
 
         self.assertIs(z, y)
         self.assertEqual(y, xnd([-1, -2, -3]))
+
+        x = xnd([10, 20, 30])
+        y = xnd([7, 8, 9])
+        a = xnd.empty("3 * int64")
+        b = xnd.empty("3 * int64")
+        q, r = fn.divmod(x, y, out=(a, b))
+
+        self.assertIs(q, a)
+        self.assertIs(r, b)
+
+        self.assertEqual(q, xnd([1, 2, 3]))
+        self.assertEqual(r, xnd([3, 4, 3]))
 
     def test_broadcast_cpu(self):
         x = xnd([1, 2, 3])

@@ -221,7 +221,7 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
             nout = 1;
             if (nin+nout > NDT_MAX_ARGS) {
                 PyErr_Format(PyExc_TypeError,
-                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin);
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
                 return -1;
             }
 
@@ -229,14 +229,14 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
         }
         else if (PyTuple_Check(out)) {
             nout = PyTuple_GET_SIZE(out);
-            if (nout > NDT_MAX_ARGS || nout+nin > NDT_MAX_ARGS) {
+            if (nout > NDT_MAX_ARGS || nin+nout > NDT_MAX_ARGS) {
                 PyErr_Format(PyExc_TypeError,
-                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin);
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
                 return -1;
             }
 
             for (Py_ssize_t i = 0; i < nout; i++) {
-                PyObject *v = PyTuple_GET_ITEM(args, i);
+                PyObject *v = PyTuple_GET_ITEM(out, i);
                 if (!Xnd_Check(v)) {
                     PyErr_Format(PyExc_TypeError,
                         "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
