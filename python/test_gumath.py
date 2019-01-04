@@ -365,6 +365,7 @@ class TestNumba(unittest.TestCase):
 class TestOut(unittest.TestCase):
 
     def test_api_cpu(self):
+        # negative
         x = xnd([1, 2, 3])
         y = xnd.empty("3 * int64")
         z = fn.negative(x, out=y)
@@ -372,6 +373,7 @@ class TestOut(unittest.TestCase):
         self.assertIs(z, y)
         self.assertEqual(y, xnd([-1, -2, -3]))
 
+        # divmod
         x = xnd([10, 20, 30])
         y = xnd([7, 8, 9])
         a = xnd.empty("3 * int64")
@@ -386,6 +388,7 @@ class TestOut(unittest.TestCase):
 
     @unittest.skipIf(cd is None, "test requires cuda")
     def test_api_cuda(self):
+        # negative
         x = xnd([1, 2, 3], device="cuda:managed")
         y = xnd.empty("3 * int64", device="cuda:managed")
         z = cd.negative(x, out=y)
@@ -393,11 +396,12 @@ class TestOut(unittest.TestCase):
         self.assertIs(z, y)
         self.assertEqual(y, xnd([-1, -2, -3]))
 
-        x = xnd([10, 20, 30])
-        y = xnd([7, 8, 9])
-        a = xnd.empty("3 * int64")
-        b = xnd.empty("3 * int64")
-        q, r = fn.divmod(x, y, out=(a, b))
+        # divmod
+        x = xnd([10, 20, 30], device="cuda:managed")
+        y = xnd([7, 8, 9], device="cuda:managed")
+        a = xnd.empty("3 * int64", device="cuda:managed")
+        b = xnd.empty("3 * int64", device="cuda:managed")
+        q, r = cd.divmod(x, y, out=(a, b))
 
         self.assertIs(q, a)
         self.assertIs(r, b)
@@ -406,6 +410,7 @@ class TestOut(unittest.TestCase):
         self.assertEqual(r, xnd([3, 4, 3]))
 
     def test_broadcast_cpu(self):
+        # multiply
         x = xnd([1, 2, 3])
         y = xnd([2])
         z = xnd.empty("3 * int64")
@@ -422,18 +427,34 @@ class TestOut(unittest.TestCase):
         self.assertIs(ans, z)
         self.assertEqual(ans, xnd([2, 4, 6]))
 
+        # divmod
+        x = xnd([10, 20, 30])
+        y = xnd([3])
+        a = xnd.empty("3 * int64")
+        b = xnd.empty("3 * int64")
+        q, r = fn.divmod(x, y, out=(a, b))
+
+        self.assertIs(q, a)
+        self.assertIs(r, b)
+        self.assertEqual(q, xnd([3, 6, 10]))
+        self.assertEqual(r, xnd([1, 2, 0]))
+
+        x = xnd([10, 20, 30])
+        y = xnd(3)
+        a = xnd.empty("3 * int64")
+        b = xnd.empty("3 * int64")
+        q, r = fn.divmod(x, y, out=(a, b))
+
+        self.assertIs(q, a)
+        self.assertIs(r, b)
+        self.assertEqual(q, xnd([3, 6, 10]))
+        self.assertEqual(r, xnd([1, 2, 0]))
+
     @unittest.skipIf(cd is None, "test requires cuda")
     def test_broadcast_cuda(self):
+        # multiply
         x = xnd([1, 2, 3], device="cuda:managed")
         y = xnd([2], device="cuda:managed")
-        z = xnd.empty("3 * int64", device="cuda:managed")
-        ans = fn.multiply(x, y, out=z)
-
-        self.assertIs(ans, z)
-        self.assertEqual(ans, xnd([2, 4, 6]))
-
-        x = xnd([1, 2, 3], device="cuda:managed")
-        y = xnd(2, device="cuda:managed")
         z = xnd.empty("3 * int64", device="cuda:managed")
         ans = fn.multiply(x, y, out=z)
 

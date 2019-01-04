@@ -1823,6 +1823,20 @@ gm_cpu_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_
         in0, in1, out0, out1, N);                                                       \
                                                                                         \
     return 0;                                                                           \
+}                                                                                       \
+                                                                                        \
+static int                                                                              \
+gm_cpu_0D_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx)         \
+{                                                                                       \
+    const char *in0 = stack[0].ptr;                                                     \
+    const char *in1 = stack[1].ptr;                                                     \
+    char *out0 = stack[2].ptr;                                                          \
+    char *out1 = stack[3].ptr;                                                          \
+    (void)ctx;                                                                          \
+                                                                                        \
+    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(in0, in1, out0, out1);          \
+                                                                                        \
+    return 0;                                                                           \
 }
 
 #define CPU_HOST_BINARY_MV_INIT(func, t0, t1, t2, t3) \
@@ -1830,7 +1844,7 @@ gm_cpu_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> " \
            "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),       \
     .Opt = gm_cpu_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3,  \
-    .C = NULL }
+    .C = gm_cpu_0D_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CPU_HOST_ALL_BINARY_MV(name) \
     CPU_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)         \
