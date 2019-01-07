@@ -48,9 +48,10 @@
 /****************************************************************************/
 
 static int
-id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
+id_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
+    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -65,13 +66,14 @@ id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     case Int32: return 28;
     case Int64: return 32;
 
-    case Float16: return 36;
-    case Float32: return 40;
-    case Float64: return 44;
+    case BFloat16: return 36;
+    case Float16: return 40;
+    case Float32: return 44;
+    case Float64: return 48;
 
-    case Complex32: return 48;
-    case Complex64: return 52;
-    case Complex128: return 56;
+    case Complex32: return 52;
+    case Complex64: return 56;
+    case Complex128: return 60;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -80,9 +82,10 @@ id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 }
 
 static int
-invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
+invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
+    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -104,9 +107,10 @@ invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 }
 
 static int
-negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
+negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
+    (void)out;
 
     switch (t->tag) {
     case Uint8: return 0;
@@ -118,13 +122,14 @@ negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
     case Int32: return 20;
     case Int64: return 24;
 
-    case Float16: return 28;
-    case Float32: return 32;
-    case Float64: return 36;
+    case BFloat16: return 28;
+    case Float16: return 32;
+    case Float32: return 36;
+    case Float64: return 40;
 
-    case Complex32: return 40;
-    case Complex64: return 44;
-    case Complex128: return 48;
+    case Complex32: return 44;
+    case Complex64: return 48;
+    case Complex128: return 52;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -133,26 +138,28 @@ negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 }
 
 static int
-math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
+math_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
+    const ndt_t *u = out ? ndt_dtype(out) : NULL;
 
     switch (t->tag) {
-    case Uint8: return 0;
-    case Int8: return 4;
-    case Float16: return 8;
+    case Uint8: return (u && u->tag == BFloat16) ? 0 : 12;
+    case Int8: return (u && u->tag == BFloat16) ? 4 : 16;
+    case BFloat16: return 8;
+    case Float16: return 20;
 
-    case Uint16: return 12;
-    case Int16: return 16;
-    case Float32: return 20;
+    case Uint16: return 24;
+    case Int16: return 28;
+    case Float32: return 32;
 
-    case Uint32: return 24;
-    case Int32: return 28;
-    case Float64: return 32;
+    case Uint32: return 36;
+    case Int32: return 40;
+    case Float64: return 44;
 
-    case Complex32: return 36;
-    case Complex64: return 40;
-    case Complex128: return 44;
+    case Complex32: return 48;
+    case Complex64: return 52;
+    case Complex128: return 56;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -267,6 +274,7 @@ CPU_UNARY_HOST(copy, int16, int16)
 CPU_UNARY_HOST(copy, int32, int32)
 CPU_UNARY_HOST(copy, int64, int64)
 
+CPU_UNARY_HOST(copy, bfloat16, bfloat16)
 CPU_NOIMPL_HOST(copy, float16, float16)
 CPU_UNARY_HOST(copy, float32, float32)
 CPU_UNARY_HOST(copy, float64, float64)
@@ -290,6 +298,7 @@ static const gm_kernel_init_t unary_id[] = {
   CPU_UNARY_HOST_INIT(copy, copy, int32, int32),
   CPU_UNARY_HOST_INIT(copy, copy, int64, int64),
 
+  CPU_UNARY_HOST_INIT(copy, copy, bfloat16, bfloat16),
   CPU_UNARY_HOST_INIT(copy, copy, float16, float16),
   CPU_UNARY_HOST_INIT(copy, copy, float32, float32),
   CPU_UNARY_HOST_INIT(copy, copy, float64, float64),
@@ -354,6 +363,7 @@ CPU_UNARY_HOST(negative, int16, int16)
 CPU_UNARY_HOST(negative, int32, int32)
 CPU_UNARY_HOST(negative, int64, int64)
 
+CPU_UNARY_HOST(negative, bfloat16, bfloat16)
 CPU_NOIMPL_HOST(negative, float16, float16)
 CPU_UNARY_HOST(negative, float32, float32)
 CPU_UNARY_HOST(negative, float64, float64)
@@ -374,6 +384,7 @@ static const gm_kernel_init_t unary_negative[] = {
   CPU_UNARY_HOST_INIT(negative, negative, int32, int32),
   CPU_UNARY_HOST_INIT(negative, negative, int64, int64),
 
+  CPU_UNARY_HOST_INIT(negative, negative, bfloat16, bfloat16),
   CPU_UNARY_HOST_INIT(negative, negative, float16, float16),
   CPU_UNARY_HOST_INIT(negative, negative, float32, float32),
   CPU_UNARY_HOST_INIT(negative, negative, float64, float64),
@@ -411,12 +422,15 @@ static const gm_kernel_init_t unary_negative[] = {
     CPU_NOIMPL_HOST(name, complex128, complex128)
 
 #define _CPU_ALL_REAL_MATH(name) \
-    CPU_UNARY_HOST(name##f, uint16, float32)  \
-    CPU_UNARY_HOST(name##f, int16, float32)   \
-    CPU_UNARY_HOST(name##f, float32, float32) \
-    CPU_UNARY_HOST(name, uint32, float64)     \
-    CPU_UNARY_HOST(name, int32, float64)      \
-    CPU_UNARY_HOST(name, float64, float64)    \
+    CPU_UNARY_HOST(name##b16, uint8, bfloat16)    \
+    CPU_UNARY_HOST(name##b16, int8, bfloat16)     \
+    CPU_UNARY_HOST(name##b16, bfloat16, bfloat16) \
+    CPU_UNARY_HOST(name##f, uint16, float32)      \
+    CPU_UNARY_HOST(name##f, int16, float32)       \
+    CPU_UNARY_HOST(name##f, float32, float32)     \
+    CPU_UNARY_HOST(name, uint32, float64)         \
+    CPU_UNARY_HOST(name, int32, float64)          \
+    CPU_UNARY_HOST(name, float64, float64)        \
 
 #define CPU_ALL_REAL_MATH(name) \
     _CPU_ALL_HALF_MATH_NOIMPL(name)    \
@@ -440,20 +454,24 @@ static const gm_kernel_init_t unary_negative[] = {
 
 
 #define CPU_ALL_UNARY_MATH_INIT(name) \
-    CPU_UNARY_HOST_INIT(name, name##f16, uint8, float16),   \
-    CPU_UNARY_HOST_INIT(name, name##f16, int8, float16),    \
-    CPU_UNARY_HOST_INIT(name, name##f16, float16, float16), \
-                                                             \
-    CPU_UNARY_HOST_INIT(name, name##f, uint16, float32),    \
-    CPU_UNARY_HOST_INIT(name, name##f, int16, float32),     \
-    CPU_UNARY_HOST_INIT(name, name##f, float32, float32),   \
-                                                             \
-    CPU_UNARY_HOST_INIT(name, name, uint32, float64),       \
-    CPU_UNARY_HOST_INIT(name, name, int32, float64),        \
-    CPU_UNARY_HOST_INIT(name, name, float64, float64),      \
-                                                             \
-    CPU_UNARY_HOST_INIT(name, name, complex32, complex32),  \
-    CPU_UNARY_HOST_INIT(name, name, complex64, complex64),  \
+    CPU_UNARY_HOST_INIT(name, name##b16, uint8, bfloat16),    \
+    CPU_UNARY_HOST_INIT(name, name##b16, int8, bfloat16),     \
+    CPU_UNARY_HOST_INIT(name, name##b16, bfloat16, bfloat16), \
+                                                              \
+    CPU_UNARY_HOST_INIT(name, name##f16, uint8, float16),     \
+    CPU_UNARY_HOST_INIT(name, name##f16, int8, float16),      \
+    CPU_UNARY_HOST_INIT(name, name##f16, float16, float16),   \
+                                                              \
+    CPU_UNARY_HOST_INIT(name, name##f, uint16, float32),      \
+    CPU_UNARY_HOST_INIT(name, name##f, int16, float32),       \
+    CPU_UNARY_HOST_INIT(name, name##f, float32, float32),     \
+                                                              \
+    CPU_UNARY_HOST_INIT(name, name, uint32, float64),         \
+    CPU_UNARY_HOST_INIT(name, name, int32, float64),          \
+    CPU_UNARY_HOST_INIT(name, name, float64, float64),        \
+                                                              \
+    CPU_UNARY_HOST_INIT(name, name, complex32, complex32),    \
+    CPU_UNARY_HOST_INIT(name, name, complex64, complex64),    \
     CPU_UNARY_HOST_INIT(name, name, complex128, complex128)
 
 

@@ -38,6 +38,8 @@
 #ifdef __cplusplus
 #include <cinttypes>
 #include <complex>
+#include "contrib/bfloat16.h"
+typedef tf::bfloat16 bfloat16_t;
 typedef std::complex<float> complex64_t;
 typedef std::complex<double> complex128_t;
 #else
@@ -83,6 +85,7 @@ CPU_DEVICE_UNARY_DECL(copy, int16, int16)
 CPU_DEVICE_UNARY_DECL(copy, int32, int32)
 CPU_DEVICE_UNARY_DECL(copy, int64, int64)
 
+CPU_DEVICE_UNARY_DECL(copy, bfloat16, bfloat16)
 CPU_DEVICE_UNARY_DECL(copy, float16, float16)
 CPU_DEVICE_UNARY_DECL(copy, float32, float32)
 CPU_DEVICE_UNARY_DECL(copy, float64, float64)
@@ -122,6 +125,7 @@ CPU_DEVICE_UNARY_DECL(negative, int16, int16)
 CPU_DEVICE_UNARY_DECL(negative, int32, int32)
 CPU_DEVICE_UNARY_DECL(negative, int64, int64)
 
+CPU_DEVICE_UNARY_DECL(negative, bfloat16, bfloat16)
 CPU_DEVICE_NOIMPL_DECL(negative, float16, float16)
 CPU_DEVICE_UNARY_DECL(negative, float32, float32)
 CPU_DEVICE_UNARY_DECL(negative, float64, float64)
@@ -136,11 +140,14 @@ CPU_DEVICE_UNARY_DECL(negative, complex128, complex128)
 /*****************************************************************************/
 
 #define CPU_DEVICE_UNARY_ALL_REAL_MATH_DECL(name) \
-    CPU_DEVICE_UNARY_DECL(name##f, uint16, float32)  \
-    CPU_DEVICE_UNARY_DECL(name##f, int16, float32)   \
-    CPU_DEVICE_UNARY_DECL(name##f, float32, float32) \
-    CPU_DEVICE_UNARY_DECL(name, uint32, float64)     \
-    CPU_DEVICE_UNARY_DECL(name, int32, float64)      \
+    CPU_DEVICE_UNARY_DECL(name##b16, uint8, bfloat16)    \
+    CPU_DEVICE_UNARY_DECL(name##b16, int8, bfloat16)     \
+    CPU_DEVICE_UNARY_DECL(name##b16, bfloat16, bfloat16) \
+    CPU_DEVICE_UNARY_DECL(name##f, uint16, float32)      \
+    CPU_DEVICE_UNARY_DECL(name##f, int16, float32)       \
+    CPU_DEVICE_UNARY_DECL(name##f, float32, float32)     \
+    CPU_DEVICE_UNARY_DECL(name, uint32, float64)         \
+    CPU_DEVICE_UNARY_DECL(name, int32, float64)          \
     CPU_DEVICE_UNARY_DECL(name, float64, float64)
 
 #define CPU_DEVICE_UNARY_ALL_COMPLEX_MATH_DECL(name) \
