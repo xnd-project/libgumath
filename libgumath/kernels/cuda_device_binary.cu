@@ -146,12 +146,8 @@ divmod_unsigned(uint64_t)
 static inline __device__ void                      \
 _divmod(T *q, T *r, T a, T b)                      \
 {                                                  \
-    if (b == 0) {                                  \
+    if (b == 0 || (a == MIN && b == -1)) {         \
         *q = 0;                                    \
-        *r = 0;                                    \
-    }                                              \
-    else if (a == MIN && b == -1) {                \
-        *q = MIN;                                  \
         *r = 0;                                    \
     }                                              \
     else {                                         \
