@@ -243,13 +243,14 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 }
 
 const gm_kernel_set_t *
-cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, const ndt_t *, ndt_context_t *),
                      ndt_apply_spec_t *spec, const gm_func_t *f,
                      const ndt_t *types[], const int64_t li[], int nin, int nout,
                      ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
     const ndt_t *t;
+    const ndt_t *u;
     const ndt_t *dtype;
     int n;
 
@@ -268,9 +269,11 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     }
 
     t = types[0];
+    u = nout ? types[1] : NULL;
     assert(ndt_is_concrete(t));
+    assert(u == NULL || ndt_is_concrete(u));
 
-    n = kernel_location(t, ctx);
+    n = kernel_location(t, u, ctx);
     if (n < 0) {
         return NULL;
     }
