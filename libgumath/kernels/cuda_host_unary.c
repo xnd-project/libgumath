@@ -34,9 +34,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <math.h>
-#include <complex.h>
-#include <inttypes.h>
 #include "ndtypes.h"
 #include "xnd.h"
 #include "gumath.h"
@@ -167,50 +164,50 @@ math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 
 
 /*****************************************************************************/
-/*                         Cuda-specific unary macros                        */
+/*                         CUDA-specific unary macros                        */
 /*****************************************************************************/
 
-#define CUDA_UNARY_HOST(func, t0, t1) \
-static int                                                             \
-gm_fixed_1D_C_##func##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)  \
-{                                                                      \
-    const char *in0 = apply_index(&stack[0]);                          \
-    char *out = apply_index(&stack[1]);                                \
-    int64_t N = xnd_fixed_shape(&stack[0]);                            \
-    (void)ctx;                                                         \
-                                                                       \
-    gm_cuda_device_fixed_1D_C_##func##_##t0##_##t1(in0, out, N);       \
-                                                                       \
-    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                   \
-        unary_update_bitmap1D(stack);                                  \
-    }                                                                  \
-                                                                       \
-    return 0;                                                          \
+#define CUDA_UNARY_HOST(name, t0, t1) \
+static int                                                                      \
+gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                               \
+    const char *in0 = apply_index(&stack[0]);                                   \
+    char *out = apply_index(&stack[1]);                                         \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                     \
+    (void)ctx;                                                                  \
+                                                                                \
+    gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(in0, out, N);                \
+                                                                                \
+    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                            \
+        unary_update_bitmap1D(stack);                                           \
+    }                                                                           \
+                                                                                \
+    return 0;                                                                   \
 }
 
 #define CUDA_NOIMPL_HOST(name, t0, t1) \
-static int                                                            \
-gm_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
-{                                                                     \
-    (void)stack;                                                      \
-                                                                      \
-    ndt_err_format(ctx, NDT_NotImplementedError,                      \
-        "implementation for " STRINGIZE(name) " : "                   \
-        STRINGIZE(t0) " -> " STRINGIZE(t1)                            \
-        " currently requires double rounding");                       \
-                                                                      \
-    return -1;                                                        \
+static int                                                                      \
+gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                               \
+    (void)stack;                                                                \
+                                                                                \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                \
+        "implementation for " STRINGIZE(name) " : "                             \
+        STRINGIZE(t0) " -> " STRINGIZE(t1)                                      \
+        " currently requires double rounding");                                 \
+                                                                                \
+    return -1;                                                                  \
 }
 
 #define CUDA_UNARY_HOST_INIT(funcname, func, t0, t1) \
   { .name = STRINGIZE(funcname),                                \
     .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),   \
-    .Opt = gm_fixed_1D_C_##func##_##t0##_##t1,                  \
+    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1,        \
     .C = NULL },                                                \
                                                                 \
   { .name = STRINGIZE(funcname),                                \
     .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1), \
-    .Opt = gm_fixed_1D_C_##func##_##t0##_##t1,                  \
+    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1,        \
     .C = NULL }
 
 
