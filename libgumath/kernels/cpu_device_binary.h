@@ -932,6 +932,98 @@ CPU_DEVICE_ALL_COMPARISON_DECL(greater)
 
 
 /*****************************************************************************/
+/*                                  Bitwise                                  */
+/*****************************************************************************/
+
+#define CPU_DEVICE_ALL_BITWISE_DECL(name) \
+    CPU_DEVICE_BINARY_DECL(name, bool, bool, bool)       \
+    CPU_DEVICE_BINARY_DECL(name, bool, uint8, uint8)     \
+    CPU_DEVICE_BINARY_DECL(name, bool, uint16, uint16)   \
+    CPU_DEVICE_BINARY_DECL(name, bool, uint32, uint32)   \
+    CPU_DEVICE_BINARY_DECL(name, bool, uint64, uint64)   \
+    CPU_DEVICE_BINARY_DECL(name, bool, int8, int8)       \
+    CPU_DEVICE_BINARY_DECL(name, bool, int16, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, bool, int32, int32)     \
+    CPU_DEVICE_BINARY_DECL(name, bool, int64, int64)     \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, uint8, bool, uint8)     \
+    CPU_DEVICE_BINARY_DECL(name, uint8, uint8, uint8)    \
+    CPU_DEVICE_BINARY_DECL(name, uint8, uint16, uint16)  \
+    CPU_DEVICE_BINARY_DECL(name, uint8, uint32, uint32)  \
+    CPU_DEVICE_BINARY_DECL(name, uint8, uint64, uint64)  \
+    CPU_DEVICE_BINARY_DECL(name, uint8, int8, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, uint8, int16, int16)    \
+    CPU_DEVICE_BINARY_DECL(name, uint8, int32, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, uint8, int64, int64)    \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, uint16, bool, uint16)   \
+    CPU_DEVICE_BINARY_DECL(name, uint16, uint8, uint16)  \
+    CPU_DEVICE_BINARY_DECL(name, uint16, uint16, uint16) \
+    CPU_DEVICE_BINARY_DECL(name, uint16, uint32, uint32) \
+    CPU_DEVICE_BINARY_DECL(name, uint16, uint64, uint64) \
+    CPU_DEVICE_BINARY_DECL(name, uint16, int8, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, uint16, int16, int32)   \
+    CPU_DEVICE_BINARY_DECL(name, uint16, int32, int32)   \
+    CPU_DEVICE_BINARY_DECL(name, uint16, int64, int64)   \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, uint32, bool, uint32)   \
+    CPU_DEVICE_BINARY_DECL(name, uint32, uint8, uint32)  \
+    CPU_DEVICE_BINARY_DECL(name, uint32, uint16, uint32) \
+    CPU_DEVICE_BINARY_DECL(name, uint32, uint32, uint32) \
+    CPU_DEVICE_BINARY_DECL(name, uint32, uint64, uint64) \
+    CPU_DEVICE_BINARY_DECL(name, uint32, int8, int64)    \
+    CPU_DEVICE_BINARY_DECL(name, uint32, int16, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, uint32, int32, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, uint32, int64, int64)   \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, uint64, bool, uint64)   \
+    CPU_DEVICE_BINARY_DECL(name, uint64, uint8, uint64)  \
+    CPU_DEVICE_BINARY_DECL(name, uint64, uint16, uint64) \
+    CPU_DEVICE_BINARY_DECL(name, uint64, uint32, uint64) \
+    CPU_DEVICE_BINARY_DECL(name, uint64, uint64, uint64) \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, int8, bool, int8)       \
+    CPU_DEVICE_BINARY_DECL(name, int8, uint8, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, int8, uint16, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, int8, uint32, int64)    \
+    CPU_DEVICE_BINARY_DECL(name, int8, int8, int8)       \
+    CPU_DEVICE_BINARY_DECL(name, int8, int16, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, int8, int32, int32)     \
+    CPU_DEVICE_BINARY_DECL(name, int8, int64, int64)     \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, int16, bool, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, int16, uint8, int16)    \
+    CPU_DEVICE_BINARY_DECL(name, int16, uint16, int32)   \
+    CPU_DEVICE_BINARY_DECL(name, int16, uint32, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, int16, int8, int16)     \
+    CPU_DEVICE_BINARY_DECL(name, int16, int16, int16)    \
+    CPU_DEVICE_BINARY_DECL(name, int16, int32, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, int16, int64, int64)    \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, int32, bool, int32)     \
+    CPU_DEVICE_BINARY_DECL(name, int32, uint8, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, int32, uint16, int32)   \
+    CPU_DEVICE_BINARY_DECL(name, int32, uint32, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, int32, int8, int32)     \
+    CPU_DEVICE_BINARY_DECL(name, int32, int16, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, int32, int32, int32)    \
+    CPU_DEVICE_BINARY_DECL(name, int32, int64, int64)    \
+                                                         \
+    CPU_DEVICE_BINARY_DECL(name, int64, bool, int64)     \
+    CPU_DEVICE_BINARY_DECL(name, int64, uint8, int64)    \
+    CPU_DEVICE_BINARY_DECL(name, int64, uint16, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, int64, uint32, int64)   \
+    CPU_DEVICE_BINARY_DECL(name, int64, int8, int64)     \
+    CPU_DEVICE_BINARY_DECL(name, int64, int16, int64)    \
+    CPU_DEVICE_BINARY_DECL(name, int64, int32, int64)    \
+    CPU_DEVICE_BINARY_DECL(name, int64, int64, int64)
+
+CPU_DEVICE_ALL_BITWISE_DECL(bitwise_and)
+CPU_DEVICE_ALL_BITWISE_DECL(bitwise_or)
+CPU_DEVICE_ALL_BITWISE_DECL(bitwise_xor)
+
+
+/*****************************************************************************/
 /*                             Two return values                             */
 /*****************************************************************************/
 

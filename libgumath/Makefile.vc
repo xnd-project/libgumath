@@ -46,12 +46,12 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 OBJS = apply.obj func.obj nploops.obj tbl.obj xndloops.obj cpu_host_unary.obj \
        cpu_device_unary.obj cpu_host_binary.obj cpu_device_binary.obj cpu_device_msvc.obj \
-       common.obj bitwise.obj examples.obj graph.obj pdist.obj
+       common.obj examples.obj graph.obj pdist.obj
 
 SHARED_OBJS = .objs/apply.obj .objs/func.obj .objs/nploops.obj .objs/tbl.obj .objs/xndloops.obj \
               .objs/cpu_host_unary.obj .objs/cpu_device_unary.obj .objs/cpu_host_binary.obj \
               .objs/cpu_device_binary.obj .objs/cpu_device_msvc.obj .objs/common.obj \
-              .objs/bitwise.obj .objs/examples.obj .objs/graph.obj .objs/pdist.obj
+              .objs/examples.obj .objs/graph.obj .objs/pdist.obj
 
 
 $(LIBSTATIC):\
@@ -155,14 +155,6 @@ Makefile kernels\common.c kernels\common.h gumath.h
 .objs\common.obj:\
 Makefile kernels\common.c kernels\common.h gumath.h
 	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\common.c
-
-bitwise.obj:\
-Makefile kernels\bitwise.c gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS) -c kernels\bitwise.c
-
-.objs\bitwise.obj:\
-Makefile kernels\bitwise.c gumath.h
-	$(CC) -I. "-I$(LIBNDTYPESINCLUDE)" "-I$(LIBXNDINCLUDE)" $(CFLAGS_SHARED) -c kernels\bitwise.c
 
 examples.obj:\
 Makefile extending\examples.c gumath.h

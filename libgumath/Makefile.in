@@ -37,11 +37,11 @@ default: $(LIBSTATIC) $(LIBSHARED)
 
 OBJS = apply.o func.o nploops.o tbl.o thread.o xndloops.o cpu_host_unary.o \
        cpu_device_unary.o cpu_host_binary.o cpu_device_binary.o common.o \
-       bitwise.o examples.o graph.o quaternion.o pdist.o
+       examples.o graph.o quaternion.o pdist.o
 
 SHARED_OBJS = .objs/apply.o .objs/func.o .objs/nploops.o .objs/tbl.o .objs/thread.o .objs/xndloops.o \
               .objs/cpu_host_unary.o .objs/cpu_device_unary.o .objs/cpu_host_binary.o .objs/cpu_device_binary.o \
-              .objs/common.o .objs/bitwise.o .objs/examples.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
+              .objs/common.o .objs/examples.o .objs/graph.o .objs/quaternion.o .objs/pdist.o
 
 ifdef CUDA_CXX
 OBJS += cuda_host_unary.o cuda_device_unary.o cuda_host_binary.o cuda_device_binary.o
@@ -148,14 +148,6 @@ Makefile kernels/common.c kernels/common.h gumath.h
 .objs/common.o:\
 Makefile kernels/common.c kernels/common.h gumath.h
 	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/common.c -o .objs/common.o
-
-bitwise.o:\
-Makefile kernels/bitwise.c gumath.h
-	$(CC) -I. $(GM_CFLAGS) -c kernels/bitwise.c
-
-.objs/bitwise.o:\
-Makefile kernels/bitwise.c gumath.h
-	$(CC) -I. $(GM_CFLAGS_SHARED) -c kernels/bitwise.c -o .objs/bitwise.o
 
 examples.o:\
 Makefile extending/examples.c gumath.h
