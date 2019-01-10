@@ -614,7 +614,7 @@ class TestBinaryCUDA(unittest.TestCase):
             self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
 
 
-class TestBitwise(unittest.TestCase):
+class TestBitwiseCPU(unittest.TestCase):
 
     def test_and(self):
         for t, u in implemented_sigs["binary"]["bitwise"]:
@@ -643,6 +643,39 @@ class TestBitwise(unittest.TestCase):
             x = xnd(a, dtype="?" + t.type)
             y = xnd(b, dtype="?" + u.type)
             z = fn.bitwise_and(x, y)
+            self.assertEqual(z, c)
+
+
+@unittest.skipIf(cd is None, "test requires cuda")
+class TestBitwiseCUDA(unittest.TestCase):
+
+    def test_and(self):
+        for t, u in implemented_sigs["binary"]["bitwise"]:
+            w = implemented_sigs["binary"]["bitwise"][(t, u)]
+
+            if t.cuda_noimpl() or u.cuda_noimpl():
+                continue
+
+            x = xnd([0, 1, 2, 3, 4, 5, 6, 7], dtype=t.type, device="cuda:managed")
+            x = xnd([0, 1, 0, 1, 1, 1, 1, 0], dtype=t.type, device="cuda:managed")
+            y = xnd([1, 0, 0, 0, 1, 1, 1, 1], dtype=u.type, device="cuda:managed")
+            z = cd.bitwise_and(x, y)
+            self.assertEqual(z, [0, 0, 0, 0, 1, 1, 1, 0])
+
+    def test_and_opt(self):
+        for t, u in implemented_sigs["binary"]["bitwise"]:
+            w = implemented_sigs["binary"]["bitwise"][(t, u)]
+
+            if t.cuda_noimpl() or u.cuda_noimpl():
+                continue
+
+            a = [0, 1, None, 1, 1, 1, 1, 0]
+            b = [1, 1, 1, 1, 1, 1, None, 0]
+            c = [0, 1, None, 1, 1, 1, None, 0]
+
+            x = xnd(a, dtype="?" + t.type, device="cuda:managed")
+            y = xnd(b, dtype="?" + u.type, device="cuda:managed")
+            z = cd.bitwise_and(x, y)
             self.assertEqual(z, c)
 
 
@@ -1254,7 +1287,8 @@ ALL_TESTS = [
   TestUnaryCUDA,
   TestBinaryCPU,
   TestBinaryCUDA,
-  TestBitwise,
+  TestBitwiseCPU,
+  TestBitwiseCUDA,
   TestFunctions,
   TestCudaManaged,
   LongIndexSliceTest,

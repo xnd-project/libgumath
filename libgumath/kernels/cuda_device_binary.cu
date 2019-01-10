@@ -1176,6 +1176,103 @@ CUDA_DEVICE_ALL_COMPARISON(greater, greater, __hgt, lexorder_gt)
 
 
 /*****************************************************************************/
+/*                                  Bitwise                                  */
+/*****************************************************************************/
+
+#define CUDA_DEVICE_ALL_BITWISE(name, func) \
+    CUDA_DEVICE_BINARY(name, func, bool, bool, bool, bool)         \
+    CUDA_DEVICE_BINARY(name, func, bool, uint8, uint8, uint8)      \
+    CUDA_DEVICE_BINARY(name, func, bool, uint16, uint16, uint16)   \
+    CUDA_DEVICE_BINARY(name, func, bool, uint32, uint32, uint32)   \
+    CUDA_DEVICE_BINARY(name, func, bool, uint64, uint64, uint64)   \
+    CUDA_DEVICE_BINARY(name, func, bool, int8, int8, int8)         \
+    CUDA_DEVICE_BINARY(name, func, bool, int16, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, bool, int32, int32, int32)      \
+    CUDA_DEVICE_BINARY(name, func, bool, int64, int64, int64)      \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, uint8, bool, uint8, uint8)      \
+    CUDA_DEVICE_BINARY(name, func, uint8, uint8, uint8, uint8)     \
+    CUDA_DEVICE_BINARY(name, func, uint8, uint16, uint16, uint16)  \
+    CUDA_DEVICE_BINARY(name, func, uint8, uint32, uint32, uint32)  \
+    CUDA_DEVICE_BINARY(name, func, uint8, uint64, uint64, uint64)  \
+    CUDA_DEVICE_BINARY(name, func, uint8, int8, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, uint8, int16, int16, int16)     \
+    CUDA_DEVICE_BINARY(name, func, uint8, int32, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, uint8, int64, int64, int64)     \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, uint16, bool, uint16, uint16)   \
+    CUDA_DEVICE_BINARY(name, func, uint16, uint8, uint16, uint16)  \
+    CUDA_DEVICE_BINARY(name, func, uint16, uint16, uint16, uint16) \
+    CUDA_DEVICE_BINARY(name, func, uint16, uint32, uint32, uint32) \
+    CUDA_DEVICE_BINARY(name, func, uint16, uint64, uint64, uint64) \
+    CUDA_DEVICE_BINARY(name, func, uint16, int8, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, uint16, int16, int32, int32)    \
+    CUDA_DEVICE_BINARY(name, func, uint16, int32, int32, int32)    \
+    CUDA_DEVICE_BINARY(name, func, uint16, int64, int64, int64)    \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, uint32, bool, uint32, uint32)   \
+    CUDA_DEVICE_BINARY(name, func, uint32, uint8, uint32, uint32)  \
+    CUDA_DEVICE_BINARY(name, func, uint32, uint16, uint32, uint32) \
+    CUDA_DEVICE_BINARY(name, func, uint32, uint32, uint32, uint32) \
+    CUDA_DEVICE_BINARY(name, func, uint32, uint64, uint64, uint64) \
+    CUDA_DEVICE_BINARY(name, func, uint32, int8, int64, int64)     \
+    CUDA_DEVICE_BINARY(name, func, uint32, int16, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, uint32, int32, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, uint32, int64, int64, int64)    \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, uint64, bool, uint64, uint64)   \
+    CUDA_DEVICE_BINARY(name, func, uint64, uint8, uint64, uint64)  \
+    CUDA_DEVICE_BINARY(name, func, uint64, uint16, uint64, uint64) \
+    CUDA_DEVICE_BINARY(name, func, uint64, uint32, uint64, uint64) \
+    CUDA_DEVICE_BINARY(name, func, uint64, uint64, uint64, uint64) \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, int8, bool, int8, int8)         \
+    CUDA_DEVICE_BINARY(name, func, int8, uint8, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, int8, uint16, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, int8, uint32, int64, int64)     \
+    CUDA_DEVICE_BINARY(name, func, int8, int8, int8, int8)         \
+    CUDA_DEVICE_BINARY(name, func, int8, int16, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, int8, int32, int32, int32)      \
+    CUDA_DEVICE_BINARY(name, func, int8, int64, int64, int64)      \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, int16, bool, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, int16, uint8, int16, int16)     \
+    CUDA_DEVICE_BINARY(name, func, int16, uint16, int32, int32)    \
+    CUDA_DEVICE_BINARY(name, func, int16, uint32, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, int16, int8, int16, int16)      \
+    CUDA_DEVICE_BINARY(name, func, int16, int16, int16, int16)     \
+    CUDA_DEVICE_BINARY(name, func, int16, int32, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, int16, int64, int64, int64)     \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, int32, bool, int32, int32)      \
+    CUDA_DEVICE_BINARY(name, func, int32, uint8, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, int32, uint16, int32, int32)    \
+    CUDA_DEVICE_BINARY(name, func, int32, uint32, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, int32, int8, int32, int32)      \
+    CUDA_DEVICE_BINARY(name, func, int32, int16, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, int32, int32, int32, int32)     \
+    CUDA_DEVICE_BINARY(name, func, int32, int64, int64, int64)     \
+                                                                   \
+    CUDA_DEVICE_BINARY(name, func, int64, bool, int64, int64)      \
+    CUDA_DEVICE_BINARY(name, func, int64, uint8, int64, int64)     \
+    CUDA_DEVICE_BINARY(name, func, int64, uint16, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, int64, uint32, int64, int64)    \
+    CUDA_DEVICE_BINARY(name, func, int64, int8, int64, int64)      \
+    CUDA_DEVICE_BINARY(name, func, int64, int16, int64, int64)     \
+    CUDA_DEVICE_BINARY(name, func, int64, int32, int64, int64)     \
+    CUDA_DEVICE_BINARY(name, func, int64, int64, int64, int64)
+
+#define bitwise_and(x, y) x & y
+CUDA_DEVICE_ALL_BITWISE(bitwise_and, bitwise_and)
+
+#define bitwise_or(x, y) x | y
+CUDA_DEVICE_ALL_BITWISE(bitwise_or, bitwise_or)
+
+#define bitwise_xor(x, y) x ^ y
+CUDA_DEVICE_ALL_BITWISE(bitwise_xor, bitwise_xor)
+
+
+/*****************************************************************************/
 /*                             Two return values                             */
 /*****************************************************************************/
 

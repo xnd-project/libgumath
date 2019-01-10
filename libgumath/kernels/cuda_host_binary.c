@@ -50,7 +50,7 @@
 
 /* Structured kernel locations for fast lookup. */
 static int
-kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
+binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 {
     const ndt_t *t0 = ndt_dtype(in0);
     const ndt_t *t1 = ndt_dtype(in1);
@@ -383,6 +383,170 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         default: goto invalid_combination;
         }
     }
+
+    default:
+        goto invalid_combination;
+    }
+
+invalid_combination:
+    ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
+    return -1;
+}
+
+static int
+bitwise_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
+{
+    const ndt_t *t0 = ndt_dtype(in0);
+    const ndt_t *t1 = ndt_dtype(in1);
+
+    switch (t0->tag) {
+    case Bool: {
+        switch (t1->tag) {
+        case Bool: return 0;
+
+        case Uint8: return 4;
+        case Uint16: return 8;
+        case Uint32: return 12;
+        case Uint64: return 16;
+
+        case Int8: return 20;
+        case Int16: return 24;
+        case Int32: return 28;
+        case Int64: return 32;
+
+        default: goto invalid_combination;
+        }
+    }
+
+    case Uint8: {
+        switch (t1->tag) {
+        case Bool: return 36;
+
+        case Uint8: return 40;
+        case Uint16: return 44;
+        case Uint32: return 48;
+        case Uint64: return 52;
+
+        case Int8: return 56;
+        case Int16: return 60;
+        case Int32: return 64;
+        case Int64: return 68;
+
+        default: goto invalid_combination;
+        }
+    }
+    case Uint16: {
+        switch (t1->tag) {
+        case Bool: return 72;
+
+        case Int8: return 76;
+        case Int16: return 80;
+        case Int32: return 84;
+        case Int64: return 88;
+
+        case Uint8: return 92;
+        case Uint16: return 96;
+        case Uint32: return 100;
+        case Uint64: return 104;
+
+        default: goto invalid_combination;
+        }
+    }
+    case Uint32: {
+        switch (t1->tag) {
+        case Bool: return 108;
+
+        case Uint8: return 112;
+        case Uint16: return 116;
+        case Uint32: return 120;
+        case Uint64: return 124;
+
+        case Int8: return 128;
+        case Int16: return 132;
+        case Int32: return 136;
+        case Int64: return 140;
+
+        default: goto invalid_combination;
+        }
+    }
+    case Uint64: {
+        switch (t1->tag) {
+        case Bool: return 144;
+
+        case Uint8: return 148;
+        case Uint16: return 152;
+        case Uint32: return 156;
+        case Uint64: return 160;
+
+        default: goto invalid_combination;
+        }
+    }
+
+    case Int8: {
+        switch (t1->tag) {
+        case Bool: return 164;
+
+        case Uint8: return 168;
+        case Uint16: return 172;
+        case Uint32: return 176;
+
+        case Int8: return 180;
+        case Int16: return 184;
+        case Int32: return 188;
+        case Int64: return 192;
+
+        default: goto invalid_combination;
+        }
+    }
+    case Int16: {
+        switch (t1->tag) {
+        case Bool: return 196;
+
+        case Uint8: return 200;
+        case Uint16: return 204;
+        case Uint32: return 208;
+
+        case Int8: return 212;
+        case Int16: return 216;
+        case Int32: return 220;
+        case Int64: return 224;
+
+        default: goto invalid_combination;
+        }
+    }
+    case Int32: {
+        switch (t1->tag) {
+        case Bool: return 228;
+
+        case Uint8: return 232;
+        case Uint16: return 236;
+        case Uint32: return 240;
+
+        case Int8: return 244;
+        case Int16: return 248;
+        case Int32: return 252;
+        case Int64: return 256;
+
+        default: goto invalid_combination;
+        }
+    }
+
+    case Int64: {
+        switch (t1->tag) {
+        case Bool: return 260;
+
+        case Uint8: return 264;
+        case Uint16: return 268;
+        case Uint32: return 272;
+
+        case Int8: return 276;
+        case Int16: return 280;
+        case Int32: return 284;
+        case Int64: return 288;
+
+        default: goto invalid_combination;
+        }
+      }
 
     default:
         goto invalid_combination;
@@ -1955,7 +2119,7 @@ CUDA_HOST_ALL_COMPARISON(greater_equal)
 CUDA_HOST_ALL_COMPARISON(greater)
 
 
-static const gm_kernel_init_t kernels[] = {
+static const gm_kernel_init_t binary_kernels[] = {
   CUDA_HOST_ALL_ARITHMETIC_INIT(add),
   CUDA_HOST_ALL_ARITHMETIC_INIT(subtract),
   CUDA_HOST_ALL_ARITHMETIC_INIT(multiply),
@@ -1966,6 +2130,191 @@ static const gm_kernel_init_t kernels[] = {
   CUDA_HOST_ALL_COMPARISON_INIT(less_equal),
   CUDA_HOST_ALL_COMPARISON_INIT(greater_equal),
   CUDA_HOST_ALL_COMPARISON_INIT(greater),
+
+  { .name = NULL, .sig = NULL }
+};
+
+
+/*****************************************************************************/
+/*                                   Bitwise                                 */
+/*****************************************************************************/
+
+#define CUDA_HOST_ALL_BITWISE(name) \
+    CUDA_HOST_BINARY(name, bool, bool, bool)       \
+    CUDA_HOST_BINARY(name, bool, uint8, uint8)     \
+    CUDA_HOST_BINARY(name, bool, uint16, uint16)   \
+    CUDA_HOST_BINARY(name, bool, uint32, uint32)   \
+    CUDA_HOST_BINARY(name, bool, uint64, uint64)   \
+    CUDA_HOST_BINARY(name, bool, int8, int8)       \
+    CUDA_HOST_BINARY(name, bool, int16, int16)     \
+    CUDA_HOST_BINARY(name, bool, int32, int32)     \
+    CUDA_HOST_BINARY(name, bool, int64, int64)     \
+                                                  \
+    CUDA_HOST_BINARY(name, uint8, bool, uint8)     \
+    CUDA_HOST_BINARY(name, uint8, uint8, uint8)    \
+    CUDA_HOST_BINARY(name, uint8, uint16, uint16)  \
+    CUDA_HOST_BINARY(name, uint8, uint32, uint32)  \
+    CUDA_HOST_BINARY(name, uint8, uint64, uint64)  \
+    CUDA_HOST_BINARY(name, uint8, int8, int16)     \
+    CUDA_HOST_BINARY(name, uint8, int16, int16)    \
+    CUDA_HOST_BINARY(name, uint8, int32, int32)    \
+    CUDA_HOST_BINARY(name, uint8, int64, int64)    \
+                                                  \
+    CUDA_HOST_BINARY(name, uint16, bool, uint16)   \
+    CUDA_HOST_BINARY(name, uint16, uint8, uint16)  \
+    CUDA_HOST_BINARY(name, uint16, uint16, uint16) \
+    CUDA_HOST_BINARY(name, uint16, uint32, uint32) \
+    CUDA_HOST_BINARY(name, uint16, uint64, uint64) \
+    CUDA_HOST_BINARY(name, uint16, int8, int32)    \
+    CUDA_HOST_BINARY(name, uint16, int16, int32)   \
+    CUDA_HOST_BINARY(name, uint16, int32, int32)   \
+    CUDA_HOST_BINARY(name, uint16, int64, int64)   \
+                                                  \
+    CUDA_HOST_BINARY(name, uint32, bool, uint32)   \
+    CUDA_HOST_BINARY(name, uint32, uint8, uint32)  \
+    CUDA_HOST_BINARY(name, uint32, uint16, uint32) \
+    CUDA_HOST_BINARY(name, uint32, uint32, uint32) \
+    CUDA_HOST_BINARY(name, uint32, uint64, uint64) \
+    CUDA_HOST_BINARY(name, uint32, int8, int64)    \
+    CUDA_HOST_BINARY(name, uint32, int16, int64)   \
+    CUDA_HOST_BINARY(name, uint32, int32, int64)   \
+    CUDA_HOST_BINARY(name, uint32, int64, int64)   \
+                                                  \
+    CUDA_HOST_BINARY(name, uint64, bool, uint64)   \
+    CUDA_HOST_BINARY(name, uint64, uint8, uint64)  \
+    CUDA_HOST_BINARY(name, uint64, uint16, uint64) \
+    CUDA_HOST_BINARY(name, uint64, uint32, uint64) \
+    CUDA_HOST_BINARY(name, uint64, uint64, uint64) \
+                                                  \
+    CUDA_HOST_BINARY(name, int8, bool, int8)       \
+    CUDA_HOST_BINARY(name, int8, uint8, int16)     \
+    CUDA_HOST_BINARY(name, int8, uint16, int32)    \
+    CUDA_HOST_BINARY(name, int8, uint32, int64)    \
+    CUDA_HOST_BINARY(name, int8, int8, int8)       \
+    CUDA_HOST_BINARY(name, int8, int16, int16)     \
+    CUDA_HOST_BINARY(name, int8, int32, int32)     \
+    CUDA_HOST_BINARY(name, int8, int64, int64)     \
+                                                  \
+    CUDA_HOST_BINARY(name, int16, bool, int16)     \
+    CUDA_HOST_BINARY(name, int16, uint8, int16)    \
+    CUDA_HOST_BINARY(name, int16, uint16, int32)   \
+    CUDA_HOST_BINARY(name, int16, uint32, int64)   \
+    CUDA_HOST_BINARY(name, int16, int8, int16)     \
+    CUDA_HOST_BINARY(name, int16, int16, int16)    \
+    CUDA_HOST_BINARY(name, int16, int32, int32)    \
+    CUDA_HOST_BINARY(name, int16, int64, int64)    \
+                                                  \
+    CUDA_HOST_BINARY(name, int32, bool, int32)     \
+    CUDA_HOST_BINARY(name, int32, uint8, int32)    \
+    CUDA_HOST_BINARY(name, int32, uint16, int32)   \
+    CUDA_HOST_BINARY(name, int32, uint32, int64)   \
+    CUDA_HOST_BINARY(name, int32, int8, int32)     \
+    CUDA_HOST_BINARY(name, int32, int16, int32)    \
+    CUDA_HOST_BINARY(name, int32, int32, int32)    \
+    CUDA_HOST_BINARY(name, int32, int64, int64)    \
+                                                  \
+    CUDA_HOST_BINARY(name, int64, bool, int64)     \
+    CUDA_HOST_BINARY(name, int64, uint8, int64)    \
+    CUDA_HOST_BINARY(name, int64, uint16, int64)   \
+    CUDA_HOST_BINARY(name, int64, uint32, int64)   \
+    CUDA_HOST_BINARY(name, int64, int8, int64)     \
+    CUDA_HOST_BINARY(name, int64, int16, int64)    \
+    CUDA_HOST_BINARY(name, int64, int32, int64)    \
+    CUDA_HOST_BINARY(name, int64, int64, int64)
+
+#define CUDA_HOST_ALL_BITWISE_INIT(name) \
+    CUDA_HOST_BINARY_INIT(name, bool, bool, bool),       \
+    CUDA_HOST_BINARY_INIT(name, bool, uint8, uint8),     \
+    CUDA_HOST_BINARY_INIT(name, bool, uint16, uint16),   \
+    CUDA_HOST_BINARY_INIT(name, bool, uint32, uint32),   \
+    CUDA_HOST_BINARY_INIT(name, bool, uint64, uint64),   \
+    CUDA_HOST_BINARY_INIT(name, bool, int8, int8),       \
+    CUDA_HOST_BINARY_INIT(name, bool, int16, int16),     \
+    CUDA_HOST_BINARY_INIT(name, bool, int32, int32),     \
+    CUDA_HOST_BINARY_INIT(name, bool, int64, int64),     \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, uint8, bool, uint8),     \
+    CUDA_HOST_BINARY_INIT(name, uint8, uint8, uint8),    \
+    CUDA_HOST_BINARY_INIT(name, uint8, uint16, uint16),  \
+    CUDA_HOST_BINARY_INIT(name, uint8, uint32, uint32),  \
+    CUDA_HOST_BINARY_INIT(name, uint8, uint64, uint64),  \
+    CUDA_HOST_BINARY_INIT(name, uint8, int8, int16),     \
+    CUDA_HOST_BINARY_INIT(name, uint8, int16, int16),    \
+    CUDA_HOST_BINARY_INIT(name, uint8, int32, int32),    \
+    CUDA_HOST_BINARY_INIT(name, uint8, int64, int64),    \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, uint16, bool, uint16),   \
+    CUDA_HOST_BINARY_INIT(name, uint16, uint8, uint16),  \
+    CUDA_HOST_BINARY_INIT(name, uint16, uint16, uint16), \
+    CUDA_HOST_BINARY_INIT(name, uint16, uint32, uint32), \
+    CUDA_HOST_BINARY_INIT(name, uint16, uint64, uint64), \
+    CUDA_HOST_BINARY_INIT(name, uint16, int8, int32),    \
+    CUDA_HOST_BINARY_INIT(name, uint16, int16, int32),   \
+    CUDA_HOST_BINARY_INIT(name, uint16, int32, int32),   \
+    CUDA_HOST_BINARY_INIT(name, uint16, int64, int64),   \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, uint32, bool, uint32),   \
+    CUDA_HOST_BINARY_INIT(name, uint32, uint8, uint32),  \
+    CUDA_HOST_BINARY_INIT(name, uint32, uint16, uint32), \
+    CUDA_HOST_BINARY_INIT(name, uint32, uint32, uint32), \
+    CUDA_HOST_BINARY_INIT(name, uint32, uint64, uint64), \
+    CUDA_HOST_BINARY_INIT(name, uint32, int8, int64),    \
+    CUDA_HOST_BINARY_INIT(name, uint32, int16, int64),   \
+    CUDA_HOST_BINARY_INIT(name, uint32, int32, int64),   \
+    CUDA_HOST_BINARY_INIT(name, uint32, int64, int64),   \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, uint64, bool, uint64),   \
+    CUDA_HOST_BINARY_INIT(name, uint64, uint8, uint64),  \
+    CUDA_HOST_BINARY_INIT(name, uint64, uint16, uint64), \
+    CUDA_HOST_BINARY_INIT(name, uint64, uint32, uint64), \
+    CUDA_HOST_BINARY_INIT(name, uint64, uint64, uint64), \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, int8, bool, int8),       \
+    CUDA_HOST_BINARY_INIT(name, int8, uint8, int16),     \
+    CUDA_HOST_BINARY_INIT(name, int8, uint16, int32),    \
+    CUDA_HOST_BINARY_INIT(name, int8, uint32, int64),    \
+    CUDA_HOST_BINARY_INIT(name, int8, int8, int8),       \
+    CUDA_HOST_BINARY_INIT(name, int8, int16, int16),     \
+    CUDA_HOST_BINARY_INIT(name, int8, int32, int32),     \
+    CUDA_HOST_BINARY_INIT(name, int8, int64, int64),     \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, int16, bool, int16),     \
+    CUDA_HOST_BINARY_INIT(name, int16, uint8, int16),    \
+    CUDA_HOST_BINARY_INIT(name, int16, uint16, int32),   \
+    CUDA_HOST_BINARY_INIT(name, int16, uint32, int64),   \
+    CUDA_HOST_BINARY_INIT(name, int16, int8, int16),     \
+    CUDA_HOST_BINARY_INIT(name, int16, int16, int16),    \
+    CUDA_HOST_BINARY_INIT(name, int16, int32, int32),    \
+    CUDA_HOST_BINARY_INIT(name, int16, int64, int64),    \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, int32, bool, int32),     \
+    CUDA_HOST_BINARY_INIT(name, int32, uint8, int32),    \
+    CUDA_HOST_BINARY_INIT(name, int32, uint16, int32),   \
+    CUDA_HOST_BINARY_INIT(name, int32, uint32, int64),   \
+    CUDA_HOST_BINARY_INIT(name, int32, int8, int32),     \
+    CUDA_HOST_BINARY_INIT(name, int32, int16, int32),    \
+    CUDA_HOST_BINARY_INIT(name, int32, int32, int32),    \
+    CUDA_HOST_BINARY_INIT(name, int32, int64, int64),    \
+                                                        \
+    CUDA_HOST_BINARY_INIT(name, int64, bool, int64),     \
+    CUDA_HOST_BINARY_INIT(name, int64, uint8, int64),    \
+    CUDA_HOST_BINARY_INIT(name, int64, uint16, int64),   \
+    CUDA_HOST_BINARY_INIT(name, int64, uint32, int64),   \
+    CUDA_HOST_BINARY_INIT(name, int64, int8, int64),     \
+    CUDA_HOST_BINARY_INIT(name, int64, int16, int64),    \
+    CUDA_HOST_BINARY_INIT(name, int64, int32, int64),    \
+    CUDA_HOST_BINARY_INIT(name, int64, int64, int64)
+
+
+CUDA_HOST_ALL_BITWISE(bitwise_and)
+CUDA_HOST_ALL_BITWISE(bitwise_or)
+CUDA_HOST_ALL_BITWISE(bitwise_xor)
+
+
+static const gm_kernel_init_t bitwise_kernels[] = {
+  CUDA_HOST_ALL_BITWISE_INIT(bitwise_and),
+  CUDA_HOST_ALL_BITWISE_INIT(bitwise_or),
+  CUDA_HOST_ALL_BITWISE_INIT(bitwise_xor),
 
   { .name = NULL, .sig = NULL }
 };
@@ -2029,7 +2378,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *c
 CUDA_HOST_ALL_BINARY_MV(divmod)
 
 
-static const gm_kernel_init_t kernels_mv[] = {
+static const gm_kernel_init_t binary_mv_kernels[] = {
   CUDA_HOST_ALL_BINARY_MV_INIT(divmod),
 
   { .name = NULL, .sig = NULL }
@@ -2041,24 +2390,40 @@ static const gm_kernel_init_t kernels_mv[] = {
 /****************************************************************************/
 
 static const gm_kernel_set_t *
-typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                 const int64_t li[], int nin, int nout, ndt_context_t *ctx)
+{
+    return cuda_binary_typecheck(binary_kernel_location, spec, f, types, li,
+                                 nin, nout, ctx);
+}
+
+static const gm_kernel_set_t *
+bitwise_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[],
           const int64_t li[], int nin, int nout, ndt_context_t *ctx)
 {
-    return cuda_binary_typecheck(kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cuda_binary_typecheck(bitwise_kernel_location, spec, f, in, li,
+                                 nin, nout, ctx);
 }
+
 
 int
 gm_init_cuda_binary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 {
     const gm_kernel_init_t *k;
 
-    for (k = kernels; k->name != NULL; k++) {
-        if (gm_add_kernel_typecheck(tbl, k, ctx, &typecheck) < 0) {
+    for (k = binary_kernels; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &binary_typecheck) < 0) {
              return -1;
         }
     }
 
-    for (k = kernels_mv; k->name != NULL; k++) {
+    for (k = bitwise_kernels; k->name != NULL; k++) {
+        if (gm_add_kernel_typecheck(tbl, k, ctx, &bitwise_typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = binary_mv_kernels; k->name != NULL; k++) {
         if (gm_add_kernel(tbl, k, ctx) < 0) {
              return -1;
         }
