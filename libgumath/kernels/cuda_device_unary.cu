@@ -49,7 +49,7 @@ half_abs(half a)
 
 
 /*****************************************************************************/
-/*                         Cuda device unary kernels                         */
+/*                         CUDA device unary kernels                         */
 /*****************************************************************************/
 
 #define CUDA_DEVICE_UNARY(name, func, t0, t1, common) \
@@ -83,7 +83,6 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(                      \
 /*****************************************************************************/
 
 #define copy(x) x
-
 CUDA_DEVICE_UNARY(copy, copy, bool, bool, bool)
 
 CUDA_DEVICE_UNARY(copy, copy, uint8, uint8, uint8)
@@ -159,8 +158,8 @@ CUDA_DEVICE_UNARY(negative, negative, complex128, complex128, complex128)
     CUDA_DEVICE_UNARY(name##f, name##f, int16, float32, float32)         \
     CUDA_DEVICE_UNARY(name##b16, tf::name, bfloat16, bfloat16, bfloat16) \
     CUDA_DEVICE_UNARY(name##f, name##f, float32, float32, float32)       \
-    CUDA_DEVICE_UNARY(name, name, int32, float64, float64)               \
     CUDA_DEVICE_UNARY(name, name, uint32, float64, float64)              \
+    CUDA_DEVICE_UNARY(name, name, int32, float64, float64)               \
     CUDA_DEVICE_UNARY(name, name, float64, float64, float64)
 
 #define CUDA_DEVICE_UNARY_ALL_COMPLEX_MATH(name) \
