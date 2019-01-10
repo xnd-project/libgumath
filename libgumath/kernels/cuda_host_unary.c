@@ -214,14 +214,14 @@ gm_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
     .C = NULL }
 
 
+#undef bool
+#define bool_t _Bool
+
+
 /*****************************************************************************/
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#undef bool
-#define bool_t _Bool
-
-#define copy(x) x
 CUDA_UNARY_HOST(copy, bool, bool)
 
 CUDA_UNARY_HOST(copy, uint8, uint8)
@@ -275,11 +275,8 @@ static const gm_kernel_init_t unary_id[] = {
 /*                                Bitwise NOT                                */
 /*****************************************************************************/
 
-#define invert(x) !x
 CUDA_UNARY_HOST(invert, bool, bool)
 
-#undef invert
-#define invert(x) ~x
 CUDA_UNARY_HOST(invert, uint8, uint8)
 CUDA_UNARY_HOST(invert, uint16, uint16)
 CUDA_UNARY_HOST(invert, uint32, uint32)
@@ -313,7 +310,6 @@ static const gm_kernel_init_t unary_invert[] = {
 /*                                  Negative                                 */
 /*****************************************************************************/
 
-#define negative(x) -x
 CUDA_UNARY_HOST(negative, uint8, int16)
 CUDA_UNARY_HOST(negative, uint16, int32)
 CUDA_UNARY_HOST(negative, uint32, int64)

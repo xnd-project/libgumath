@@ -639,6 +639,10 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     .C = NULL }
 
 
+#undef bool
+#define bool_t _Bool
+
+
 /*****************************************************************************/
 /*                                 Arithmetic                                */
 /*****************************************************************************/
@@ -1669,22 +1673,11 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex128, complex128, complex128)
 
 
-#define add(x, y) x + y
 CUDA_HOST_ALL_ARITHMETIC(add)
-
-#define subtract(x, y) x - y
 CUDA_HOST_ALL_ARITHMETIC(subtract)
-
-#define multiply(x, y) x * y
 CUDA_HOST_ALL_ARITHMETIC(multiply)
-
-#define floor_divide(x, y) x / y
 CUDA_HOST_ALL_ARITHMETIC_NO_COMPLEX(floor_divide)
-
-#define remainder(x, y) x % y
 CUDA_HOST_ALL_ARITHMETIC_NO_COMPLEX(remainder)
-
-#define divide(x, y) x / y
 CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
 
 
@@ -2103,19 +2096,9 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, complex128, complex128, bool)
 
 
-#undef bool
-#define bool_t _Bool
-
-#define less(x, y) x < y
 CUDA_HOST_ALL_COMPARISON(less)
-
-#define less_equal(x, y) x <= y
 CUDA_HOST_ALL_COMPARISON(less_equal)
-
-#define greater_equal(x, y) x >= y
 CUDA_HOST_ALL_COMPARISON(greater_equal)
-
-#define greater(x, y) x > y
 CUDA_HOST_ALL_COMPARISON(greater)
 
 

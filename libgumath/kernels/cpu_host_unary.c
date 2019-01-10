@@ -251,14 +251,14 @@ gm_cpu_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     .C = gm_cpu_0D_##func##_##t0##_##t1 }
 
 
+#undef bool
+#define bool_t _Bool
+
+
 /*****************************************************************************/
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#undef bool
-#define bool_t _Bool
-
-#define copy(x) x
 CPU_UNARY_HOST(copy, bool, bool)
 
 CPU_UNARY_HOST(copy, uint8, uint8)
@@ -312,11 +312,8 @@ static const gm_kernel_init_t unary_id[] = {
 /*                                Bitwise NOT                                */
 /*****************************************************************************/
 
-#define invert(x) !x
 CPU_UNARY_HOST(invert, bool, bool)
 
-#undef invert
-#define invert(x) ~x
 CPU_UNARY_HOST(invert, uint8, uint8)
 CPU_UNARY_HOST(invert, uint16, uint16)
 CPU_UNARY_HOST(invert, uint32, uint32)
