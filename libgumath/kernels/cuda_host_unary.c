@@ -49,10 +49,9 @@
 /****************************************************************************/
 
 static int
-id_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -83,10 +82,9 @@ id_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -108,10 +106,9 @@ invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Uint8: return 0;
@@ -139,10 +136,9 @@ negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-math_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    const ndt_t *u = out ? ndt_dtype(out) : NULL;
 
     switch (t->tag) {
     case Uint8: return 0;

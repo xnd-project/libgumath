@@ -48,10 +48,9 @@
 /****************************************************************************/
 
 static int
-id_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+id_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -82,10 +81,9 @@ id_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+invert_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Bool: return 0;
@@ -107,10 +105,9 @@ invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+negative_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    (void)out;
 
     switch (t->tag) {
     case Uint8: return 0;
@@ -138,28 +135,28 @@ negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 }
 
 static int
-math_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
+math_kernel_location(const ndt_t *in, ndt_context_t *ctx)
 {
     const ndt_t *t = ndt_dtype(in);
-    const ndt_t *u = out ? ndt_dtype(out) : NULL;
 
     switch (t->tag) {
-    case Uint8: return (u && u->tag == BFloat16) ? 0 : 12;
-    case Int8: return (u && u->tag == BFloat16) ? 4 : 16;
-    case BFloat16: return 8;
-    case Float16: return 20;
+    case Uint8: return 0;
+    case Int8: return 4;
+    case Float16: return 8;
 
-    case Uint16: return 24;
-    case Int16: return 28;
-    case Float32: return 32;
+    case BFloat16: return 12;
 
-    case Uint32: return 36;
-    case Int32: return 40;
-    case Float64: return 44;
+    case Uint16: return 16;
+    case Int16: return 20;
+    case Float32: return 24;
 
-    case Complex32: return 48;
-    case Complex64: return 52;
-    case Complex128: return 56;
+    case Uint32: return 28;
+    case Int32: return 32;
+    case Float64: return 36;
+
+    case Complex32: return 40;
+    case Complex64: return 44;
+    case Complex128: return 48;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -422,8 +419,6 @@ static const gm_kernel_init_t unary_negative[] = {
     CPU_NOIMPL_HOST(name, complex128, complex128)
 
 #define _CPU_ALL_REAL_MATH(name) \
-    CPU_UNARY_HOST(name##b16, uint8, bfloat16)    \
-    CPU_UNARY_HOST(name##b16, int8, bfloat16)     \
     CPU_UNARY_HOST(name##b16, bfloat16, bfloat16) \
     CPU_UNARY_HOST(name##f, uint16, float32)      \
     CPU_UNARY_HOST(name##f, int16, float32)       \
@@ -454,13 +449,11 @@ static const gm_kernel_init_t unary_negative[] = {
 
 
 #define CPU_ALL_UNARY_MATH_INIT(name) \
-    CPU_UNARY_HOST_INIT(name, name##b16, uint8, bfloat16),    \
-    CPU_UNARY_HOST_INIT(name, name##b16, int8, bfloat16),     \
-    CPU_UNARY_HOST_INIT(name, name##b16, bfloat16, bfloat16), \
-                                                              \
     CPU_UNARY_HOST_INIT(name, name##f16, uint8, float16),     \
     CPU_UNARY_HOST_INIT(name, name##f16, int8, float16),      \
     CPU_UNARY_HOST_INIT(name, name##f16, float16, float16),   \
+                                                              \
+    CPU_UNARY_HOST_INIT(name, name##b16, bfloat16, bfloat16), \
                                                               \
     CPU_UNARY_HOST_INIT(name, name##f, uint16, float32),      \
     CPU_UNARY_HOST_INIT(name, name##f, int16, float32),       \
