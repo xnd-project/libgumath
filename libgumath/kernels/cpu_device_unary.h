@@ -140,11 +140,9 @@ CPU_DEVICE_UNARY_DECL(negative, complex128, complex128)
 /*****************************************************************************/
 
 #define CPU_DEVICE_UNARY_ALL_REAL_MATH_DECL(name) \
-    CPU_DEVICE_UNARY_DECL(name##b16, uint8, bfloat16)    \
-    CPU_DEVICE_UNARY_DECL(name##b16, int8, bfloat16)     \
-    CPU_DEVICE_UNARY_DECL(name##b16, bfloat16, bfloat16) \
     CPU_DEVICE_UNARY_DECL(name##f, uint16, float32)      \
     CPU_DEVICE_UNARY_DECL(name##f, int16, float32)       \
+    CPU_DEVICE_UNARY_DECL(name##b16, bfloat16, bfloat16) \
     CPU_DEVICE_UNARY_DECL(name##f, float32, float32)     \
     CPU_DEVICE_UNARY_DECL(name, uint32, float64)         \
     CPU_DEVICE_UNARY_DECL(name, int32, float64)          \
