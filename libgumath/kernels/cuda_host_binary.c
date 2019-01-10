@@ -34,9 +34,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include <math.h>
-#include <complex.h>
-#include <inttypes.h>
 #include "ndtypes.h"
 #include "xnd.h"
 #include "gumath.h"
