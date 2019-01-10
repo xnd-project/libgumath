@@ -141,11 +141,9 @@ CUDA_DEVICE_UNARY_DECL(negative, complex128, complex128)
 /*****************************************************************************/
 
 #define CUDA_DEVICE_UNARY_ALL_REAL_MATH_DECL(name) \
-    CUDA_DEVICE_UNARY_DECL(name##b16, uint8, bfloat16)    \
-    CUDA_DEVICE_UNARY_DECL(name##b16, int8, bfloat16)     \
-    CUDA_DEVICE_UNARY_DECL(name##b16, bfloat16, bfloat16) \
     CUDA_DEVICE_UNARY_DECL(name##f, uint16, float32)      \
     CUDA_DEVICE_UNARY_DECL(name##f, int16, float32)       \
+    CUDA_DEVICE_UNARY_DECL(name##b16, bfloat16, bfloat16) \
     CUDA_DEVICE_UNARY_DECL(name##f, float32, float32)     \
     CUDA_DEVICE_UNARY_DECL(name, uint32, float64)         \
     CUDA_DEVICE_UNARY_DECL(name, int32, float64)          \

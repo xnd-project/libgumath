@@ -422,20 +422,21 @@ def half_noimpl(name):
 
 tunsigned = ["bool", "uint8", "uint16", "uint32", "uint64"]
 tsigned = ["int8", "int16", "int32", "int64"]
-tfloat = ["float16", "float32", "float64"]
+tfloat = ["bfloat16", "float16", "float32", "float64"]
 tcomplex = ["complex32", "complex64", "complex128"]
 
 tinfo = {
-  "bool": (0, 1),
-  "uint8": (0, 2**8-1),
-  "uint16": (0, 2**16-1),
-  "uint32": (0, 2**32-1),
-  "uint64": (0, 2**64-1),
-  "int8": (-2**7,  2**7-1),
-  "int16": (-2**15, 2**15-1),
-  "int32": (-2**31, 2**31-1),
-  "int64": (-2**63, 2**63-1),
+  "bool": (0, 1, 0),
+  "uint8": (0, 2**8-1, 0),
+  "uint16": (0, 2**16-1, 0),
+  "uint32": (0, 2**32-1, 0),
+  "uint64": (0, 2**64-1, 0),
+  "int8": (-2**7,  2**7-1, 0),
+  "int16": (-2**15, 2**15-1, 0),
+  "int32": (-2**31, 2**31-1, 0),
+  "int64": (-2**63, 2**63-1, 0),
   "float16": (-2**11, 2**11, 15),
+  "bfloat16": (-2**8, 2**8, 127),
   "float32": (-2**24, 2**24, 127),
   "float64": (-2**53, 2**53, 1023),
   "complex32": (-2**11, 2**11, 15),
@@ -448,8 +449,8 @@ class Tint(object):
         if type not in tunsigned + tsigned:
             raise ValueError("not an integer type: '%s'" % type)
         self.type = type
-        self.min, self.max = tinfo[type]
-        self.all = (self.type, self.min, self.max)
+        self.min, self.max, self.exp = tinfo[type]
+        self.all = (self.type, self.min, self.max, self.exp)
     def __repr__(self):
         return self.type
     def __eq__(self, other):
@@ -555,6 +556,7 @@ tinfo_default = [
   Tint("int32"),
   Tint("int64"),
   Tfloat("float16"),
+  Tfloat("bfloat16"),
   Tfloat("float32"),
   Tfloat("float64"),
   Tcomplex("complex32"),
@@ -624,7 +626,7 @@ def init_unary_cast(pattern, tinfo, rank):
     for i in range(start, len(tinfo_default)):
         cast = tinfo[i]
         if cast.min <= t.min and t.max <= cast.max:
-            if found_cast:
+            if found_cast or (t.type=="bfloat16") != (cast.type=="bfloat16"):
                 exact_sigs["unary"][pattern][(t,)] = cast
             else:
                 found_cast = True
@@ -646,6 +648,15 @@ def init_unary_cast_tbl(pattern):
     for rank, _ in enumerate(tinfo):
         init_unary_cast(pattern, tinfo, rank)
 
+def is_binary_common_cast(cast, t, u):
+    if cast.min <= t.min and t.max <= cast.max and \
+       cast.min <= u.min and u.max <= cast.max:
+        if isinstance(cast, Tfloat):
+            return t.exp <= cast.exp and u.exp <= cast.exp
+        else:
+            return True
+    return False
+
 def init_binary_cast(pattern, tinfo, rank1, rank2):
     min_rank = min(rank1, rank2)
     max_rank = max(rank1, rank2)
@@ -659,14 +670,14 @@ def init_binary_cast(pattern, tinfo, rank1, rank2):
     for i in range(start, len(tinfo_default)):
         common_cast = tinfo_default[i]
         w = Tint("bool") if pattern == "bool_result" else common_cast
-        if common_cast.min <= t.min and t.max <= common_cast.max and \
-           common_cast.min <= u.min and u.max <= common_cast.max:
-               if smallest_common_cast:
-                   exact_sigs["binary"][pattern][(t, u)] = w
-               else:
-                   smallest_common_cast = True
-                   implemented_sigs["binary"][pattern][(t, u)] = w
-                   exact_sigs["binary"][pattern][(t, u)] = w
+        if is_binary_common_cast(common_cast, t, u):
+           if smallest_common_cast:
+               exact_sigs["binary"][pattern][(t, u)] = w
+           else:
+               print(t, u, w)
+               smallest_common_cast = True
+               implemented_sigs["binary"][pattern][(t, u)] = w
+               exact_sigs["binary"][pattern][(t, u)] = w
         else:
             inexact_sigs["binary"][pattern][(t, u)] = w
 

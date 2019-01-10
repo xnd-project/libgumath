@@ -33,6 +33,7 @@
 
 #include <cinttypes>
 #include <thrust/complex.h>
+#include "contrib/bfloat16.h"
 #include "cuda_device_binary.h"
 
 
@@ -121,6 +122,18 @@ _divmod(float *q, float *r, float vx, float wx)
 
     *q = floordiv;
     *r = mod;
+}
+
+static inline __device__ void
+_divmod(bfloat16_t *q, bfloat16_t *r, bfloat16_t a, bfloat16_t b)
+{
+    float qq;
+    float rr;
+
+    _divmod(&qq, &rr, (float)a, (float)b);
+
+    *q = (bfloat16_t)qq;
+    *r = (bfloat16_t)rr;
 }
 
 #define divmod_unsigned(T) \
@@ -314,6 +327,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint8, int16, int16, int16)                     \
     CUDA_DEVICE_BINARY(name, func, uint8, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, uint8, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, uint8, bfloat16, bfloat16, bfloat16)            \
     CUDA_DEVICE_BINARY(name, hfunc, uint8, float16, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
@@ -329,6 +343,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint16, int16, int32, int32)                    \
     CUDA_DEVICE_BINARY(name, func, uint16, int32, int32, int32)                    \
     CUDA_DEVICE_BINARY(name, func, uint16, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint16, bfloat16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, uint16, float16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
@@ -344,6 +359,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint32, int16, int64, int64)                    \
     CUDA_DEVICE_BINARY(name, func, uint32, int32, int64, int64)                    \
     CUDA_DEVICE_BINARY(name, func, uint32, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint32, bfloat16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, uint32, float16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
@@ -363,6 +379,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int8, int16, int16, int16)                      \
     CUDA_DEVICE_BINARY(name, func, int8, int32, int32, int32)                      \
     CUDA_DEVICE_BINARY(name, func, int8, int64, int64, int64)                      \
+    CUDA_DEVICE_BINARY(name, func, int8, bfloat16, bfloat16, bfloat16)             \
     CUDA_DEVICE_BINARY(name, hfunc, int8, float16, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
@@ -377,6 +394,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int16, int16, int16, int16)                     \
     CUDA_DEVICE_BINARY(name, func, int16, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int16, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int16, bfloat16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, int16, float16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
@@ -391,6 +409,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int32, int16, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int32, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int32, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int32, bfloat16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, int32, float16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
@@ -406,12 +425,27 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int64, int32, int64, int64)                     \
     CUDA_DEVICE_BINARY(name, func, int64, int64, int64, int64)                     \
                                                                                    \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint8, bfloat16, bfloat16)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint16, float32, float32)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint32, float64, float64)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int8, bfloat16, bfloat16)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int16, float32, float32)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int32, float64, float64)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, bfloat16, bfloat16, bfloat16)         \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float16, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float32, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float64, float64, float64)            \
+    CUDA_DEVICE_NOIMPL(name, func, bfloat16, complex32, complex32, complex64)      \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, complex64, complex64, complex64)      \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, complex128, complex128, complex128)   \
+                                                                                   \
     CUDA_DEVICE_BINARY(name, hfunc, float16, uint8, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint32, float64, float64)              \
     CUDA_DEVICE_BINARY(name, hfunc, float16, int8, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, float16, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float16, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float16, bfloat16, float32, float32)            \
     CUDA_DEVICE_BINARY(name, hfunc, float16, float16, float16, float16)            \
     CUDA_DEVICE_BINARY(name, func, float16, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float16, float64, float64, float64)             \
@@ -425,6 +459,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float32, bfloat16, float32, float32)            \
     CUDA_DEVICE_BINARY(name, func, float32, float16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
@@ -438,6 +473,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
     CUDA_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float64, bfloat16, float64, float64)            \
     CUDA_DEVICE_BINARY(name, func, float64, float16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
@@ -451,6 +487,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)          \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)         \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)       \
+    CUDA_DEVICE_NOIMPL(name, func, complex32, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)     \
@@ -464,6 +501,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, complex64, int8, complex64, complex64)          \
     CUDA_DEVICE_BINARY(name, func, complex64, int16, complex64, complex64)         \
     CUDA_DEVICE_BINARY(name, func, complex64, int32, complex128, complex128)       \
+    CUDA_DEVICE_BINARY(name, func, complex64, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_BINARY(name, func, complex64, float16, complex64, complex64)       \
     CUDA_DEVICE_BINARY(name, func, complex64, float32, complex64, complex64)       \
     CUDA_DEVICE_BINARY(name, func, complex64, float64, complex128, complex128)     \
@@ -477,6 +515,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, complex128, int8, complex128, complex128)       \
     CUDA_DEVICE_BINARY(name, func, complex128, int16, complex128, complex128)      \
     CUDA_DEVICE_BINARY(name, func, complex128, int32, complex128, complex128)      \
+    CUDA_DEVICE_BINARY(name, func, complex128, bfloat16, complex128, complex128)   \
     CUDA_DEVICE_BINARY(name, func, complex128, float16, complex128, complex128)    \
     CUDA_DEVICE_BINARY(name, func, complex128, float32, complex128, complex128)    \
     CUDA_DEVICE_BINARY(name, func, complex128, float64, complex128, complex128)    \
@@ -493,6 +532,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint8, int16, int16, int16)                     \
     CUDA_DEVICE_BINARY(name, func, uint8, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, uint8, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, uint8, bfloat16, bfloat16, bfloat16)            \
     CUDA_DEVICE_NOIMPL(name, hfunc, uint8, float16, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
@@ -508,6 +548,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint16, int16, int32, int32)                    \
     CUDA_DEVICE_BINARY(name, func, uint16, int32, int32, int32)                    \
     CUDA_DEVICE_BINARY(name, func, uint16, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint16, bfloat16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, uint16, float16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
@@ -523,6 +564,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint32, int16, int64, int64)                    \
     CUDA_DEVICE_BINARY(name, func, uint32, int32, int64, int64)                    \
     CUDA_DEVICE_BINARY(name, func, uint32, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint32, bfloat16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, uint32, float16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
@@ -542,6 +584,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int8, int16, int16, int16)                      \
     CUDA_DEVICE_BINARY(name, func, int8, int32, int32, int32)                      \
     CUDA_DEVICE_BINARY(name, func, int8, int64, int64, int64)                      \
+    CUDA_DEVICE_BINARY(name, func, int8, bfloat16, bfloat16, bfloat16)             \
     CUDA_DEVICE_NOIMPL(name, hfunc, int8, float16, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
@@ -556,6 +599,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int16, int16, int16, int16)                     \
     CUDA_DEVICE_BINARY(name, func, int16, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int16, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int16, bfloat16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, int16, float16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
@@ -570,6 +614,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int32, int16, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int32, int32, int32, int32)                     \
     CUDA_DEVICE_BINARY(name, func, int32, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int32, bfloat16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, int32, float16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
@@ -585,12 +630,27 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int64, int32, int64, int64)                     \
     CUDA_DEVICE_BINARY(name, func, int64, int64, int64, int64)                     \
                                                                                    \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint8, bfloat16, bfloat16)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint16, float32, float32)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint32, float64, float64)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int8, bfloat16, bfloat16)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int16, float32, float32)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int32, float64, float64)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, bfloat16, bfloat16, bfloat16)         \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float16, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float32, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float64, float64, float64)            \
+    CUDA_DEVICE_NOKERN(name, func, bfloat16, complex32, complex32, complex32)      \
+    CUDA_DEVICE_NOKERN(name, func, bfloat16, complex64, complex64, complex64)      \
+    CUDA_DEVICE_NOKERN(name, func, bfloat16, complex128, complex128, complex128)   \
+                                                                                   \
     CUDA_DEVICE_NOIMPL(name, hfunc, float16, uint8, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint32, float64, float64)              \
     CUDA_DEVICE_NOIMPL(name, hfunc, float16, int8, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, float16, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float16, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float16, bfloat16, float32, float32)            \
     CUDA_DEVICE_NOIMPL(name, hfunc, float16, float16, float16, float16)            \
     CUDA_DEVICE_BINARY(name, func, float16, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float16, float64, float64, float64)             \
@@ -604,6 +664,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float32, bfloat16, float32, float32)            \
     CUDA_DEVICE_BINARY(name, func, float32, float16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
@@ -617,6 +678,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
     CUDA_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float64, bfloat16, float64, float64)            \
     CUDA_DEVICE_BINARY(name, func, float64, float16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
@@ -630,6 +692,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOKERN(name, func, complex32, int8, complex32, complex32)          \
     CUDA_DEVICE_NOKERN(name, func, complex32, int16, complex64, complex64)         \
     CUDA_DEVICE_NOKERN(name, func, complex32, int32, complex128, complex128)       \
+    CUDA_DEVICE_NOKERN(name, func, complex32, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_NOKERN(name, func, complex32, float16, complex32, complex32)       \
     CUDA_DEVICE_NOKERN(name, func, complex32, float32, complex64, complex64)       \
     CUDA_DEVICE_NOKERN(name, func, complex32, float64, complex128, complex128)     \
@@ -643,6 +706,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOKERN(name, func, complex64, int8, complex64, complex64)          \
     CUDA_DEVICE_NOKERN(name, func, complex64, int16, complex64, complex64)         \
     CUDA_DEVICE_NOKERN(name, func, complex64, int32, complex128, complex128)       \
+    CUDA_DEVICE_NOKERN(name, func, complex64, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_NOKERN(name, func, complex64, float16, complex64, complex64)       \
     CUDA_DEVICE_NOKERN(name, func, complex64, float32, complex64, complex64)       \
     CUDA_DEVICE_NOKERN(name, func, complex64, float64, complex128, complex128)     \
@@ -656,6 +720,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOKERN(name, func, complex128, int8, complex128, complex128)       \
     CUDA_DEVICE_NOKERN(name, func, complex128, int16, complex128, complex128)      \
     CUDA_DEVICE_NOKERN(name, func, complex128, int32, complex128, complex128)      \
+    CUDA_DEVICE_NOKERN(name, func, complex128, bfloat16, complex128, complex128)   \
     CUDA_DEVICE_NOKERN(name, func, complex128, float16, complex128, complex128)    \
     CUDA_DEVICE_NOKERN(name, func, complex128, float32, complex128, complex128)    \
     CUDA_DEVICE_NOKERN(name, func, complex128, float64, complex128, complex128)    \
@@ -672,6 +737,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint8, int16, float32, float32)                 \
     CUDA_DEVICE_BINARY(name, func, uint8, int32, float64, float64)                 \
     CUDA_DEVICE_NOKERN(name, func, uint8, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, uint8, bfloat16, bfloat16, bfloat16)            \
     CUDA_DEVICE_BINARY(name, hfunc, uint8, float16, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, uint8, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, uint8, float64, float64, float64)               \
@@ -687,6 +753,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint16, int16, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, uint16, int32, float64, float64)                \
     CUDA_DEVICE_NOKERN(name, func, uint16, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint16, bfloat16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, uint16, float16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float32, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, uint16, float64, float64, float64)              \
@@ -702,6 +769,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, uint32, int16, float64, float64)                \
     CUDA_DEVICE_BINARY(name, func, uint32, int32, float64, float64)                \
     CUDA_DEVICE_NOKERN(name, func, uint32, int64, int64, int64)                    \
+    CUDA_DEVICE_BINARY(name, func, uint32, bfloat16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, uint32, float16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float32, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, uint32, float64, float64, float64)              \
@@ -721,6 +789,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int8, int16, float32, float32)                  \
     CUDA_DEVICE_BINARY(name, func, int8, int32, float64, float64)                  \
     CUDA_DEVICE_NOKERN(name, func, int8, int64, int64, int64)                      \
+    CUDA_DEVICE_BINARY(name, func, int8, bfloat16, bfloat16, bfloat16)             \
     CUDA_DEVICE_BINARY(name, hfunc, int8, float16, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, int8, float32, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, int8, float64, float64, float64)                \
@@ -735,6 +804,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int16, int16, float32, float32)                 \
     CUDA_DEVICE_BINARY(name, func, int16, int32, float64, float64)                 \
     CUDA_DEVICE_NOKERN(name, func, int16, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int16, bfloat16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, int16, float16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float32, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, int16, float64, float64, float64)               \
@@ -749,6 +819,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, int32, int16, float64, float64)                 \
     CUDA_DEVICE_BINARY(name, func, int32, int32, float64, float64)                 \
     CUDA_DEVICE_NOKERN(name, func, int32, int64, int64, int64)                     \
+    CUDA_DEVICE_BINARY(name, func, int32, bfloat16, float64, float64)              \
     CUDA_DEVICE_BINARY(name, func, int32, float16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float32, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, int32, float64, float64, float64)               \
@@ -764,12 +835,27 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOKERN(name, func, int64, int32, int64, int64)                     \
     CUDA_DEVICE_NOKERN(name, func, int64, int64, int64, int64)                     \
                                                                                    \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint8, bfloat16, bfloat16)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint16, float32, float32)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint32, float64, float64)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int8, bfloat16, bfloat16)             \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int16, float32, float32)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int32, float64, float64)              \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, bfloat16, bfloat16, bfloat16)         \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float16, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float32, float32, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float64, float64, float64)            \
+    CUDA_DEVICE_NOIMPL(name, func, bfloat16, complex32, complex64, complex64)      \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, complex64, complex64, complex64)      \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, complex128, complex128, complex128)   \
+                                                                                   \
     CUDA_DEVICE_BINARY(name, hfunc, float16, uint8, float16, float16)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint16, float32, float32)              \
     CUDA_DEVICE_BINARY(name, func, float16, uint32, float64, float64)              \
     CUDA_DEVICE_BINARY(name, hfunc, float16, int8, float16, float16)               \
     CUDA_DEVICE_BINARY(name, func, float16, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float16, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float16, bfloat16, float32, float32)            \
     CUDA_DEVICE_BINARY(name, hfunc, float16, float16, float16, float16)            \
     CUDA_DEVICE_BINARY(name, func, float16, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float16, float64, float64, float64)             \
@@ -783,6 +869,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float32, int8, float32, float32)                \
     CUDA_DEVICE_BINARY(name, func, float32, int16, float32, float32)               \
     CUDA_DEVICE_BINARY(name, func, float32, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float32, bfloat16, float32, float32)            \
     CUDA_DEVICE_BINARY(name, func, float32, float16, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float32, float32, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, float64, float64, float64)             \
@@ -796,6 +883,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, float64, int8, float64, float64)                \
     CUDA_DEVICE_BINARY(name, func, float64, int16, float64, float64)               \
     CUDA_DEVICE_BINARY(name, func, float64, int32, float64, float64)               \
+    CUDA_DEVICE_BINARY(name, func, float64, bfloat16, float64, float64)            \
     CUDA_DEVICE_BINARY(name, func, float64, float16, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float32, float64, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, float64, float64, float64)             \
@@ -809,6 +897,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int8, complex32, complex32)          \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int16, complex64, complex64)         \
     CUDA_DEVICE_NOIMPL(name, func, complex32, int32, complex128, complex128)       \
+    CUDA_DEVICE_NOIMPL(name, func, complex32, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float16, complex32, complex32)       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float32, complex64, complex64)       \
     CUDA_DEVICE_NOIMPL(name, func, complex32, float64, complex128, complex128)     \
@@ -822,6 +911,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, complex64, int8, complex64, complex64)          \
     CUDA_DEVICE_BINARY(name, func, complex64, int16, complex64, complex64)         \
     CUDA_DEVICE_BINARY(name, func, complex64, int32, complex128, complex128)       \
+    CUDA_DEVICE_BINARY(name, func, complex64, bfloat16, complex64, complex64)      \
     CUDA_DEVICE_BINARY(name, func, complex64, float16, complex64, complex64)       \
     CUDA_DEVICE_BINARY(name, func, complex64, float32, complex64, complex64)       \
     CUDA_DEVICE_BINARY(name, func, complex64, float64, complex128, complex128)     \
@@ -835,6 +925,7 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
     CUDA_DEVICE_BINARY(name, func, complex128, int8, complex128, complex128)       \
     CUDA_DEVICE_BINARY(name, func, complex128, int16, complex128, complex128)      \
     CUDA_DEVICE_BINARY(name, func, complex128, int32, complex128, complex128)      \
+    CUDA_DEVICE_BINARY(name, func, complex128, bfloat16, complex128, complex128)   \
     CUDA_DEVICE_BINARY(name, func, complex128, float16, complex128, complex128)    \
     CUDA_DEVICE_BINARY(name, func, complex128, float32, complex128, complex128)    \
     CUDA_DEVICE_BINARY(name, func, complex128, float64, complex128, complex128)    \
@@ -874,6 +965,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, uint8, int16, bool, int16)                 \
     CUDA_DEVICE_BINARY(name, func, uint8, int32, bool, int32)                 \
     CUDA_DEVICE_BINARY(name, func, uint8, int64, bool, int64)                 \
+    CUDA_DEVICE_BINARY(name, func, uint8, bfloat16, bool, bfloat16)           \
     CUDA_DEVICE_BINARY(name, func, uint8, float16, bool, float16)             \
     CUDA_DEVICE_BINARY(name, func, uint8, float32, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, uint8, float64, bool, float64)             \
@@ -889,6 +981,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, uint16, int16, bool, int32)                \
     CUDA_DEVICE_BINARY(name, func, uint16, int32, bool, int32)                \
     CUDA_DEVICE_BINARY(name, func, uint16, int64, bool, int64)                \
+    CUDA_DEVICE_BINARY(name, func, uint16, bfloat16, bool, float32)           \
     CUDA_DEVICE_BINARY(name, func, uint16, float16, bool, float32)            \
     CUDA_DEVICE_BINARY(name, func, uint16, float32, bool, float32)            \
     CUDA_DEVICE_BINARY(name, func, uint16, float64, bool, float64)            \
@@ -904,6 +997,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, uint32, int16, bool, int64)                \
     CUDA_DEVICE_BINARY(name, func, uint32, int32, bool, int64)                \
     CUDA_DEVICE_BINARY(name, func, uint32, int64, bool, int64)                \
+    CUDA_DEVICE_BINARY(name, func, uint32, bfloat16, bool, float64)           \
     CUDA_DEVICE_BINARY(name, func, uint32, float16, bool, float64)            \
     CUDA_DEVICE_BINARY(name, func, uint32, float32, bool, float64)            \
     CUDA_DEVICE_BINARY(name, func, uint32, float64, bool, float64)            \
@@ -923,6 +1017,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, int8, int16, bool, int16)                  \
     CUDA_DEVICE_BINARY(name, func, int8, int32, bool, int32)                  \
     CUDA_DEVICE_BINARY(name, func, int8, int64, bool, int64)                  \
+    CUDA_DEVICE_BINARY(name, func, int8, bfloat16, bool, bfloat16)            \
     CUDA_DEVICE_BINARY(name, func, int8, float16, bool, float16)              \
     CUDA_DEVICE_BINARY(name, func, int8, float32, bool, float32)              \
     CUDA_DEVICE_BINARY(name, func, int8, float64, bool, float64)              \
@@ -937,6 +1032,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, int16, int16, bool, int16)                 \
     CUDA_DEVICE_BINARY(name, func, int16, int32, bool, int32)                 \
     CUDA_DEVICE_BINARY(name, func, int16, int64, bool, int64)                 \
+    CUDA_DEVICE_BINARY(name, func, int16, bfloat16, bool, float32)            \
     CUDA_DEVICE_BINARY(name, func, int16, float16, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, int16, float32, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, int16, float64, bool, float64)             \
@@ -951,6 +1047,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, int32, int16, bool, int32)                 \
     CUDA_DEVICE_BINARY(name, func, int32, int32, bool, int32)                 \
     CUDA_DEVICE_BINARY(name, func, int32, int64, bool, int64)                 \
+    CUDA_DEVICE_BINARY(name, func, int32, bfloat16, bool, float64)            \
     CUDA_DEVICE_BINARY(name, func, int32, float16, bool, float64)             \
     CUDA_DEVICE_BINARY(name, func, int32, float32, bool, float64)             \
     CUDA_DEVICE_BINARY(name, func, int32, float64, bool, float64)             \
@@ -966,12 +1063,27 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, int64, int32, bool, int64)                 \
     CUDA_DEVICE_BINARY(name, func, int64, int64, bool, int64)                 \
                                                                               \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint8, bool, bfloat16)           \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint16, bool, float32)           \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, uint32, bool, float64)           \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int8, bool, bfloat16)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int16, bool, float32)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, int32, bool, float64)            \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, bfloat16, bool, bfloat16)        \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float16, bool, float32)          \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float32, bool, float32)          \
+    CUDA_DEVICE_BINARY(name, func, bfloat16, float64, bool, float64)          \
+    CUDA_DEVICE_NOIMPL(name, cfunc, bfloat16, complex32, bool, complex64)     \
+    CUDA_DEVICE_BINARY(name, cfunc, bfloat16, complex64, bool, complex64)     \
+    CUDA_DEVICE_BINARY(name, cfunc, bfloat16, complex128, bool, complex128)   \
+                                                                              \
     CUDA_DEVICE_BINARY(name, func, float16, uint8, bool, float16)             \
     CUDA_DEVICE_BINARY(name, func, float16, uint16, bool, float32)            \
     CUDA_DEVICE_BINARY(name, func, float16, uint32, bool, float64)            \
     CUDA_DEVICE_BINARY(name, func, float16, int8, bool, float16)              \
     CUDA_DEVICE_BINARY(name, func, float16, int16, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, float16, int32, bool, float64)             \
+    CUDA_DEVICE_BINARY(name, func, float16, bfloat16, bool, float32)          \
     CUDA_DEVICE_BINARY(name, func, float16, float16, bool, float16)           \
     CUDA_DEVICE_BINARY(name, func, float16, float32, bool, float32)           \
     CUDA_DEVICE_BINARY(name, func, float16, float64, bool, float64)           \
@@ -985,6 +1097,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, float32, int8, bool, float32)              \
     CUDA_DEVICE_BINARY(name, func, float32, int16, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, float32, int32, bool, float64)             \
+    CUDA_DEVICE_BINARY(name, func, float32, bfloat16, bool, float32)          \
     CUDA_DEVICE_BINARY(name, func, float32, float16, bool, float32)           \
     CUDA_DEVICE_BINARY(name, func, float32, float32, bool, float32)           \
     CUDA_DEVICE_BINARY(name, func, float32, float64, bool, float64)           \
@@ -998,6 +1111,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, float64, int8, bool, float64)              \
     CUDA_DEVICE_BINARY(name, func, float64, int16, bool, float64)             \
     CUDA_DEVICE_BINARY(name, func, float64, int32, bool, float64)             \
+    CUDA_DEVICE_BINARY(name, func, float64, bfloat16, bool, float64)          \
     CUDA_DEVICE_BINARY(name, func, float64, float16, bool, float64)           \
     CUDA_DEVICE_BINARY(name, func, float64, float32, bool, float64)           \
     CUDA_DEVICE_BINARY(name, func, float64, float64, bool, float64)           \
@@ -1011,6 +1125,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, int8, bool, complex32)         \
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, int16, bool, complex64)        \
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, int32, bool, complex128)       \
+    CUDA_DEVICE_NOIMPL(name, cfunc, complex32, bfloat16, bool, complex64)     \
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, float16, bool, complex32)      \
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, float32, bool, complex64)      \
     CUDA_DEVICE_NOIMPL(name, cfunc, complex32, float64, bool, complex128)     \
@@ -1024,6 +1139,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, cfunc, complex64, int8, bool, complex64)         \
     CUDA_DEVICE_BINARY(name, cfunc, complex64, int16, bool, complex64)        \
     CUDA_DEVICE_BINARY(name, cfunc, complex64, int32, bool, complex128)       \
+    CUDA_DEVICE_BINARY(name, cfunc, complex64, bfloat16, bool, complex64)     \
     CUDA_DEVICE_BINARY(name, cfunc, complex64, float16, bool, complex64)      \
     CUDA_DEVICE_BINARY(name, cfunc, complex64, float32, bool, complex64)      \
     CUDA_DEVICE_BINARY(name, cfunc, complex64, float64, bool, complex128)     \
@@ -1037,6 +1153,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int8, bool, complex128)       \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int16, bool, complex128)      \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int32, bool, complex128)      \
+    CUDA_DEVICE_BINARY(name, cfunc, complex128, bfloat16, bool, complex128)    \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float16, bool, complex128)    \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float32, bool, complex128)    \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float64, bool, complex128)    \
@@ -1112,15 +1229,16 @@ gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(         \
 }
 
 #define CUDA_DEVICE_ALL_BINARY_MV(name, func) \
-    CUDA_DEVICE_BINARY_MV(name, func, uint8, uint8, uint8, uint8)         \
-    CUDA_DEVICE_BINARY_MV(name, func, uint16, uint16, uint16, uint16)     \
-    CUDA_DEVICE_BINARY_MV(name, func, uint32, uint32, uint32, uint32)     \
-    CUDA_DEVICE_BINARY_MV(name, func, uint64, uint64, uint64, uint64)     \
-    CUDA_DEVICE_BINARY_MV(name, func, int8, int8, int8, int8)             \
-    CUDA_DEVICE_BINARY_MV(name, func, int16, int16, int16, int16)         \
-    CUDA_DEVICE_BINARY_MV(name, func, int32, int32, int32, int32)         \
-    CUDA_DEVICE_BINARY_MV(name, func, int64, int64, int64, int64)         \
-    CUDA_DEVICE_BINARY_MV(name, func, float32, float32, float32, float32) \
+    CUDA_DEVICE_BINARY_MV(name, func, uint8, uint8, uint8, uint8)             \
+    CUDA_DEVICE_BINARY_MV(name, func, uint16, uint16, uint16, uint16)         \
+    CUDA_DEVICE_BINARY_MV(name, func, uint32, uint32, uint32, uint32)         \
+    CUDA_DEVICE_BINARY_MV(name, func, uint64, uint64, uint64, uint64)         \
+    CUDA_DEVICE_BINARY_MV(name, func, int8, int8, int8, int8)                 \
+    CUDA_DEVICE_BINARY_MV(name, func, int16, int16, int16, int16)             \
+    CUDA_DEVICE_BINARY_MV(name, func, int32, int32, int32, int32)             \
+    CUDA_DEVICE_BINARY_MV(name, func, int64, int64, int64, int64)             \
+    CUDA_DEVICE_BINARY_MV(name, func, bfloat16, bfloat16, bfloat16, bfloat16) \
+    CUDA_DEVICE_BINARY_MV(name, func, float32, float32, float32, float32)     \
     CUDA_DEVICE_BINARY_MV(name, func, float64, float64, float64, float64)
 
 CUDA_DEVICE_ALL_BINARY_MV(divmod, _divmod)

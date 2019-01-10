@@ -68,69 +68,72 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         case Int32: return 24;
         case Int64: return 28;
 
-        case Float16: return 32;
-        case Float32: return 36;
-        case Float64: return 40;
+        case BFloat16: return 32;
+        case Float16: return 36;
+        case Float32: return 40;
+        case Float64: return 44;
 
-        case Complex32: return 44;
-        case Complex64: return 48;
-        case Complex128: return 52;
+        case Complex32: return 48;
+        case Complex64: return 52;
+        case Complex128: return 56;
 
         default: goto invalid_combination;
         }
     }
     case Uint16: {
         switch (t1->tag) {
-        case Uint8: return 56;
-        case Uint16: return 60;
-        case Uint32: return 64;
-        case Uint64: return 68;
+        case Uint8: return 60;
+        case Uint16: return 64;
+        case Uint32: return 68;
+        case Uint64: return 72;
 
-        case Int8: return 72;
-        case Int16: return 76;
-        case Int32: return 80;
-        case Int64: return 84;
+        case Int8: return 76;
+        case Int16: return 80;
+        case Int32: return 84;
+        case Int64: return 88;
 
-        case Float16: return 88;
-        case Float32: return 92;
-        case Float64: return 96;
+        case BFloat16: return 92;
+        case Float16: return 96;
+        case Float32: return 100;
+        case Float64: return 104;
 
-        case Complex32: return 100;
-        case Complex64: return 104;
-        case Complex128: return 108;
+        case Complex32: return 108;
+        case Complex64: return 112;
+        case Complex128: return 116;
 
         default: goto invalid_combination;
         }
     }
     case Uint32: {
         switch (t1->tag) {
-        case Uint8: return 112;
-        case Uint16: return 116;
-        case Uint32: return 120;
-        case Uint64: return 124;
+        case Uint8: return 120;
+        case Uint16: return 124;
+        case Uint32: return 128;
+        case Uint64: return 132;
 
-        case Int8: return 128;
-        case Int16: return 132;
-        case Int32: return 136;
-        case Int64: return 140;
+        case Int8: return 136;
+        case Int16: return 140;
+        case Int32: return 144;
+        case Int64: return 148;
 
-        case Float16: return 144;
-        case Float32: return 148;
-        case Float64: return 152;
+        case BFloat16: return 152;
+        case Float16: return 156;
+        case Float32: return 160;
+        case Float64: return 164;
 
-        case Complex32: return 156;
-        case Complex64: return 160;
-        case Complex128: return 164;
+        case Complex32: return 168;
+        case Complex64: return 172;
+        case Complex128: return 176;
 
         default: goto invalid_combination;
         }
     }
     case Uint64: {
         switch (t1->tag) {
-        case Uint8: return 168;
-        case Uint16: return 172;
-        case Uint32: return 176;
-        case Uint64: return 180;
+        case Uint8: return 180;
+        case Uint16: return 184;
+        case Uint32: return 188;
+        case Uint64: return 192;
 
         default: goto invalid_combination;
         }
@@ -138,80 +141,106 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int8: {
         switch (t1->tag) {
-        case Uint8: return 184;
-        case Uint16: return 188;
-        case Uint32: return 192;
+        case Uint8: return 196;
+        case Uint16: return 200;
+        case Uint32: return 204;
 
-        case Int8: return 196;
-        case Int16: return 200;
-        case Int32: return 204;
-        case Int64: return 208;
+        case Int8: return 208;
+        case Int16: return 212;
+        case Int32: return 216;
+        case Int64: return 220;
 
-        case Float16: return 212;
-        case Float32: return 216;
-        case Float64: return 220;
+        case BFloat16: return 224;
+        case Float16: return 228;
+        case Float32: return 232;
+        case Float64: return 236;
 
-        case Complex32: return 224;
-        case Complex64: return 228;
-        case Complex128: return 232;
+        case Complex32: return 240;
+        case Complex64: return 244;
+        case Complex128: return 248;
 
         default: goto invalid_combination;
         }
     }
     case Int16: {
         switch (t1->tag) {
-        case Uint8: return 236;
-        case Uint16: return 240;
-        case Uint32: return 244;
+        case Uint8: return 252;
+        case Uint16: return 256;
+        case Uint32: return 260;
 
-        case Int8: return 248;
-        case Int16: return 252;
-        case Int32: return 256;
-        case Int64: return 260;
+        case Int8: return 264;
+        case Int16: return 268;
+        case Int32: return 272;
+        case Int64: return 276;
 
-        case Float16: return 264;
-        case Float32: return 268;
-        case Float64: return 272;
+        case BFloat16: return 280;
+        case Float16: return 284;
+        case Float32: return 288;
+        case Float64: return 292;
 
-        case Complex32: return 276;
-        case Complex64: return 280;
-        case Complex128: return 284;
+        case Complex32: return 296;
+        case Complex64: return 300;
+        case Complex128: return 304;
 
         default: goto invalid_combination;
         }
     }
     case Int32: {
         switch (t1->tag) {
-        case Uint8: return 288;
-        case Uint16: return 292;
-        case Uint32: return 296;
+        case Uint8: return 308;
+        case Uint16: return 312;
+        case Uint32: return 316;
 
-        case Int8: return 300;
-        case Int16: return 304;
-        case Int32: return 308;
-        case Int64: return 312;
+        case Int8: return 320;
+        case Int16: return 324;
+        case Int32: return 328;
+        case Int64: return 332;
 
-        case Float16: return 316;
-        case Float32: return 320;
-        case Float64: return 324;
+        case BFloat16: return 336;
+        case Float16: return 340;
+        case Float32: return 344;
+        case Float64: return 348;
 
-        case Complex32: return 328;
-        case Complex64: return 332;
-        case Complex128: return 336;
+        case Complex32: return 352;
+        case Complex64: return 356;
+        case Complex128: return 360;
 
         default: goto invalid_combination;
         }
     }
     case Int64: {
         switch (t1->tag) {
-        case Uint8: return 340;
-        case Uint16: return 344;
-        case Uint32: return 348;
+        case Uint8: return 364;
+        case Uint16: return 368;
+        case Uint32: return 372;
 
-        case Int8: return 352;
-        case Int16: return 356;
-        case Int32: return 360;
-        case Int64: return 364;
+        case Int8: return 376;
+        case Int16: return 380;
+        case Int32: return 384;
+        case Int64: return 388;
+
+        default: goto invalid_combination;
+        }
+    }
+
+    case BFloat16: {
+        switch (t1->tag) {
+        case Uint8: return 392;
+        case Uint16: return 396;
+        case Uint32: return 400;
+
+        case Int8: return 404;
+        case Int16: return 408;
+        case Int32: return 412;
+
+        case BFloat16: return 416;
+        case Float16: return 420;
+        case Float32: return 424;
+        case Float64: return 428;
+
+        case Complex32: return 432;
+        case Complex64: return 436;
+        case Complex128: return 440;
 
         default: goto invalid_combination;
         }
@@ -219,21 +248,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float16: {
         switch (t1->tag) {
-        case Uint8: return 368;
-        case Uint16: return 372;
-        case Uint32: return 376;
+        case Uint8: return 444;
+        case Uint16: return 448;
+        case Uint32: return 452;
 
-        case Int8: return 380;
-        case Int16: return 384;
-        case Int32: return 388;
+        case Int8: return 456;
+        case Int16: return 460;
+        case Int32: return 464;
 
-        case Float16: return 392;
-        case Float32: return 396;
-        case Float64: return 400;
+        case BFloat16: return 468;
+        case Float16: return 472;
+        case Float32: return 476;
+        case Float64: return 480;
 
-        case Complex32: return 404;
-        case Complex64: return 408;
-        case Complex128: return 412;
+        case Complex32: return 484;
+        case Complex64: return 488;
+        case Complex128: return 492;
 
         default: goto invalid_combination;
         }
@@ -241,21 +271,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float32: {
         switch (t1->tag) {
-        case Uint8: return 416;
-        case Uint16: return 420;
-        case Uint32: return 424;
+        case Uint8: return 496;
+        case Uint16: return 500;
+        case Uint32: return 504;
 
-        case Int8: return 428;
-        case Int16: return 432;
-        case Int32: return 436;
+        case Int8: return 508;
+        case Int16: return 512;
+        case Int32: return 516;
 
-        case Float16: return 440;
-        case Float32: return 444;
-        case Float64: return 448;
+        case BFloat16: return 520;
+        case Float16: return 524;
+        case Float32: return 528;
+        case Float64: return 532;
 
-        case Complex32: return 452;
-        case Complex64: return 456;
-        case Complex128: return 460;
+        case Complex32: return 536;
+        case Complex64: return 540;
+        case Complex128: return 544;
 
         default: goto invalid_combination;
         }
@@ -263,21 +294,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float64: {
         switch (t1->tag) {
-        case Uint8: return 464;
-        case Uint16: return 468;
-        case Uint32: return 472;
+        case Uint8: return 548;
+        case Uint16: return 552;
+        case Uint32: return 556;
 
-        case Int8: return 476;
-        case Int16: return 480;
-        case Int32: return 484;
+        case Int8: return 560;
+        case Int16: return 564;
+        case Int32: return 568;
 
-        case Float16: return 488;
-        case Float32: return 492;
-        case Float64: return 496;
+        case BFloat16: return 572;
+        case Float16: return 576;
+        case Float32: return 580;
+        case Float64: return 584;
 
-        case Complex32: return 500;
-        case Complex64: return 504;
-        case Complex128: return 508;
+        case Complex32: return 588;
+        case Complex64: return 592;
+        case Complex128: return 596;
 
         default: goto invalid_combination;
         }
@@ -285,21 +317,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex32: {
         switch (t1->tag) {
-        case Uint8: return 512;
-        case Uint16: return 516;
-        case Uint32: return 520;
+        case Uint8: return 600;
+        case Uint16: return 604;
+        case Uint32: return 608;
 
-        case Int8: return 524;
-        case Int16: return 528;
-        case Int32: return 532;
+        case Int8: return 612;
+        case Int16: return 616;
+        case Int32: return 620;
 
-        case Float16: return 536;
-        case Float32: return 540;
-        case Float64: return 544;
+        case BFloat16: return 624;
+        case Float16: return 628;
+        case Float32: return 632;
+        case Float64: return 636;
 
-        case Complex32: return 548;
-        case Complex64: return 552;
-        case Complex128: return 556;
+        case Complex32: return 640;
+        case Complex64: return 644;
+        case Complex128: return 648;
 
         default: goto invalid_combination;
         }
@@ -307,21 +340,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex64: {
         switch (t1->tag) {
-        case Uint8: return 560;
-        case Uint16: return 564;
-        case Uint32: return 568;
+        case Uint8: return 652;
+        case Uint16: return 656;
+        case Uint32: return 660;
 
-        case Int8: return 572;
-        case Int16: return 576;
-        case Int32: return 580;
+        case Int8: return 664;
+        case Int16: return 668;
+        case Int32: return 672;
 
-        case Float16: return 584;
-        case Float32: return 588;
-        case Float64: return 592;
+        case BFloat16: return 676;
+        case Float16: return 680;
+        case Float32: return 684;
+        case Float64: return 688;
 
-        case Complex32: return 596;
-        case Complex64: return 600;
-        case Complex128: return 604;
+        case Complex32: return 692;
+        case Complex64: return 696;
+        case Complex128: return 700;
 
         default: goto invalid_combination;
         }
@@ -329,21 +363,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex128: {
         switch (t1->tag) {
-        case Uint8: return 608;
-        case Uint16: return 612;
-        case Uint32: return 616;
+        case Uint8: return 704;
+        case Uint16: return 708;
+        case Uint32: return 712;
 
-        case Int8: return 620;
-        case Int16: return 624;
-        case Int32: return 628;
+        case Int8: return 716;
+        case Int16: return 720;
+        case Int32: return 724;
 
-        case Float16: return 632;
-        case Float32: return 636;
-        case Float64: return 640;
+        case BFloat16: return 728;
+        case Float16: return 732;
+        case Float32: return 736;
+        case Float64: return 740;
 
-        case Complex32: return 644;
-        case Complex64: return 648;
-        case Complex128: return 652;
+        case Complex32: return 744;
+        case Complex64: return 748;
+        case Complex128: return 752;
 
         default: goto invalid_combination;
         }
@@ -453,6 +488,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint8, int16, int16)                \
     CUDA_HOST_BINARY(name, uint8, int32, int32)                \
     CUDA_HOST_BINARY(name, uint8, int64, int64)                \
+    CUDA_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CUDA_HOST_BINARY(name, uint8, float16, float16)            \
     CUDA_HOST_BINARY(name, uint8, float32, float32)            \
     CUDA_HOST_BINARY(name, uint8, float64, float64)            \
@@ -468,6 +504,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint16, int16, int32)               \
     CUDA_HOST_BINARY(name, uint16, int32, int32)               \
     CUDA_HOST_BINARY(name, uint16, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CUDA_HOST_BINARY(name, uint16, float16, float32)           \
     CUDA_HOST_BINARY(name, uint16, float32, float32)           \
     CUDA_HOST_BINARY(name, uint16, float64, float64)           \
@@ -483,6 +520,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint32, int16, int64)               \
     CUDA_HOST_BINARY(name, uint32, int32, int64)               \
     CUDA_HOST_BINARY(name, uint32, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CUDA_HOST_BINARY(name, uint32, float16, float64)           \
     CUDA_HOST_BINARY(name, uint32, float32, float64)           \
     CUDA_HOST_BINARY(name, uint32, float64, float64)           \
@@ -502,6 +540,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int8, int16, int16)                 \
     CUDA_HOST_BINARY(name, int8, int32, int32)                 \
     CUDA_HOST_BINARY(name, int8, int64, int64)                 \
+    CUDA_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CUDA_HOST_BINARY(name, int8, float16, float16)             \
     CUDA_HOST_BINARY(name, int8, float32, float32)             \
     CUDA_HOST_BINARY(name, int8, float64, float64)             \
@@ -516,6 +555,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int16, int16, int16)                \
     CUDA_HOST_BINARY(name, int16, int32, int32)                \
     CUDA_HOST_BINARY(name, int16, int64, int64)                \
+    CUDA_HOST_BINARY(name, int16, bfloat16, float32)           \
     CUDA_HOST_BINARY(name, int16, float16, float32)            \
     CUDA_HOST_BINARY(name, int16, float32, float32)            \
     CUDA_HOST_BINARY(name, int16, float64, float64)            \
@@ -530,6 +570,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int32, int16, int32)                \
     CUDA_HOST_BINARY(name, int32, int32, int32)                \
     CUDA_HOST_BINARY(name, int32, int64, int64)                \
+    CUDA_HOST_BINARY(name, int32, bfloat16, float64)           \
     CUDA_HOST_BINARY(name, int32, float16, float64)            \
     CUDA_HOST_BINARY(name, int32, float32, float64)            \
     CUDA_HOST_BINARY(name, int32, float64, float64)            \
@@ -545,12 +586,27 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int64, int32, int64)                \
     CUDA_HOST_BINARY(name, int64, int64, int64)                \
                                                                \
+    CUDA_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CUDA_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CUDA_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CUDA_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CUDA_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CUDA_HOST_BINARY(name, bfloat16, float16, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CUDA_HOST_NOIMPL(name, bfloat16, complex32, complex64)     \
+    CUDA_HOST_BINARY(name, bfloat16, complex64, complex64)     \
+    CUDA_HOST_BINARY(name, bfloat16, complex128, complex128)   \
+                                                               \
     CUDA_HOST_BINARY(name, float16, uint8, float16)            \
     CUDA_HOST_BINARY(name, float16, uint16, float32)           \
     CUDA_HOST_BINARY(name, float16, uint32, float64)           \
     CUDA_HOST_BINARY(name, float16, int8, float16)             \
     CUDA_HOST_BINARY(name, float16, int16, float32)            \
     CUDA_HOST_BINARY(name, float16, int32, float64)            \
+    CUDA_HOST_BINARY(name, float16, bfloat16, float32)         \
     CUDA_HOST_BINARY(name, float16, float16, float16)          \
     CUDA_HOST_BINARY(name, float16, float32, float32)          \
     CUDA_HOST_BINARY(name, float16, float64, float64)          \
@@ -564,6 +620,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float32, int8, float32)             \
     CUDA_HOST_BINARY(name, float32, int16, float32)            \
     CUDA_HOST_BINARY(name, float32, int32, float64)            \
+    CUDA_HOST_BINARY(name, float32, bfloat16, float32)         \
     CUDA_HOST_BINARY(name, float32, float16, float32)          \
     CUDA_HOST_BINARY(name, float32, float32, float32)          \
     CUDA_HOST_BINARY(name, float32, float64, float64)          \
@@ -577,6 +634,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float64, int8, float64)             \
     CUDA_HOST_BINARY(name, float64, int16, float64)            \
     CUDA_HOST_BINARY(name, float64, int32, float64)            \
+    CUDA_HOST_BINARY(name, float64, bfloat16, float64)         \
     CUDA_HOST_BINARY(name, float64, float16, float64)          \
     CUDA_HOST_BINARY(name, float64, float32, float64)          \
     CUDA_HOST_BINARY(name, float64, float64, float64)          \
@@ -590,6 +648,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOIMPL(name, complex32, int8, complex32)         \
     CUDA_HOST_NOIMPL(name, complex32, int16, complex64)        \
     CUDA_HOST_NOIMPL(name, complex32, int32, complex128)       \
+    CUDA_HOST_NOIMPL(name, complex32, bfloat16, complex64)     \
     CUDA_HOST_NOIMPL(name, complex32, float16, complex32)      \
     CUDA_HOST_NOIMPL(name, complex32, float32, complex64)      \
     CUDA_HOST_NOIMPL(name, complex32, float64, complex128)     \
@@ -603,6 +662,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, complex64, int8, complex64)         \
     CUDA_HOST_BINARY(name, complex64, int16, complex64)        \
     CUDA_HOST_BINARY(name, complex64, int32, complex128)       \
+    CUDA_HOST_BINARY(name, complex64, bfloat16, complex64)     \
     CUDA_HOST_BINARY(name, complex64, float16, complex64)      \
     CUDA_HOST_BINARY(name, complex64, float32, complex64)      \
     CUDA_HOST_BINARY(name, complex64, float64, complex128)     \
@@ -616,6 +676,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, complex128, int8, complex128)       \
     CUDA_HOST_BINARY(name, complex128, int16, complex128)      \
     CUDA_HOST_BINARY(name, complex128, int32, complex128)      \
+    CUDA_HOST_BINARY(name, complex128, bfloat16, complex128)   \
     CUDA_HOST_BINARY(name, complex128, float16, complex128)    \
     CUDA_HOST_BINARY(name, complex128, float32, complex128)    \
     CUDA_HOST_BINARY(name, complex128, float64, complex128)    \
@@ -632,6 +693,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint8, int16, int16)                \
     CUDA_HOST_BINARY(name, uint8, int32, int32)                \
     CUDA_HOST_BINARY(name, uint8, int64, int64)                \
+    CUDA_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CUDA_HOST_NOIMPL(name, uint8, float16, float16)            \
     CUDA_HOST_BINARY(name, uint8, float32, float32)            \
     CUDA_HOST_BINARY(name, uint8, float64, float64)            \
@@ -647,6 +709,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint16, int16, int32)               \
     CUDA_HOST_BINARY(name, uint16, int32, int32)               \
     CUDA_HOST_BINARY(name, uint16, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CUDA_HOST_BINARY(name, uint16, float16, float32)           \
     CUDA_HOST_BINARY(name, uint16, float32, float32)           \
     CUDA_HOST_BINARY(name, uint16, float64, float64)           \
@@ -662,6 +725,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint32, int16, int64)               \
     CUDA_HOST_BINARY(name, uint32, int32, int64)               \
     CUDA_HOST_BINARY(name, uint32, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CUDA_HOST_BINARY(name, uint32, float16, float64)           \
     CUDA_HOST_BINARY(name, uint32, float32, float64)           \
     CUDA_HOST_BINARY(name, uint32, float64, float64)           \
@@ -681,6 +745,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int8, int16, int16)                 \
     CUDA_HOST_BINARY(name, int8, int32, int32)                 \
     CUDA_HOST_BINARY(name, int8, int64, int64)                 \
+    CUDA_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CUDA_HOST_NOIMPL(name, int8, float16, float16)             \
     CUDA_HOST_BINARY(name, int8, float32, float32)             \
     CUDA_HOST_BINARY(name, int8, float64, float64)             \
@@ -695,6 +760,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int16, int16, int16)                \
     CUDA_HOST_BINARY(name, int16, int32, int32)                \
     CUDA_HOST_BINARY(name, int16, int64, int64)                \
+    CUDA_HOST_BINARY(name, int16, bfloat16, float32)           \
     CUDA_HOST_BINARY(name, int16, float16, float32)            \
     CUDA_HOST_BINARY(name, int16, float32, float32)            \
     CUDA_HOST_BINARY(name, int16, float64, float64)            \
@@ -709,6 +775,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int32, int16, int32)                \
     CUDA_HOST_BINARY(name, int32, int32, int32)                \
     CUDA_HOST_BINARY(name, int32, int64, int64)                \
+    CUDA_HOST_BINARY(name, int32, bfloat16, float64)           \
     CUDA_HOST_BINARY(name, int32, float16, float64)            \
     CUDA_HOST_BINARY(name, int32, float32, float64)            \
     CUDA_HOST_BINARY(name, int32, float64, float64)            \
@@ -724,12 +791,27 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int64, int32, int64)                \
     CUDA_HOST_BINARY(name, int64, int64, int64)                \
                                                                \
+    CUDA_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CUDA_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CUDA_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CUDA_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CUDA_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CUDA_HOST_BINARY(name, bfloat16, float16, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CUDA_HOST_NOKERN(name, bfloat16, complex32, complex64)     \
+    CUDA_HOST_NOKERN(name, bfloat16, complex64, complex64)     \
+    CUDA_HOST_NOKERN(name, bfloat16, complex128, complex128)   \
+                                                               \
     CUDA_HOST_NOIMPL(name, float16, uint8, float16)            \
     CUDA_HOST_BINARY(name, float16, uint16, float32)           \
     CUDA_HOST_BINARY(name, float16, uint32, float64)           \
     CUDA_HOST_NOIMPL(name, float16, int8, float16)             \
     CUDA_HOST_BINARY(name, float16, int16, float32)            \
     CUDA_HOST_BINARY(name, float16, int32, float64)            \
+    CUDA_HOST_NOIMPL(name, float16, bfloat16, float32)         \
     CUDA_HOST_NOIMPL(name, float16, float16, float16)          \
     CUDA_HOST_BINARY(name, float16, float32, float32)          \
     CUDA_HOST_BINARY(name, float16, float64, float64)          \
@@ -743,6 +825,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float32, int8, float32)             \
     CUDA_HOST_BINARY(name, float32, int16, float32)            \
     CUDA_HOST_BINARY(name, float32, int32, float64)            \
+    CUDA_HOST_BINARY(name, float32, bfloat16, float32)         \
     CUDA_HOST_BINARY(name, float32, float16, float32)          \
     CUDA_HOST_BINARY(name, float32, float32, float32)          \
     CUDA_HOST_BINARY(name, float32, float64, float64)          \
@@ -756,6 +839,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float64, int8, float64)             \
     CUDA_HOST_BINARY(name, float64, int16, float64)            \
     CUDA_HOST_BINARY(name, float64, int32, float64)            \
+    CUDA_HOST_BINARY(name, float64, bfloat16, float64)         \
     CUDA_HOST_BINARY(name, float64, float16, float64)          \
     CUDA_HOST_BINARY(name, float64, float32, float64)          \
     CUDA_HOST_BINARY(name, float64, float64, float64)          \
@@ -769,6 +853,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOKERN(name, complex32, int8, complex32)         \
     CUDA_HOST_NOKERN(name, complex32, int16, complex64)        \
     CUDA_HOST_NOKERN(name, complex32, int32, complex128)       \
+    CUDA_HOST_NOKERN(name, complex32, bfloat16, complex64)     \
     CUDA_HOST_NOKERN(name, complex32, float16, complex32)      \
     CUDA_HOST_NOKERN(name, complex32, float32, complex64)      \
     CUDA_HOST_NOKERN(name, complex32, float64, complex128)     \
@@ -782,6 +867,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOKERN(name, complex64, int8, complex64)         \
     CUDA_HOST_NOKERN(name, complex64, int16, complex64)        \
     CUDA_HOST_NOKERN(name, complex64, int32, complex128)       \
+    CUDA_HOST_NOKERN(name, complex64, bfloat16, complex64)     \
     CUDA_HOST_NOKERN(name, complex64, float16, complex64)      \
     CUDA_HOST_NOKERN(name, complex64, float32, complex64)      \
     CUDA_HOST_NOKERN(name, complex64, float64, complex128)     \
@@ -795,6 +881,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOKERN(name, complex128, int8, complex128)       \
     CUDA_HOST_NOKERN(name, complex128, int16, complex128)      \
     CUDA_HOST_NOKERN(name, complex128, int32, complex128)      \
+    CUDA_HOST_NOKERN(name, complex128, bfloat16, complex128)   \
     CUDA_HOST_NOKERN(name, complex128, float16, complex128)    \
     CUDA_HOST_NOKERN(name, complex128, float32, complex128)    \
     CUDA_HOST_NOKERN(name, complex128, float64, complex128)    \
@@ -803,7 +890,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOKERN(name, complex128, complex128, complex128)
 
 #define CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(name) \
-    CUDA_HOST_BINARY(name, uint8, uint8, float16)             \
+    CUDA_HOST_BINARY(name, uint8, uint8, float16)              \
     CUDA_HOST_BINARY(name, uint8, uint16, float32)             \
     CUDA_HOST_BINARY(name, uint8, uint32, float64)             \
     CUDA_HOST_NOKERN(name, uint8, uint64, uint64)              \
@@ -811,6 +898,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint8, int16, float32)              \
     CUDA_HOST_BINARY(name, uint8, int32, float64)              \
     CUDA_HOST_NOKERN(name, uint8, int64, int64)                \
+    CUDA_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CUDA_HOST_BINARY(name, uint8, float16, float16)            \
     CUDA_HOST_BINARY(name, uint8, float32, float32)            \
     CUDA_HOST_BINARY(name, uint8, float64, float64)            \
@@ -826,6 +914,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint16, int16, float32)             \
     CUDA_HOST_BINARY(name, uint16, int32, float64)             \
     CUDA_HOST_NOKERN(name, uint16, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CUDA_HOST_BINARY(name, uint16, float16, float32)           \
     CUDA_HOST_BINARY(name, uint16, float32, float32)           \
     CUDA_HOST_BINARY(name, uint16, float64, float64)           \
@@ -841,6 +930,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, uint32, int16, float64)             \
     CUDA_HOST_BINARY(name, uint32, int32, float64)             \
     CUDA_HOST_NOKERN(name, uint32, int64, int64)               \
+    CUDA_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CUDA_HOST_BINARY(name, uint32, float16, float64)           \
     CUDA_HOST_BINARY(name, uint32, float32, float64)           \
     CUDA_HOST_BINARY(name, uint32, float64, float64)           \
@@ -860,6 +950,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int8, int16, float32)               \
     CUDA_HOST_BINARY(name, int8, int32, float64)               \
     CUDA_HOST_NOKERN(name, int8, int64, int64)                 \
+    CUDA_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CUDA_HOST_BINARY(name, int8, float16, float16)             \
     CUDA_HOST_BINARY(name, int8, float32, float32)             \
     CUDA_HOST_BINARY(name, int8, float64, float64)             \
@@ -874,6 +965,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int16, int16, float32)              \
     CUDA_HOST_BINARY(name, int16, int32, float64)              \
     CUDA_HOST_NOKERN(name, int16, int64, int64)                \
+    CUDA_HOST_BINARY(name, int16, bfloat16, float32)           \
     CUDA_HOST_BINARY(name, int16, float16, float32)            \
     CUDA_HOST_BINARY(name, int16, float32, float32)            \
     CUDA_HOST_BINARY(name, int16, float64, float64)            \
@@ -888,6 +980,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, int32, int16, float64)              \
     CUDA_HOST_BINARY(name, int32, int32, float64)              \
     CUDA_HOST_NOKERN(name, int32, int64, int64)                \
+    CUDA_HOST_BINARY(name, int32, bfloat16, float64)           \
     CUDA_HOST_BINARY(name, int32, float16, float64)            \
     CUDA_HOST_BINARY(name, int32, float32, float64)            \
     CUDA_HOST_BINARY(name, int32, float64, float64)            \
@@ -903,12 +996,27 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOKERN(name, int64, int32, int64)                \
     CUDA_HOST_NOKERN(name, int64, int64, int64)                \
                                                                \
+    CUDA_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CUDA_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CUDA_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CUDA_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CUDA_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CUDA_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CUDA_HOST_BINARY(name, bfloat16, float16, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CUDA_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CUDA_HOST_NOIMPL(name, bfloat16, complex32, complex64)     \
+    CUDA_HOST_BINARY(name, bfloat16, complex64, complex64)     \
+    CUDA_HOST_BINARY(name, bfloat16, complex128, complex128)   \
+                                                               \
     CUDA_HOST_BINARY(name, float16, uint8, float16)            \
     CUDA_HOST_BINARY(name, float16, uint16, float32)           \
     CUDA_HOST_BINARY(name, float16, uint32, float64)           \
     CUDA_HOST_BINARY(name, float16, int8, float16)             \
     CUDA_HOST_BINARY(name, float16, int16, float32)            \
     CUDA_HOST_BINARY(name, float16, int32, float64)            \
+    CUDA_HOST_BINARY(name, float16, bfloat16, float32)         \
     CUDA_HOST_BINARY(name, float16, float16, float16)          \
     CUDA_HOST_BINARY(name, float16, float32, float32)          \
     CUDA_HOST_BINARY(name, float16, float64, float64)          \
@@ -922,6 +1030,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float32, int8, float32)             \
     CUDA_HOST_BINARY(name, float32, int16, float32)            \
     CUDA_HOST_BINARY(name, float32, int32, float64)            \
+    CUDA_HOST_BINARY(name, float32, bfloat16, float32)         \
     CUDA_HOST_BINARY(name, float32, float16, float32)          \
     CUDA_HOST_BINARY(name, float32, float32, float32)          \
     CUDA_HOST_BINARY(name, float32, float64, float64)          \
@@ -935,6 +1044,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, float64, int8, float64)             \
     CUDA_HOST_BINARY(name, float64, int16, float64)            \
     CUDA_HOST_BINARY(name, float64, int32, float64)            \
+    CUDA_HOST_BINARY(name, float64, bfloat16, float64)         \
     CUDA_HOST_BINARY(name, float64, float16, float64)          \
     CUDA_HOST_BINARY(name, float64, float32, float64)          \
     CUDA_HOST_BINARY(name, float64, float64, float64)          \
@@ -948,6 +1058,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_NOIMPL(name, complex32, int8, complex32)         \
     CUDA_HOST_NOIMPL(name, complex32, int16, complex64)        \
     CUDA_HOST_NOIMPL(name, complex32, int32, complex128)       \
+    CUDA_HOST_NOIMPL(name, complex32, bfloat16, complex64)     \
     CUDA_HOST_NOIMPL(name, complex32, float16, complex32)      \
     CUDA_HOST_NOIMPL(name, complex32, float32, complex64)      \
     CUDA_HOST_NOIMPL(name, complex32, float64, complex128)     \
@@ -961,6 +1072,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, complex64, int8, complex64)         \
     CUDA_HOST_BINARY(name, complex64, int16, complex64)        \
     CUDA_HOST_BINARY(name, complex64, int32, complex128)       \
+    CUDA_HOST_BINARY(name, complex64, bfloat16, complex64)     \
     CUDA_HOST_BINARY(name, complex64, float16, complex64)      \
     CUDA_HOST_BINARY(name, complex64, float32, complex64)      \
     CUDA_HOST_BINARY(name, complex64, float64, complex128)     \
@@ -974,6 +1086,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY(name, complex128, int8, complex128)       \
     CUDA_HOST_BINARY(name, complex128, int16, complex128)      \
     CUDA_HOST_BINARY(name, complex128, int32, complex128)      \
+    CUDA_HOST_BINARY(name, complex128, bfloat16, complex128)   \
     CUDA_HOST_BINARY(name, complex128, float16, complex128)    \
     CUDA_HOST_BINARY(name, complex128, float32, complex128)    \
     CUDA_HOST_BINARY(name, complex128, float64, complex128)    \
@@ -990,6 +1103,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint8, int16, int16),                \
     CUDA_HOST_BINARY_INIT(name, uint8, int32, int32),                \
     CUDA_HOST_BINARY_INIT(name, uint8, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, uint8, bfloat16, bfloat16),          \
     CUDA_HOST_BINARY_INIT(name, uint8, float16, float16),            \
     CUDA_HOST_BINARY_INIT(name, uint8, float32, float32),            \
     CUDA_HOST_BINARY_INIT(name, uint8, float64, float64),            \
@@ -1005,6 +1119,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint16, int16, int32),               \
     CUDA_HOST_BINARY_INIT(name, uint16, int32, int32),               \
     CUDA_HOST_BINARY_INIT(name, uint16, int64, int64),               \
+    CUDA_HOST_BINARY_INIT(name, uint16, bfloat16, float32),          \
     CUDA_HOST_BINARY_INIT(name, uint16, float16, float32),           \
     CUDA_HOST_BINARY_INIT(name, uint16, float32, float32),           \
     CUDA_HOST_BINARY_INIT(name, uint16, float64, float64),           \
@@ -1020,6 +1135,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint32, int16, int64),               \
     CUDA_HOST_BINARY_INIT(name, uint32, int32, int64),               \
     CUDA_HOST_BINARY_INIT(name, uint32, int64, int64),               \
+    CUDA_HOST_BINARY_INIT(name, uint32, bfloat16, float64),          \
     CUDA_HOST_BINARY_INIT(name, uint32, float16, float64),           \
     CUDA_HOST_BINARY_INIT(name, uint32, float32, float64),           \
     CUDA_HOST_BINARY_INIT(name, uint32, float64, float64),           \
@@ -1039,6 +1155,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int8, int16, int16),                 \
     CUDA_HOST_BINARY_INIT(name, int8, int32, int32),                 \
     CUDA_HOST_BINARY_INIT(name, int8, int64, int64),                 \
+    CUDA_HOST_BINARY_INIT(name, int8, bfloat16, bfloat16),           \
     CUDA_HOST_BINARY_INIT(name, int8, float16, float16),             \
     CUDA_HOST_BINARY_INIT(name, int8, float32, float32),             \
     CUDA_HOST_BINARY_INIT(name, int8, float64, float64),             \
@@ -1053,6 +1170,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int16, int16, int16),                \
     CUDA_HOST_BINARY_INIT(name, int16, int32, int32),                \
     CUDA_HOST_BINARY_INIT(name, int16, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, int16, bfloat16, float32),           \
     CUDA_HOST_BINARY_INIT(name, int16, float16, float32),            \
     CUDA_HOST_BINARY_INIT(name, int16, float32, float32),            \
     CUDA_HOST_BINARY_INIT(name, int16, float64, float64),            \
@@ -1067,6 +1185,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int32, int16, int32),                \
     CUDA_HOST_BINARY_INIT(name, int32, int32, int32),                \
     CUDA_HOST_BINARY_INIT(name, int32, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, int32, bfloat16, float64),           \
     CUDA_HOST_BINARY_INIT(name, int32, float16, float64),            \
     CUDA_HOST_BINARY_INIT(name, int32, float32, float64),            \
     CUDA_HOST_BINARY_INIT(name, int32, float64, float64),            \
@@ -1082,12 +1201,27 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int64, int32, int64),                \
     CUDA_HOST_BINARY_INIT(name, int64, int64, int64),                \
                                                                      \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint8, bfloat16),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint16, float32),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint32, float64),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int8, bfloat16),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int16, float32),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int32, float64),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, bfloat16, bfloat16),       \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float16, float32),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float32, float32),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float64, float64),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex32, complex64),     \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex64, complex64),     \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex128, complex128),   \
+                                                                     \
     CUDA_HOST_BINARY_INIT(name, float16, uint8, float16),            \
     CUDA_HOST_BINARY_INIT(name, float16, uint16, float32),           \
     CUDA_HOST_BINARY_INIT(name, float16, uint32, float64),           \
     CUDA_HOST_BINARY_INIT(name, float16, int8, float16),             \
     CUDA_HOST_BINARY_INIT(name, float16, int16, float32),            \
     CUDA_HOST_BINARY_INIT(name, float16, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float16, bfloat16, float32),         \
     CUDA_HOST_BINARY_INIT(name, float16, float16, float16),          \
     CUDA_HOST_BINARY_INIT(name, float16, float32, float32),          \
     CUDA_HOST_BINARY_INIT(name, float16, float64, float64),          \
@@ -1101,6 +1235,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, float32, int8, float32),             \
     CUDA_HOST_BINARY_INIT(name, float32, int16, float32),            \
     CUDA_HOST_BINARY_INIT(name, float32, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float32, bfloat16, float32),         \
     CUDA_HOST_BINARY_INIT(name, float32, float16, float32),          \
     CUDA_HOST_BINARY_INIT(name, float32, float32, float32),          \
     CUDA_HOST_BINARY_INIT(name, float32, float64, float64),          \
@@ -1114,6 +1249,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, float64, int8, float64),             \
     CUDA_HOST_BINARY_INIT(name, float64, int16, float64),            \
     CUDA_HOST_BINARY_INIT(name, float64, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float64, bfloat16, float64),         \
     CUDA_HOST_BINARY_INIT(name, float64, float16, float64),          \
     CUDA_HOST_BINARY_INIT(name, float64, float32, float64),          \
     CUDA_HOST_BINARY_INIT(name, float64, float64, float64),          \
@@ -1127,6 +1263,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex32, int8, complex32),         \
     CUDA_HOST_BINARY_INIT(name, complex32, int16, complex64),        \
     CUDA_HOST_BINARY_INIT(name, complex32, int32, complex128),       \
+    CUDA_HOST_BINARY_INIT(name, complex32, bfloat16, complex64),     \
     CUDA_HOST_BINARY_INIT(name, complex32, float16, complex32),      \
     CUDA_HOST_BINARY_INIT(name, complex32, float32, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex32, float64, complex128),     \
@@ -1140,6 +1277,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex64, int8, complex64),         \
     CUDA_HOST_BINARY_INIT(name, complex64, int16, complex64),        \
     CUDA_HOST_BINARY_INIT(name, complex64, int32, complex128),       \
+    CUDA_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),     \
     CUDA_HOST_BINARY_INIT(name, complex64, float16, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float32, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float64, complex128),     \
@@ -1153,6 +1291,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex128, int8, complex128),       \
     CUDA_HOST_BINARY_INIT(name, complex128, int16, complex128),      \
     CUDA_HOST_BINARY_INIT(name, complex128, int32, complex128),      \
+    CUDA_HOST_BINARY_INIT(name, complex128, bfloat16, complex128),   \
     CUDA_HOST_BINARY_INIT(name, complex128, float16, complex128),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float32, complex128),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float64, complex128),    \
@@ -1169,6 +1308,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint8, int16, float32),              \
     CUDA_HOST_BINARY_INIT(name, uint8, int32, float64),              \
     CUDA_HOST_BINARY_INIT(name, uint8, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, uint8, bfloat16, bfloat16),          \
     CUDA_HOST_BINARY_INIT(name, uint8, float16, float16),            \
     CUDA_HOST_BINARY_INIT(name, uint8, float32, float32),            \
     CUDA_HOST_BINARY_INIT(name, uint8, float64, float64),            \
@@ -1184,6 +1324,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint16, int16, float32),             \
     CUDA_HOST_BINARY_INIT(name, uint16, int32, float64),             \
     CUDA_HOST_BINARY_INIT(name, uint16, int64, int64),               \
+    CUDA_HOST_BINARY_INIT(name, uint16, bfloat16, float32),          \
     CUDA_HOST_BINARY_INIT(name, uint16, float16, float32),           \
     CUDA_HOST_BINARY_INIT(name, uint16, float32, float32),           \
     CUDA_HOST_BINARY_INIT(name, uint16, float64, float64),           \
@@ -1199,6 +1340,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, uint32, int16, float64),             \
     CUDA_HOST_BINARY_INIT(name, uint32, int32, float64),             \
     CUDA_HOST_BINARY_INIT(name, uint32, int64, int64),               \
+    CUDA_HOST_BINARY_INIT(name, uint32, bfloat16, float64),          \
     CUDA_HOST_BINARY_INIT(name, uint32, float16, float64),           \
     CUDA_HOST_BINARY_INIT(name, uint32, float32, float64),           \
     CUDA_HOST_BINARY_INIT(name, uint32, float64, float64),           \
@@ -1218,6 +1360,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int8, int16, float32),               \
     CUDA_HOST_BINARY_INIT(name, int8, int32, float64),               \
     CUDA_HOST_BINARY_INIT(name, int8, int64, int64),                 \
+    CUDA_HOST_BINARY_INIT(name, int8, bfloat16, bfloat16),           \
     CUDA_HOST_BINARY_INIT(name, int8, float16, float16),             \
     CUDA_HOST_BINARY_INIT(name, int8, float32, float32),             \
     CUDA_HOST_BINARY_INIT(name, int8, float64, float64),             \
@@ -1232,6 +1375,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int16, int16, float32),              \
     CUDA_HOST_BINARY_INIT(name, int16, int32, float64),              \
     CUDA_HOST_BINARY_INIT(name, int16, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, int16, bfloat16, float32),           \
     CUDA_HOST_BINARY_INIT(name, int16, float16, float32),            \
     CUDA_HOST_BINARY_INIT(name, int16, float32, float32),            \
     CUDA_HOST_BINARY_INIT(name, int16, float64, float64),            \
@@ -1246,6 +1390,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int32, int16, float64),              \
     CUDA_HOST_BINARY_INIT(name, int32, int32, float64),              \
     CUDA_HOST_BINARY_INIT(name, int32, int64, int64),                \
+    CUDA_HOST_BINARY_INIT(name, int32, bfloat16, float64),           \
     CUDA_HOST_BINARY_INIT(name, int32, float16, float64),            \
     CUDA_HOST_BINARY_INIT(name, int32, float32, float64),            \
     CUDA_HOST_BINARY_INIT(name, int32, float64, float64),            \
@@ -1261,12 +1406,27 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, int64, int32, int64),                \
     CUDA_HOST_BINARY_INIT(name, int64, int64, int64),                \
                                                                      \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint8, bfloat16),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint16, float32),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint32, float64),          \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int8, bfloat16),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int16, float32),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int32, float64),           \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, bfloat16, bfloat16),       \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float16, float32),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float32, float32),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float64, float64),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex32, complex64),     \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex64, complex64),     \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex128, complex128),   \
+                                                                     \
     CUDA_HOST_BINARY_INIT(name, float16, uint8, float16),            \
     CUDA_HOST_BINARY_INIT(name, float16, uint16, float32),           \
     CUDA_HOST_BINARY_INIT(name, float16, uint32, float64),           \
     CUDA_HOST_BINARY_INIT(name, float16, int8, float16),             \
     CUDA_HOST_BINARY_INIT(name, float16, int16, float32),            \
     CUDA_HOST_BINARY_INIT(name, float16, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float16, bfloat16, float32),         \
     CUDA_HOST_BINARY_INIT(name, float16, float16, float16),          \
     CUDA_HOST_BINARY_INIT(name, float16, float32, float32),          \
     CUDA_HOST_BINARY_INIT(name, float16, float64, float64),          \
@@ -1280,6 +1440,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, float32, int8, float32),             \
     CUDA_HOST_BINARY_INIT(name, float32, int16, float32),            \
     CUDA_HOST_BINARY_INIT(name, float32, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float32, bfloat16, float32),         \
     CUDA_HOST_BINARY_INIT(name, float32, float16, float32),          \
     CUDA_HOST_BINARY_INIT(name, float32, float32, float32),          \
     CUDA_HOST_BINARY_INIT(name, float32, float64, float64),          \
@@ -1293,6 +1454,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, float64, int8, float64),             \
     CUDA_HOST_BINARY_INIT(name, float64, int16, float64),            \
     CUDA_HOST_BINARY_INIT(name, float64, int32, float64),            \
+    CUDA_HOST_BINARY_INIT(name, float64, bfloat16, float64),         \
     CUDA_HOST_BINARY_INIT(name, float64, float16, float64),          \
     CUDA_HOST_BINARY_INIT(name, float64, float32, float64),          \
     CUDA_HOST_BINARY_INIT(name, float64, float64, float64),          \
@@ -1306,6 +1468,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex32, int8, complex32),         \
     CUDA_HOST_BINARY_INIT(name, complex32, int16, complex64),        \
     CUDA_HOST_BINARY_INIT(name, complex32, int32, complex128),       \
+    CUDA_HOST_BINARY_INIT(name, complex32, bfloat16, complex64),     \
     CUDA_HOST_BINARY_INIT(name, complex32, float16, complex32),      \
     CUDA_HOST_BINARY_INIT(name, complex32, float32, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex32, float64, complex128),     \
@@ -1319,6 +1482,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex64, int8, complex64),         \
     CUDA_HOST_BINARY_INIT(name, complex64, int16, complex64),        \
     CUDA_HOST_BINARY_INIT(name, complex64, int32, complex128),       \
+    CUDA_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float16, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float32, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float64, complex128),     \
@@ -1332,6 +1496,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex128, int8, complex128),       \
     CUDA_HOST_BINARY_INIT(name, complex128, int16, complex128),      \
     CUDA_HOST_BINARY_INIT(name, complex128, int32, complex128),      \
+    CUDA_HOST_BINARY_INIT(name, complex128, bfloat16, complex128),   \
     CUDA_HOST_BINARY_INIT(name, complex128, float16, complex128),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float32, complex128),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float64, complex128),    \
@@ -1372,6 +1537,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, uint8, int16, bool)           \
     CUDA_HOST_BINARY(name, uint8, int32, bool)           \
     CUDA_HOST_BINARY(name, uint8, int64, bool)           \
+    CUDA_HOST_BINARY(name, uint8, bfloat16, bool)        \
     CUDA_HOST_BINARY(name, uint8, float16, bool)         \
     CUDA_HOST_BINARY(name, uint8, float32, bool)         \
     CUDA_HOST_BINARY(name, uint8, float64, bool)         \
@@ -1387,6 +1553,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, uint16, int16, bool)          \
     CUDA_HOST_BINARY(name, uint16, int32, bool)          \
     CUDA_HOST_BINARY(name, uint16, int64, bool)          \
+    CUDA_HOST_BINARY(name, uint16, bfloat16, bool)       \
     CUDA_HOST_BINARY(name, uint16, float16, bool)        \
     CUDA_HOST_BINARY(name, uint16, float32, bool)        \
     CUDA_HOST_BINARY(name, uint16, float64, bool)        \
@@ -1402,6 +1569,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, uint32, int16, bool)          \
     CUDA_HOST_BINARY(name, uint32, int32, bool)          \
     CUDA_HOST_BINARY(name, uint32, int64, bool)          \
+    CUDA_HOST_BINARY(name, uint32, bfloat16, bool)       \
     CUDA_HOST_BINARY(name, uint32, float16, bool)        \
     CUDA_HOST_BINARY(name, uint32, float32, bool)        \
     CUDA_HOST_BINARY(name, uint32, float64, bool)        \
@@ -1421,6 +1589,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, int8, int16, bool)            \
     CUDA_HOST_BINARY(name, int8, int32, bool)            \
     CUDA_HOST_BINARY(name, int8, int64, bool)            \
+    CUDA_HOST_BINARY(name, int8, bfloat16, bool)         \
     CUDA_HOST_BINARY(name, int8, float16, bool)          \
     CUDA_HOST_BINARY(name, int8, float32, bool)          \
     CUDA_HOST_BINARY(name, int8, float64, bool)          \
@@ -1435,6 +1604,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, int16, int16, bool)           \
     CUDA_HOST_BINARY(name, int16, int32, bool)           \
     CUDA_HOST_BINARY(name, int16, int64, bool)           \
+    CUDA_HOST_BINARY(name, int16, bfloat16, bool)        \
     CUDA_HOST_BINARY(name, int16, float16, bool)         \
     CUDA_HOST_BINARY(name, int16, float32, bool)         \
     CUDA_HOST_BINARY(name, int16, float64, bool)         \
@@ -1449,6 +1619,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, int32, int16, bool)           \
     CUDA_HOST_BINARY(name, int32, int32, bool)           \
     CUDA_HOST_BINARY(name, int32, int64, bool)           \
+    CUDA_HOST_BINARY(name, int32, bfloat16, bool)        \
     CUDA_HOST_BINARY(name, int32, float16, bool)         \
     CUDA_HOST_BINARY(name, int32, float32, bool)         \
     CUDA_HOST_BINARY(name, int32, float64, bool)         \
@@ -1464,12 +1635,27 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, int64, int32, bool)           \
     CUDA_HOST_BINARY(name, int64, int64, bool)           \
                                                          \
+    CUDA_HOST_BINARY(name, bfloat16, uint8, bool)        \
+    CUDA_HOST_BINARY(name, bfloat16, uint16, bool)       \
+    CUDA_HOST_BINARY(name, bfloat16, uint32, bool)       \
+    CUDA_HOST_BINARY(name, bfloat16, int8, bool)         \
+    CUDA_HOST_BINARY(name, bfloat16, int16, bool)        \
+    CUDA_HOST_BINARY(name, bfloat16, int32, bool)        \
+    CUDA_HOST_BINARY(name, bfloat16, bfloat16, bool)     \
+    CUDA_HOST_BINARY(name, bfloat16, float16, bool)      \
+    CUDA_HOST_BINARY(name, bfloat16, float32, bool)      \
+    CUDA_HOST_BINARY(name, bfloat16, float64, bool)      \
+    CUDA_HOST_NOIMPL(name, bfloat16, complex32, bool)    \
+    CUDA_HOST_BINARY(name, bfloat16, complex64, bool)    \
+    CUDA_HOST_BINARY(name, bfloat16, complex128, bool)   \
+                                                         \
     CUDA_HOST_BINARY(name, float16, uint8, bool)         \
     CUDA_HOST_BINARY(name, float16, uint16, bool)        \
     CUDA_HOST_BINARY(name, float16, uint32, bool)        \
     CUDA_HOST_BINARY(name, float16, int8, bool)          \
     CUDA_HOST_BINARY(name, float16, int16, bool)         \
     CUDA_HOST_BINARY(name, float16, int32, bool)         \
+    CUDA_HOST_BINARY(name, float16, bfloat16, bool)      \
     CUDA_HOST_BINARY(name, float16, float16, bool)       \
     CUDA_HOST_BINARY(name, float16, float32, bool)       \
     CUDA_HOST_BINARY(name, float16, float64, bool)       \
@@ -1483,6 +1669,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, float32, int8, bool)          \
     CUDA_HOST_BINARY(name, float32, int16, bool)         \
     CUDA_HOST_BINARY(name, float32, int32, bool)         \
+    CUDA_HOST_BINARY(name, float32, bfloat16, bool)      \
     CUDA_HOST_BINARY(name, float32, float16, bool)       \
     CUDA_HOST_BINARY(name, float32, float32, bool)       \
     CUDA_HOST_BINARY(name, float32, float64, bool)       \
@@ -1496,6 +1683,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, float64, int8, bool)          \
     CUDA_HOST_BINARY(name, float64, int16, bool)         \
     CUDA_HOST_BINARY(name, float64, int32, bool)         \
+    CUDA_HOST_BINARY(name, float64, bfloat16, bool)      \
     CUDA_HOST_BINARY(name, float64, float16, bool)       \
     CUDA_HOST_BINARY(name, float64, float32, bool)       \
     CUDA_HOST_BINARY(name, float64, float64, bool)       \
@@ -1509,6 +1697,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_NOIMPL(name, complex32, int8, bool)        \
     CUDA_HOST_NOIMPL(name, complex32, int16, bool)       \
     CUDA_HOST_NOIMPL(name, complex32, int32, bool)       \
+    CUDA_HOST_NOIMPL(name, complex32, bfloat16, bool)    \
     CUDA_HOST_NOIMPL(name, complex32, float16, bool)     \
     CUDA_HOST_NOIMPL(name, complex32, float32, bool)     \
     CUDA_HOST_NOIMPL(name, complex32, float64, bool)     \
@@ -1522,6 +1711,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, complex64, int8, bool)        \
     CUDA_HOST_BINARY(name, complex64, int16, bool)       \
     CUDA_HOST_BINARY(name, complex64, int32, bool)       \
+    CUDA_HOST_BINARY(name, complex64, bfloat16, bool)    \
     CUDA_HOST_BINARY(name, complex64, float16, bool)     \
     CUDA_HOST_BINARY(name, complex64, float32, bool)     \
     CUDA_HOST_BINARY(name, complex64, float64, bool)     \
@@ -1535,6 +1725,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY(name, complex128, int8, bool)       \
     CUDA_HOST_BINARY(name, complex128, int16, bool)      \
     CUDA_HOST_BINARY(name, complex128, int32, bool)      \
+    CUDA_HOST_BINARY(name, complex128, bfloat16, bool)   \
     CUDA_HOST_BINARY(name, complex128, float16, bool)    \
     CUDA_HOST_BINARY(name, complex128, float32, bool)    \
     CUDA_HOST_BINARY(name, complex128, float64, bool)    \
@@ -1551,6 +1742,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, uint8, int16, bool),           \
     CUDA_HOST_BINARY_INIT(name, uint8, int32, bool),           \
     CUDA_HOST_BINARY_INIT(name, uint8, int64, bool),           \
+    CUDA_HOST_BINARY_INIT(name, uint8, bfloat16, bool),        \
     CUDA_HOST_BINARY_INIT(name, uint8, float16, bool),         \
     CUDA_HOST_BINARY_INIT(name, uint8, float32, bool),         \
     CUDA_HOST_BINARY_INIT(name, uint8, float64, bool),         \
@@ -1566,6 +1758,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, uint16, int16, bool),          \
     CUDA_HOST_BINARY_INIT(name, uint16, int32, bool),          \
     CUDA_HOST_BINARY_INIT(name, uint16, int64, bool),          \
+    CUDA_HOST_BINARY_INIT(name, uint16, bfloat16, bool),       \
     CUDA_HOST_BINARY_INIT(name, uint16, float16, bool),        \
     CUDA_HOST_BINARY_INIT(name, uint16, float32, bool),        \
     CUDA_HOST_BINARY_INIT(name, uint16, float64, bool),        \
@@ -1581,6 +1774,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, uint32, int16, bool),          \
     CUDA_HOST_BINARY_INIT(name, uint32, int32, bool),          \
     CUDA_HOST_BINARY_INIT(name, uint32, int64, bool),          \
+    CUDA_HOST_BINARY_INIT(name, uint32, bfloat16, bool),       \
     CUDA_HOST_BINARY_INIT(name, uint32, float16, bool),        \
     CUDA_HOST_BINARY_INIT(name, uint32, float32, bool),        \
     CUDA_HOST_BINARY_INIT(name, uint32, float64, bool),        \
@@ -1600,6 +1794,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, int8, int16, bool),            \
     CUDA_HOST_BINARY_INIT(name, int8, int32, bool),            \
     CUDA_HOST_BINARY_INIT(name, int8, int64, bool),            \
+    CUDA_HOST_BINARY_INIT(name, int8, bfloat16, bool),         \
     CUDA_HOST_BINARY_INIT(name, int8, float16, bool),          \
     CUDA_HOST_BINARY_INIT(name, int8, float32, bool),          \
     CUDA_HOST_BINARY_INIT(name, int8, float64, bool),          \
@@ -1614,6 +1809,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, int16, int16, bool),           \
     CUDA_HOST_BINARY_INIT(name, int16, int32, bool),           \
     CUDA_HOST_BINARY_INIT(name, int16, int64, bool),           \
+    CUDA_HOST_BINARY_INIT(name, int16, bfloat16, bool),        \
     CUDA_HOST_BINARY_INIT(name, int16, float16, bool),         \
     CUDA_HOST_BINARY_INIT(name, int16, float32, bool),         \
     CUDA_HOST_BINARY_INIT(name, int16, float64, bool),         \
@@ -1628,6 +1824,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, int32, int16, bool),           \
     CUDA_HOST_BINARY_INIT(name, int32, int32, bool),           \
     CUDA_HOST_BINARY_INIT(name, int32, int64, bool),           \
+    CUDA_HOST_BINARY_INIT(name, int32, bfloat16, bool),        \
     CUDA_HOST_BINARY_INIT(name, int32, float16, bool),         \
     CUDA_HOST_BINARY_INIT(name, int32, float32, bool),         \
     CUDA_HOST_BINARY_INIT(name, int32, float64, bool),         \
@@ -1643,12 +1840,27 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, int64, int32, bool),           \
     CUDA_HOST_BINARY_INIT(name, int64, int64, bool),           \
                                                                \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint8, bool),        \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint16, bool),       \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, uint32, bool),       \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int8, bool),         \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int16, bool),        \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, int32, bool),        \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, bfloat16, bool),     \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float16, bool),      \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float32, bool),      \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, float64, bool),      \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex32, bool),    \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex64, bool),    \
+    CUDA_HOST_BINARY_INIT(name, bfloat16, complex128, bool),   \
+                                                               \
     CUDA_HOST_BINARY_INIT(name, float16, uint8, bool),         \
     CUDA_HOST_BINARY_INIT(name, float16, uint16, bool),        \
     CUDA_HOST_BINARY_INIT(name, float16, uint32, bool),        \
     CUDA_HOST_BINARY_INIT(name, float16, int8, bool),          \
     CUDA_HOST_BINARY_INIT(name, float16, int16, bool),         \
     CUDA_HOST_BINARY_INIT(name, float16, int32, bool),         \
+    CUDA_HOST_BINARY_INIT(name, float16, bfloat16, bool),      \
     CUDA_HOST_BINARY_INIT(name, float16, float16, bool),       \
     CUDA_HOST_BINARY_INIT(name, float16, float32, bool),       \
     CUDA_HOST_BINARY_INIT(name, float16, float64, bool),       \
@@ -1662,6 +1874,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, float32, int8, bool),          \
     CUDA_HOST_BINARY_INIT(name, float32, int16, bool),         \
     CUDA_HOST_BINARY_INIT(name, float32, int32, bool),         \
+    CUDA_HOST_BINARY_INIT(name, float32, bfloat16, bool),      \
     CUDA_HOST_BINARY_INIT(name, float32, float16, bool),       \
     CUDA_HOST_BINARY_INIT(name, float32, float32, bool),       \
     CUDA_HOST_BINARY_INIT(name, float32, float64, bool),       \
@@ -1675,6 +1888,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, float64, int8, bool),          \
     CUDA_HOST_BINARY_INIT(name, float64, int16, bool),         \
     CUDA_HOST_BINARY_INIT(name, float64, int32, bool),         \
+    CUDA_HOST_BINARY_INIT(name, float64, bfloat16, bool),      \
     CUDA_HOST_BINARY_INIT(name, float64, float16, bool),       \
     CUDA_HOST_BINARY_INIT(name, float64, float32, bool),       \
     CUDA_HOST_BINARY_INIT(name, float64, float64, bool),       \
@@ -1688,6 +1902,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, complex32, int8, bool),        \
     CUDA_HOST_BINARY_INIT(name, complex32, int16, bool),       \
     CUDA_HOST_BINARY_INIT(name, complex32, int32, bool),       \
+    CUDA_HOST_BINARY_INIT(name, complex32, bfloat16, bool),    \
     CUDA_HOST_BINARY_INIT(name, complex32, float16, bool),     \
     CUDA_HOST_BINARY_INIT(name, complex32, float32, bool),     \
     CUDA_HOST_BINARY_INIT(name, complex32, float64, bool),     \
@@ -1701,6 +1916,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, complex64, int8, bool),        \
     CUDA_HOST_BINARY_INIT(name, complex64, int16, bool),       \
     CUDA_HOST_BINARY_INIT(name, complex64, int32, bool),       \
+    CUDA_HOST_BINARY_INIT(name, complex64, bfloat16, bool),    \
     CUDA_HOST_BINARY_INIT(name, complex64, float16, bool),     \
     CUDA_HOST_BINARY_INIT(name, complex64, float32, bool),     \
     CUDA_HOST_BINARY_INIT(name, complex64, float64, bool),     \
@@ -1714,6 +1930,7 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, complex128, int8, bool),       \
     CUDA_HOST_BINARY_INIT(name, complex128, int16, bool),      \
     CUDA_HOST_BINARY_INIT(name, complex128, int32, bool),      \
+    CUDA_HOST_BINARY_INIT(name, complex128, bfloat16, bool),   \
     CUDA_HOST_BINARY_INIT(name, complex128, float16, bool),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float32, bool),    \
     CUDA_HOST_BINARY_INIT(name, complex128, float64, bool),    \
@@ -1784,27 +2001,29 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *c
     .C = NULL }
 
 #define CUDA_HOST_ALL_BINARY_MV(name) \
-    CUDA_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)         \
-    CUDA_HOST_BINARY_MV(name, uint16, uint16, uint16, uint16)     \
-    CUDA_HOST_BINARY_MV(name, uint32, uint32, uint32, uint32)     \
-    CUDA_HOST_BINARY_MV(name, uint64, uint64, uint64, uint64)     \
-    CUDA_HOST_BINARY_MV(name, int8, int8, int8, int8)             \
-    CUDA_HOST_BINARY_MV(name, int16, int16, int16, int16)         \
-    CUDA_HOST_BINARY_MV(name, int32, int32, int32, int32)         \
-    CUDA_HOST_BINARY_MV(name, int64, int64, int64, int64)         \
-    CUDA_HOST_BINARY_MV(name, float32, float32, float32, float32) \
+    CUDA_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)             \
+    CUDA_HOST_BINARY_MV(name, uint16, uint16, uint16, uint16)         \
+    CUDA_HOST_BINARY_MV(name, uint32, uint32, uint32, uint32)         \
+    CUDA_HOST_BINARY_MV(name, uint64, uint64, uint64, uint64)         \
+    CUDA_HOST_BINARY_MV(name, int8, int8, int8, int8)                 \
+    CUDA_HOST_BINARY_MV(name, int16, int16, int16, int16)             \
+    CUDA_HOST_BINARY_MV(name, int32, int32, int32, int32)             \
+    CUDA_HOST_BINARY_MV(name, int64, int64, int64, int64)             \
+    CUDA_HOST_BINARY_MV(name, bfloat16, bfloat16, bfloat16, bfloat16) \
+    CUDA_HOST_BINARY_MV(name, float32, float32, float32, float32)     \
     CUDA_HOST_BINARY_MV(name, float64, float64, float64, float64)
 
 #define CUDA_HOST_ALL_BINARY_MV_INIT(name) \
-    CUDA_HOST_BINARY_MV_INIT(name, uint8, uint8, uint8, uint8),         \
-    CUDA_HOST_BINARY_MV_INIT(name, uint16, uint16, uint16, uint16),     \
-    CUDA_HOST_BINARY_MV_INIT(name, uint32, uint32, uint32, uint32),     \
-    CUDA_HOST_BINARY_MV_INIT(name, uint64, uint64, uint64, uint64),     \
-    CUDA_HOST_BINARY_MV_INIT(name, int8, int8, int8, int8),             \
-    CUDA_HOST_BINARY_MV_INIT(name, int16, int16, int16, int16),         \
-    CUDA_HOST_BINARY_MV_INIT(name, int32, int32, int32, int32),         \
-    CUDA_HOST_BINARY_MV_INIT(name, int64, int64, int64, int64),         \
-    CUDA_HOST_BINARY_MV_INIT(name, float32, float32, float32, float32), \
+    CUDA_HOST_BINARY_MV_INIT(name, uint8, uint8, uint8, uint8),             \
+    CUDA_HOST_BINARY_MV_INIT(name, uint16, uint16, uint16, uint16),         \
+    CUDA_HOST_BINARY_MV_INIT(name, uint32, uint32, uint32, uint32),         \
+    CUDA_HOST_BINARY_MV_INIT(name, uint64, uint64, uint64, uint64),         \
+    CUDA_HOST_BINARY_MV_INIT(name, int8, int8, int8, int8),                 \
+    CUDA_HOST_BINARY_MV_INIT(name, int16, int16, int16, int16),             \
+    CUDA_HOST_BINARY_MV_INIT(name, int32, int32, int32, int32),             \
+    CUDA_HOST_BINARY_MV_INIT(name, int64, int64, int64, int64),             \
+    CUDA_HOST_BINARY_MV_INIT(name, bfloat16, bfloat16, bfloat16, bfloat16), \
+    CUDA_HOST_BINARY_MV_INIT(name, float32, float32, float32, float32),     \
     CUDA_HOST_BINARY_MV_INIT(name, float64, float64, float64, float64)
 
 CUDA_HOST_ALL_BINARY_MV(divmod)
