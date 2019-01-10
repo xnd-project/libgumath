@@ -1482,7 +1482,7 @@ gm_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
     CUDA_HOST_BINARY_INIT(name, complex64, int8, complex64),         \
     CUDA_HOST_BINARY_INIT(name, complex64, int16, complex64),        \
     CUDA_HOST_BINARY_INIT(name, complex64, int32, complex128),       \
-    CUDA_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),      \
+    CUDA_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),     \
     CUDA_HOST_BINARY_INIT(name, complex64, float16, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float32, complex64),      \
     CUDA_HOST_BINARY_INIT(name, complex64, float64, complex128),     \

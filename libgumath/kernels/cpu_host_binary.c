@@ -68,13 +68,14 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         case Int32: return 48;
         case Int64: return 56;
 
-        case Float16: return 64;
-        case Float32: return 72;
-        case Float64: return 80;
+        case BFloat16: return 64;
+        case Float16: return 72;
+        case Float32: return 80;
+        case Float64: return 88;
 
-        case Complex32: return 88;
-        case Complex64: return 96;
-        case Complex128: return 104;
+        case Complex32: return 96;
+        case Complex64: return 104;
+        case Complex128: return 112;
 
         default: goto invalid_combination;
         }
@@ -82,23 +83,24 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint16: {
         switch (t1->tag) {
-        case Uint8: return 112;
-        case Uint16: return 120;
-        case Uint32: return 128;
-        case Uint64: return 136;
+        case Uint8: return 120;
+        case Uint16: return 128;
+        case Uint32: return 136;
+        case Uint64: return 144;
 
-        case Int8: return 144;
-        case Int16: return 152;
-        case Int32: return 160;
-        case Int64: return 168;
+        case Int8: return 152;
+        case Int16: return 160;
+        case Int32: return 168;
+        case Int64: return 176;
 
-        case Float16: return 176;
-        case Float32: return 184;
-        case Float64: return 192;
+        case BFloat16: return 184;
+        case Float16: return 192;
+        case Float32: return 200;
+        case Float64: return 208;
 
-        case Complex32: return 200;
-        case Complex64: return 208;
-        case Complex128: return 216;
+        case Complex32: return 216;
+        case Complex64: return 224;
+        case Complex128: return 232;
 
         default: goto invalid_combination;
         }
@@ -106,23 +108,24 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint32: {
         switch (t1->tag) {
-        case Uint8: return 224;
-        case Uint16: return 232;
-        case Uint32: return 240;
-        case Uint64: return 248;
+        case Uint8: return 240;
+        case Uint16: return 248;
+        case Uint32: return 256;
+        case Uint64: return 264;
 
-        case Int8: return 256;
-        case Int16: return 264;
-        case Int32: return 272;
-        case Int64: return 280;
+        case Int8: return 272;
+        case Int16: return 280;
+        case Int32: return 288;
+        case Int64: return 296;
 
-        case Float16: return 288;
-        case Float32: return 296;
-        case Float64: return 304;
+        case BFloat16: return 304;
+        case Float16: return 312;
+        case Float32: return 320;
+        case Float64: return 328;
 
-        case Complex32: return 312;
-        case Complex64: return 320;
-        case Complex128: return 328;
+        case Complex32: return 336;
+        case Complex64: return 344;
+        case Complex128: return 352;
 
         default: goto invalid_combination;
         }
@@ -130,10 +133,10 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint64: {
         switch (t1->tag) {
-        case Uint8: return 336;
-        case Uint16: return 344;
-        case Uint32: return 352;
-        case Uint64: return 360;
+        case Uint8: return 360;
+        case Uint16: return 368;
+        case Uint32: return 376;
+        case Uint64: return 384;
 
         default: goto invalid_combination;
         }
@@ -141,22 +144,23 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int8: {
         switch (t1->tag) {
-        case Uint8: return 368;
-        case Uint16: return 376;
-        case Uint32: return 384;
+        case Uint8: return 392;
+        case Uint16: return 400;
+        case Uint32: return 408;
 
-        case Int8: return 392;
-        case Int16: return 400;
-        case Int32: return 408;
-        case Int64: return 416;
+        case Int8: return 416;
+        case Int16: return 424;
+        case Int32: return 432;
+        case Int64: return 440;
 
-        case Float16: return 424;
-        case Float32: return 432;
-        case Float64: return 440;
+        case BFloat16: return 448;
+        case Float16: return 456;
+        case Float32: return 464;
+        case Float64: return 472;
 
-        case Complex32: return 448;
-        case Complex64: return 456;
-        case Complex128: return 464;
+        case Complex32: return 480;
+        case Complex64: return 488;
+        case Complex128: return 496;
 
         default: goto invalid_combination;
         }
@@ -164,22 +168,23 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int16: {
         switch (t1->tag) {
-        case Uint8: return 472;
-        case Uint16: return 480;
-        case Uint32: return 488;
+        case Uint8: return 504;
+        case Uint16: return 512;
+        case Uint32: return 520;
 
-        case Int8: return 496;
-        case Int16: return 504;
-        case Int32: return 512;
-        case Int64: return 520;
+        case Int8: return 528;
+        case Int16: return 536;
+        case Int32: return 544;
+        case Int64: return 552;
 
-        case Float16: return 528;
-        case Float32: return 536;
-        case Float64: return 544;
+        case BFloat16: return 560;
+        case Float16: return 568;
+        case Float32: return 576;
+        case Float64: return 584;
 
-        case Complex32: return 552;
-        case Complex64: return 560;
-        case Complex128: return 568;
+        case Complex32: return 592;
+        case Complex64: return 600;
+        case Complex128: return 608;
 
         default: goto invalid_combination;
         }
@@ -187,22 +192,23 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int32: {
         switch (t1->tag) {
-        case Uint8: return 576;
-        case Uint16: return 584;
-        case Uint32: return 592;
+        case Uint8: return 616;
+        case Uint16: return 624;
+        case Uint32: return 632;
 
-        case Int8: return 600;
-        case Int16: return 608;
-        case Int32: return 616;
-        case Int64: return 624;
+        case Int8: return 640;
+        case Int16: return 648;
+        case Int32: return 656;
+        case Int64: return 664;
 
-        case Float16: return 632;
-        case Float32: return 640;
-        case Float64: return 648;
+        case BFloat16: return 672;
+        case Float16: return 680;
+        case Float32: return 688;
+        case Float64: return 696;
 
-        case Complex32: return 656;
-        case Complex64: return 664;
-        case Complex128: return 672;
+        case Complex32: return 704;
+        case Complex64: return 712;
+        case Complex128: return 720;
 
         default: goto invalid_combination;
         }
@@ -210,14 +216,37 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int64: {
         switch (t1->tag) {
-        case Uint8: return 680;
-        case Uint16: return 688;
-        case Uint32: return 696;
+        case Uint8: return 728;
+        case Uint16: return 736;
+        case Uint32: return 744;
 
-        case Int8: return 704;
-        case Int16: return 712;
-        case Int32: return 720;
-        case Int64: return 728;
+        case Int8: return 752;
+        case Int16: return 760;
+        case Int32: return 768;
+        case Int64: return 776;
+
+        default: goto invalid_combination;
+        }
+    }
+
+    case BFloat16: {
+        switch (t1->tag) {
+        case Uint8: return 784;
+        case Uint16: return 792;
+        case Uint32: return 800;
+
+        case Int8: return 808;
+        case Int16: return 816;
+        case Int32: return 824;
+
+        case BFloat16: return 832;
+        case Float16: return 840;
+        case Float32: return 848;
+        case Float64: return 856;
+
+        case Complex32: return 864;
+        case Complex64: return 872;
+        case Complex128: return 880;
 
         default: goto invalid_combination;
         }
@@ -225,21 +254,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float16: {
         switch (t1->tag) {
-        case Uint8: return 736;
-        case Uint16: return 744;
-        case Uint32: return 752;
+        case Uint8: return 888;
+        case Uint16: return 896;
+        case Uint32: return 904;
 
-        case Int8: return 760;
-        case Int16: return 768;
-        case Int32: return 776;
+        case Int8: return 912;
+        case Int16: return 920;
+        case Int32: return 928;
 
-        case Float16: return 784;
-        case Float32: return 792;
-        case Float64: return 800;
+        case BFloat16: return 936;
+        case Float16: return 944;
+        case Float32: return 952;
+        case Float64: return 960;
 
-        case Complex32: return 808;
-        case Complex64: return 816;
-        case Complex128: return 824;
+        case Complex32: return 968;
+        case Complex64: return 976;
+        case Complex128: return 984;
 
         default: goto invalid_combination;
         }
@@ -247,21 +277,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float32: {
         switch (t1->tag) {
-        case Uint8: return 832;
-        case Uint16: return 840;
-        case Uint32: return 848;
+        case Uint8: return 992;
+        case Uint16: return 1000;
+        case Uint32: return 1008;
 
-        case Int8: return 856;
-        case Int16: return 864;
-        case Int32: return 872;
+        case Int8: return 1016;
+        case Int16: return 1024;
+        case Int32: return 1032;
 
-        case Float16: return 880;
-        case Float32: return 888;
-        case Float64: return 896;
+        case BFloat16: return 1040;
+        case Float16: return 1048;
+        case Float32: return 1056;
+        case Float64: return 1064;
 
-        case Complex32: return 904;
-        case Complex64: return 912;
-        case Complex128: return 920;
+        case Complex32: return 1072;
+        case Complex64: return 1080;
+        case Complex128: return 1088;
 
         default: goto invalid_combination;
         }
@@ -269,21 +300,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float64: {
         switch (t1->tag) {
-        case Uint8: return 928;
-        case Uint16: return 936;
-        case Uint32: return 944;
+        case Uint8: return 1096;
+        case Uint16: return 1104;
+        case Uint32: return 1112;
 
-        case Int8: return 952;
-        case Int16: return 960;
-        case Int32: return 968;
+        case Int8: return 1120;
+        case Int16: return 1128;
+        case Int32: return 1136;
 
-        case Float16: return 976;
-        case Float32: return 984;
-        case Float64: return 992;
+        case BFloat16: return 1144;
+        case Float16: return 1152;
+        case Float32: return 1160;
+        case Float64: return 1168;
 
-        case Complex32: return 1000;
-        case Complex64: return 1008;
-        case Complex128: return 1016;
+        case Complex32: return 1176;
+        case Complex64: return 1184;
+        case Complex128: return 1192;
 
         default: goto invalid_combination;
         }
@@ -291,21 +323,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex32: {
         switch (t1->tag) {
-        case Uint8: return 1024;
-        case Uint16: return 1032;
-        case Uint32: return 1040;
+        case Uint8: return 1200;
+        case Uint16: return 1208;
+        case Uint32: return 1216;
 
-        case Int8: return 1048;
-        case Int16: return 1056;
-        case Int32: return 1064;
+        case Int8: return 1224;
+        case Int16: return 1232;
+        case Int32: return 1240;
 
-        case Float16: return 1072;
-        case Float32: return 1080;
-        case Float64: return 1088;
+        case BFloat16: return 1248;
+        case Float16: return 1256;
+        case Float32: return 1264;
+        case Float64: return 1272;
 
-        case Complex32: return 1096;
-        case Complex64: return 1104;
-        case Complex128: return 1112;
+        case Complex32: return 1280;
+        case Complex64: return 1288;
+        case Complex128: return 1296;
 
         default: goto invalid_combination;
         }
@@ -313,21 +346,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex64: {
         switch (t1->tag) {
-        case Uint8: return 1120;
-        case Uint16: return 1128;
-        case Uint32: return 1136;
+        case Uint8: return 1304;
+        case Uint16: return 1312;
+        case Uint32: return 1320;
 
-        case Int8: return 1144;
-        case Int16: return 1152;
-        case Int32: return 1160;
+        case Int8: return 1328;
+        case Int16: return 1336;
+        case Int32: return 1344;
 
-        case Float16: return 1168;
-        case Float32: return 1176;
-        case Float64: return 1184;
+        case BFloat16: return 1352;
+        case Float16: return 1360;
+        case Float32: return 1368;
+        case Float64: return 1376;
 
-        case Complex32: return 1192;
-        case Complex64: return 1200;
-        case Complex128: return 1208;
+        case Complex32: return 1384;
+        case Complex64: return 1392;
+        case Complex128: return 1400;
 
         default: goto invalid_combination;
         }
@@ -335,21 +369,22 @@ kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex128: {
         switch (t1->tag) {
-        case Uint8: return 1216;
-        case Uint16: return 1224;
-        case Uint32: return 1232;
+        case Uint8: return 1408;
+        case Uint16: return 1416;
+        case Uint32: return 1424;
 
-        case Int8: return 1240;
-        case Int16: return 1248;
-        case Int32: return 1256;
+        case Int8: return 1432;
+        case Int16: return 1440;
+        case Int32: return 1448;
 
-        case Float16: return 1264;
-        case Float32: return 1272;
-        case Float64: return 1280;
+        case BFloat16: return 1456;
+        case Float16: return 1464;
+        case Float32: return 1472;
+        case Float64: return 1480;
 
-        case Complex32: return 1288;
-        case Complex64: return 1296;
-        case Complex128: return 1304;
+        case Complex32: return 1488;
+        case Complex64: return 1496;
+        case Complex128: return 1504;
 
         default: goto invalid_combination;
         }
@@ -503,6 +538,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint8, int16, int16)                \
     CPU_HOST_BINARY(name, uint8, int32, int32)                \
     CPU_HOST_BINARY(name, uint8, int64, int64)                \
+    CPU_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CPU_HOST_NOIMPL(name, uint8, float16, float16)            \
     CPU_HOST_BINARY(name, uint8, float32, float32)            \
     CPU_HOST_BINARY(name, uint8, float64, float64)            \
@@ -518,6 +554,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint16, int16, int32)               \
     CPU_HOST_BINARY(name, uint16, int32, int32)               \
     CPU_HOST_BINARY(name, uint16, int64, int64)               \
+    CPU_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CPU_HOST_NOIMPL(name, uint16, float16, float32)           \
     CPU_HOST_BINARY(name, uint16, float32, float32)           \
     CPU_HOST_BINARY(name, uint16, float64, float64)           \
@@ -533,6 +570,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint32, int16, int64)               \
     CPU_HOST_BINARY(name, uint32, int32, int64)               \
     CPU_HOST_BINARY(name, uint32, int64, int64)               \
+    CPU_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CPU_HOST_NOIMPL(name, uint32, float16, float64)           \
     CPU_HOST_BINARY(name, uint32, float32, float64)           \
     CPU_HOST_BINARY(name, uint32, float64, float64)           \
@@ -552,6 +590,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int8, int16, int16)                 \
     CPU_HOST_BINARY(name, int8, int32, int32)                 \
     CPU_HOST_BINARY(name, int8, int64, int64)                 \
+    CPU_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CPU_HOST_NOIMPL(name, int8, float16, float16)             \
     CPU_HOST_BINARY(name, int8, float32, float32)             \
     CPU_HOST_BINARY(name, int8, float64, float64)             \
@@ -566,6 +605,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int16, int16, int16)                \
     CPU_HOST_BINARY(name, int16, int32, int32)                \
     CPU_HOST_BINARY(name, int16, int64, int64)                \
+    CPU_HOST_BINARY(name, int16, bfloat16, float32)           \
     CPU_HOST_NOIMPL(name, int16, float16, float32)            \
     CPU_HOST_BINARY(name, int16, float32, float32)            \
     CPU_HOST_BINARY(name, int16, float64, float64)            \
@@ -580,6 +620,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int32, int16, int32)                \
     CPU_HOST_BINARY(name, int32, int32, int32)                \
     CPU_HOST_BINARY(name, int32, int64, int64)                \
+    CPU_HOST_BINARY(name, int32, bfloat16, float64)           \
     CPU_HOST_NOIMPL(name, int32, float16, float64)            \
     CPU_HOST_BINARY(name, int32, float32, float64)            \
     CPU_HOST_BINARY(name, int32, float64, float64)            \
@@ -595,12 +636,27 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int64, int32, int64)                \
     CPU_HOST_BINARY(name, int64, int64, int64)                \
                                                               \
+    CPU_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CPU_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CPU_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CPU_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CPU_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CPU_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CPU_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_HOST_NOIMPL(name, bfloat16, float16, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CPU_HOST_NOIMPL(name, bfloat16, complex32, complex64)     \
+    CPU_HOST_BINARY(name, bfloat16, complex64, complex64)     \
+    CPU_HOST_BINARY(name, bfloat16, complex128, complex128)   \
+                                                              \
     CPU_HOST_NOIMPL(name, float16, uint8, float16)            \
     CPU_HOST_NOIMPL(name, float16, uint16, float32)           \
     CPU_HOST_NOIMPL(name, float16, uint32, float64)           \
     CPU_HOST_NOIMPL(name, float16, int8, float16)             \
     CPU_HOST_NOIMPL(name, float16, int16, float32)            \
     CPU_HOST_NOIMPL(name, float16, int32, float64)            \
+    CPU_HOST_NOIMPL(name, float16, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float16, float16, float16)          \
     CPU_HOST_NOIMPL(name, float16, float32, float32)          \
     CPU_HOST_NOIMPL(name, float16, float64, float64)          \
@@ -614,6 +670,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float32, int8, float32)             \
     CPU_HOST_BINARY(name, float32, int16, float32)            \
     CPU_HOST_BINARY(name, float32, int32, float64)            \
+    CPU_HOST_BINARY(name, float32, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float32, float16, float32)          \
     CPU_HOST_BINARY(name, float32, float32, float32)          \
     CPU_HOST_BINARY(name, float32, float64, float64)          \
@@ -627,6 +684,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float64, int8, float64)             \
     CPU_HOST_BINARY(name, float64, int16, float64)            \
     CPU_HOST_BINARY(name, float64, int32, float64)            \
+    CPU_HOST_BINARY(name, float64, bfloat16, float64)         \
     CPU_HOST_NOIMPL(name, float64, float16, float64)          \
     CPU_HOST_BINARY(name, float64, float32, float64)          \
     CPU_HOST_BINARY(name, float64, float64, float64)          \
@@ -640,6 +698,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOIMPL(name, complex32, int8, complex32)         \
     CPU_HOST_NOIMPL(name, complex32, int16, complex64)        \
     CPU_HOST_NOIMPL(name, complex32, int32, complex128)       \
+    CPU_HOST_NOIMPL(name, complex32, bfloat16, complex64)     \
     CPU_HOST_NOIMPL(name, complex32, float16, complex32)      \
     CPU_HOST_NOIMPL(name, complex32, float32, complex64)      \
     CPU_HOST_NOIMPL(name, complex32, float64, complex128)     \
@@ -653,6 +712,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, complex64, int8, complex64)         \
     CPU_HOST_BINARY(name, complex64, int16, complex64)        \
     CPU_HOST_BINARY(name, complex64, int32, complex128)       \
+    CPU_HOST_BINARY(name, complex64, bfloat16, complex64)     \
     CPU_HOST_NOIMPL(name, complex64, float16, complex64)      \
     CPU_HOST_BINARY(name, complex64, float32, complex64)      \
     CPU_HOST_BINARY(name, complex64, float64, complex128)     \
@@ -666,6 +726,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, complex128, int8, complex128)       \
     CPU_HOST_BINARY(name, complex128, int16, complex128)      \
     CPU_HOST_BINARY(name, complex128, int32, complex128)      \
+    CPU_HOST_BINARY(name, complex128, bfloat16, complex128)   \
     CPU_HOST_NOIMPL(name, complex128, float16, complex128)    \
     CPU_HOST_BINARY(name, complex128, float32, complex128)    \
     CPU_HOST_BINARY(name, complex128, float64, complex128)    \
@@ -682,6 +743,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint8, int16, int16)                \
     CPU_HOST_BINARY(name, uint8, int32, int32)                \
     CPU_HOST_BINARY(name, uint8, int64, int64)                \
+    CPU_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CPU_HOST_NOIMPL(name, uint8, float16, float16)            \
     CPU_HOST_BINARY(name, uint8, float32, float32)            \
     CPU_HOST_BINARY(name, uint8, float64, float64)            \
@@ -697,6 +759,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint16, int16, int32)               \
     CPU_HOST_BINARY(name, uint16, int32, int32)               \
     CPU_HOST_BINARY(name, uint16, int64, int64)               \
+    CPU_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CPU_HOST_NOIMPL(name, uint16, float16, float32)           \
     CPU_HOST_BINARY(name, uint16, float32, float32)           \
     CPU_HOST_BINARY(name, uint16, float64, float64)           \
@@ -712,6 +775,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint32, int16, int64)               \
     CPU_HOST_BINARY(name, uint32, int32, int64)               \
     CPU_HOST_BINARY(name, uint32, int64, int64)               \
+    CPU_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CPU_HOST_NOIMPL(name, uint32, float16, float64)           \
     CPU_HOST_BINARY(name, uint32, float32, float64)           \
     CPU_HOST_BINARY(name, uint32, float64, float64)           \
@@ -731,6 +795,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int8, int16, int16)                 \
     CPU_HOST_BINARY(name, int8, int32, int32)                 \
     CPU_HOST_BINARY(name, int8, int64, int64)                 \
+    CPU_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CPU_HOST_NOIMPL(name, int8, float16, float16)             \
     CPU_HOST_BINARY(name, int8, float32, float32)             \
     CPU_HOST_BINARY(name, int8, float64, float64)             \
@@ -745,6 +810,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int16, int16, int16)                \
     CPU_HOST_BINARY(name, int16, int32, int32)                \
     CPU_HOST_BINARY(name, int16, int64, int64)                \
+    CPU_HOST_BINARY(name, int16, bfloat16, float32)           \
     CPU_HOST_NOIMPL(name, int16, float16, float32)            \
     CPU_HOST_BINARY(name, int16, float32, float32)            \
     CPU_HOST_BINARY(name, int16, float64, float64)            \
@@ -759,6 +825,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int32, int16, int32)                \
     CPU_HOST_BINARY(name, int32, int32, int32)                \
     CPU_HOST_BINARY(name, int32, int64, int64)                \
+    CPU_HOST_BINARY(name, int32, bfloat16, float64)           \
     CPU_HOST_NOIMPL(name, int32, float16, float64)            \
     CPU_HOST_BINARY(name, int32, float32, float64)            \
     CPU_HOST_BINARY(name, int32, float64, float64)            \
@@ -774,12 +841,27 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int64, int32, int64)                \
     CPU_HOST_BINARY(name, int64, int64, int64)                \
                                                               \
+    CPU_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CPU_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CPU_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CPU_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CPU_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CPU_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CPU_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_HOST_NOIMPL(name, bfloat16, float16, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CPU_HOST_NOKERN(name, bfloat16, complex32, complex64)     \
+    CPU_HOST_NOKERN(name, bfloat16, complex64, complex64)     \
+    CPU_HOST_NOKERN(name, bfloat16, complex128, complex128)   \
+                                                              \
     CPU_HOST_NOIMPL(name, float16, uint8, float16)            \
     CPU_HOST_NOIMPL(name, float16, uint16, float32)           \
     CPU_HOST_NOIMPL(name, float16, uint32, float64)           \
     CPU_HOST_NOIMPL(name, float16, int8, float16)             \
     CPU_HOST_NOIMPL(name, float16, int16, float32)            \
     CPU_HOST_NOIMPL(name, float16, int32, float64)            \
+    CPU_HOST_NOIMPL(name, float16, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float16, float16, float16)          \
     CPU_HOST_NOIMPL(name, float16, float32, float32)          \
     CPU_HOST_NOIMPL(name, float16, float64, float64)          \
@@ -793,6 +875,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float32, int8, float32)             \
     CPU_HOST_BINARY(name, float32, int16, float32)            \
     CPU_HOST_BINARY(name, float32, int32, float64)            \
+    CPU_HOST_BINARY(name, float32, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float32, float16, float32)          \
     CPU_HOST_BINARY(name, float32, float32, float32)          \
     CPU_HOST_BINARY(name, float32, float64, float64)          \
@@ -806,6 +889,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float64, int8, float64)             \
     CPU_HOST_BINARY(name, float64, int16, float64)            \
     CPU_HOST_BINARY(name, float64, int32, float64)            \
+    CPU_HOST_BINARY(name, float64, bfloat16, float64)         \
     CPU_HOST_NOIMPL(name, float64, float16, float64)          \
     CPU_HOST_BINARY(name, float64, float32, float64)          \
     CPU_HOST_BINARY(name, float64, float64, float64)          \
@@ -819,6 +903,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOKERN(name, complex32, int8, complex32)         \
     CPU_HOST_NOKERN(name, complex32, int16, complex64)        \
     CPU_HOST_NOKERN(name, complex32, int32, complex128)       \
+    CPU_HOST_NOKERN(name, complex32, bfloat16, complex64)     \
     CPU_HOST_NOKERN(name, complex32, float16, complex32)      \
     CPU_HOST_NOKERN(name, complex32, float32, complex64)      \
     CPU_HOST_NOKERN(name, complex32, float64, complex128)     \
@@ -832,6 +917,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOKERN(name, complex64, int8, complex64)         \
     CPU_HOST_NOKERN(name, complex64, int16, complex64)        \
     CPU_HOST_NOKERN(name, complex64, int32, complex128)       \
+    CPU_HOST_NOKERN(name, complex64, bfloat16, complex64)     \
     CPU_HOST_NOKERN(name, complex64, float16, complex64)      \
     CPU_HOST_NOKERN(name, complex64, float32, complex64)      \
     CPU_HOST_NOKERN(name, complex64, float64, complex128)     \
@@ -845,6 +931,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOKERN(name, complex128, int8, complex128)       \
     CPU_HOST_NOKERN(name, complex128, int16, complex128)      \
     CPU_HOST_NOKERN(name, complex128, int32, complex128)      \
+    CPU_HOST_NOKERN(name, complex128, bfloat16, complex128)   \
     CPU_HOST_NOKERN(name, complex128, float16, complex128)    \
     CPU_HOST_NOKERN(name, complex128, float32, complex128)    \
     CPU_HOST_NOKERN(name, complex128, float64, complex128)    \
@@ -861,6 +948,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint8, int16, float32)              \
     CPU_HOST_BINARY(name, uint8, int32, float64)              \
     CPU_HOST_NOKERN(name, uint8, int64, int64)                \
+    CPU_HOST_BINARY(name, uint8, bfloat16, bfloat16)          \
     CPU_HOST_NOIMPL(name, uint8, float16, float16)            \
     CPU_HOST_BINARY(name, uint8, float32, float32)            \
     CPU_HOST_BINARY(name, uint8, float64, float64)            \
@@ -876,6 +964,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint16, int16, float32)             \
     CPU_HOST_BINARY(name, uint16, int32, float64)             \
     CPU_HOST_NOKERN(name, uint16, int64, int64)               \
+    CPU_HOST_BINARY(name, uint16, bfloat16, float32)          \
     CPU_HOST_NOIMPL(name, uint16, float16, float32)           \
     CPU_HOST_BINARY(name, uint16, float32, float32)           \
     CPU_HOST_BINARY(name, uint16, float64, float64)           \
@@ -891,6 +980,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, uint32, int16, float64)             \
     CPU_HOST_BINARY(name, uint32, int32, float64)             \
     CPU_HOST_NOKERN(name, uint32, int64, int64)               \
+    CPU_HOST_BINARY(name, uint32, bfloat16, float64)          \
     CPU_HOST_NOIMPL(name, uint32, float16, float64)           \
     CPU_HOST_BINARY(name, uint32, float32, float64)           \
     CPU_HOST_BINARY(name, uint32, float64, float64)           \
@@ -910,6 +1000,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int8, int16, float32)               \
     CPU_HOST_BINARY(name, int8, int32, float64)               \
     CPU_HOST_NOKERN(name, int8, int64, int64)                 \
+    CPU_HOST_BINARY(name, int8, bfloat16, bfloat16)           \
     CPU_HOST_NOIMPL(name, int8, float16, float16)             \
     CPU_HOST_BINARY(name, int8, float32, float32)             \
     CPU_HOST_BINARY(name, int8, float64, float64)             \
@@ -924,6 +1015,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int16, int16, float32)              \
     CPU_HOST_BINARY(name, int16, int32, float64)              \
     CPU_HOST_NOKERN(name, int16, int64, int64)                \
+    CPU_HOST_BINARY(name, int16, bfloat16, float32)           \
     CPU_HOST_NOIMPL(name, int16, float16, float32)            \
     CPU_HOST_BINARY(name, int16, float32, float32)            \
     CPU_HOST_BINARY(name, int16, float64, float64)            \
@@ -938,6 +1030,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, int32, int16, float64)              \
     CPU_HOST_BINARY(name, int32, int32, float64)              \
     CPU_HOST_NOKERN(name, int32, int64, int64)                \
+    CPU_HOST_BINARY(name, int32, bfloat16, float64)           \
     CPU_HOST_NOIMPL(name, int32, float16, float64)            \
     CPU_HOST_BINARY(name, int32, float32, float64)            \
     CPU_HOST_BINARY(name, int32, float64, float64)            \
@@ -953,12 +1046,27 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOKERN(name, int64, int32, int64)                \
     CPU_HOST_NOKERN(name, int64, int64, int64)                \
                                                               \
+    CPU_HOST_BINARY(name, bfloat16, uint8, bfloat16)          \
+    CPU_HOST_BINARY(name, bfloat16, uint16, float32)          \
+    CPU_HOST_BINARY(name, bfloat16, uint32, float64)          \
+    CPU_HOST_BINARY(name, bfloat16, int8, bfloat16)           \
+    CPU_HOST_BINARY(name, bfloat16, int16, float32)           \
+    CPU_HOST_BINARY(name, bfloat16, int32, float64)           \
+    CPU_HOST_BINARY(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_HOST_NOIMPL(name, bfloat16, float16, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float32, float32)         \
+    CPU_HOST_BINARY(name, bfloat16, float64, float64)         \
+    CPU_HOST_NOIMPL(name, bfloat16, complex32, complex64)     \
+    CPU_HOST_BINARY(name, bfloat16, complex64, complex64)     \
+    CPU_HOST_BINARY(name, bfloat16, complex128, complex128)   \
+                                                              \
     CPU_HOST_NOIMPL(name, float16, uint8, float16)            \
     CPU_HOST_NOIMPL(name, float16, uint16, float32)           \
     CPU_HOST_NOIMPL(name, float16, uint32, float64)           \
     CPU_HOST_NOIMPL(name, float16, int8, float16)             \
     CPU_HOST_NOIMPL(name, float16, int16, float32)            \
     CPU_HOST_NOIMPL(name, float16, int32, float64)            \
+    CPU_HOST_NOIMPL(name, float16, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float16, float16, float16)          \
     CPU_HOST_NOIMPL(name, float16, float32, float32)          \
     CPU_HOST_NOIMPL(name, float16, float64, float64)          \
@@ -972,6 +1080,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float32, int8, float32)             \
     CPU_HOST_BINARY(name, float32, int16, float32)            \
     CPU_HOST_BINARY(name, float32, int32, float64)            \
+    CPU_HOST_BINARY(name, float32, bfloat16, float32)         \
     CPU_HOST_NOIMPL(name, float32, float16, float32)          \
     CPU_HOST_BINARY(name, float32, float32, float32)          \
     CPU_HOST_BINARY(name, float32, float64, float64)          \
@@ -985,6 +1094,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, float64, int8, float64)             \
     CPU_HOST_BINARY(name, float64, int16, float64)            \
     CPU_HOST_BINARY(name, float64, int32, float64)            \
+    CPU_HOST_BINARY(name, float64, bfloat16, float64)         \
     CPU_HOST_NOIMPL(name, float64, float16, float64)          \
     CPU_HOST_BINARY(name, float64, float32, float64)          \
     CPU_HOST_BINARY(name, float64, float64, float64)          \
@@ -998,6 +1108,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_NOIMPL(name, complex32, int8, complex32)         \
     CPU_HOST_NOIMPL(name, complex32, int16, complex64)        \
     CPU_HOST_NOIMPL(name, complex32, int32, complex128)       \
+    CPU_HOST_NOIMPL(name, complex32, bfloat16, complex64)     \
     CPU_HOST_NOIMPL(name, complex32, float16, complex32)      \
     CPU_HOST_NOIMPL(name, complex32, float32, complex64)      \
     CPU_HOST_NOIMPL(name, complex32, float64, complex128)     \
@@ -1011,6 +1122,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, complex64, int8, complex64)         \
     CPU_HOST_BINARY(name, complex64, int16, complex64)        \
     CPU_HOST_BINARY(name, complex64, int32, complex128)       \
+    CPU_HOST_BINARY(name, complex64, bfloat16, complex64)     \
     CPU_HOST_NOIMPL(name, complex64, float16, complex64)      \
     CPU_HOST_BINARY(name, complex64, float32, complex64)      \
     CPU_HOST_BINARY(name, complex64, float64, complex128)     \
@@ -1024,6 +1136,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY(name, complex128, int8, complex128)       \
     CPU_HOST_BINARY(name, complex128, int16, complex128)      \
     CPU_HOST_BINARY(name, complex128, int32, complex128)      \
+    CPU_HOST_BINARY(name, complex128, bfloat16, complex128)   \
     CPU_HOST_NOIMPL(name, complex128, float16, complex128)    \
     CPU_HOST_BINARY(name, complex128, float32, complex128)    \
     CPU_HOST_BINARY(name, complex128, float64, complex128)    \
@@ -1040,6 +1153,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint8, int16, int16),                \
     CPU_HOST_BINARY_INIT(name, uint8, int32, int32),                \
     CPU_HOST_BINARY_INIT(name, uint8, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, uint8, bfloat16, bfloat16),          \
     CPU_HOST_BINARY_INIT(name, uint8, float16, float16),            \
     CPU_HOST_BINARY_INIT(name, uint8, float32, float32),            \
     CPU_HOST_BINARY_INIT(name, uint8, float64, float64),            \
@@ -1055,6 +1169,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint16, int16, int32),               \
     CPU_HOST_BINARY_INIT(name, uint16, int32, int32),               \
     CPU_HOST_BINARY_INIT(name, uint16, int64, int64),               \
+    CPU_HOST_BINARY_INIT(name, uint16, bfloat16, float32),          \
     CPU_HOST_BINARY_INIT(name, uint16, float16, float32),           \
     CPU_HOST_BINARY_INIT(name, uint16, float32, float32),           \
     CPU_HOST_BINARY_INIT(name, uint16, float64, float64),           \
@@ -1070,6 +1185,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint32, int16, int64),               \
     CPU_HOST_BINARY_INIT(name, uint32, int32, int64),               \
     CPU_HOST_BINARY_INIT(name, uint32, int64, int64),               \
+    CPU_HOST_BINARY_INIT(name, uint32, bfloat16, float64),          \
     CPU_HOST_BINARY_INIT(name, uint32, float16, float64),           \
     CPU_HOST_BINARY_INIT(name, uint32, float32, float64),           \
     CPU_HOST_BINARY_INIT(name, uint32, float64, float64),           \
@@ -1089,6 +1205,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int8, int16, int16),                 \
     CPU_HOST_BINARY_INIT(name, int8, int32, int32),                 \
     CPU_HOST_BINARY_INIT(name, int8, int64, int64),                 \
+    CPU_HOST_BINARY_INIT(name, int8, bfloat16, bfloat16),           \
     CPU_HOST_BINARY_INIT(name, int8, float16, float16),             \
     CPU_HOST_BINARY_INIT(name, int8, float32, float32),             \
     CPU_HOST_BINARY_INIT(name, int8, float64, float64),             \
@@ -1103,6 +1220,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int16, int16, int16),                \
     CPU_HOST_BINARY_INIT(name, int16, int32, int32),                \
     CPU_HOST_BINARY_INIT(name, int16, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, int16, bfloat16, float32),           \
     CPU_HOST_BINARY_INIT(name, int16, float16, float32),            \
     CPU_HOST_BINARY_INIT(name, int16, float32, float32),            \
     CPU_HOST_BINARY_INIT(name, int16, float64, float64),            \
@@ -1117,6 +1235,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int32, int16, int32),                \
     CPU_HOST_BINARY_INIT(name, int32, int32, int32),                \
     CPU_HOST_BINARY_INIT(name, int32, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, int32, bfloat16, float64),           \
     CPU_HOST_BINARY_INIT(name, int32, float16, float64),            \
     CPU_HOST_BINARY_INIT(name, int32, float32, float64),            \
     CPU_HOST_BINARY_INIT(name, int32, float64, float64),            \
@@ -1132,12 +1251,27 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int64, int32, int64),                \
     CPU_HOST_BINARY_INIT(name, int64, int64, int64),                \
                                                                     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint8, bfloat16),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint16, float32),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint32, float64),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int8, bfloat16),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int16, float32),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int32, float64),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, bfloat16, bfloat16),       \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float16, float32),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float32, float32),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float64, float64),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex32, complex64),     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex64, complex64),     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex128, complex128),   \
+                                                                    \
     CPU_HOST_BINARY_INIT(name, float16, uint8, float16),            \
     CPU_HOST_BINARY_INIT(name, float16, uint16, float32),           \
     CPU_HOST_BINARY_INIT(name, float16, uint32, float64),           \
     CPU_HOST_BINARY_INIT(name, float16, int8, float16),             \
     CPU_HOST_BINARY_INIT(name, float16, int16, float32),            \
     CPU_HOST_BINARY_INIT(name, float16, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float16, bfloat16, float32),         \
     CPU_HOST_BINARY_INIT(name, float16, float16, float16),          \
     CPU_HOST_BINARY_INIT(name, float16, float32, float32),          \
     CPU_HOST_BINARY_INIT(name, float16, float64, float64),          \
@@ -1151,6 +1285,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, float32, int8, float32),             \
     CPU_HOST_BINARY_INIT(name, float32, int16, float32),            \
     CPU_HOST_BINARY_INIT(name, float32, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float32, bfloat16, float32),         \
     CPU_HOST_BINARY_INIT(name, float32, float16, float32),          \
     CPU_HOST_BINARY_INIT(name, float32, float32, float32),          \
     CPU_HOST_BINARY_INIT(name, float32, float64, float64),          \
@@ -1164,6 +1299,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, float64, int8, float64),             \
     CPU_HOST_BINARY_INIT(name, float64, int16, float64),            \
     CPU_HOST_BINARY_INIT(name, float64, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float64, bfloat16, float64),         \
     CPU_HOST_BINARY_INIT(name, float64, float16, float64),          \
     CPU_HOST_BINARY_INIT(name, float64, float32, float64),          \
     CPU_HOST_BINARY_INIT(name, float64, float64, float64),          \
@@ -1177,6 +1313,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex32, int8, complex32),         \
     CPU_HOST_BINARY_INIT(name, complex32, int16, complex64),        \
     CPU_HOST_BINARY_INIT(name, complex32, int32, complex128),       \
+    CPU_HOST_BINARY_INIT(name, complex32, bfloat16, complex64),     \
     CPU_HOST_BINARY_INIT(name, complex32, float16, complex32),      \
     CPU_HOST_BINARY_INIT(name, complex32, float32, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex32, float64, complex128),     \
@@ -1190,6 +1327,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex64, int8, complex64),         \
     CPU_HOST_BINARY_INIT(name, complex64, int16, complex64),        \
     CPU_HOST_BINARY_INIT(name, complex64, int32, complex128),       \
+    CPU_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),     \
     CPU_HOST_BINARY_INIT(name, complex64, float16, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex64, float32, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex64, float64, complex128),     \
@@ -1203,6 +1341,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex128, int8, complex128),       \
     CPU_HOST_BINARY_INIT(name, complex128, int16, complex128),      \
     CPU_HOST_BINARY_INIT(name, complex128, int32, complex128),      \
+    CPU_HOST_BINARY_INIT(name, complex128, bfloat16, complex128),   \
     CPU_HOST_BINARY_INIT(name, complex128, float16, complex128),    \
     CPU_HOST_BINARY_INIT(name, complex128, float32, complex128),    \
     CPU_HOST_BINARY_INIT(name, complex128, float64, complex128),    \
@@ -1219,6 +1358,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint8, int16, float32),              \
     CPU_HOST_BINARY_INIT(name, uint8, int32, float64),              \
     CPU_HOST_BINARY_INIT(name, uint8, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, uint8, bfloat16, bfloat16),          \
     CPU_HOST_BINARY_INIT(name, uint8, float16, float16),            \
     CPU_HOST_BINARY_INIT(name, uint8, float32, float32),            \
     CPU_HOST_BINARY_INIT(name, uint8, float64, float64),            \
@@ -1234,6 +1374,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint16, int16, float32),             \
     CPU_HOST_BINARY_INIT(name, uint16, int32, float64),             \
     CPU_HOST_BINARY_INIT(name, uint16, int64, int64),               \
+    CPU_HOST_BINARY_INIT(name, uint16, bfloat16, float32),          \
     CPU_HOST_BINARY_INIT(name, uint16, float16, float32),           \
     CPU_HOST_BINARY_INIT(name, uint16, float32, float32),           \
     CPU_HOST_BINARY_INIT(name, uint16, float64, float64),           \
@@ -1249,6 +1390,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, uint32, int16, float64),             \
     CPU_HOST_BINARY_INIT(name, uint32, int32, float64),             \
     CPU_HOST_BINARY_INIT(name, uint32, int64, int64),               \
+    CPU_HOST_BINARY_INIT(name, uint32, bfloat16, float64),          \
     CPU_HOST_BINARY_INIT(name, uint32, float16, float64),           \
     CPU_HOST_BINARY_INIT(name, uint32, float32, float64),           \
     CPU_HOST_BINARY_INIT(name, uint32, float64, float64),           \
@@ -1268,6 +1410,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int8, int16, float32),               \
     CPU_HOST_BINARY_INIT(name, int8, int32, float64),               \
     CPU_HOST_BINARY_INIT(name, int8, int64, int64),                 \
+    CPU_HOST_BINARY_INIT(name, int8, bfloat16, bfloat16),           \
     CPU_HOST_BINARY_INIT(name, int8, float16, float16),             \
     CPU_HOST_BINARY_INIT(name, int8, float32, float32),             \
     CPU_HOST_BINARY_INIT(name, int8, float64, float64),             \
@@ -1282,6 +1425,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int16, int16, float32),              \
     CPU_HOST_BINARY_INIT(name, int16, int32, float64),              \
     CPU_HOST_BINARY_INIT(name, int16, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, int16, bfloat16, float32),           \
     CPU_HOST_BINARY_INIT(name, int16, float16, float32),            \
     CPU_HOST_BINARY_INIT(name, int16, float32, float32),            \
     CPU_HOST_BINARY_INIT(name, int16, float64, float64),            \
@@ -1296,6 +1440,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int32, int16, float64),              \
     CPU_HOST_BINARY_INIT(name, int32, int32, float64),              \
     CPU_HOST_BINARY_INIT(name, int32, int64, int64),                \
+    CPU_HOST_BINARY_INIT(name, int32, bfloat16, float64),           \
     CPU_HOST_BINARY_INIT(name, int32, float16, float64),            \
     CPU_HOST_BINARY_INIT(name, int32, float32, float64),            \
     CPU_HOST_BINARY_INIT(name, int32, float64, float64),            \
@@ -1311,12 +1456,27 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, int64, int32, int64),                \
     CPU_HOST_BINARY_INIT(name, int64, int64, int64),                \
                                                                     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint8, bfloat16),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint16, float32),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint32, float64),          \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int8, bfloat16),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int16, float32),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int32, float64),           \
+    CPU_HOST_BINARY_INIT(name, bfloat16, bfloat16, bfloat16),       \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float16, float32),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float32, float32),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float64, float64),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex32, complex64),     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex64, complex64),     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex128, complex128),   \
+                                                                    \
     CPU_HOST_BINARY_INIT(name, float16, uint8, float16),            \
     CPU_HOST_BINARY_INIT(name, float16, uint16, float32),           \
     CPU_HOST_BINARY_INIT(name, float16, uint32, float64),           \
     CPU_HOST_BINARY_INIT(name, float16, int8, float16),             \
     CPU_HOST_BINARY_INIT(name, float16, int16, float32),            \
     CPU_HOST_BINARY_INIT(name, float16, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float16, bfloat16, float32),         \
     CPU_HOST_BINARY_INIT(name, float16, float16, float16),          \
     CPU_HOST_BINARY_INIT(name, float16, float32, float32),          \
     CPU_HOST_BINARY_INIT(name, float16, float64, float64),          \
@@ -1330,6 +1490,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, float32, int8, float32),             \
     CPU_HOST_BINARY_INIT(name, float32, int16, float32),            \
     CPU_HOST_BINARY_INIT(name, float32, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float32, bfloat16, float32),         \
     CPU_HOST_BINARY_INIT(name, float32, float16, float32),          \
     CPU_HOST_BINARY_INIT(name, float32, float32, float32),          \
     CPU_HOST_BINARY_INIT(name, float32, float64, float64),          \
@@ -1343,6 +1504,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, float64, int8, float64),             \
     CPU_HOST_BINARY_INIT(name, float64, int16, float64),            \
     CPU_HOST_BINARY_INIT(name, float64, int32, float64),            \
+    CPU_HOST_BINARY_INIT(name, float64, bfloat16, float64),         \
     CPU_HOST_BINARY_INIT(name, float64, float16, float64),          \
     CPU_HOST_BINARY_INIT(name, float64, float32, float64),          \
     CPU_HOST_BINARY_INIT(name, float64, float64, float64),          \
@@ -1356,6 +1518,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex32, int8, complex32),         \
     CPU_HOST_BINARY_INIT(name, complex32, int16, complex64),        \
     CPU_HOST_BINARY_INIT(name, complex32, int32, complex128),       \
+    CPU_HOST_BINARY_INIT(name, complex32, bfloat16, complex64),     \
     CPU_HOST_BINARY_INIT(name, complex32, float16, complex32),      \
     CPU_HOST_BINARY_INIT(name, complex32, float32, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex32, float64, complex128),     \
@@ -1369,6 +1532,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex64, int8, complex64),         \
     CPU_HOST_BINARY_INIT(name, complex64, int16, complex64),        \
     CPU_HOST_BINARY_INIT(name, complex64, int32, complex128),       \
+    CPU_HOST_BINARY_INIT(name, complex64, bfloat16, complex64),     \
     CPU_HOST_BINARY_INIT(name, complex64, float16, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex64, float32, complex64),      \
     CPU_HOST_BINARY_INIT(name, complex64, float64, complex128),     \
@@ -1382,6 +1546,7 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)        
     CPU_HOST_BINARY_INIT(name, complex128, int8, complex128),       \
     CPU_HOST_BINARY_INIT(name, complex128, int16, complex128),      \
     CPU_HOST_BINARY_INIT(name, complex128, int32, complex128),      \
+    CPU_HOST_BINARY_INIT(name, complex128, bfloat16, complex128),   \
     CPU_HOST_BINARY_INIT(name, complex128, float16, complex128),    \
     CPU_HOST_BINARY_INIT(name, complex128, float32, complex128),    \
     CPU_HOST_BINARY_INIT(name, complex128, float64, complex128),    \
@@ -1422,6 +1587,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, uint8, int16, bool)           \
     CPU_HOST_BINARY(name, uint8, int32, bool)           \
     CPU_HOST_BINARY(name, uint8, int64, bool)           \
+    CPU_HOST_BINARY(name, uint8, bfloat16, bool)        \
     CPU_HOST_NOIMPL(name, uint8, float16, bool)         \
     CPU_HOST_BINARY(name, uint8, float32, bool)         \
     CPU_HOST_BINARY(name, uint8, float64, bool)         \
@@ -1437,6 +1603,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, uint16, int16, bool)          \
     CPU_HOST_BINARY(name, uint16, int32, bool)          \
     CPU_HOST_BINARY(name, uint16, int64, bool)          \
+    CPU_HOST_BINARY(name, uint16, bfloat16, bool)       \
     CPU_HOST_NOIMPL(name, uint16, float16, bool)        \
     CPU_HOST_BINARY(name, uint16, float32, bool)        \
     CPU_HOST_BINARY(name, uint16, float64, bool)        \
@@ -1452,6 +1619,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, uint32, int16, bool)          \
     CPU_HOST_BINARY(name, uint32, int32, bool)          \
     CPU_HOST_BINARY(name, uint32, int64, bool)          \
+    CPU_HOST_BINARY(name, uint32, bfloat16, bool)       \
     CPU_HOST_NOIMPL(name, uint32, float16, bool)        \
     CPU_HOST_BINARY(name, uint32, float32, bool)        \
     CPU_HOST_BINARY(name, uint32, float64, bool)        \
@@ -1471,6 +1639,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, int8, int16, bool)            \
     CPU_HOST_BINARY(name, int8, int32, bool)            \
     CPU_HOST_BINARY(name, int8, int64, bool)            \
+    CPU_HOST_BINARY(name, int8, bfloat16, bool)         \
     CPU_HOST_NOIMPL(name, int8, float16, bool)          \
     CPU_HOST_BINARY(name, int8, float32, bool)          \
     CPU_HOST_BINARY(name, int8, float64, bool)          \
@@ -1485,6 +1654,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, int16, int16, bool)           \
     CPU_HOST_BINARY(name, int16, int32, bool)           \
     CPU_HOST_BINARY(name, int16, int64, bool)           \
+    CPU_HOST_BINARY(name, int16, bfloat16, bool)        \
     CPU_HOST_NOIMPL(name, int16, float16, bool)         \
     CPU_HOST_BINARY(name, int16, float32, bool)         \
     CPU_HOST_BINARY(name, int16, float64, bool)         \
@@ -1499,6 +1669,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, int32, int16, bool)           \
     CPU_HOST_BINARY(name, int32, int32, bool)           \
     CPU_HOST_BINARY(name, int32, int64, bool)           \
+    CPU_HOST_BINARY(name, int32, bfloat16, bool)        \
     CPU_HOST_NOIMPL(name, int32, float16, bool)         \
     CPU_HOST_BINARY(name, int32, float32, bool)         \
     CPU_HOST_BINARY(name, int32, float64, bool)         \
@@ -1514,12 +1685,27 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, int64, int32, bool)           \
     CPU_HOST_BINARY(name, int64, int64, bool)           \
                                                         \
+    CPU_HOST_BINARY(name, bfloat16, uint8, bool)        \
+    CPU_HOST_BINARY(name, bfloat16, uint16, bool)       \
+    CPU_HOST_BINARY(name, bfloat16, uint32, bool)       \
+    CPU_HOST_BINARY(name, bfloat16, int8, bool)         \
+    CPU_HOST_BINARY(name, bfloat16, int16, bool)        \
+    CPU_HOST_BINARY(name, bfloat16, int32, bool)        \
+    CPU_HOST_BINARY(name, bfloat16, bfloat16, bool)     \
+    CPU_HOST_NOIMPL(name, bfloat16, float16, bool)      \
+    CPU_HOST_BINARY(name, bfloat16, float32, bool)      \
+    CPU_HOST_BINARY(name, bfloat16, float64, bool)      \
+    CPU_HOST_NOIMPL(name, bfloat16, complex32, bool)    \
+    CPU_HOST_BINARY(name, bfloat16, complex64, bool)    \
+    CPU_HOST_BINARY(name, bfloat16, complex128, bool)   \
+                                                        \
     CPU_HOST_NOIMPL(name, float16, uint8, bool)         \
     CPU_HOST_NOIMPL(name, float16, uint16, bool)        \
     CPU_HOST_NOIMPL(name, float16, uint32, bool)        \
     CPU_HOST_NOIMPL(name, float16, int8, bool)          \
     CPU_HOST_NOIMPL(name, float16, int16, bool)         \
     CPU_HOST_NOIMPL(name, float16, int32, bool)         \
+    CPU_HOST_NOIMPL(name, float16, bfloat16, bool)      \
     CPU_HOST_NOIMPL(name, float16, float16, bool)       \
     CPU_HOST_NOIMPL(name, float16, float32, bool)       \
     CPU_HOST_NOIMPL(name, float16, float64, bool)       \
@@ -1533,6 +1719,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, float32, int8, bool)          \
     CPU_HOST_BINARY(name, float32, int16, bool)         \
     CPU_HOST_BINARY(name, float32, int32, bool)         \
+    CPU_HOST_BINARY(name, float32, bfloat16, bool)      \
     CPU_HOST_NOIMPL(name, float32, float16, bool)       \
     CPU_HOST_BINARY(name, float32, float32, bool)       \
     CPU_HOST_BINARY(name, float32, float64, bool)       \
@@ -1546,6 +1733,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, float64, int8, bool)          \
     CPU_HOST_BINARY(name, float64, int16, bool)         \
     CPU_HOST_BINARY(name, float64, int32, bool)         \
+    CPU_HOST_BINARY(name, float64, bfloat16, bool)      \
     CPU_HOST_NOIMPL(name, float64, float16, bool)       \
     CPU_HOST_BINARY(name, float64, float32, bool)       \
     CPU_HOST_BINARY(name, float64, float64, bool)       \
@@ -1559,6 +1747,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_NOIMPL(name, complex32, int8, bool)        \
     CPU_HOST_NOIMPL(name, complex32, int16, bool)       \
     CPU_HOST_NOIMPL(name, complex32, int32, bool)       \
+    CPU_HOST_NOIMPL(name, complex32, bfloat16, bool)    \
     CPU_HOST_NOIMPL(name, complex32, float16, bool)     \
     CPU_HOST_NOIMPL(name, complex32, float32, bool)     \
     CPU_HOST_NOIMPL(name, complex32, float64, bool)     \
@@ -1572,6 +1761,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, complex64, int8, bool)        \
     CPU_HOST_BINARY(name, complex64, int16, bool)       \
     CPU_HOST_BINARY(name, complex64, int32, bool)       \
+    CPU_HOST_BINARY(name, complex64, bfloat16, bool)    \
     CPU_HOST_NOIMPL(name, complex64, float16, bool)     \
     CPU_HOST_BINARY(name, complex64, float32, bool)     \
     CPU_HOST_BINARY(name, complex64, float64, bool)     \
@@ -1585,6 +1775,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY(name, complex128, int8, bool)       \
     CPU_HOST_BINARY(name, complex128, int16, bool)      \
     CPU_HOST_BINARY(name, complex128, int32, bool)      \
+    CPU_HOST_BINARY(name, complex128, bfloat16, bool)   \
     CPU_HOST_NOIMPL(name, complex128, float16, bool)    \
     CPU_HOST_BINARY(name, complex128, float32, bool)    \
     CPU_HOST_BINARY(name, complex128, float64, bool)    \
@@ -1601,6 +1792,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, uint8, int16, bool),           \
     CPU_HOST_BINARY_INIT(name, uint8, int32, bool),           \
     CPU_HOST_BINARY_INIT(name, uint8, int64, bool),           \
+    CPU_HOST_BINARY_INIT(name, uint8, bfloat16, bool),        \
     CPU_HOST_BINARY_INIT(name, uint8, float16, bool),         \
     CPU_HOST_BINARY_INIT(name, uint8, float32, bool),         \
     CPU_HOST_BINARY_INIT(name, uint8, float64, bool),         \
@@ -1616,6 +1808,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, uint16, int16, bool),          \
     CPU_HOST_BINARY_INIT(name, uint16, int32, bool),          \
     CPU_HOST_BINARY_INIT(name, uint16, int64, bool),          \
+    CPU_HOST_BINARY_INIT(name, uint16, bfloat16, bool),       \
     CPU_HOST_BINARY_INIT(name, uint16, float16, bool),        \
     CPU_HOST_BINARY_INIT(name, uint16, float32, bool),        \
     CPU_HOST_BINARY_INIT(name, uint16, float64, bool),        \
@@ -1631,6 +1824,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, uint32, int16, bool),          \
     CPU_HOST_BINARY_INIT(name, uint32, int32, bool),          \
     CPU_HOST_BINARY_INIT(name, uint32, int64, bool),          \
+    CPU_HOST_BINARY_INIT(name, uint32, bfloat16, bool),       \
     CPU_HOST_BINARY_INIT(name, uint32, float16, bool),        \
     CPU_HOST_BINARY_INIT(name, uint32, float32, bool),        \
     CPU_HOST_BINARY_INIT(name, uint32, float64, bool),        \
@@ -1650,6 +1844,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, int8, int16, bool),            \
     CPU_HOST_BINARY_INIT(name, int8, int32, bool),            \
     CPU_HOST_BINARY_INIT(name, int8, int64, bool),            \
+    CPU_HOST_BINARY_INIT(name, int8, bfloat16, bool),         \
     CPU_HOST_BINARY_INIT(name, int8, float16, bool),          \
     CPU_HOST_BINARY_INIT(name, int8, float32, bool),          \
     CPU_HOST_BINARY_INIT(name, int8, float64, bool),          \
@@ -1664,6 +1859,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, int16, int16, bool),           \
     CPU_HOST_BINARY_INIT(name, int16, int32, bool),           \
     CPU_HOST_BINARY_INIT(name, int16, int64, bool),           \
+    CPU_HOST_BINARY_INIT(name, int16, bfloat16, bool),        \
     CPU_HOST_BINARY_INIT(name, int16, float16, bool),         \
     CPU_HOST_BINARY_INIT(name, int16, float32, bool),         \
     CPU_HOST_BINARY_INIT(name, int16, float64, bool),         \
@@ -1678,6 +1874,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, int32, int16, bool),           \
     CPU_HOST_BINARY_INIT(name, int32, int32, bool),           \
     CPU_HOST_BINARY_INIT(name, int32, int64, bool),           \
+    CPU_HOST_BINARY_INIT(name, int32, bfloat16, bool),        \
     CPU_HOST_BINARY_INIT(name, int32, float16, bool),         \
     CPU_HOST_BINARY_INIT(name, int32, float32, bool),         \
     CPU_HOST_BINARY_INIT(name, int32, float64, bool),         \
@@ -1692,6 +1889,20 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, int64, int16, bool),           \
     CPU_HOST_BINARY_INIT(name, int64, int32, bool),           \
     CPU_HOST_BINARY_INIT(name, int64, int64, bool),           \
+                                                               \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint8, bool),        \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint16, bool),       \
+    CPU_HOST_BINARY_INIT(name, bfloat16, uint32, bool),       \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int8, bool),         \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int16, bool),        \
+    CPU_HOST_BINARY_INIT(name, bfloat16, int32, bool),        \
+    CPU_HOST_BINARY_INIT(name, bfloat16, bfloat16, bool),     \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float16, bool),      \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float32, bool),      \
+    CPU_HOST_BINARY_INIT(name, bfloat16, float64, bool),      \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex32, bool),    \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex64, bool),    \
+    CPU_HOST_BINARY_INIT(name, bfloat16, complex128, bool),   \
                                                               \
     CPU_HOST_BINARY_INIT(name, float16, uint8, bool),         \
     CPU_HOST_BINARY_INIT(name, float16, uint16, bool),        \
@@ -1699,6 +1910,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, float16, int8, bool),          \
     CPU_HOST_BINARY_INIT(name, float16, int16, bool),         \
     CPU_HOST_BINARY_INIT(name, float16, int32, bool),         \
+    CPU_HOST_BINARY_INIT(name, float16, bfloat16, bool),      \
     CPU_HOST_BINARY_INIT(name, float16, float16, bool),       \
     CPU_HOST_BINARY_INIT(name, float16, float32, bool),       \
     CPU_HOST_BINARY_INIT(name, float16, float64, bool),       \
@@ -1712,6 +1924,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, float32, int8, bool),          \
     CPU_HOST_BINARY_INIT(name, float32, int16, bool),         \
     CPU_HOST_BINARY_INIT(name, float32, int32, bool),         \
+    CPU_HOST_BINARY_INIT(name, float32, bfloat16, bool),      \
     CPU_HOST_BINARY_INIT(name, float32, float16, bool),       \
     CPU_HOST_BINARY_INIT(name, float32, float32, bool),       \
     CPU_HOST_BINARY_INIT(name, float32, float64, bool),       \
@@ -1725,6 +1938,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, float64, int8, bool),          \
     CPU_HOST_BINARY_INIT(name, float64, int16, bool),         \
     CPU_HOST_BINARY_INIT(name, float64, int32, bool),         \
+    CPU_HOST_BINARY_INIT(name, float64, bfloat16, bool),      \
     CPU_HOST_BINARY_INIT(name, float64, float16, bool),       \
     CPU_HOST_BINARY_INIT(name, float64, float32, bool),       \
     CPU_HOST_BINARY_INIT(name, float64, float64, bool),       \
@@ -1738,6 +1952,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, complex32, int8, bool),        \
     CPU_HOST_BINARY_INIT(name, complex32, int16, bool),       \
     CPU_HOST_BINARY_INIT(name, complex32, int32, bool),       \
+    CPU_HOST_BINARY_INIT(name, complex32, bfloat16, bool),    \
     CPU_HOST_BINARY_INIT(name, complex32, float16, bool),     \
     CPU_HOST_BINARY_INIT(name, complex32, float32, bool),     \
     CPU_HOST_BINARY_INIT(name, complex32, float64, bool),     \
@@ -1751,6 +1966,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, complex64, int8, bool),        \
     CPU_HOST_BINARY_INIT(name, complex64, int16, bool),       \
     CPU_HOST_BINARY_INIT(name, complex64, int32, bool),       \
+    CPU_HOST_BINARY_INIT(name, complex64, bfloat16, bool),    \
     CPU_HOST_BINARY_INIT(name, complex64, float16, bool),     \
     CPU_HOST_BINARY_INIT(name, complex64, float32, bool),     \
     CPU_HOST_BINARY_INIT(name, complex64, float64, bool),     \
@@ -1764,6 +1980,7 @@ CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CPU_HOST_BINARY_INIT(name, complex128, int8, bool),       \
     CPU_HOST_BINARY_INIT(name, complex128, int16, bool),      \
     CPU_HOST_BINARY_INIT(name, complex128, int32, bool),      \
+    CPU_HOST_BINARY_INIT(name, complex128, bfloat16, bool),   \
     CPU_HOST_BINARY_INIT(name, complex128, float16, bool),    \
     CPU_HOST_BINARY_INIT(name, complex128, float32, bool),    \
     CPU_HOST_BINARY_INIT(name, complex128, float64, bool),    \
@@ -1847,27 +2064,29 @@ gm_cpu_0D_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx) 
     .C = gm_cpu_0D_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CPU_HOST_ALL_BINARY_MV(name) \
-    CPU_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)         \
-    CPU_HOST_BINARY_MV(name, uint16, uint16, uint16, uint16)     \
-    CPU_HOST_BINARY_MV(name, uint32, uint32, uint32, uint32)     \
-    CPU_HOST_BINARY_MV(name, uint64, uint64, uint64, uint64)     \
-    CPU_HOST_BINARY_MV(name, int8, int8, int8, int8)             \
-    CPU_HOST_BINARY_MV(name, int16, int16, int16, int16)         \
-    CPU_HOST_BINARY_MV(name, int32, int32, int32, int32)         \
-    CPU_HOST_BINARY_MV(name, int64, int64, int64, int64)         \
-    CPU_HOST_BINARY_MV(name, float32, float32, float32, float32) \
+    CPU_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)             \
+    CPU_HOST_BINARY_MV(name, uint16, uint16, uint16, uint16)         \
+    CPU_HOST_BINARY_MV(name, uint32, uint32, uint32, uint32)         \
+    CPU_HOST_BINARY_MV(name, uint64, uint64, uint64, uint64)         \
+    CPU_HOST_BINARY_MV(name, int8, int8, int8, int8)                 \
+    CPU_HOST_BINARY_MV(name, int16, int16, int16, int16)             \
+    CPU_HOST_BINARY_MV(name, int32, int32, int32, int32)             \
+    CPU_HOST_BINARY_MV(name, int64, int64, int64, int64)             \
+    CPU_HOST_BINARY_MV(name, bfloat16, bfloat16, bfloat16, bfloat16) \
+    CPU_HOST_BINARY_MV(name, float32, float32, float32, float32)     \
     CPU_HOST_BINARY_MV(name, float64, float64, float64, float64)
 
 #define CPU_HOST_ALL_BINARY_MV_INIT(name) \
-    CPU_HOST_BINARY_MV_INIT(name, uint8, uint8, uint8, uint8),         \
-    CPU_HOST_BINARY_MV_INIT(name, uint16, uint16, uint16, uint16),     \
-    CPU_HOST_BINARY_MV_INIT(name, uint32, uint32, uint32, uint32),     \
-    CPU_HOST_BINARY_MV_INIT(name, uint64, uint64, uint64, uint64),     \
-    CPU_HOST_BINARY_MV_INIT(name, int8, int8, int8, int8),             \
-    CPU_HOST_BINARY_MV_INIT(name, int16, int16, int16, int16),         \
-    CPU_HOST_BINARY_MV_INIT(name, int32, int32, int32, int32),         \
-    CPU_HOST_BINARY_MV_INIT(name, int64, int64, int64, int64),         \
-    CPU_HOST_BINARY_MV_INIT(name, float32, float32, float32, float32), \
+    CPU_HOST_BINARY_MV_INIT(name, uint8, uint8, uint8, uint8),             \
+    CPU_HOST_BINARY_MV_INIT(name, uint16, uint16, uint16, uint16),         \
+    CPU_HOST_BINARY_MV_INIT(name, uint32, uint32, uint32, uint32),         \
+    CPU_HOST_BINARY_MV_INIT(name, uint64, uint64, uint64, uint64),         \
+    CPU_HOST_BINARY_MV_INIT(name, int8, int8, int8, int8),                 \
+    CPU_HOST_BINARY_MV_INIT(name, int16, int16, int16, int16),             \
+    CPU_HOST_BINARY_MV_INIT(name, int32, int32, int32, int32),             \
+    CPU_HOST_BINARY_MV_INIT(name, int64, int64, int64, int64),             \
+    CPU_HOST_BINARY_MV_INIT(name, bfloat16, bfloat16, bfloat16, bfloat16), \
+    CPU_HOST_BINARY_MV_INIT(name, float32, float32, float32, float32),     \
     CPU_HOST_BINARY_MV_INIT(name, float64, float64, float64, float64)
 
 CPU_HOST_ALL_BINARY_MV(divmod)

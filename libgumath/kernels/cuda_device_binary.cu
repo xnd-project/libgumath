@@ -164,8 +164,8 @@ _divmod(T *q, T *r, T a, T b)                      \
         *r = 0;                                    \
     }                                              \
     else {                                         \
-        int64_t qq = a / b;                        \
-        int64_t rr = a % b;                        \
+        T qq = a / b;                              \
+        T rr = a % b;                              \
                                                    \
         *q = rr ? (qq - ((a < 0) ^ (b < 0))) : qq; \
         *r = a - *q * b;                           \
@@ -1153,7 +1153,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int8, bool, complex128)       \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int16, bool, complex128)      \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, int32, bool, complex128)      \
-    CUDA_DEVICE_BINARY(name, cfunc, complex128, bfloat16, bool, complex128)    \
+    CUDA_DEVICE_BINARY(name, cfunc, complex128, bfloat16, bool, complex128)   \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float16, bool, complex128)    \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float32, bool, complex128)    \
     CUDA_DEVICE_BINARY(name, cfunc, complex128, float64, bool, complex128)    \

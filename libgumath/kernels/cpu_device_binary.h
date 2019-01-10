@@ -38,6 +38,9 @@
 #ifdef __cplusplus
 #include <cinttypes>
 #include <complex>
+#include "contrib/bfloat16.h"
+ 
+typedef tf::bfloat16 bfloat16_t;
 typedef std::complex<float> complex64_t;
 typedef std::complex<double> complex128_t;
 #else
@@ -97,6 +100,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint8, int16, int16)                \
     CPU_DEVICE_BINARY_DECL(name, uint8, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, uint8, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, uint8, bfloat16, bfloat16)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint8, float16, float16)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float64, float64)            \
@@ -112,6 +116,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint16, int16, int32)               \
     CPU_DEVICE_BINARY_DECL(name, uint16, int32, int32)               \
     CPU_DEVICE_BINARY_DECL(name, uint16, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint16, bfloat16, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint16, float16, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float32, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float64, float64)           \
@@ -127,6 +132,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint32, int16, int64)               \
     CPU_DEVICE_BINARY_DECL(name, uint32, int32, int64)               \
     CPU_DEVICE_BINARY_DECL(name, uint32, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint32, bfloat16, float64)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint32, float16, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float32, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float64, float64)           \
@@ -146,6 +152,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int8, int16, int16)                 \
     CPU_DEVICE_BINARY_DECL(name, int8, int32, int32)                 \
     CPU_DEVICE_BINARY_DECL(name, int8, int64, int64)                 \
+    CPU_DEVICE_BINARY_DECL(name, int8, bfloat16, bfloat16)           \
     CPU_DEVICE_NOIMPL_DECL(name, int8, float16, float16)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float32, float32)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float64, float64)             \
@@ -160,6 +167,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int16, int16, int16)                \
     CPU_DEVICE_BINARY_DECL(name, int16, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int16, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int16, bfloat16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, int16, float16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float64, float64)            \
@@ -174,6 +182,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int32, int16, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int32, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int32, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int32, bfloat16, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, int32, float16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float32, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float64, float64)            \
@@ -189,12 +198,27 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int64, int32, int64)                \
     CPU_DEVICE_BINARY_DECL(name, int64, int64, int64)                \
                                                                      \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint8, bfloat16)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint16, float32)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint32, float64)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int8, bfloat16)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int16, float32)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int32, float64)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, float16, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float32, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float64, float64)         \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, complex32, complex64)     \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex64, complex64)     \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex128, complex128)   \
+                                                                     \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint8, float16)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint32, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int8, float16)             \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int16, float32)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int32, float64)            \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float16, float16)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float32, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float64, float64)          \
@@ -208,6 +232,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float32, int8, float32)             \
     CPU_DEVICE_BINARY_DECL(name, float32, int16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, float32, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float32, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float32, float16, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float32, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float64, float64)          \
@@ -221,6 +246,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float64, int8, float64)             \
     CPU_DEVICE_BINARY_DECL(name, float64, int16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, float64, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float64, bfloat16, float64)         \
     CPU_DEVICE_NOIMPL_DECL(name, float64, float16, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float32, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float64, float64)          \
@@ -234,6 +260,7 @@ typedef double float64_t;
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int8, complex32)         \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int16, complex64)        \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int32, complex128)       \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, bfloat16, complex64)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float16, complex32)      \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float32, complex64)      \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float64, complex128)     \
@@ -247,6 +274,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, complex64, int8, complex64)         \
     CPU_DEVICE_BINARY_DECL(name, complex64, int16, complex64)        \
     CPU_DEVICE_BINARY_DECL(name, complex64, int32, complex128)       \
+    CPU_DEVICE_BINARY_DECL(name, complex64, bfloat16, complex64)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex64, float16, complex64)      \
     CPU_DEVICE_BINARY_DECL(name, complex64, float32, complex64)      \
     CPU_DEVICE_BINARY_DECL(name, complex64, float64, complex128)     \
@@ -260,6 +288,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, complex128, int8, complex128)       \
     CPU_DEVICE_BINARY_DECL(name, complex128, int16, complex128)      \
     CPU_DEVICE_BINARY_DECL(name, complex128, int32, complex128)      \
+    CPU_DEVICE_BINARY_DECL(name, complex128, bfloat16, complex128)   \
     CPU_DEVICE_NOIMPL_DECL(name, complex128, float16, complex128)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float32, complex128)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float64, complex128)    \
@@ -276,6 +305,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint8, int16, int16)                \
     CPU_DEVICE_BINARY_DECL(name, uint8, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, uint8, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, uint8, bfloat16, bfloat16)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint8, float16, float16)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float64, float64)            \
@@ -291,6 +321,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint16, int16, int32)               \
     CPU_DEVICE_BINARY_DECL(name, uint16, int32, int32)               \
     CPU_DEVICE_BINARY_DECL(name, uint16, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint16, bfloat16, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint16, float16, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float32, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float64, float64)           \
@@ -306,6 +337,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint32, int16, int64)               \
     CPU_DEVICE_BINARY_DECL(name, uint32, int32, int64)               \
     CPU_DEVICE_BINARY_DECL(name, uint32, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint32, bfloat16, float64)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint32, float16, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float32, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float64, float64)           \
@@ -325,6 +357,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int8, int16, int16)                 \
     CPU_DEVICE_BINARY_DECL(name, int8, int32, int32)                 \
     CPU_DEVICE_BINARY_DECL(name, int8, int64, int64)                 \
+    CPU_DEVICE_BINARY_DECL(name, int8, bfloat16, bfloat16)           \
     CPU_DEVICE_NOIMPL_DECL(name, int8, float16, float16)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float32, float32)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float64, float64)             \
@@ -339,6 +372,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int16, int16, int16)                \
     CPU_DEVICE_BINARY_DECL(name, int16, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int16, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int16, bfloat16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, int16, float16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float64, float64)            \
@@ -353,6 +387,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int32, int16, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int32, int32, int32)                \
     CPU_DEVICE_BINARY_DECL(name, int32, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int32, bfloat16, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, int32, float16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float32, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float64, float64)            \
@@ -368,12 +403,27 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int64, int32, int64)                \
     CPU_DEVICE_BINARY_DECL(name, int64, int64, int64)                \
                                                                      \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint8, bfloat16)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint16, float32)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint32, float64)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int8, bfloat16)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int16, float32)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int32, float64)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, float16, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float32, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float64, float64)         \
+    CPU_DEVICE_NOKERN_DECL(name, bfloat16, complex32, complex64)     \
+    CPU_DEVICE_NOKERN_DECL(name, bfloat16, complex64, complex64)     \
+    CPU_DEVICE_NOKERN_DECL(name, bfloat16, complex128, complex128)   \
+                                                                     \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint8, float16)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint32, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int8, float16)             \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int16, float32)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int32, float64)            \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float16, float16)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float32, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float64, float64)          \
@@ -387,6 +437,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float32, int8, float32)             \
     CPU_DEVICE_BINARY_DECL(name, float32, int16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, float32, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float32, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float32, float16, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float32, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float64, float64)          \
@@ -400,6 +451,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float64, int8, float64)             \
     CPU_DEVICE_BINARY_DECL(name, float64, int16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, float64, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float64, bfloat16, float64)         \
     CPU_DEVICE_NOIMPL_DECL(name, float64, float16, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float32, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float64, float64)          \
@@ -413,6 +465,7 @@ typedef double float64_t;
     CPU_DEVICE_NOKERN_DECL(name, complex32, int8, complex32)         \
     CPU_DEVICE_NOKERN_DECL(name, complex32, int16, complex64)        \
     CPU_DEVICE_NOKERN_DECL(name, complex32, int32, complex128)       \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, bfloat16, complex64)     \
     CPU_DEVICE_NOKERN_DECL(name, complex32, float16, complex32)      \
     CPU_DEVICE_NOKERN_DECL(name, complex32, float32, complex64)      \
     CPU_DEVICE_NOKERN_DECL(name, complex32, float64, complex128)     \
@@ -426,6 +479,7 @@ typedef double float64_t;
     CPU_DEVICE_NOKERN_DECL(name, complex64, int8, complex64)         \
     CPU_DEVICE_NOKERN_DECL(name, complex64, int16, complex64)        \
     CPU_DEVICE_NOKERN_DECL(name, complex64, int32, complex128)       \
+    CPU_DEVICE_BINARY_DECL(name, complex64, bfloat16, complex64)     \
     CPU_DEVICE_NOKERN_DECL(name, complex64, float16, complex64)      \
     CPU_DEVICE_NOKERN_DECL(name, complex64, float32, complex64)      \
     CPU_DEVICE_NOKERN_DECL(name, complex64, float64, complex128)     \
@@ -439,6 +493,7 @@ typedef double float64_t;
     CPU_DEVICE_NOKERN_DECL(name, complex128, int8, complex128)       \
     CPU_DEVICE_NOKERN_DECL(name, complex128, int16, complex128)      \
     CPU_DEVICE_NOKERN_DECL(name, complex128, int32, complex128)      \
+    CPU_DEVICE_BINARY_DECL(name, complex128, bfloat16, complex128)   \
     CPU_DEVICE_NOKERN_DECL(name, complex128, float16, complex128)    \
     CPU_DEVICE_NOKERN_DECL(name, complex128, float32, complex128)    \
     CPU_DEVICE_NOKERN_DECL(name, complex128, float64, complex128)    \
@@ -455,6 +510,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint8, int16, float32)              \
     CPU_DEVICE_BINARY_DECL(name, uint8, int32, float64)              \
     CPU_DEVICE_NOKERN_DECL(name, uint8, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, uint8, bfloat16, bfloat16)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint8, float16, float16)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, uint8, float64, float64)            \
@@ -470,6 +526,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint16, int16, float32)             \
     CPU_DEVICE_BINARY_DECL(name, uint16, int32, float64)             \
     CPU_DEVICE_NOKERN_DECL(name, uint16, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint16, bfloat16, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint16, float16, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float32, float32)           \
     CPU_DEVICE_BINARY_DECL(name, uint16, float64, float64)           \
@@ -485,6 +542,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, uint32, int16, float64)             \
     CPU_DEVICE_BINARY_DECL(name, uint32, int32, float64)             \
     CPU_DEVICE_NOKERN_DECL(name, uint32, int64, int64)               \
+    CPU_DEVICE_BINARY_DECL(name, uint32, bfloat16, float64)          \
     CPU_DEVICE_NOIMPL_DECL(name, uint32, float16, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float32, float64)           \
     CPU_DEVICE_BINARY_DECL(name, uint32, float64, float64)           \
@@ -504,6 +562,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int8, int16, float32)               \
     CPU_DEVICE_BINARY_DECL(name, int8, int32, float64)               \
     CPU_DEVICE_NOKERN_DECL(name, int8, int64, int64)                 \
+    CPU_DEVICE_BINARY_DECL(name, int8, bfloat16, bfloat16)           \
     CPU_DEVICE_NOIMPL_DECL(name, int8, float16, float16)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float32, float32)             \
     CPU_DEVICE_BINARY_DECL(name, int8, float64, float64)             \
@@ -518,6 +577,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int16, int16, float32)              \
     CPU_DEVICE_BINARY_DECL(name, int16, int32, float64)              \
     CPU_DEVICE_NOKERN_DECL(name, int16, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int16, bfloat16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, int16, float16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float32, float32)            \
     CPU_DEVICE_BINARY_DECL(name, int16, float64, float64)            \
@@ -532,6 +592,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, int32, int16, float64)              \
     CPU_DEVICE_BINARY_DECL(name, int32, int32, float64)              \
     CPU_DEVICE_NOKERN_DECL(name, int32, int64, int64)                \
+    CPU_DEVICE_BINARY_DECL(name, int32, bfloat16, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, int32, float16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float32, float64)            \
     CPU_DEVICE_BINARY_DECL(name, int32, float64, float64)            \
@@ -547,12 +608,27 @@ typedef double float64_t;
     CPU_DEVICE_NOKERN_DECL(name, int64, int32, int64)                \
     CPU_DEVICE_NOKERN_DECL(name, int64, int64, int64)                \
                                                                      \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint8, bfloat16)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint16, float32)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint32, float64)          \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int8, bfloat16)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int16, float32)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int32, float64)           \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, bfloat16, bfloat16)       \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, float16, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float32, float32)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float64, float64)         \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, complex32, complex64)     \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex64, complex64)     \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex128, complex128)   \
+                                                                     \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint8, float16)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint16, float32)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint32, float64)           \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int8, float16)             \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int16, float32)            \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int32, float64)            \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float16, float16)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float32, float32)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float64, float64)          \
@@ -566,6 +642,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float32, int8, float32)             \
     CPU_DEVICE_BINARY_DECL(name, float32, int16, float32)            \
     CPU_DEVICE_BINARY_DECL(name, float32, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float32, bfloat16, float32)         \
     CPU_DEVICE_NOIMPL_DECL(name, float32, float16, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float32, float32)          \
     CPU_DEVICE_BINARY_DECL(name, float32, float64, float64)          \
@@ -579,6 +656,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, float64, int8, float64)             \
     CPU_DEVICE_BINARY_DECL(name, float64, int16, float64)            \
     CPU_DEVICE_BINARY_DECL(name, float64, int32, float64)            \
+    CPU_DEVICE_BINARY_DECL(name, float64, bfloat16, float64)         \
     CPU_DEVICE_NOIMPL_DECL(name, float64, float16, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float32, float64)          \
     CPU_DEVICE_BINARY_DECL(name, float64, float64, float64)          \
@@ -592,6 +670,7 @@ typedef double float64_t;
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int8, complex32)         \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int16, complex64)        \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int32, complex128)       \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, bfloat16, complex64)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float16, complex32)      \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float32, complex64)      \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float64, complex128)     \
@@ -605,6 +684,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, complex64, int8, complex64)         \
     CPU_DEVICE_BINARY_DECL(name, complex64, int16, complex64)        \
     CPU_DEVICE_BINARY_DECL(name, complex64, int32, complex128)       \
+    CPU_DEVICE_BINARY_DECL(name, complex64, bfloat16, complex64)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex64, float16, complex64)      \
     CPU_DEVICE_BINARY_DECL(name, complex64, float32, complex64)      \
     CPU_DEVICE_BINARY_DECL(name, complex64, float64, complex128)     \
@@ -618,6 +698,7 @@ typedef double float64_t;
     CPU_DEVICE_BINARY_DECL(name, complex128, int8, complex128)       \
     CPU_DEVICE_BINARY_DECL(name, complex128, int16, complex128)      \
     CPU_DEVICE_BINARY_DECL(name, complex128, int32, complex128)      \
+    CPU_DEVICE_BINARY_DECL(name, complex128, bfloat16, complex128)   \
     CPU_DEVICE_NOIMPL_DECL(name, complex128, float16, complex128)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float32, complex128)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float64, complex128)    \
@@ -647,6 +728,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, uint8, int16, bool)           \
     CPU_DEVICE_BINARY_DECL(name, uint8, int32, bool)           \
     CPU_DEVICE_BINARY_DECL(name, uint8, int64, bool)           \
+    CPU_DEVICE_BINARY_DECL(name, uint8, bfloat16, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, uint8, float16, bool)         \
     CPU_DEVICE_BINARY_DECL(name, uint8, float32, bool)         \
     CPU_DEVICE_BINARY_DECL(name, uint8, float64, bool)         \
@@ -662,6 +744,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, uint16, int16, bool)          \
     CPU_DEVICE_BINARY_DECL(name, uint16, int32, bool)          \
     CPU_DEVICE_BINARY_DECL(name, uint16, int64, bool)          \
+    CPU_DEVICE_BINARY_DECL(name, uint16, bfloat16, bool)       \
     CPU_DEVICE_NOIMPL_DECL(name, uint16, float16, bool)        \
     CPU_DEVICE_BINARY_DECL(name, uint16, float32, bool)        \
     CPU_DEVICE_BINARY_DECL(name, uint16, float64, bool)        \
@@ -677,6 +760,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, uint32, int16, bool)          \
     CPU_DEVICE_BINARY_DECL(name, uint32, int32, bool)          \
     CPU_DEVICE_BINARY_DECL(name, uint32, int64, bool)          \
+    CPU_DEVICE_BINARY_DECL(name, uint32, bfloat16, bool)       \
     CPU_DEVICE_NOIMPL_DECL(name, uint32, float16, bool)        \
     CPU_DEVICE_BINARY_DECL(name, uint32, float32, bool)        \
     CPU_DEVICE_BINARY_DECL(name, uint32, float64, bool)        \
@@ -696,6 +780,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, int8, int16, bool)            \
     CPU_DEVICE_BINARY_DECL(name, int8, int32, bool)            \
     CPU_DEVICE_BINARY_DECL(name, int8, int64, bool)            \
+    CPU_DEVICE_BINARY_DECL(name, int8, bfloat16, bool)         \
     CPU_DEVICE_NOIMPL_DECL(name, int8, float16, bool)          \
     CPU_DEVICE_BINARY_DECL(name, int8, float32, bool)          \
     CPU_DEVICE_BINARY_DECL(name, int8, float64, bool)          \
@@ -710,6 +795,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, int16, int16, bool)           \
     CPU_DEVICE_BINARY_DECL(name, int16, int32, bool)           \
     CPU_DEVICE_BINARY_DECL(name, int16, int64, bool)           \
+    CPU_DEVICE_BINARY_DECL(name, int16, bfloat16, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, int16, float16, bool)         \
     CPU_DEVICE_BINARY_DECL(name, int16, float32, bool)         \
     CPU_DEVICE_BINARY_DECL(name, int16, float64, bool)         \
@@ -724,6 +810,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, int32, int16, bool)           \
     CPU_DEVICE_BINARY_DECL(name, int32, int32, bool)           \
     CPU_DEVICE_BINARY_DECL(name, int32, int64, bool)           \
+    CPU_DEVICE_BINARY_DECL(name, int32, bfloat16, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, int32, float16, bool)         \
     CPU_DEVICE_BINARY_DECL(name, int32, float32, bool)         \
     CPU_DEVICE_BINARY_DECL(name, int32, float64, bool)         \
@@ -739,12 +826,27 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, int64, int32, bool)           \
     CPU_DEVICE_BINARY_DECL(name, int64, int64, bool)           \
                                                                \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint8, bool)        \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint16, bool)       \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, uint32, bool)       \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int8, bool)         \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int16, bool)        \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, int32, bool)        \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, bfloat16, bool)     \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float16, bool)      \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float32, bool)      \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, float64, bool)      \
+    CPU_DEVICE_NOIMPL_DECL(name, bfloat16, complex32, bool)    \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex64, bool)    \
+    CPU_DEVICE_BINARY_DECL(name, bfloat16, complex128, bool)   \
+                                                               \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint8, bool)         \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint16, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, float16, uint32, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int8, bool)          \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int16, bool)         \
     CPU_DEVICE_NOIMPL_DECL(name, float16, int32, bool)         \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, bfloat16, bool)      \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float16, bool)       \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float32, bool)       \
     CPU_DEVICE_NOIMPL_DECL(name, float16, float64, bool)       \
@@ -758,6 +860,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, float32, int8, bool)          \
     CPU_DEVICE_BINARY_DECL(name, float32, int16, bool)         \
     CPU_DEVICE_BINARY_DECL(name, float32, int32, bool)         \
+    CPU_DEVICE_BINARY_DECL(name, float32, bfloat16, bool)      \
     CPU_DEVICE_NOIMPL_DECL(name, float32, float16, bool)       \
     CPU_DEVICE_BINARY_DECL(name, float32, float32, bool)       \
     CPU_DEVICE_BINARY_DECL(name, float32, float64, bool)       \
@@ -771,6 +874,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, float64, int8, bool)          \
     CPU_DEVICE_BINARY_DECL(name, float64, int16, bool)         \
     CPU_DEVICE_BINARY_DECL(name, float64, int32, bool)         \
+    CPU_DEVICE_BINARY_DECL(name, float64, bfloat16, bool)      \
     CPU_DEVICE_NOIMPL_DECL(name, float64, float16, bool)       \
     CPU_DEVICE_BINARY_DECL(name, float64, float32, bool)       \
     CPU_DEVICE_BINARY_DECL(name, float64, float64, bool)       \
@@ -784,6 +888,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int8, bool)        \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int16, bool)       \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, int32, bool)       \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, bfloat16, bool)    \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float16, bool)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float32, bool)     \
     CPU_DEVICE_NOIMPL_DECL(name, complex32, float64, bool)     \
@@ -797,6 +902,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, complex64, int8, bool)        \
     CPU_DEVICE_BINARY_DECL(name, complex64, int16, bool)       \
     CPU_DEVICE_BINARY_DECL(name, complex64, int32, bool)       \
+    CPU_DEVICE_BINARY_DECL(name, complex64, bfloat16, bool)    \
     CPU_DEVICE_NOIMPL_DECL(name, complex64, float16, bool)     \
     CPU_DEVICE_BINARY_DECL(name, complex64, float32, bool)     \
     CPU_DEVICE_BINARY_DECL(name, complex64, float64, bool)     \
@@ -810,6 +916,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
     CPU_DEVICE_BINARY_DECL(name, complex128, int8, bool)       \
     CPU_DEVICE_BINARY_DECL(name, complex128, int16, bool)      \
     CPU_DEVICE_BINARY_DECL(name, complex128, int32, bool)      \
+    CPU_DEVICE_BINARY_DECL(name, complex128, bfloat16, bool)   \
     CPU_DEVICE_NOIMPL_DECL(name, complex128, float16, bool)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float32, bool)    \
     CPU_DEVICE_BINARY_DECL(name, complex128, float64, bool)    \
@@ -829,15 +936,16 @@ CPU_DEVICE_ALL_COMPARISON_DECL(greater)
 /*****************************************************************************/
 
 #define CPU_DEVICE_ALL_BINARY_MV_DECL(name) \
-    CPU_DEVICE_BINARY_MV_DECL(name, uint8, uint8, uint8, uint8)         \
-    CPU_DEVICE_BINARY_MV_DECL(name, uint16, uint16, uint16, uint16)     \
-    CPU_DEVICE_BINARY_MV_DECL(name, uint32, uint32, uint32, uint32)     \
-    CPU_DEVICE_BINARY_MV_DECL(name, uint64, uint64, uint64, uint64)     \
-    CPU_DEVICE_BINARY_MV_DECL(name, int8, int8, int8, int8)             \
-    CPU_DEVICE_BINARY_MV_DECL(name, int16, int16, int16, int16)         \
-    CPU_DEVICE_BINARY_MV_DECL(name, int32, int32, int32, int32)         \
-    CPU_DEVICE_BINARY_MV_DECL(name, int64, int64, int64, int64)         \
-    CPU_DEVICE_BINARY_MV_DECL(name, float32, float32, float32, float32) \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint8, uint8, uint8, uint8)             \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint16, uint16, uint16, uint16)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint32, uint32, uint32, uint32)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, uint64, uint64, uint64, uint64)         \
+    CPU_DEVICE_BINARY_MV_DECL(name, int8, int8, int8, int8)                 \
+    CPU_DEVICE_BINARY_MV_DECL(name, int16, int16, int16, int16)             \
+    CPU_DEVICE_BINARY_MV_DECL(name, int32, int32, int32, int32)             \
+    CPU_DEVICE_BINARY_MV_DECL(name, int64, int64, int64, int64)             \
+    CPU_DEVICE_BINARY_MV_DECL(name, bfloat16, bfloat16, bfloat16, bfloat16) \
+    CPU_DEVICE_BINARY_MV_DECL(name, float32, float32, float32, float32)     \
     CPU_DEVICE_BINARY_MV_DECL(name, float64, float64, float64, float64)
 
 CPU_DEVICE_ALL_BINARY_MV_DECL(divmod)

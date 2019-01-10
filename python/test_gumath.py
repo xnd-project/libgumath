@@ -586,7 +586,6 @@ class TestBinaryCUDA(unittest.TestCase):
 
             x = xnd([0, 1, None, 3, 4, 5, 6, 7], dtype="?" + t.type, device="cuda:managed")
             y = xnd([1, 2, 3, 4, 5, 6, None, 8], dtype="?" + u.type, device="cuda:managed")
-            print(x, y, flush=True)
             z = cd.add(x, y)
             self.assertEqual(z, [1, 3, None, 7, 9, 11, None, 15])
 
@@ -845,7 +844,7 @@ class TestFunctions(unittest.TestCase):
                         else:
                             self.check_unary(f, a, t, u)
 
-    def XXXtest_binary_cpu(self):
+    def test_binary_cpu(self):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         print("\n", flush=True)
@@ -1251,9 +1250,9 @@ ALL_TESTS = [
   TestPdist,
   TestNumba,
   TestOut,
-  #TestUnaryCPU,
+  TestUnaryCPU,
   TestUnaryCUDA,
-  # TestBinaryCPU,
+  TestBinaryCPU,
   TestBinaryCUDA,
   TestBitwise,
   TestFunctions,

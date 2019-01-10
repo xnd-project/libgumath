@@ -674,7 +674,6 @@ def init_binary_cast(pattern, tinfo, rank1, rank2):
            if smallest_common_cast:
                exact_sigs["binary"][pattern][(t, u)] = w
            else:
-               print(t, u, w)
                smallest_common_cast = True
                implemented_sigs["binary"][pattern][(t, u)] = w
                exact_sigs["binary"][pattern][(t, u)] = w
