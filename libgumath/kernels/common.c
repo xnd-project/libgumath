@@ -159,14 +159,16 @@ binary_update_bitmap(xnd_t stack[])
 
 const gm_kernel_set_t *
 cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                    ndt_apply_spec_t *spec, const gm_func_t *f,
-                    const ndt_t *types[], const int64_t li[], int nin, int nout,
+                    ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                    const int64_t li[], int nin, int nout, bool check_broadcast,
                     ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
     const ndt_t *t;
     const ndt_t *dtype;
     int n;
+
+    (void)check_broadcast; /* XXX */
 
     if (nin != 1) {
         ndt_err_format(ctx, NDT_ValueError,
@@ -244,14 +246,16 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 
 const gm_kernel_set_t *
 cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                     ndt_apply_spec_t *spec, const gm_func_t *f,
-                     const ndt_t *types[], const int64_t li[], int nin, int nout,
+                     ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                     const int64_t li[], int nin, int nout, bool check_broadcast,
                      ndt_context_t *ctx)
 {
     const gm_kernel_set_t *set;
     const ndt_t *t;
     const ndt_t *dtype;
     int n;
+
+    (void)check_broadcast; /* XXX */
 
     if (nin != 1) {
         ndt_err_format(ctx, NDT_ValueError,
@@ -322,8 +326,8 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 
 const gm_kernel_set_t *
 cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
-                     ndt_apply_spec_t *spec, const gm_func_t *f,
-                     const ndt_t *types[], const int64_t li[], int nin, int nout,
+                     ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                     const int64_t li[], int nin, int nout, bool check_broadcast,
                      ndt_context_t *ctx)
 {
     const ndt_t *t0;
@@ -362,8 +366,8 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
     if (t0->tag == VarDim || t0->tag == VarDimElem ||
         t1->tag == VarDim || t1->tag == VarDimElem) {
         const gm_kernel_set_t *set = &f->kernels[n+4];
-        if (ndt_typecheck(spec, set->sig, types, li, nin, nout, NULL, NULL,
-                          ctx) < 0) {
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
+                          check_broadcast, NULL, NULL, ctx) < 0) {
             return NULL;
         }
         return set;
@@ -371,7 +375,8 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
 
     const gm_kernel_set_t *set = &f->kernels[n];
 
-    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout, ctx) < 0) {
+    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout,
+                                        check_broadcast, ctx) < 0) {
         return NULL;
     }
 
@@ -380,8 +385,8 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
 
 const gm_kernel_set_t *
 cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
-                      ndt_apply_spec_t *spec, const gm_func_t *f,
-                      const ndt_t *in[], const int64_t li[], int nin, int nout,
+                      ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                      const int64_t li[], int nin, int nout, bool check_broadcast,
                       ndt_context_t *ctx)
 {
     const ndt_t *t0;
@@ -395,8 +400,8 @@ cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1
             f->name, nin);
         return NULL;
     }
-    t0 = in[0];
-    t1 = in[1];
+    t0 = types[0];
+    t1 = types[1];
     assert(ndt_is_concrete(t0));
     assert(ndt_is_concrete(t1));
 
@@ -427,7 +432,8 @@ cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1
 
     const gm_kernel_set_t *set = &f->kernels[n];
 
-    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, in, nin, nout, ctx) < 0) {
+    if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout,
+                                        check_broadcast, ctx) < 0) {
         return NULL;
     }
 

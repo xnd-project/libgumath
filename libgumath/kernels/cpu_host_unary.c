@@ -599,36 +599,42 @@ static const gm_kernel_init_t unary_float[] = {
 /*                         Initialize kernel table                          */
 /****************************************************************************/
 
+typedef _Bool bool;
+
 static const gm_kernel_set_t *
-unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                   const ndt_t *types[], const int64_t li[], int nin, int nout,
+unary_id_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                   const int64_t li[], int nin, int nout, bool check_broadcast,
                    ndt_context_t *ctx)
 {
-    return cpu_unary_typecheck(id_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cpu_unary_typecheck(id_kernel_location, spec, f, types, li,
+                               nin, nout, check_broadcast, ctx);
 }
 
 static const gm_kernel_set_t *
-unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                       const ndt_t *types[], const int64_t li[], int nin, int nout,
+unary_invert_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                       const int64_t li[], int nin, int nout, bool check_broadcast,
                        ndt_context_t *ctx)
 {
-    return cpu_unary_typecheck(invert_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cpu_unary_typecheck(invert_kernel_location, spec, f, types, li,
+                               nin, nout, check_broadcast, ctx);
 }
 
 static const gm_kernel_set_t *
-unary_negative_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                         const ndt_t *types[], const int64_t li[], int nin, int nout,
+unary_negative_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                         const int64_t li[], int nin, int nout, bool check_broadcast,
                          ndt_context_t *ctx)
 {
-    return cpu_unary_typecheck(negative_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cpu_unary_typecheck(negative_kernel_location, spec, f, types, li,
+                               nin, nout, check_broadcast, ctx);
 }
 
 static const gm_kernel_set_t *
-unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f,
-                     const ndt_t *types[], const int64_t li[], int nin, int nout,
+unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                     const int64_t li[], int nin, int nout, bool check_broadcast,
                      ndt_context_t *ctx)
 {
-    return cpu_unary_typecheck(math_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cpu_unary_typecheck(math_kernel_location, spec, f, types, li,
+                               nin, nout, check_broadcast, ctx);
 }
 
 int

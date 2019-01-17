@@ -168,10 +168,9 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
     Py_ssize_t nout;
 
     if (!args || !PyTuple_Check(args)) {
-        const char *tuple = args ? Py_TYPE(args)->tp_name : "NULL";
+        const char *name = args ? Py_TYPE(args)->tp_name : "NULL";
         PyErr_Format(PyExc_SystemError,
-            "internal error: expected tuple, got '%.200s'",
-            tuple);
+            "internal error: expected tuple, got '%.200s'", name);
         return -1;
     }
 
@@ -271,7 +270,8 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
 }
 
 static PyObject *
-gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
+_gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
+             bool enable_threads, bool check_broadcast)
 {
     NDT_STATIC_CONTEXT(ctx);
     PyObject *pystack[NDT_MAX_ARGS];
@@ -307,7 +307,8 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
         }
     }
 
-    kernel = gm_select(&spec, self->tbl, self->name, types, li, nin, nout, stack, &ctx);
+    kernel = gm_select(&spec, self->tbl, self->name, types, li, nin, nout,
+                       nout && check_broadcast, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
     }
@@ -366,8 +367,9 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
         const int rounding = fegetround();
         fesetround(FE_TONEAREST);
 
+        const int64_t N = enable_threads ? max_threads : 1;
         const int ret = gm_apply_thread(&kernel, stack, spec.outer_dims,
-                                        spec.flags, max_threads, &ctx);
+                                        spec.flags, N, &ctx);
         fesetround(rounding);
 
         if (ret < 0) {
@@ -417,6 +419,12 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
         return tuple;
       }
     }
+}
+
+static PyObject *
+gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
+{
+    return _gufunc_call(self, args, kwargs, true, true);
 }
 
 static PyObject *
@@ -491,6 +499,18 @@ struct map_args {
 };
 
 static int
+Gufunc_CheckExact(const PyObject *v)
+{
+    return Py_TYPE(v) == &Gufunc_Type;
+}
+
+static int
+Gufunc_Check(const PyObject *v)
+{
+    return PyObject_TypeCheck(v, &Gufunc_Type);
+}
+
+static int
 add_function(const gm_func_t *f, void *args)
 {
     struct map_args *a = (struct map_args *)args;
@@ -545,6 +565,9 @@ Gumath_AddCudaFunctions(PyObject *m, const gm_tbl_t *tbl)
 static PyObject *
 init_api(void)
 {
+    gumath_api[Gufunc_CheckExact_INDEX] = (void *)Gufunc_CheckExact;
+    gumath_api[Gufunc_Check_INDEX] = (void *)Gufunc_Check;
+    gumath_api[Gumath_AddFunctions_INDEX] = (void *)Gumath_AddFunctions;
     gumath_api[Gumath_AddFunctions_INDEX] = (void *)Gumath_AddFunctions;
     gumath_api[Gumath_AddCudaFunctions_INDEX] = (void *)Gumath_AddCudaFunctions;
 
@@ -555,6 +578,74 @@ init_api(void)
 /****************************************************************************/
 /*                                  Module                                  */
 /****************************************************************************/
+
+static PyObject *
+gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
+{
+    static char *kwlist[] = {"fn", "acc", NULL};
+    PyObject *func = Py_None;
+    PyObject *acc = Py_None;
+    PyObject *tuple;
+    PyObject *dict;
+    PyObject *res;
+    Py_ssize_t size, i;
+    int ret;
+
+    tuple = PyTuple_New(0);
+    if (tuple == NULL) {
+        return NULL;
+    }
+
+    ret = PyArg_ParseTupleAndKeywords(tuple, kwargs, "|$OO", kwlist, &func, &acc);
+    Py_DECREF(tuple);
+    if (ret < 0) {
+        return NULL;
+    }
+
+    if (!Gufunc_Check(func)) {
+        PyErr_Format(PyExc_TypeError,
+            "vfold: expected gufunc object, got '%.200s'", Py_TYPE(func));
+        return NULL;
+    }
+
+    if (!Xnd_Check(acc)) {
+        PyErr_Format(PyExc_TypeError,
+            "vfold: expected xnd object, got '%.200s'", Py_TYPE(acc));
+        return NULL;
+    }
+
+    /* Push the accumulator onto the argument stack. */
+    size = PyTuple_Size(args);
+    tuple = PyTuple_New(size+1);
+    if (tuple == NULL) {
+        return NULL;
+    }
+
+    Py_INCREF(acc);
+    PyTuple_SET_ITEM(tuple, 0, acc);
+    for (i = 0; i < size; i++) {
+        PyObject *v = PyTuple_GET_ITEM(args, i);
+        Py_INCREF(v);
+        PyTuple_SET_ITEM(tuple, i+1, v);
+    }
+
+    /* Simultaneously use the accumulator as the 'out' argument. */
+    dict = PyDict_New();
+    if (dict == NULL) {
+        Py_DECREF(tuple);
+        return NULL;
+    }
+    if (PyDict_SetItemString(dict, "out", acc) < 0) {
+        Py_DECREF(tuple);
+        return NULL;
+    }
+
+    res = _gufunc_call((GufuncObject *)func, tuple, dict, false, false);
+    Py_DECREF(tuple);
+    Py_DECREF(dict);
+
+    return res;
+}
 
 static PyObject *
 unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
@@ -684,6 +775,7 @@ set_max_threads(PyObject *m UNUSED, PyObject *obj)
 static PyMethodDef gumath_methods [] =
 {
   /* Methods */
+  { "vfold", (PyCFunction)gufunc_vfold, METH_VARARGS|METH_KEYWORDS, NULL },
   { "unsafe_add_kernel", (PyCFunction)unsafe_add_kernel, METH_VARARGS|METH_KEYWORDS, NULL },
   { "get_max_threads", (PyCFunction)get_max_threads, METH_NOARGS, NULL },
   { "set_max_threads", (PyCFunction)set_max_threads, METH_O, NULL },

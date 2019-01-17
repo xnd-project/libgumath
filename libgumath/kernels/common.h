@@ -116,23 +116,23 @@ void binary_update_bitmap1D(xnd_t stack[]);
 void binary_update_bitmap(xnd_t stack[]);
 
 const gm_kernel_set_t *cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                                           ndt_apply_spec_t *spec, const gm_func_t *f,
-                                           const ndt_t *types[], const int64_t li[], int nin, int nout,
+                                           ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                                           const int64_t li[], int nin, int nout, bool check_broadcast,
                                            ndt_context_t *ctx);
 
 const gm_kernel_set_t *cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
-                                            ndt_apply_spec_t *spec, const gm_func_t *f,
-                                            const ndt_t *types[], const int64_t li[], int nin, int nout,
+                                            ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                                            const int64_t li[], int nin, int nout, bool check_broadcast,
                                             ndt_context_t *ctx);
 
 const gm_kernel_set_t *cpu_binary_typecheck(int (*kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
-                                            ndt_apply_spec_t *spec, const gm_func_t *f,
-                                            const ndt_t *types[], const int64_t li[], int nin, int nout,
+                                            ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                                            const int64_t li[], int nin, int nout, bool check_broadcast,
                                             ndt_context_t *ctx);
 
 const gm_kernel_set_t *cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx),
-                                             ndt_apply_spec_t *spec, const gm_func_t *f,
-                                             const ndt_t *types[], const int64_t li[], int nin, int nout,
+                                             ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                                             const int64_t li[], int nin, int nout, bool check_broadcast,
                                              ndt_context_t *ctx);
 
 /* END LOCAL SCOPE */

@@ -35,6 +35,9 @@ from xnd import xnd
 from ._gumath import *
 
 
+def fold(fn, acc, x):
+    return vfold(x, fn=fn, acc=acc)
+
 try:
     import numpy as np
     from numba.npyufunc import GUVectorize

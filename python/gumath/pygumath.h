@@ -64,22 +64,38 @@ typedef struct {
 /*                                Capsule API                               */
 /****************************************************************************/
 
-#define Gumath_AddFunctions_INDEX 0
+#define Gufunc_CheckExact_INDEX 0
+#define Gufunc_CheckExact_RETURN int
+#define Gufunc_CheckExact_ARGS (const PyObject *)
+
+#define Gufunc_Check_INDEX 1
+#define Gufunc_Check_RETURN int
+#define Gufunc_Check_ARGS (const PyObject *)
+
+#define Gumath_AddFunctions_INDEX 2
 #define Gumath_AddFunctions_RETURN int
 #define Gumath_AddFunctions_ARGS (PyObject *, const gm_tbl_t *)
 
-#define Gumath_AddCudaFunctions_INDEX 1
+#define Gumath_AddCudaFunctions_INDEX 3
 #define Gumath_AddCudaFunctions_RETURN int
 #define Gumath_AddCudaFunctions_ARGS (PyObject *, const gm_tbl_t *)
 
-#define GUMATH_MAX_API 2
+#define GUMATH_MAX_API 4
 
 
 #ifdef GUMATH_MODULE
+static Gufunc_CheckExact_RETURN Gufunc_CheckExact Gufunc_CheckExact_ARGS;
+static Gufunc_Check_RETURN Gufunc_Check Gufunc_Check_ARGS;
 static Gumath_AddFunctions_RETURN Gumath_AddFunctions Gumath_AddFunctions_ARGS;
 static Gumath_AddCudaFunctions_RETURN Gumath_AddCudaFunctions Gumath_AddCudaFunctions_ARGS;
 #else
 static void **_gumath_api;
+
+#define Gufunc_CheckExact \
+    (*(Gufunc_CheckExact_RETURN (*)Gufunc_CheckExact_ARGS) _gumath_api[Gufunc_CheckExact_INDEX])
+
+#define Gufunc_Check \
+    (*(Gufunc_Check_RETURN (*)Gufunc_Check_ARGS) _gumath_api[Gufunc_Check_INDEX])
 
 #define Gumath_AddFunctions \
     (*(Gumath_AddFunctions_RETURN (*)Gumath_AddFunctions_ARGS) _gumath_api[Gumath_AddFunctions_INDEX])

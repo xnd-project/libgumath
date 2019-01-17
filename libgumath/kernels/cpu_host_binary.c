@@ -2433,20 +2433,24 @@ static const gm_kernel_init_t binary_mv_kernels[] = {
 /*                       Initialize kernel table                            */
 /****************************************************************************/
 
+typedef _Bool bool;
+
 static const gm_kernel_set_t *
 binary_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
-          const int64_t li[], int nin, int nout, ndt_context_t *ctx)
+                 const int64_t li[], int nin, int nout, bool check_broadcast,
+                 ndt_context_t *ctx)
 {
     return cpu_binary_typecheck(binary_kernel_location, spec, f, types, li,
-                                nin, nout, ctx);
+                                nin, nout, check_broadcast, ctx);
 }
 
 static const gm_kernel_set_t *
-bitwise_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *in[],
-          const int64_t li[], int nin, int nout, ndt_context_t *ctx)
+bitwise_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
+                  const int64_t li[], int nin, int nout, bool check_broadcast,
+                  ndt_context_t *ctx)
 {
-    return cpu_binary_typecheck(bitwise_kernel_location, spec, f, in, li,
-                                nin, nout, ctx);
+    return cpu_binary_typecheck(bitwise_kernel_location, spec, f, types, li,
+                                nin, nout, check_broadcast, ctx);
 }
 
 
