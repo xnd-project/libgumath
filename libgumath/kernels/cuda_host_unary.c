@@ -586,7 +586,8 @@ unary_negative_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t
                          const int64_t li[], int nin, int nout, bool check_broadcast,
                          ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(negative_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cuda_unary_typecheck(negative_kernel_location, spec, f, types, li,
+                                nin, nout, check_broadcast, ctx);
 }
 
 static const gm_kernel_set_t *
@@ -594,7 +595,8 @@ unary_math_typecheck(ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *ty
                       const int64_t li[], int nin, int nout, bool check_broadcast,
                       ndt_context_t *ctx)
 {
-    return cuda_unary_typecheck(math_kernel_location, spec, f, types, li, nin, nout, ctx);
+    return cuda_unary_typecheck(math_kernel_location, spec, f, types, li,
+                                nin, nout, check_broadcast, ctx);
 }
 
 int
