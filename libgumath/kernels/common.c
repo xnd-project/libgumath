@@ -191,7 +191,7 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
         n++;
     }
 
-    if (t->tag == VarDim) {
+    if (t->tag == VarDim || t->tag == VarDimElem) {
         const gm_kernel_set_t *set = &f->kernels[n+2];
         if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
                           check_broadcast, NULL, NULL, ctx) < 0) {
