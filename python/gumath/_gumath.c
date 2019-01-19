@@ -582,7 +582,7 @@ init_api(void)
 static PyObject *
 gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
 {
-    static char *kwlist[] = {"fn", "acc", NULL};
+    static char *kwlist[] = {"f", "acc", NULL};
     PyObject *func = Py_None;
     PyObject *acc = Py_None;
     PyObject *tuple;
