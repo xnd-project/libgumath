@@ -163,12 +163,14 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                     const int64_t li[], int nin, int nout, bool check_broadcast,
                     ndt_context_t *ctx)
 {
-    const gm_kernel_set_t *set;
     const ndt_t *t;
-    const ndt_t *dtype;
     int n;
 
-    (void)check_broadcast; /* XXX */
+    assert(spec->flags == 0);
+    assert(spec->outer_dims == 0);
+    assert(spec->nin == 0);
+    assert(spec->nout == 0);
+    assert(spec->nargs == 0);
 
     if (nin != 1) {
         ndt_err_format(ctx, NDT_ValueError,
@@ -176,13 +178,6 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
             f->name, nin);
         return NULL;
 
-    }
-
-    if (nout && nout != 1) {
-        ndt_err_format(ctx, NDT_ValueError,
-            "invalid number of arguments for %s(x, out=y): expected 1, got %d",
-            f->name, nout);
-        return NULL;
     }
 
     t = types[0];
@@ -196,50 +191,21 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
         n++;
     }
 
-    switch (t->tag) {
-    case FixedDim:
-        spec->flags = NDT_C|NDT_STRIDED;
-        spec->outer_dims = t->ndim;
-        if (ndt_is_c_contiguous(ndt_logical_dim_at(t, t->ndim-1))) {
-            spec->flags |= NDT_ELEMWISE_1D;
-        }
-        break;
-    case VarDim: case VarDimElem:
-        spec->flags = NDT_C;
-        spec->outer_dims = ndt_logical_ndim(t);
-        n += 2;
-        break;
-    default:
-        assert(t->ndim == 0);
-        spec->flags = NDT_C|NDT_STRIDED;
-        spec->outer_dims = 0;
-        break;
-    }
-
-    set = &f->kernels[n];
-
-    dtype = ndt_dtype(set->sig->Function.types[1]);
-    dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
-    if (dtype == NULL) {
-        ndt_apply_spec_clear(spec);
-        return NULL;
-    }
-
-    if (nout) {
-        if (!ndt_equal(types[1], dtype)) {
-            ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
-            ndt_apply_spec_clear(spec);
-            ndt_decref(dtype);
+    if (t->tag == VarDim) {
+        const gm_kernel_set_t *set = &f->kernels[n+2];
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
+                          check_broadcast, NULL, NULL, ctx) < 0) {
             return NULL;
         }
+        return set;
     }
 
-    ndt_incref(types[0]);
-    spec->types[0] = types[0];
-    spec->types[1] = dtype;
-    spec->nin = 1;
-    spec->nout = 1;
-    spec->nargs = 2;
+    const gm_kernel_set_t *set = &f->kernels[n];
+
+    if (ndt_fast_unary_fixed_typecheck(spec, set->sig, types, nin, nout,
+                                       check_broadcast, ctx) < 0) {
+        return NULL;
+    }
 
     return set;
 }
@@ -250,24 +216,20 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
                      const int64_t li[], int nin, int nout, bool check_broadcast,
                      ndt_context_t *ctx)
 {
-    const gm_kernel_set_t *set;
     const ndt_t *t;
-    const ndt_t *dtype;
     int n;
+    (void)li;
 
-    (void)check_broadcast; /* XXX */
+    assert(spec->flags == 0);
+    assert(spec->outer_dims == 0);
+    assert(spec->nin == 0);
+    assert(spec->nout == 0);
+    assert(spec->nargs == 0);
 
     if (nin != 1) {
         ndt_err_format(ctx, NDT_ValueError,
             "invalid number of arguments for %s(x): expected 1, got %d",
             f->name, nin);
-        return NULL;
-    }
-
-    if (nout && nout != 1) {
-        ndt_err_format(ctx, NDT_ValueError,
-            "invalid number of arguments for %s(x, out=y): expected 1, got %d",
-            f->name, nout);
         return NULL;
     }
 
@@ -288,33 +250,13 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
             f->name);
         return NULL;
     }
-    spec->flags = NDT_C|NDT_ELEMWISE_1D;
-    spec->outer_dims = t->ndim;
 
-    set = &f->kernels[n];
+    const gm_kernel_set_t *set = &f->kernels[n];
 
-    dtype = ndt_dtype(set->sig->Function.types[1]);
-    dtype = ndt_copy_contiguous_dtype(t, dtype, li[0], ctx);
-    if (dtype == NULL) {
-        ndt_apply_spec_clear(spec);
+    if (ndt_fast_unary_fixed_typecheck(spec, set->sig, types, nin, nout,
+                                       check_broadcast, ctx) < 0) {
         return NULL;
     }
-
-    if (nout) {
-        if (!ndt_equal(types[1], dtype)) {
-            ndt_err_format(ctx, NDT_ValueError, "invalid type for 'out' argument");
-            ndt_apply_spec_clear(spec);
-            ndt_decref(dtype);
-            return NULL;
-        }
-    }
-
-    ndt_incref(types[0]);
-    spec->types[0] = types[0];
-    spec->types[1] = dtype;
-    spec->nin = 1;
-    spec->nout = 1;
-    spec->nargs = 2;
 
     return set;
 }
@@ -394,12 +336,19 @@ cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1
     int n;
     (void)li;
 
+    assert(spec->flags == 0);
+    assert(spec->outer_dims == 0);
+    assert(spec->nin == 0);
+    assert(spec->nout == 0);
+    assert(spec->nargs == 0);
+
     if (nin != 2) {
         ndt_err_format(ctx, NDT_ValueError,
             "invalid number of arguments for %s(x, y): expected 2, got %d",
             f->name, nin);
         return NULL;
     }
+
     t0 = types[0];
     t1 = types[1];
     assert(ndt_is_concrete(t0));
