@@ -114,7 +114,7 @@ struct bfloat16 {
   }
 
   B16_DEVICE_FUNC explicit operator bool() const {
-    return static_cast<bool>(float(*this));
+    return static_cast<bool>(!!(float(*this)));
   }
 
   B16_DEVICE_FUNC explicit operator short() const {
