@@ -78,11 +78,53 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#define copy(x) x
+#define CPU_DEVICE_ALL_UNARY_COPY(name, func, hfunc) \
+    CPU_DEVICE_NOIMPL(name, func, bool, complex32, complex32)         \
+    CPU_DEVICE_UNARYC(name, func, bool, complex64, complex64)         \
+    CPU_DEVICE_UNARYC(name, func, bool, complex128, complex128)       \
+                                                                      \
+    CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32)        \
+    CPU_DEVICE_UNARYC(name, func, uint8, complex64, complex64)        \
+    CPU_DEVICE_UNARYC(name, func, uint8, complex128, complex128)      \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, uint16, complex64, complex64)       \
+    CPU_DEVICE_UNARYC(name, func, uint16, complex128, complex128)     \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, uint32, complex128, complex128)     \
+                                                                      \
+    CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32)         \
+    CPU_DEVICE_UNARYC(name, func, int8, complex64, complex64)         \
+    CPU_DEVICE_UNARYC(name, func, int8, complex128, complex128)       \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, int16, complex64, complex64)        \
+    CPU_DEVICE_UNARYC(name, func, int16, complex128, complex128)      \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, int32, complex128, complex128)      \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, bfloat16, complex64, complex64)     \
+    CPU_DEVICE_UNARYC(name, func, bfloat16, complex128, complex128)   \
+                                                                      \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex32, complex32)      \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex64, complex64)      \
+    CPU_DEVICE_NOIMPL(name, func, float16, complex128, complex128)    \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, float32, complex64, complex64)      \
+    CPU_DEVICE_UNARYC(name, func, float32, complex128, complex128)    \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, float64, complex128, complex128)    \
+                                                                      \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32)    \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64)    \
+    CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128)  \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, complex64, complex64, complex64)    \
+    CPU_DEVICE_UNARYC(name, func, complex64, complex128, complex128)  \
+                                                                      \
+    CPU_DEVICE_UNARYC(name, func, complex128, complex128, complex128)
 
-CPU_DEVICE_NOIMPL(copy, copy, complex32, complex32, complex32)
-CPU_DEVICE_UNARYC(copy, copy, complex64, complex64, complex64)
-CPU_DEVICE_UNARYC(copy, copy, complex128, complex128, complex128)
+
+#define copy(x) x
+CPU_DEVICE_ALL_UNARY_COPY(copy, copy, copy)
 
 
 /*****************************************************************************/

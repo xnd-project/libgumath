@@ -92,8 +92,8 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
     CPU_DEVICE_UNARY(name, func, bool, float32, float32)              \
     CPU_DEVICE_UNARY(name, func, bool, float64, float64)              \
     CPU_DEVICE_NOIMPL(name, func, bool, complex32, complex32)         \
-    CPU_DEVICE_UNARY(name, func, bool, complex64, complex64)          \
-    CPU_DEVICE_UNARY(name, func, bool, complex128, complex128)        \
+    CPU_DEVICE_UNARYC(name, func, bool, complex64, complex64)         \
+    CPU_DEVICE_UNARYC(name, func, bool, complex128, complex128)       \
                                                                       \
     CPU_DEVICE_UNARY(name, func, uint8, uint8, uint8)                 \
     CPU_DEVICE_UNARY(name, func, uint8, uint16, uint16)               \
@@ -107,8 +107,8 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
     CPU_DEVICE_UNARY(name, func, uint8, float32, float32)             \
     CPU_DEVICE_UNARY(name, func, uint8, float64, float64)             \
     CPU_DEVICE_NOIMPL(name, func, uint8, complex32, complex32)        \
-    CPU_DEVICE_UNARY(name, func, uint8, complex64, complex64)         \
-    CPU_DEVICE_UNARY(name, func, uint8, complex128, complex128)       \
+    CPU_DEVICE_UNARYC(name, func, uint8, complex64, complex64)        \
+    CPU_DEVICE_UNARYC(name, func, uint8, complex128, complex128)      \
                                                                       \
     CPU_DEVICE_UNARY(name, func, uint16, uint16, uint16)              \
     CPU_DEVICE_UNARY(name, func, uint16, uint32, uint32)              \
@@ -117,14 +117,14 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
     CPU_DEVICE_UNARY(name, func, uint16, int64, int64)                \
     CPU_DEVICE_UNARY(name, func, uint16, float32, float32)            \
     CPU_DEVICE_UNARY(name, func, uint16, float64, float64)            \
-    CPU_DEVICE_UNARY(name, func, uint16, complex64, complex64)        \
-    CPU_DEVICE_UNARY(name, func, uint16, complex128, complex128)      \
+    CPU_DEVICE_UNARYC(name, func, uint16, complex64, complex64)       \
+    CPU_DEVICE_UNARYC(name, func, uint16, complex128, complex128)     \
                                                                       \
     CPU_DEVICE_UNARY(name, func, uint32, uint32, uint32)              \
     CPU_DEVICE_UNARY(name, func, uint32, uint64, uint64)              \
     CPU_DEVICE_UNARY(name, func, uint32, int64, int64)                \
     CPU_DEVICE_UNARY(name, func, uint32, float64, float64)            \
-    CPU_DEVICE_UNARY(name, func, uint32, complex128, complex128)      \
+    CPU_DEVICE_UNARYC(name, func, uint32, complex128, complex128)     \
                                                                       \
     CPU_DEVICE_UNARY(name, func, uint64, uint64, uint64)              \
                                                                       \
@@ -137,29 +137,29 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
     CPU_DEVICE_UNARY(name, func, int8, float32, float32)              \
     CPU_DEVICE_UNARY(name, func, int8, float64, float64)              \
     CPU_DEVICE_NOIMPL(name, func, int8, complex32, complex32)         \
-    CPU_DEVICE_UNARY(name, func, int8, complex64, complex64)          \
-    CPU_DEVICE_UNARY(name, func, int8, complex128, complex128)        \
+    CPU_DEVICE_UNARYC(name, func, int8, complex64, complex64)         \
+    CPU_DEVICE_UNARYC(name, func, int8, complex128, complex128)       \
                                                                       \
     CPU_DEVICE_UNARY(name, func, int16, int16, int16)                 \
     CPU_DEVICE_UNARY(name, func, int16, int32, int32)                 \
     CPU_DEVICE_UNARY(name, func, int16, int64, int64)                 \
     CPU_DEVICE_UNARY(name, func, int16, float32, float32)             \
     CPU_DEVICE_UNARY(name, func, int16, float64, float64)             \
-    CPU_DEVICE_UNARY(name, func, int16, complex64, complex64)         \
-    CPU_DEVICE_UNARY(name, func, int16, complex128, complex128)       \
+    CPU_DEVICE_UNARYC(name, func, int16, complex64, complex64)        \
+    CPU_DEVICE_UNARYC(name, func, int16, complex128, complex128)      \
                                                                       \
     CPU_DEVICE_UNARY(name, func, int32, int32, int32)                 \
     CPU_DEVICE_UNARY(name, func, int32, int64, int64)                 \
     CPU_DEVICE_UNARY(name, func, int32, float64, float64)             \
-    CPU_DEVICE_UNARY(name, func, int32, complex128, complex128)       \
+    CPU_DEVICE_UNARYC(name, func, int32, complex128, complex128)      \
                                                                       \
     CPU_DEVICE_UNARY(name, func, int64, int64, int64)                 \
                                                                       \
     CPU_DEVICE_UNARY(name, func, bfloat16, bfloat16, bfloat16)        \
     CPU_DEVICE_UNARY(name, func, bfloat16, float32, float32)          \
     CPU_DEVICE_UNARY(name, func, bfloat16, float64, float64)          \
-    CPU_DEVICE_UNARY(name, func, bfloat16, complex64, complex64)      \
-    CPU_DEVICE_UNARY(name, func, bfloat16, complex128, complex128)    \
+    CPU_DEVICE_UNARYC(name, func, bfloat16, complex64, complex64)     \
+    CPU_DEVICE_UNARYC(name, func, bfloat16, complex128, complex128)   \
                                                                       \
     CPU_DEVICE_NOIMPL(name, hfunc, float16, float16, float16)         \
     CPU_DEVICE_NOIMPL(name, func, float16, float32, float32)          \
@@ -170,20 +170,20 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out) \
                                                                       \
     CPU_DEVICE_UNARY(name, func, float32, float32, float32)           \
     CPU_DEVICE_UNARY(name, func, float32, float64, float64)           \
-    CPU_DEVICE_UNARY(name, func, float32, complex64, complex64)       \
-    CPU_DEVICE_UNARY(name, func, float32, complex128, complex128)     \
+    CPU_DEVICE_UNARYC(name, func, float32, complex64, complex64)      \
+    CPU_DEVICE_UNARYC(name, func, float32, complex128, complex128)    \
                                                                       \
     CPU_DEVICE_UNARY(name, func, float64, float64, float64)           \
-    CPU_DEVICE_UNARY(name, func, float64, complex128, complex128)     \
+    CPU_DEVICE_UNARYC(name, func, float64, complex128, complex128)    \
                                                                       \
     CPU_DEVICE_NOIMPL(name, func, complex32, complex32, complex32)    \
     CPU_DEVICE_NOIMPL(name, func, complex32, complex64, complex64)    \
     CPU_DEVICE_NOIMPL(name, func, complex32, complex128, complex128)  \
                                                                       \
-    CPU_DEVICE_UNARY(name, func, complex64, complex64, complex64)     \
-    CPU_DEVICE_UNARY(name, func, complex64, complex128, complex128)   \
+    CPU_DEVICE_UNARYC(name, func, complex64, complex64, complex64)    \
+    CPU_DEVICE_UNARYC(name, func, complex64, complex128, complex128)  \
                                                                       \
-    CPU_DEVICE_UNARY(name, func, complex128, complex128, complex128)
+    CPU_DEVICE_UNARYC(name, func, complex128, complex128, complex128)
 
 
 #define copy(x) x
