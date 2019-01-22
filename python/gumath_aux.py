@@ -137,7 +137,7 @@ def getitem(lst, indices):
 
 class NDArray(list):
     """A simple wrapper for using generalized slicing/indexing on a list."""
-    def __init__(self, value):
+    def __init__(self, value, dtype=None):
         list.__init__(self, value)
         self.maxlevel = maxlevel(value)
 

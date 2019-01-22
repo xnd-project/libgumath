@@ -33,10 +33,81 @@
 from ndtypes import ndt
 from xnd import xnd
 from ._gumath import *
+from . import functions as _fn
 
 
-def fold(fn, acc, x):
-    return vfold(x, fn=fn, acc=acc)
+# ==============================================================================
+#                             General fold function
+# ==============================================================================
+
+def fold(f, acc, x):
+    return vfold(x, f=f, acc=acc)
+
+
+# ==============================================================================
+#                        NumPy's reduce in terms of fold
+# ==============================================================================
+
+def _get_identity(f, x):
+    if f == _fn.add:
+        return xnd(0, dtype=x.dtype)
+    elif f == _fn.multiply:
+        return xnd(1, dtype=x.dtype)
+    else:
+        raise ValueError("%r does not have an identity element")
+
+def reduce(f, x, axis=None, dtype=None):
+    """NumPy's reduce in terms of fold."""
+    axis = 0 if axis is None else axis
+    if not isinstance(axis, int):
+        raise NotImplementedError("currently axis must be a single integer")
+
+    dtype = _maxcast[x.dtype] if dtype is None else dtype
+
+    permute = list(range(x.ndim))
+    hd = permute.pop(axis)
+    permute = [hd] + permute
+
+    T = x.transpose(permute=permute)
+
+    t = T.type.at(1, dtype=dtype)
+    acc = xnd.empty(t)
+
+    if T.type.shape[0] > 0: # First element of x exists.
+        init = T[0]
+        if init.ndim == 0:
+            acc[()] = T[0]
+        else:
+            acc[:] = T[0]
+    else: # Otherwise, use identity element, if it exists.
+        elem = _get_identity(f, T)
+        _fn.copy(elem, out=acc)
+
+    tl = T[1:] # Remaining elements of x.
+
+    return fold(f, acc, tl)
+
+_maxcast = {
+  ndt("int8"): ndt("int64"),
+  ndt("int16"): ndt("int64"),
+  ndt("int32"): ndt("int64"),
+  ndt("int64"): ndt("int64"),
+  ndt("uint8"): ndt("uint64"),
+  ndt("uint16"): ndt("uint64"),
+  ndt("uint32"): ndt("uint64"),
+  ndt("bfloat16"): ndt("float64"),
+  ndt("float16"): ndt("float64"),
+  ndt("float32"): ndt("float64"),
+  ndt("float64"): ndt("float64"),
+  ndt("complex32"): ndt("complex128"),
+  ndt("complex64"): ndt("complex128"),
+  ndt("complex128"): ndt("complex128"),
+}
+
+
+# ==============================================================================
+#                         Numba's GUVectorize on xnd arrays
+# ==============================================================================
 
 try:
     import numpy as np

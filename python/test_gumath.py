@@ -1066,11 +1066,12 @@ class TestCudaManaged(unittest.TestCase):
 
 class TestSpec(unittest.TestCase):
 
-    def __init__(self, *, constr,
+    def __init__(self, *, constr, ndarray,
                  values, value_generator,
                  indices_generator, indices_generator_args):
         super().__init__()
         self.constr = constr
+        self.ndarray = ndarray
         self.values = values
         self.value_generator = value_generator
         self.indices_generator = indices_generator
@@ -1093,6 +1094,58 @@ class TestSpec(unittest.TestCase):
             sys.stderr.write("y%d = y%d[%s]\n" % (i+1, i, itos(self.indices_stack[i])))
 
         sys.stderr.write("\n")
+
+    def run_reduce(self, nd, d):
+        if not isinstance(nd, xnd) or not isinstance(d, np.ndarray):
+            return
+
+        for attr in ["add", "subtract", "multiply"]:
+            f = getattr(fn, attr)
+            g = getattr(np, attr)
+
+            x = nd_exception = None
+            try:
+                x = gm.reduce(f, nd)
+            except Exception as e:
+                nd_exception =  e
+
+            y = np_exception = None
+            try:
+                y = g.reduce(d)
+            except Exception as e:
+                np_exception =  e
+
+            if nd_exception or np_exception:
+                self.assertIs(nd_exception.__class__, np_exception.__class__,
+                              "f: %r nd: %r np: %r x: %r y: %r" % (attr, nd, d, x, y))
+                continue
+            elif 0 in d.shape and x == 0 or x == 1:
+                 pass #12798
+            else:
+                self.assertEqual(x.value, y.tolist(),
+                                 "f: %r nd: %r np: %r x: %r y: %r" % (attr, nd, d, x, y))
+
+            for axis in range(y.ndim):
+                nd_exception = None
+                try:
+                    x = gm.reduce(f, nd, axis=axis)
+                except Exception as e:
+                    nd_exception =  e
+
+                np_exception = None
+                try:
+                    y = g.reduce(d, axis=axis)
+                except Exception as e:
+                    np_exception =  e
+
+                if nd_exception or np_exception:
+                    self.assertIs(nd_exception.__class__, np_exception.__class__,
+                                  "f: %r axis: %r nd: %r np: %r x: %r y: %r" % (attr, axis, nd, d, x, y))
+                elif 0 in d.shape and x == 0 or x == 1:
+                    pass #12798
+                else:
+                    self.assertEqual(x.value, y.tolist(),
+                                     "f: %r axis: %r nd: %r np: %r x: %r y: %r" % (attr, axis, nd, d, x, y))
 
     def run_single(self, nd, d, indices):
         """Run a single test case."""
@@ -1134,11 +1187,19 @@ class TestSpec(unittest.TestCase):
         elif def_result is None:
             a = None
             b = None
+        elif isinstance(def_result, np.ndarray):
+            a = np.sin(def_result).tolist()
+            b = np.multiply(def_result, def_result).tolist()
+        elif isinstance(def_result, np.int32):
+            a = np.sin(def_result).tolist()
+            b = np.multiply(def_result, def_result).tolist()
         else:
-            raise TypeError("unexpected def_result")
+            raise TypeError("unexpected def_result: %s : %s" % (def_result, type(def_result)))
 
         self.assertEqual(x, a)
         self.assertEqual(y, b)
+
+        self.run_reduce(nd_result, def_result)
 
         return nd_result, def_result
 
@@ -1164,7 +1225,8 @@ class TestSpec(unittest.TestCase):
         for value in self.values:
             dtype = "?int32" if have_none(value) else "int32"
             nd = self.constr(value, dtype=dtype)
-            d = NDArray(value)
+            # NumPy does not support "?int32", NDArray does not need the dtype.
+            d = self.ndarray(value, dtype="int32")
             check(nd, d, value, 0)
 
         for max_ndim in range(1, 5):
@@ -1173,7 +1235,8 @@ class TestSpec(unittest.TestCase):
                     for value in self.value_generator(max_ndim, min_shape, max_shape):
                         dtype = "?int32" if have_none(value) else "int32"
                         nd = self.constr(value, dtype=dtype)
-                        d = NDArray(value)
+                        # See above.
+                        d = self.ndarray(value, dtype="int32")
                         check(nd, d, value, 0)
 
 
@@ -1184,6 +1247,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=genindices,
@@ -1191,6 +1255,7 @@ class LongIndexSliceTest(unittest.TestCase):
         t.run()
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=genindices,
@@ -1202,6 +1267,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=randslices,
@@ -1209,6 +1275,7 @@ class LongIndexSliceTest(unittest.TestCase):
         t.run()
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=randslices,
@@ -1220,6 +1287,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=gen_indices_or_slices,
@@ -1228,6 +1296,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=gen_indices_or_slices,
@@ -1239,6 +1308,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=mixed_indices,
@@ -1250,6 +1320,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_LONG, "use --long argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=mixed_indices,
@@ -1261,6 +1332,7 @@ class LongIndexSliceTest(unittest.TestCase):
         skip_if(SKIP_BRUTE_FORCE, "use --all argument to enable these tests")
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=genslices_ndim,
@@ -1268,10 +1340,23 @@ class LongIndexSliceTest(unittest.TestCase):
         t.run()
 
         t = TestSpec(constr=xnd,
+                     ndarray=NDArray,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=genslices_ndim,
                      indices_generator_args=(3, [3,3,3]))
+        t.run()
+
+    @unittest.skipIf(np is None, "numpy not found")
+    def test_reduce(self):
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     ndarray=np.array,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=mixed_indices,
+                     indices_generator_args=(3,))
         t.run()
 
 
