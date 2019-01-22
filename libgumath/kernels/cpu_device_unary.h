@@ -73,26 +73,101 @@ typedef double float64_t;
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-CPU_DEVICE_UNARY_DECL(copy, bool, bool)
+#define CPU_DEVICE_ALL_UNARY_COPY_DECL(name) \
+    CPU_DEVICE_UNARY_DECL(name, bool, bool)             \
+    CPU_DEVICE_UNARY_DECL(name, bool, uint8)            \
+    CPU_DEVICE_UNARY_DECL(name, bool, uint16)           \
+    CPU_DEVICE_UNARY_DECL(name, bool, uint32)           \
+    CPU_DEVICE_UNARY_DECL(name, bool, uint64)           \
+    CPU_DEVICE_UNARY_DECL(name, bool, int8)             \
+    CPU_DEVICE_UNARY_DECL(name, bool, int16)            \
+    CPU_DEVICE_UNARY_DECL(name, bool, int32)            \
+    CPU_DEVICE_UNARY_DECL(name, bool, int64)            \
+    CPU_DEVICE_UNARY_DECL(name, bool, bfloat16)         \
+    CPU_DEVICE_NOIMPL_DECL(name, bool, float16)         \
+    CPU_DEVICE_UNARY_DECL(name, bool, float32)          \
+    CPU_DEVICE_UNARY_DECL(name, bool, float64)          \
+    CPU_DEVICE_NOIMPL_DECL(name, bool, complex32)       \
+    CPU_DEVICE_UNARY_DECL(name, bool, complex64)        \
+    CPU_DEVICE_UNARY_DECL(name, bool, complex128)       \
+    CPU_DEVICE_UNARY_DECL(name, uint8, uint8)           \
+    CPU_DEVICE_UNARY_DECL(name, uint8, uint16)          \
+    CPU_DEVICE_UNARY_DECL(name, uint8, uint32)          \
+    CPU_DEVICE_UNARY_DECL(name, uint8, uint64)          \
+    CPU_DEVICE_UNARY_DECL(name, uint8, int16)           \
+    CPU_DEVICE_UNARY_DECL(name, uint8, int32)           \
+    CPU_DEVICE_UNARY_DECL(name, uint8, int64)           \
+    CPU_DEVICE_UNARY_DECL(name, uint8, bfloat16)        \
+    CPU_DEVICE_NOIMPL_DECL(name, uint8, float16)        \
+    CPU_DEVICE_UNARY_DECL(name, uint8, float32)         \
+    CPU_DEVICE_UNARY_DECL(name, uint8, float64)         \
+    CPU_DEVICE_NOIMPL_DECL(name, uint8, complex32)      \
+    CPU_DEVICE_UNARY_DECL(name, uint8, complex64)       \
+    CPU_DEVICE_UNARY_DECL(name, uint8, complex128)      \
+    CPU_DEVICE_UNARY_DECL(name, uint16, uint16)         \
+    CPU_DEVICE_UNARY_DECL(name, uint16, uint32)         \
+    CPU_DEVICE_UNARY_DECL(name, uint16, uint64)         \
+    CPU_DEVICE_UNARY_DECL(name, uint16, int32)          \
+    CPU_DEVICE_UNARY_DECL(name, uint16, int64)          \
+    CPU_DEVICE_UNARY_DECL(name, uint16, float32)        \
+    CPU_DEVICE_UNARY_DECL(name, uint16, float64)        \
+    CPU_DEVICE_UNARY_DECL(name, uint16, complex64)      \
+    CPU_DEVICE_UNARY_DECL(name, uint16, complex128)     \
+    CPU_DEVICE_UNARY_DECL(name, uint32, uint32)         \
+    CPU_DEVICE_UNARY_DECL(name, uint32, uint64)         \
+    CPU_DEVICE_UNARY_DECL(name, uint32, int64)          \
+    CPU_DEVICE_UNARY_DECL(name, uint32, float64)        \
+    CPU_DEVICE_UNARY_DECL(name, uint32, complex128)     \
+    CPU_DEVICE_UNARY_DECL(name, uint64, uint64)         \
+    CPU_DEVICE_UNARY_DECL(name, int8, int8)             \
+    CPU_DEVICE_UNARY_DECL(name, int8, int16)            \
+    CPU_DEVICE_UNARY_DECL(name, int8, int32)            \
+    CPU_DEVICE_UNARY_DECL(name, int8, int64)            \
+    CPU_DEVICE_UNARY_DECL(name, int8, bfloat16)         \
+    CPU_DEVICE_NOIMPL_DECL(name, int8, float16)         \
+    CPU_DEVICE_UNARY_DECL(name, int8, float32)          \
+    CPU_DEVICE_UNARY_DECL(name, int8, float64)          \
+    CPU_DEVICE_NOIMPL_DECL(name, int8, complex32)       \
+    CPU_DEVICE_UNARY_DECL(name, int8, complex64)        \
+    CPU_DEVICE_UNARY_DECL(name, int8, complex128)       \
+    CPU_DEVICE_UNARY_DECL(name, int16, int16)           \
+    CPU_DEVICE_UNARY_DECL(name, int16, int32)           \
+    CPU_DEVICE_UNARY_DECL(name, int16, int64)           \
+    CPU_DEVICE_UNARY_DECL(name, int16, float32)         \
+    CPU_DEVICE_UNARY_DECL(name, int16, float64)         \
+    CPU_DEVICE_UNARY_DECL(name, int16, complex64)       \
+    CPU_DEVICE_UNARY_DECL(name, int16, complex128)      \
+    CPU_DEVICE_UNARY_DECL(name, int32, int32)           \
+    CPU_DEVICE_UNARY_DECL(name, int32, int64)           \
+    CPU_DEVICE_UNARY_DECL(name, int32, float64)         \
+    CPU_DEVICE_UNARY_DECL(name, int32, complex128)      \
+    CPU_DEVICE_UNARY_DECL(name, int64, int64)           \
+    CPU_DEVICE_UNARY_DECL(name, bfloat16, bfloat16)     \
+    CPU_DEVICE_UNARY_DECL(name, bfloat16, float32)      \
+    CPU_DEVICE_UNARY_DECL(name, bfloat16, float64)      \
+    CPU_DEVICE_UNARY_DECL(name, bfloat16, complex64)    \
+    CPU_DEVICE_UNARY_DECL(name, bfloat16, complex128)   \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, float16)      \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, float32)      \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, float64)      \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, complex32)    \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, complex64)    \
+    CPU_DEVICE_NOIMPL_DECL(name, float16, complex128)   \
+    CPU_DEVICE_UNARY_DECL(name, float32, float32)       \
+    CPU_DEVICE_UNARY_DECL(name, float32, float64)       \
+    CPU_DEVICE_UNARY_DECL(name, float32, complex64)     \
+    CPU_DEVICE_UNARY_DECL(name, float32, complex128)    \
+    CPU_DEVICE_UNARY_DECL(name, float64, float64)       \
+    CPU_DEVICE_UNARY_DECL(name, float64, complex128)    \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, complex32)  \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, complex64)  \
+    CPU_DEVICE_NOIMPL_DECL(name, complex32, complex128) \
+    CPU_DEVICE_UNARY_DECL(name, complex64, complex64)   \
+    CPU_DEVICE_UNARY_DECL(name, complex64, complex128)  \
+    CPU_DEVICE_UNARY_DECL(name, complex128, complex128)
 
-CPU_DEVICE_UNARY_DECL(copy, uint8, uint8)
-CPU_DEVICE_UNARY_DECL(copy, uint16, uint16)
-CPU_DEVICE_UNARY_DECL(copy, uint32, uint32)
-CPU_DEVICE_UNARY_DECL(copy, uint64, uint64)
 
-CPU_DEVICE_UNARY_DECL(copy, int8, int8)
-CPU_DEVICE_UNARY_DECL(copy, int16, int16)
-CPU_DEVICE_UNARY_DECL(copy, int32, int32)
-CPU_DEVICE_UNARY_DECL(copy, int64, int64)
-
-CPU_DEVICE_UNARY_DECL(copy, bfloat16, bfloat16)
-CPU_DEVICE_UNARY_DECL(copy, float16, float16)
-CPU_DEVICE_UNARY_DECL(copy, float32, float32)
-CPU_DEVICE_UNARY_DECL(copy, float64, float64)
-
-CPU_DEVICE_NOIMPL_DECL(copy, complex32, complex32)
-CPU_DEVICE_UNARY_DECL(copy, complex64, complex64)
-CPU_DEVICE_UNARY_DECL(copy, complex128, complex128)
+CPU_DEVICE_ALL_UNARY_COPY_DECL(copy)
 
 
 /*****************************************************************************/
