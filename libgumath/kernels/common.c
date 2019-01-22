@@ -211,12 +211,13 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
 }
 
 const gm_kernel_set_t *
-cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
+cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, const ndt_t *, ndt_context_t *),
                      ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
                      const int64_t li[], int nin, int nout, bool check_broadcast,
                      ndt_context_t *ctx)
 {
     const ndt_t *t;
+    const ndt_t *u;
     int n;
     (void)li;
 
@@ -234,9 +235,24 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, ndt_context_t *),
     }
 
     t = types[0];
-    assert(ndt_is_concrete(t));
 
-    n = kernel_location(t, ctx);
+    if (nout) {
+        if (nout != 1) {
+            ndt_err_format(ctx, NDT_ValueError,
+                "%s(x) expects at most one 'out' argument, got %d",
+                f->name, nout);
+            return NULL;
+        }
+        u = types[1];
+    }
+    else {
+        u = types[0];
+    }
+
+    assert(ndt_is_concrete(t));
+    assert(ndt_is_concrete(u));
+
+    n = kernel_location(t, u, ctx);
     if (n < 0) {
         return NULL;
     }
