@@ -114,13 +114,15 @@ gufunc_new(const gm_tbl_t *tbl, const char *name, const uint32_t flags)
     }
 
     self->tbl = tbl;
+    self->flags = flags;
 
     self->name = ndt_strdup(name, &ctx);
     if (self->name == NULL) {
         return seterr(&ctx);
     }
 
-    self->flags = flags;
+    self->identity = Py_None;
+    Py_INCREF(self->identity);
 
     return (PyObject *)self;
 }
@@ -129,6 +131,7 @@ static void
 gufunc_dealloc(GufuncObject *self)
 {
     ndt_free(self->name);
+    Py_DECREF(self->identity);
     PyObject_Del(self);
 }
 
@@ -428,7 +431,23 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
 }
 
 static PyObject *
-gufunc_kernels(GufuncObject *self, PyObject *args GM_UNUSED)
+gufunc_getidentity(GufuncObject *self, PyObject *args GM_UNUSED)
+{
+    Py_INCREF(self->identity);
+    return self->identity;
+}
+
+static int
+gufunc_setidentity(GufuncObject *self, PyObject *value, void *closure GM_UNUSED)
+{
+    Py_DECREF(self->identity);
+    Py_INCREF(value);
+    self->identity = value;
+    return 0;
+}
+
+static PyObject *
+gufunc_getkernels(GufuncObject *self, PyObject *args GM_UNUSED)
 {
     NDT_STATIC_CONTEXT(ctx);
     PyObject *list, *tmp;
@@ -469,7 +488,8 @@ gufunc_kernels(GufuncObject *self, PyObject *args GM_UNUSED)
 
 static PyGetSetDef gufunc_getsets [] =
 {
-  { "kernels", (getter)gufunc_kernels, NULL, NULL, NULL},
+  { "identity", (getter)gufunc_getidentity, (setter)gufunc_setidentity, NULL, NULL},
+  { "kernels", (getter)gufunc_getkernels, NULL, NULL, NULL},
   {NULL}
 };
 

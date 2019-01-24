@@ -57,6 +57,7 @@ typedef struct {
     const gm_tbl_t *tbl; /* kernel table */
     uint32_t flags;      /* memory target */
     char *name;          /* function name */
+    PyObject *identity;  /* identity element */
 } GufuncObject;
 
 
