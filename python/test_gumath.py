@@ -1118,34 +1118,29 @@ class TestSpec(unittest.TestCase):
             if nd_exception or np_exception:
                 self.assertIs(nd_exception.__class__, np_exception.__class__,
                               "f: %r nd: %r np: %r x: %r y: %r" % (attr, nd, d, x, y))
-                continue
-            elif 0 in d.shape and x == 0 or x == 1:
-                 pass #12798
             else:
                 self.assertEqual(x.value, y.tolist(),
                                  "f: %r nd: %r np: %r x: %r y: %r" % (attr, nd, d, x, y))
 
-            for axis in range(y.ndim):
+            for axes in gen_axes(d.ndim):
                 nd_exception = None
                 try:
-                    x = gm.reduce(f, nd, axis=axis)
+                    x = gm.reduce(f, nd, axes=axes)
                 except Exception as e:
                     nd_exception =  e
 
                 np_exception = None
                 try:
-                    y = g.reduce(d, axis=axis)
+                    y = g.reduce(d, axis=axes)
                 except Exception as e:
                     np_exception =  e
 
                 if nd_exception or np_exception:
                     self.assertIs(nd_exception.__class__, np_exception.__class__,
-                                  "f: %r axis: %r nd: %r np: %r x: %r y: %r" % (attr, axis, nd, d, x, y))
-                elif 0 in d.shape and x == 0 or x == 1:
-                    pass #12798
+                                  "f: %r axes: %r nd: %r np: %r x: %r y: %r" % (attr, axes, nd, d, x, y))
                 else:
                     self.assertEqual(x.value, y.tolist(),
-                                     "f: %r axis: %r nd: %r np: %r x: %r y: %r" % (attr, axis, nd, d, x, y))
+                                     "f: %r axes: %r nd: %r np: %r x: %r y: %r" % (attr, axes, nd, d, x, y))
 
     def run_single(self, nd, d, indices):
         """Run a single test case."""

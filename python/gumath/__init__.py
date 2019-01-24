@@ -37,6 +37,15 @@ from . import functions as _fn
 
 
 # ==============================================================================
+#                              Init identity elements
+# ==============================================================================
+
+# This is done here now, perhaps it should be on the C level.
+_fn.add.identity = 0
+_fn.multiply.identity = 1
+
+
+# ==============================================================================
 #                             General fold function
 # ==============================================================================
 
@@ -48,46 +57,61 @@ def fold(f, acc, x):
 #                        NumPy's reduce in terms of fold
 # ==============================================================================
 
-def _get_identity(f, x):
-    if f == _fn.add:
-        return xnd(0, dtype=x.dtype)
-    elif f == _fn.multiply:
-        return xnd(1, dtype=x.dtype)
-    else:
-        raise ValueError("%r does not have an identity element")
+def _get_axes(axes, ndim):
+    type_err = "'axis' must be None, a single integer or a tuple of integers"
+    value_err = "axis with value %d out of range"
+    duplicate_err = "axis contains duplicate values"
+    if axes is None:
+        axes = tuple(range(x.ndim))
+    elif isinstance(axes, int):
+        axes = (axes,)
+    elif not isinstance(axes, tuple) or \
+         any(not isinstance(v, int) for v in axes):
+        raise TypeError(type_err)
 
-def reduce(f, x, axis=None, dtype=None):
+    if any(n >= ndim for n in axes):
+        raise ValueError(value_err % n)
+
+    if len(set(axes)) != len(axes):
+        raise ValueError(duplicate_err)
+
+    return list(axes)
+
+def _copyto(dest, value):
+    x = xnd(value, dtype=dest.dtype)
+    _fn.copy(x, out=dest)
+
+def reduce(f, x, axes=0, dtype=None):
     """NumPy's reduce in terms of fold."""
-    axis = 0 if axis is None else axis
-    if not isinstance(axis, int):
-        raise NotImplementedError("currently axis must be a single integer")
+    axes = _get_axes(axes, x.ndim)
+    if not axes:
+        return x
 
-    dtype = _maxcast[x.dtype] if dtype is None else dtype
+    if dtype is None:
+        dtype = maxcast[x.dtype]
 
-    permute = list(range(x.ndim))
-    hd = permute.pop(axis)
-    permute = [hd] + permute
+    permute = [n for n in range(x.ndim) if n not in axes]
+    permute = axes + permute
 
     T = x.transpose(permute=permute)
 
-    t = T.type.at(1, dtype=dtype)
+    N = len(axes)
+    t = T.type.at(N, dtype=dtype)
     acc = xnd.empty(t)
 
-    if T.type.shape[0] > 0: # First element of x exists.
-        init = T[0]
-        if init.ndim == 0:
-            acc[()] = T[0]
-        else:
-            acc[:] = T[0]
-    else: # Otherwise, use identity element, if it exists.
-        elem = _get_identity(f, T)
-        _fn.copy(elem, out=acc)
-
-    tl = T[1:] # Remaining elements of x.
+    if f.identity is not None:
+        _copyto(acc, f.identity)
+        tl = T
+    elif N == 1 and T.type.shape[0] > 0:
+        hd, tl = T[0], T[1:]
+        acc[()] = hd
+    else:
+        raise ValueError(
+            "reduction not possible for function without an identity element")
 
     return fold(f, acc, tl)
 
-_maxcast = {
+maxcast = {
   ndt("int8"): ndt("int64"),
   ndt("int16"): ndt("int64"),
   ndt("int32"): ndt("int64"),

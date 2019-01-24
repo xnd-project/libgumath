@@ -33,7 +33,7 @@
 # Python NDarray and functions for generating test cases.
 
 from itertools import accumulate, count, product
-from random import randrange
+from random import randrange, sample
 from collections import namedtuple
 import math
 import struct
@@ -758,3 +758,10 @@ def np_noimpl(name):
         return False
     except AttributeError:
         return True
+
+def gen_axes(ndim):
+    for i in range(ndim):
+        yield i
+    lst = list(range(ndim))
+    for i in range(ndim):
+        yield tuple(sample(lst, i))
