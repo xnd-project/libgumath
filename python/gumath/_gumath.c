@@ -431,6 +431,16 @@ gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs)
 }
 
 static PyObject *
+gufunc_getdevice(GufuncObject *self, PyObject *args GM_UNUSED)
+{
+    if (self->flags & GM_CUDA_MANAGED_FUNC) {
+        return PyUnicode_FromString("cuda:managed");
+    }
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *
 gufunc_getidentity(GufuncObject *self, PyObject *args GM_UNUSED)
 {
     Py_INCREF(self->identity);
@@ -488,6 +498,7 @@ gufunc_getkernels(GufuncObject *self, PyObject *args GM_UNUSED)
 
 static PyGetSetDef gufunc_getsets [] =
 {
+  { "device", (getter)gufunc_getdevice, NULL, NULL, NULL},
   { "identity", (getter)gufunc_getidentity, (setter)gufunc_setidentity, NULL, NULL},
   { "kernels", (getter)gufunc_getkernels, NULL, NULL, NULL},
   {NULL}
