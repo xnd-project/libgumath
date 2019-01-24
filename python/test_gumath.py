@@ -60,8 +60,6 @@ SKIP_BRUTE_FORCE = True
 
 ARCH = platform.architecture()[0]
 
-gm.set_max_threads(1)
-
 
 class TestCall(unittest.TestCase):
 
