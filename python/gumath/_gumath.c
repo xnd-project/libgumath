@@ -368,8 +368,8 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
         fesetround(FE_TONEAREST);
 
         const int64_t N = enable_threads ? max_threads : 1;
-        const int ret = gm_apply_thread(&kernel, stack, spec.outer_dims,
-                                        spec.flags, N, &ctx);
+        const int ret = gm_apply_thread(&kernel, stack, spec.outer_dims, N,
+                                        &ctx);
         fesetround(rounding);
 
         if (ret < 0) {

@@ -94,16 +94,27 @@ apply_thread(void *arg)
 
 int
 gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
-                uint32_t flags, const int64_t nthreads, ndt_context_t *ctx)
+                const int64_t nthreads, ndt_context_t *ctx)
 {
     const int nrows = (int)kernel->set->sig->Function.nargs;
     ALLOCA(xnd_t *, slices, nrows);
     ALLOCA(int, nslices, nrows);
     struct thread_info *tinfo;
     int ncols, tnum;
+    bool use_threads = true;
 
-    if (nthreads <= 1 || nrows == 0 || outer_dims == 0 ||
-        !(flags & NDT_STRIDED)) {
+    if (nthreads <= 1 || nrows == 0 || outer_dims == 0) {
+        use_threads = false;
+    }
+
+    for (int i = 0; i < nrows; i++) {
+        const ndt_t *t = stack[i].type;
+        if (!ndt_is_ndarray(t) || ndt_nelem(t) < GM_THREAD_CUTOFF) {
+            use_threads = false;
+        }
+    }
+
+    if (!use_threads) {
         return gm_apply(kernel, stack, outer_dims, ctx);
     }
 

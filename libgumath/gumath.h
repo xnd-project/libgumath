@@ -77,6 +77,7 @@ extern "C" {
 
 
 #define GM_MAX_KERNELS 2048
+#define GM_THREAD_CUTOFF 1000000
 
 typedef float float32_t;
 typedef double float64_t;
@@ -156,7 +157,7 @@ GM_API gm_kernel_t gm_select(ndt_apply_spec_t *spec, const gm_tbl_t *tbl, const 
                              const ndt_t *types[], const int64_t li[], int nin, int nout,
                              bool check_broadcast, const xnd_t args[], ndt_context_t *ctx);
 GM_API int gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, ndt_context_t *ctx);
-GM_API int gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, uint32_t flags, const int64_t nthreads, ndt_context_t *ctx);
+GM_API int gm_apply_thread(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims, const int64_t nthreads, ndt_context_t *ctx);
 
 
 /******************************************************************************/
