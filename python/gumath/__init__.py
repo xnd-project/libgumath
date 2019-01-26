@@ -58,11 +58,11 @@ def fold(f, acc, x):
 # ==============================================================================
 
 def _get_axes(axes, ndim):
-    type_err = "'axis' must be None, a single integer or a tuple of integers"
+    type_err = "'axes' must be None, a single integer or a tuple of integers"
     value_err = "axis with value %d out of range"
-    duplicate_err = "axis contains duplicate values"
+    duplicate_err = "'axes' argument contains duplicate values"
     if axes is None:
-        axes = tuple(range(x.ndim))
+        axes = tuple(range(ndim))
     elif isinstance(axes, int):
         axes = (axes,)
     elif not isinstance(axes, tuple) or \
