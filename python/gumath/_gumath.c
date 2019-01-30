@@ -704,8 +704,8 @@ unsafe_add_kernel(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwds)
     k.name = name;
     k.sig = sig;
 
-    if (strcmp(tag, "Opt") == 0) {
-        k.Opt = p;
+    if (strcmp(tag, "Opt") == 0) { /* XXX */
+        k.OptC = p;
     }
     else if (strcmp(tag, "C") == 0) {
         k.C = p;

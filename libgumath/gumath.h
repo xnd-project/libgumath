@@ -86,15 +86,25 @@ typedef double float64_t;
 typedef int (* gm_xnd_kernel_t)(xnd_t stack[], ndt_context_t *ctx);
 typedef int (* gm_strided_kernel_t)(char **args, intptr_t *dimensions, intptr_t *steps, void *data);
 
-/* Collection of specialized kernels for a single function signature. */
+/*
+ * Collection of specialized kernels for a single function signature.
+ *
+ * NOTE: The specialized kernel lookup scheme is transitional and may
+ * be replaced by something else.
+ *
+ * This should be considered as a first version of a kernel request
+ * protocol.
+ */
 typedef struct {
     const ndt_t *sig;
     const ndt_constraint_t *constraint;
 
     /* Xnd signatures */
-    gm_xnd_kernel_t Opt;     /* dispatch ensures elementwise, at least 1D, contiguous in last dimensions */
-    gm_xnd_kernel_t C;       /* dispatch ensures c-contiguous in inner dimensions */
-    gm_xnd_kernel_t Fortran; /* dispatch ensures f-contiguous in inner dimensions */
+    gm_xnd_kernel_t OptC;    /* C in inner+1 dimensions */
+    gm_xnd_kernel_t OptZ;    /* C in inner dimensions, C or zero stride in (inner+1)th. */
+    gm_xnd_kernel_t OptSC;   /* C in inner dimensions, strided in (inner+1)th. */
+    gm_xnd_kernel_t C;       /* C in inner dimensions */
+    gm_xnd_kernel_t Fortran; /* Fortran in inner dimensions */
     gm_xnd_kernel_t Xnd;     /* selected if non-contiguous or the other fields are NULL */
 
     /* NumPy signature */
@@ -111,11 +121,17 @@ typedef struct {
     const char *name;
     const char *sig;
     const ndt_constraint_t *constraint;
+    uint32_t cap;
 
-    gm_xnd_kernel_t Opt;
+    /* Xnd signatures */
+    gm_xnd_kernel_t OptC;
+    gm_xnd_kernel_t OptZ;
+    gm_xnd_kernel_t OptSC;
     gm_xnd_kernel_t C;
     gm_xnd_kernel_t Fortran;
     gm_xnd_kernel_t Xnd;
+
+    /* NumPy signature */
     gm_strided_kernel_t Strided;
 } gm_kernel_init_t;
 

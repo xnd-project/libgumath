@@ -652,39 +652,39 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
 #define CPU_HOST_BINARY_INIT(func, t0, t1, t2) \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                     \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                     \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                     \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),          \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                     \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),    \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * ?" STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),  \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * " STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),  \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * ?" STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2), \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 }
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 }
 
 
 #undef bool
@@ -2390,7 +2390,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *
   { .name = STRINGIZE(func),                                           \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> "      \
            "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),            \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3,  \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3, \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CPU_HOST_ALL_BINARY_MV(name) \

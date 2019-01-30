@@ -617,23 +617,19 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
 #define CUDA_HOST_BINARY_INIT(func, t0, t1, t2) \
   { .name = STRINGIZE(func),                                                              \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),    \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                           \
-    .C = NULL },                                                                          \
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),  \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                           \
-    .C = NULL },                                                                          \
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),  \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                           \
-    .C = NULL },                                                                          \
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2), \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                           \
-    .C = NULL }
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 }
 
 
 #undef bool
@@ -2323,11 +2319,10 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_co
 }
 
 #define CUDA_HOST_BINARY_MV_INIT(func, t0, t1, t2, t3) \
-  { .name = STRINGIZE(func),                                           \
-    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> "      \
-           "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),            \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3, \
-    .C = NULL }
+  { .name = STRINGIZE(func),                                             \
+    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> "        \
+           "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),              \
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CUDA_HOST_ALL_BINARY_MV(name) \
     CUDA_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)             \

@@ -404,21 +404,21 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
 #define CPU_HOST_UNARY_INIT(funcname, func, t0, t1) \
   { .name = STRINGIZE(funcname),                                      \
     .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),         \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,               \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,              \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                       \
                                                                       \
   { .name = STRINGIZE(funcname),                                      \
     .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),       \
-    .Opt = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,               \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,              \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                       \
                                                                       \
   { .name = STRINGIZE(funcname),                                      \
     .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),   \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                       \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 },                     \
                                                                       \
   { .name = STRINGIZE(funcname),                                      \
     .sig = "var... * ?" STRINGIZE(t0) " -> var... * ?" STRINGIZE(t1), \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1 }
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 }
 
 
 #undef bool

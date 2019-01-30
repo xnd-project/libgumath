@@ -374,13 +374,11 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) 
 #define CUDA_HOST_UNARY_INIT(funcname, func, t0, t1) \
   { .name = STRINGIZE(funcname),                                \
     .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),   \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1,        \
-    .C = NULL },                                                \
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1 },     \
                                                                 \
   { .name = STRINGIZE(funcname),                                \
     .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1), \
-    .Opt = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1,        \
-    .C = NULL }
+    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1 }
 
 
 #undef bool
