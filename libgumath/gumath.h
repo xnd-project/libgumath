@@ -102,7 +102,7 @@ typedef struct {
     /* Xnd signatures */
     gm_xnd_kernel_t OptC;    /* C in inner+1 dimensions */
     gm_xnd_kernel_t OptZ;    /* C in inner dimensions, C or zero stride in (inner+1)th. */
-    gm_xnd_kernel_t OptSC;   /* C in inner dimensions, strided in (inner+1)th. */
+    gm_xnd_kernel_t OptS;    /* strided in (inner+1)th. */
     gm_xnd_kernel_t C;       /* C in inner dimensions */
     gm_xnd_kernel_t Fortran; /* Fortran in inner dimensions */
     gm_xnd_kernel_t Xnd;     /* selected if non-contiguous or the other fields are NULL */
@@ -126,7 +126,7 @@ typedef struct {
     /* Xnd signatures */
     gm_xnd_kernel_t OptC;
     gm_xnd_kernel_t OptZ;
-    gm_xnd_kernel_t OptSC;
+    gm_xnd_kernel_t OptS;
     gm_xnd_kernel_t C;
     gm_xnd_kernel_t Fortran;
     gm_xnd_kernel_t Xnd;

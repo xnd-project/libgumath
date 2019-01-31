@@ -41,11 +41,11 @@
 
 
 /* flags that apply to all arguments */
-#define OPT_Z (NDT_EXT_ZERO|NDT_INNER_C)
-#define OPT_C (NDT_EXT_C|NDT_INNER_C)
+#define OPT_Z  (NDT_EXT_ZERO|NDT_INNER_C)
+#define OPT_C  (NDT_EXT_C|NDT_INNER_C)
+#define OPT_S  (NDT_EXT_STRIDED|NDT_INNER_STRIDED)
 #define OPT_SC (NDT_EXT_STRIDED|NDT_INNER_C)
 #define OPT_SF (NDT_EXT_STRIDED|NDT_INNER_F)
-#define OPT_SS (NDT_EXT_STRIDED|NDT_INNER_STRIDED)
 
 #define INNER_C (NDT_INNER_C)
 #define INNER_F (NDT_INNER_F)
@@ -55,7 +55,7 @@
 /* kernel requests */
 #define REQ_LOOP_C(flags) ((flags&OPT_C) == OPT_C)
 #define REQ_LOOP_Z(flags) ((flags&OPT_C) == OPT_C || (flags&OPT_Z) == OPT_Z)
-#define REQ_LOOP_SC(flags) ((flags&OPT_SC) == OPT_SC)
+#define REQ_LOOP_S(flags) ((flags&OPT_S) == OPT_S)
 
 #define REQ_INNER_C(flags) ((flags&INNER_C) == INNER_C)
 #define REQ_INNER_F(flags) ((flags&INNER_F) == INNER_F)
@@ -113,12 +113,12 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
         return gm_xnd_map(kernel->set->OptZ, stack, nargs, outer_dims-1, ctx);
     }
 
-    case OPT_SC: {
+    case OPT_S: {
         if (!opt_safe(outer_dims, ctx)) {
             return -1;
         }
 
-        return gm_xnd_map(kernel->set->OptSC, stack, nargs, outer_dims-1, ctx);
+        return gm_xnd_map(kernel->set->OptS, stack, nargs, outer_dims-1, ctx);
     }
 
     case INNER_C: {
@@ -153,8 +153,9 @@ gm_apply(const gm_kernel_t *kernel, xnd_t stack[], int outer_dims,
       }
     }
 
-    /* NOT REACHED: tags should be exhaustive. */
-    ndt_internal_error("invalid tag");
+    ndt_err_format(ctx, NDT_RuntimeError,
+                   "internal error: kernel selection failed");
+    return -1;
 }
 
 static gm_kernel_t
@@ -175,8 +176,8 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         return kernel;
     }
 
-    if (REQ_LOOP_SC(spec->flags) && set->OptSC != NULL) {
-        kernel.flag = OPT_SC;
+    if (REQ_LOOP_S(spec->flags) && set->OptS != NULL) {
+        kernel.flag = OPT_S;
         return kernel;
     }
 
@@ -206,7 +207,7 @@ select_kernel(const ndt_apply_spec_t *spec, const gm_kernel_set_t *set,
         ndt_apply_flags_as_string(spec),
         set->OptC ? "OptC" : "_",
         set->OptZ ? "OptZ" : "_",
-        set->OptSC ? "OptSC" : "_",
+        set->OptS ? "OptS" : "_",
         set->C ? "C" : "_",
         set->Fortran ? "Fortran" : "_",
         set->Xnd ? "Xnd" : "_",

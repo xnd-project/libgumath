@@ -581,6 +581,29 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 }                                                                                     \
                                                                                       \
 static int                                                                            \
+gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                     \
+    const char *in0 = apply_index(&stack[0]);                                         \
+    const char *in1 = apply_index(&stack[1]);                                         \
+    char *out = apply_index(&stack[2]);                                               \
+    int64_t N = xnd_fixed_shape(&stack[0]);                                           \
+    int64_t steps[3];                                                                 \
+    (void)ctx;                                                                        \
+                                                                                      \
+    steps[0] = xnd_fixed_step(&stack[0]);                                             \
+    steps[1] = xnd_fixed_step(&stack[1]);                                             \
+    steps[2] = xnd_fixed_step(&stack[2]);                                             \
+                                                                                      \
+    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(in0, in1, out, steps, N);    \
+                                                                                      \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
+        binary_update_bitmap1D(stack);                                                \
+    }                                                                                 \
+                                                                                      \
+    return 0;                                                                         \
+}                                                                                     \
+                                                                                      \
+static int                                                                            \
 gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                     \
     const char *in0 = stack[0].ptr;                                                   \
@@ -600,6 +623,19 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
 #define CPU_HOST_NOIMPL(name, t0, t1, t2) \
 static int                                                                            \
 gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                     \
+    (void)stack;                                                                      \
+                                                                                      \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                      \
+        "implementation for " STRINGIZE(name) " : "                                   \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2)                         \
+        " currently requires double rounding");                                       \
+                                                                                      \
+    return -1;                                                                        \
+}                                                                                     \
+                                                                                      \
+static int                                                                            \
+gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                     \
     (void)stack;                                                                      \
                                                                                       \
@@ -638,6 +674,18 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 }                                                                                     \
                                                                                       \
 static int                                                                            \
+gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                     \
+    (void)stack;                                                                      \
+                                                                                      \
+    ndt_err_format(ctx, NDT_TypeError,                                                \
+        "no kernel for " STRINGIZE(name) " : "                                        \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2));                       \
+                                                                                      \
+    return -1;                                                                        \
+}                                                                                     \
+                                                                                      \
+static int                                                                            \
 gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                     \
     (void)stack;                                                                      \
@@ -653,21 +701,25 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),          \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
