@@ -97,7 +97,7 @@ def reduce(f, x, axes=0, dtype=None):
 
     N = len(axes)
     t = T.type.at(N, dtype=dtype)
-    acc = xnd.empty(t)
+    acc = xnd.empty(t, device=x.device)
 
     if f.identity is not None:
         _copyto(acc, f.identity)
