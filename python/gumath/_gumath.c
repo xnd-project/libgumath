@@ -350,6 +350,14 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
 
     if (self->flags == GM_CUDA_MANAGED_FUNC) {
     #if HAVE_CUDA
+        if (!check_broadcast) {
+            ndt_err_format(&ctx, NDT_NotImplementedError,
+               "fold() is currently not supported on cuda");
+            clear_pystack(pystack, spec.nargs);
+            ndt_apply_spec_clear(&spec);
+            return seterr(&ctx);
+        }
+
         const int ret = gm_apply(&kernel, stack, spec.outer_dims, &ctx);
 
         if (xnd_cuda_device_synchronize(&ctx) < 0 || ret < 0) {
