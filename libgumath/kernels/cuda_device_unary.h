@@ -61,10 +61,20 @@ typedef double float64_t;
 
 #ifdef __cplusplus
   #define CUDA_DEVICE_UNARY_DECL(name, t0, t1) \
-  extern "C" void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *in0, char *out, int64_t N);
+  extern "C" void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                                                 const int64_t N);                   \
+  extern "C" void gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                                                 const int64_t s0, const int64_t s1, \
+                                                                 const int64_t N);                   \
+  extern "C" void gm_cuda_device_0D_##name##_##t0##_##t1(const char *a0, char *a1);
 #else
   #define CUDA_DEVICE_UNARY_DECL(name, t0, t1) \
-  void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *in0, char *out, int64_t N);
+  void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                                      const int64_t N);                   \
+  void gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                                      const int64_t s0, const int64_t s1, \
+                                                      const int64_t N);                   \
+  void gm_cuda_device_0D_##name##_##t0##_##t1(const char *a0, char *a1);
 #endif
 
 #define CUDA_DEVICE_NOIMPL_DECL(name, t0, t1)

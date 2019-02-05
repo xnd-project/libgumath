@@ -43,38 +43,38 @@
 /*****************************************************************************/
 
 #define CPU_DEVICE_UNARY(name, func, t0, t1, common) \
-extern "C" void                                                              \
-gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(                               \
-    const char *in0, char *out, int64_t N)                                   \
-{                                                                            \
-    const t0##_t *_in0 = (const t0##_t *)in0;                                \
-    t1##_t *_out = (t1##_t *)out;                                            \
-                                                                             \
-    for (int64_t i = 0; i < N; i++) {                                        \
-        _out[i] = func((common##_t)_in0[i]);                                 \
-    }                                                                        \
-}                                                                            \
-                                                                             \
-extern "C" void                                                              \
-gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1(                               \
-    const char *in0, char *out, const int64_t steps[2], int64_t N)           \
-{                                                                            \
-    const t0##_t *_in0 = (const t0##_t *)in0;                                \
-    t1##_t *_out = (t1##_t *)out;                                            \
-    const int64_t s0 = steps[0];                                             \
-    const int64_t s1 = steps[1];                                             \
-    int64_t i, j, k;                                                         \
-                                                                             \
-    for (i=0, j=0, k=0; i < N; i++, j+=s0, k+=s1) {                          \
-        _out[k] = func((common##_t)_in0[j]);                                 \
-    }                                                                        \
-}                                                                            \
-                                                                             \
-extern "C" void                                                              \
-gm_cpu_device_0D_##name##_##t0##_##t1(const char *in0, char *out)            \
-{                                                                            \
-    const t0##_t x = *((const t0##_t *)in0);                                 \
-    *((t1##_t *)out) = func((common##_t)x);                                  \
+extern "C" void                                                                   \
+gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                              const int64_t N)                    \
+{                                                                                 \
+    const t0##_t *x0 = (const t0##_t *)a0;                                        \
+    t1##_t *x1 = (t1##_t *)a1;                                                    \
+                                                                                  \
+    for (int64_t i = 0; i < N; i++) {                                             \
+        x1[i] = func((common##_t)x0[i]);                                          \
+    }                                                                             \
+}                                                                                 \
+                                                                                  \
+extern "C" void                                                                   \
+gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1(const char *a0, char *a1,           \
+                                              const int64_t s0, const int64_t s1, \
+                                              const int64_t N)                    \
+{                                                                                 \
+    const t0##_t *x0 = (const t0##_t *)a0;                                        \
+    t1##_t *x1 = (t1##_t *)a1;                                                    \
+    int64_t i, k0, k1;                                                            \
+                                                                                  \
+    for (i=0, k0=0, k1=0; i < N; i++, k0+=s0, k1+=s1) {                           \
+        x1[k1] = func((common##_t)x0[k0]);                                        \
+    }                                                                             \
+}                                                                                 \
+                                                                                  \
+extern "C" void                                                                   \
+gm_cpu_device_0D_##name##_##t0##_##t1(const char *a0, char *a1)                   \
+{                                                                                 \
+    const t0##_t x0 = *((const t0##_t *)a0);                                      \
+    t1##_t *x1 = (t1##_t *)a1;                                                    \
+    *x1 = func((common##_t)x0);                                                   \
 }
 
 #ifdef _MSC_VER

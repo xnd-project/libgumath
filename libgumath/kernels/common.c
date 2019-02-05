@@ -276,13 +276,6 @@ cuda_unary_typecheck(int (*kernel_location)(const ndt_t *, const ndt_t *, ndt_co
         n++;
     }
 
-    if (!ndt_is_c_contiguous(ndt_logical_dim_at(t, t->ndim-1))) {
-        ndt_err_format(ctx, NDT_NotImplementedError,
-            "cuda %s kernel: input must be contiguous in the last dimension",
-            f->name);
-        return NULL;
-    }
-
     const gm_kernel_set_t *set = &f->kernels[n];
 
     if (ndt_fast_unary_fixed_typecheck(spec, set->sig, types, nin, nout,

@@ -1064,12 +1064,13 @@ class TestCudaManaged(unittest.TestCase):
 
 class TestSpec(unittest.TestCase):
 
-    def __init__(self, *, constr, ndarray,
+    def __init__(self, *, constr, ndarray, mod,
                  values, value_generator,
                  indices_generator, indices_generator_args):
         super().__init__()
         self.constr = constr
         self.ndarray = ndarray
+        self.mod = mod
         self.values = values
         self.value_generator = value_generator
         self.indices_generator = indices_generator
@@ -1168,31 +1169,41 @@ class TestSpec(unittest.TestCase):
 
         assert(isinstance(nd_result, xnd))
 
-        x = fn.sin(nd_result)
-        y = fn.multiply(nd_result, nd_result)
+        x = self.mod.sin(nd_result)
+        if self.mod == fn:
+            y = self.mod.multiply(nd_result, nd_result)
 
         if isinstance(def_result, NDArray):
-            a = def_result.sin()
+            aa = a = def_result.sin()
             b = def_result * def_result
         elif isinstance(def_result, int):
-            a = math.sin(def_result)
+            aa = a = math.sin(def_result)
             b = def_result * def_result
         elif def_result is None:
-            a = None
-            b = None
+            aa = a = None
+            aa = b = None
         elif isinstance(def_result, np.ndarray):
-            a = np.sin(def_result).tolist()
-            b = np.multiply(def_result, def_result).tolist()
+            aa = np.sin(def_result)
+            a = aa.tolist()
+            bb = np.multiply(def_result, def_result)
+            b = bb.tolist()
         elif isinstance(def_result, np.int32):
-            a = np.sin(def_result).tolist()
-            b = np.multiply(def_result, def_result).tolist()
+            aa = np.sin(def_result)
+            a = aa.tolist()
+            bb = np.multiply(def_result, def_result)
+            b = bb.tolist()
         else:
             raise TypeError("unexpected def_result: %s : %s" % (def_result, type(def_result)))
 
-        self.assertEqual(x, a)
-        self.assertEqual(y, b)
+        if self.mod == cd:
+            np.testing.assert_allclose(x, aa, 1e-6)
+            # np.testing.assert_allclose(y, bb, 1e-6)
+        else:
+            self.assertEqual(x, a)
+            self.assertEqual(y, b)
 
-        self.run_reduce(nd_result, def_result)
+        if self.mod == fn:
+            self.run_reduce(nd_result, def_result)
 
         return nd_result, def_result
 
@@ -1217,7 +1228,10 @@ class TestSpec(unittest.TestCase):
 
         for value in self.values:
             dtype = "?int32" if have_none(value) else "int32"
-            nd = self.constr(value, dtype=dtype)
+            if self.constr == xnd:
+                nd = xnd(value, dtype=dtype, device=None if self.mod==fn else "cuda:managed")
+            else:
+                nd = self.constr(value, dtype=dtype)
             # NumPy does not support "?int32", NDArray does not need the dtype.
             d = self.ndarray(value, dtype="int32")
             check(nd, d, value, 0)
@@ -1227,7 +1241,10 @@ class TestSpec(unittest.TestCase):
                 for max_shape in range(1, 8):
                     for value in self.value_generator(max_ndim, min_shape, max_shape):
                         dtype = "?int32" if have_none(value) else "int32"
-                        nd = self.constr(value, dtype=dtype)
+                        if self.constr == xnd:
+                            nd = xnd(value, dtype=dtype, device=None if self.mod==fn else "cuda:managed")
+                        else:
+                            nd = self.constr(value, dtype=dtype)
                         # See above.
                         d = self.ndarray(value, dtype="int32")
                         check(nd, d, value, 0)
@@ -1241,6 +1258,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=genindices,
@@ -1249,8 +1267,23 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
+                     indices_generator=genindices,
+                     indices_generator_args=())
+        t.run()
+
+    @unittest.skipIf(cd is None or np is None, "cuda or numpy not found")
+    def test_subarray_cuda(self):
+        # Multidimensional indexing
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     ndarray=np.array,
+                     mod=cd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
                      indices_generator=genindices,
                      indices_generator_args=())
         t.run()
@@ -1261,6 +1294,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=randslices,
@@ -1269,8 +1303,23 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
+                     indices_generator=randslices,
+                     indices_generator_args=(3,))
+        t.run()
+
+    @unittest.skipIf(cd is None or np is None, "cuda or numpy not found")
+    def test_slices_cuda(self):
+        # Multidimensional slicing
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     ndarray=np.array,
+                     mod=cd,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
                      indices_generator=randslices,
                      indices_generator_args=(3,))
         t.run()
@@ -1281,6 +1330,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=gen_indices_or_slices,
@@ -1290,6 +1340,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=gen_indices_or_slices,
@@ -1302,6 +1353,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=mixed_indices,
@@ -1314,6 +1366,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=mixed_indices,
@@ -1326,6 +1379,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=genslices_ndim,
@@ -1334,6 +1388,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=NDArray,
+                     mod=fn,
                      values=SUBSCRIPT_VAR_TEST_CASES,
                      value_generator=gen_var,
                      indices_generator=genslices_ndim,
@@ -1346,6 +1401,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
         t = TestSpec(constr=xnd,
                      ndarray=np.array,
+                     mod=fn,
                      values=SUBSCRIPT_FIXED_TEST_CASES,
                      value_generator=gen_fixed,
                      indices_generator=mixed_indices,

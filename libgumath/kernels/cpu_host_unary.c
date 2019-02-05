@@ -343,12 +343,12 @@ math_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 static int                                                                     \
 gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                              \
-    const char *in0 = apply_index(&stack[0]);                                  \
-    char *out = apply_index(&stack[1]);                                        \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                    \
+    const char *a0 = apply_index(&stack[0]);                                   \
+    char *a1 = apply_index(&stack[1]);                                         \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                              \
     (void)ctx;                                                                 \
                                                                                \
-    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(in0, out, N);                \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(a0, a1, N);                  \
                                                                                \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                           \
         unary_update_bitmap1D(stack);                                          \
@@ -360,16 +360,14 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
 static int                                                                     \
 gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                              \
-    const char *in0 = apply_index(&stack[0]);                                  \
-    char *out = apply_index(&stack[1]);                                        \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                    \
-    int64_t steps[2];                                                          \
+    const char *a0 = apply_index(&stack[0]);                                   \
+    char *a1 = apply_index(&stack[1]);                                         \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                              \
+    const int64_t s0 = xnd_fixed_step(&stack[0]);                              \
+    const int64_t s1 = xnd_fixed_step(&stack[1]);                              \
     (void)ctx;                                                                 \
                                                                                \
-    steps[0] = xnd_fixed_step(&stack[0]);                                      \
-    steps[1] = xnd_fixed_step(&stack[1]);                                      \
-                                                                               \
-    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1(in0, out, steps, N);         \
+    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1(a0, a1, s0, s1, N);          \
                                                                                \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                           \
         unary_update_bitmap1D(stack);                                          \
@@ -381,11 +379,11 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
 static int                                                                     \
 gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                              \
-    const char *in0 = stack[0].ptr;                                            \
-    char *out = stack[1].ptr;                                                  \
+    const char *a0 = stack[0].ptr;                                             \
+    char *a1 = stack[1].ptr;                                                   \
     (void)ctx;                                                                 \
                                                                                \
-    gm_cpu_device_0D_##name##_##t0##_##t1(in0, out);                           \
+    gm_cpu_device_0D_##name##_##t0##_##t1(a0, a1);                             \
                                                                                \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                           \
         unary_update_bitmap(stack);                                            \
