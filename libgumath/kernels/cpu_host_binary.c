@@ -565,13 +565,13 @@ invalid_combination:
 static int                                                                            \
 gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                     \
-    const char *in0 = apply_index(&stack[0]);                                         \
-    const char *in1 = apply_index(&stack[1]);                                         \
-    char *out = apply_index(&stack[2]);                                               \
+    const char *a0 = apply_index(&stack[0]);                                          \
+    const char *a1 = apply_index(&stack[1]);                                          \
+    char *a3 = apply_index(&stack[2]);                                                \
     int64_t N = xnd_fixed_shape(&stack[0]);                                           \
     (void)ctx;                                                                        \
                                                                                       \
-    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(in0, in1, out, N);           \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a3, N);              \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
         binary_update_bitmap1D(stack);                                                \
@@ -583,18 +583,16 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 static int                                                                            \
 gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                     \
-    const char *in0 = apply_index(&stack[0]);                                         \
-    const char *in1 = apply_index(&stack[1]);                                         \
-    char *out = apply_index(&stack[2]);                                               \
+    const char *a0 = apply_index(&stack[0]);                                          \
+    const char *a1 = apply_index(&stack[1]);                                          \
+    char *a2 = apply_index(&stack[2]);                                                \
     int64_t N = xnd_fixed_shape(&stack[0]);                                           \
-    int64_t steps[3];                                                                 \
+    const int64_t s0 = xnd_fixed_step(&stack[0]);                                     \
+    const int64_t s1 = xnd_fixed_step(&stack[1]);                                     \
+    const int64_t s2 = xnd_fixed_step(&stack[2]);                                     \
     (void)ctx;                                                                        \
                                                                                       \
-    steps[0] = xnd_fixed_step(&stack[0]);                                             \
-    steps[1] = xnd_fixed_step(&stack[1]);                                             \
-    steps[2] = xnd_fixed_step(&stack[2]);                                             \
-                                                                                      \
-    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(in0, in1, out, steps, N);    \
+    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
         binary_update_bitmap1D(stack);                                                \
@@ -606,12 +604,12 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 static int                                                                            \
 gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                     \
-    const char *in0 = stack[0].ptr;                                                   \
-    const char *in1 = stack[1].ptr;                                                   \
-    char *out = stack[2].ptr;                                                         \
+    const char *a0 = stack[0].ptr;                                                    \
+    const char *a1 = stack[1].ptr;                                                    \
+    char *a2 = stack[2].ptr;                                                          \
     (void)ctx;                                                                        \
                                                                                       \
-    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(in0, in1, out);                      \
+    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
         binary_update_bitmap(stack);                                                  \
@@ -2411,15 +2409,15 @@ static const gm_kernel_init_t bitwise_kernels[] = {
 static int                                                                                   \
 gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                            \
-    const char *in0 = apply_index(&stack[0]);                                                \
-    const char *in1 = apply_index(&stack[1]);                                                \
-    char *out0 = apply_index(&stack[2]);                                                     \
-    char *out1 = apply_index(&stack[3]);                                                     \
+    const char *a0 = apply_index(&stack[0]);                                                 \
+    const char *a1 = apply_index(&stack[1]);                                                 \
+    char *a2 = apply_index(&stack[2]);                                                       \
+    char *a3 = apply_index(&stack[3]);                                                       \
     int64_t N = xnd_fixed_shape(&stack[0]);                                                  \
     (void)ctx;                                                                               \
                                                                                              \
     gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(                             \
-        in0, in1, out0, out1, N);                                                            \
+        a0, a1, a2, a3, N);                                                                  \
                                                                                              \
     return 0;                                                                                \
 }                                                                                            \
@@ -2427,13 +2425,13 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_con
 static int                                                                                   \
 gm_cpu_host_0D_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                            \
-    const char *in0 = stack[0].ptr;                                                          \
-    const char *in1 = stack[1].ptr;                                                          \
-    char *out0 = stack[2].ptr;                                                               \
-    char *out1 = stack[3].ptr;                                                               \
+    const char *a0 = stack[0].ptr;                                                           \
+    const char *a1 = stack[1].ptr;                                                           \
+    char *a2 = stack[2].ptr;                                                                 \
+    char *a3 = stack[3].ptr;                                                                 \
     (void)ctx;                                                                               \
                                                                                              \
-    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(in0, in1, out0, out1);               \
+    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(a0, a1, a2, a3);                     \
                                                                                              \
     return 0;                                                                                \
 }
