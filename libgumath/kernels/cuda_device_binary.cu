@@ -39,55 +39,85 @@
 
 
 /*****************************************************************************/
-/*                         Cuda device binary kernels                        */
+/*                         CUDA device binary kernels                        */
 /*****************************************************************************/
 
 #define CUDA_DEVICE_BINARY(name, func, t0, t1, t2, common) \
-static __global__ void                                                       \
-_##name##_##t0##_##t1##_##t2(                                                \
-    const t0##_t* in0, const t1##_t* in1, t2##_t* out, int64_t N,            \
-    enum cuda_binary tag)                                                    \
-{                                                                            \
-    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;                   \
-    int64_t stride = blockDim.x * gridDim.x;                                 \
-                                                                             \
-    switch (tag) {                                                           \
-    case ZeroStepNone:                                                       \
-        for (int64_t i = index; i < N; i += stride) {                        \
-            out[i] = func((common##_t)in0[i], (common##_t)in1[i]);           \
-        }                                                                    \
-        break;                                                               \
-    case ZeroStepIn0:                                                        \
-        for (int64_t i = index; i < N; i += stride) {                        \
-            out[i] = func((common##_t)in0[0], (common##_t)in1[i]);           \
-        }                                                                    \
-        break;                                                               \
-    case ZeroStepIn1:                                                        \
-        for (int64_t i = index; i < N; i += stride) {                        \
-            out[i] = func((common##_t)in0[i], (common##_t)in1[0]);           \
-        }                                                                    \
-        break;                                                               \
-    case ZeroStepIn0In1:                                                     \
-        for (int64_t i = index; i < N; i += stride) {                        \
-            out[i] = func((common##_t)in0[0], (common##_t)in1[0]);           \
-        }                                                                    \
-        break;                                                               \
-    }                                                                        \
-}                                                                            \
-                                                                             \
-extern "C" void                                                              \
-gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
-    const char *in0, const char *in1, char *out, int64_t N,                  \
-    enum cuda_binary tag)                                                    \
-{                                                                            \
-    const t0##_t *_in0 = (const t0##_t *)in0;                                \
-    const t1##_t *_in1 = (const t1##_t *)in1;                                \
-    t2##_t *_out = (t2##_t *)out;                                            \
-    int blockSize = 256;                                                     \
-    int64_t numBlocks = (N + blockSize - 1) / blockSize;                     \
-                                                                             \
-    _##name##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(_in0, _in1, _out, \
-                                                           N, tag);          \
+static __global__ void                                                          \
+_1D_C_##name##_##t0##_##t1##_##t2(                                              \
+    const t0##_t *x0, const t1##_t *x1, t2##_t *x2,                             \
+    const int64_t N)                                                            \
+{                                                                               \
+    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;                      \
+    int64_t stride = blockDim.x * gridDim.x;                                    \
+                                                                                \
+    for (int64_t i = index; i < N; i += stride) {                               \
+        x2[i] = func((common##_t)x0[i], (common##_t)x1[i]);                     \
+    }                                                                           \
+}                                                                               \
+                                                                                \
+extern "C" void                                                                 \
+gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                          \
+    const char *a0, const char *a1, char *a2,                                   \
+    const int64_t N)                                                            \
+{                                                                               \
+    const t0##_t *x0 = (const t0##_t *)a0;                                      \
+    const t1##_t *x1 = (const t1##_t *)a1;                                      \
+    t2##_t *x2 = (t2##_t *)a2;                                                  \
+    int blockSize = 256;                                                        \
+    int64_t numBlocks = (N + blockSize - 1) / blockSize;                        \
+                                                                                \
+    _1D_C_##name##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(x0, x1, x2, N); \
+}                                                                               \
+                                                                                \
+static __global__ void                                                          \
+_1D_S_##name##_##t0##_##t1##_##t2(                                              \
+    const t0##_t *x0, const t1##_t *x1, t2##_t *x2,                             \
+    const int64_t s0, const int64_t s1, const int64_t s2,                       \
+    const int64_t N)                                                            \
+{                                                                               \
+    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;                      \
+    int64_t stride = blockDim.x * gridDim.x;                                    \
+                                                                                \
+    for (int64_t i = index; i < N; i += stride) {                               \
+        const int64_t i0 = i * s0;                                              \
+        const int64_t i1 = i * s1;                                              \
+        const int64_t i2 = i * s2;                                              \
+        x2[i2] = func((common##_t)x0[i0], (common##_t)x1[i1]);                  \
+    }                                                                           \
+}                                                                               \
+                                                                                \
+extern "C" void                                                                 \
+gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(                          \
+    const char *a0, const char *a1, char *a2,                                   \
+    const int64_t s0, const int64_t s1, const int64_t s2,                       \
+    const int64_t N)                                                            \
+{                                                                               \
+    const t0##_t *x0 = (const t0##_t *)a0;                                      \
+    const t1##_t *x1 = (const t1##_t *)a1;                                      \
+    t2##_t *x2 = (t2##_t *)a2;                                                  \
+    int blockSize = 256;                                                        \
+    int64_t numBlocks = (N + blockSize - 1) / blockSize;                        \
+                                                                                \
+    _1D_S_##name##_##t0##_##t1##_##t2<<<numBlocks, blockSize>>>(x0, x1, x2,     \
+                                                                s0, s1, s2, N); \
+}                                                                               \
+                                                                                \
+static __global__ void                                                          \
+_0D_##name##_##t0##_##t1##_##t2(const t0##_t *x0, const t1##_t *x1, t2##_t *x2) \
+{                                                                               \
+    *x2 = func((common##_t)*x0, (common##_t)*x1);                               \
+}                                                                               \
+                                                                                \
+extern "C" void                                                                 \
+gm_cuda_device_0D_##name##_##t0##_##t1##_##t2(                                  \
+    const char *a0, const char *a1, char *a2)                                   \
+{                                                                               \
+    const t0##_t *x0 = (const t0##_t *)a0;                                      \
+    const t1##_t *x1 = (const t1##_t *)a1;                                      \
+    t2##_t *x2 = (t2##_t *)a2;                                                  \
+                                                                                \
+    _0D_##name##_##t0##_##t1##_##t2<<<1, 1>>>(x0, x1, x2);                      \
 }
 
 #define CUDA_DEVICE_NOIMPL(name, func, t0, t1, t2, common)
@@ -1057,52 +1087,33 @@ CUDA_DEVICE_ALL_BITWISE(bitwise_xor, bitwise_xor)
 /*****************************************************************************/
 
 #define CUDA_DEVICE_BINARY_MV(name, func, t0, t1, t2, t3) \
-static __global__ void                                                \
-_##name##_##t0##_##t1##_##t2##_##t3(                                  \
-    const t0##_t* in0, const t1##_t* in1, t2##_t* out0, t2##_t* out1, \
-    int64_t N, enum cuda_binary tag)                                  \
-{                                                                     \
-    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;            \
-    int64_t stride = blockDim.x * gridDim.x;                          \
-                                                                      \
-    switch (tag) {                                                    \
-    case ZeroStepNone:                                                \
-        for (int64_t i = index; i < N; i += stride) {                 \
-            func(&out0[i], &out1[i], in0[i], in1[i]);                 \
-        }                                                             \
-        break;                                                        \
-    case ZeroStepIn0:                                                 \
-        for (int64_t i = index; i < N; i += stride) {                 \
-            func(&out0[i], &out1[i], in0[0], in1[i]);                 \
-        }                                                             \
-        break;                                                        \
-    case ZeroStepIn1:                                                 \
-        for (int64_t i = index; i < N; i += stride) {                 \
-            func(&out0[i], &out1[i], in0[i], in1[0]);                 \
-        }                                                             \
-        break;                                                        \
-    case ZeroStepIn0In1:                                              \
-        for (int64_t i = index; i < N; i += stride) {                 \
-            func(&out0[i], &out1[i], in0[0], in1[0]);                 \
-        }                                                             \
-        break;                                                        \
-    }                                                                 \
-}                                                                     \
-                                                                      \
-extern "C" void                                                       \
-gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(         \
-    const char *in0, const char *in1, char *out0, char *out1,         \
-    int64_t N, enum cuda_binary tag)                                  \
-{                                                                     \
-    const t0##_t *_in0 = (const t0##_t *)in0;                         \
-    const t1##_t *_in1 = (const t1##_t *)in1;                         \
-    t2##_t *_out0 = (t2##_t *)out0;                                   \
-    t3##_t *_out1 = (t3##_t *)out1;                                   \
-    int blockSize = 256;                                              \
-    int64_t numBlocks = (N + blockSize - 1) / blockSize;              \
-                                                                      \
-    _##name##_##t0##_##t1##_##t2##_##t3<<<numBlocks, blockSize>>>(    \
-        _in0, _in1, _out0, _out1, N, tag);                            \
+static __global__ void                                                  \
+_1D_C_##name##_##t0##_##t1##_##t2##_##t3(                               \
+    const t0##_t *x0, const t1##_t *x1, t2##_t *x2, t2##_t *x3,         \
+    int64_t N)                                                          \
+{                                                                       \
+    int64_t index = threadIdx.x + blockIdx.x * blockDim.x;              \
+    int64_t stride = blockDim.x * gridDim.x;                            \
+                                                                        \
+    for (int64_t i = index; i < N; i += stride) {                       \
+        func(&x2[i], &x3[i], x0[i], x1[i]);                             \
+    }                                                                   \
+}                                                                       \
+                                                                        \
+extern "C" void                                                         \
+gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(           \
+    const char *a0, const char *a1, char *a2, char *a3,                 \
+    int64_t N)                                                          \
+{                                                                       \
+    const t0##_t *x0 = (const t0##_t *)a0;                              \
+    const t1##_t *x1 = (const t1##_t *)a1;                              \
+    t2##_t *x2 = (t2##_t *)a2;                                          \
+    t3##_t *x3 = (t3##_t *)a3;                                          \
+    int blockSize = 256;                                                \
+    int64_t numBlocks = (N + blockSize - 1) / blockSize;                \
+                                                                        \
+    _1D_C_##name##_##t0##_##t1##_##t2##_##t3<<<numBlocks, blockSize>>>( \
+        x0, x1, x2, x3, N);                                             \
 }
 
 #define CUDA_DEVICE_ALL_BINARY_MV(name, func) \

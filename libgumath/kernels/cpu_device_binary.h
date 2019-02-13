@@ -59,39 +59,39 @@ typedef double float64_t;
 
 #ifdef __cplusplus
   #define CPU_DEVICE_BINARY_DECL(name, t0, t1, t2) \
-  extern "C" void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(    \
-                     const char *a0, const char *a1, char *a2, int64_t N); \
-  extern "C" void gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(    \
-                     const char *a0, const char *a1, char *a2,             \
-                     const int64_t s0, const int64_t s1, const int64_t s2, \
-                     int64_t N);                                           \
-  extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(            \
-                     const char *a0, const char *a1, char *a2);
+  extern "C" void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2( \
+                 const char *a0, const char *a1, char *a2,              \
+                 const int64_t N);                                      \
+  extern "C" void gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2( \
+                 const char *a0, const char *a1, char *a2,              \
+                 const int64_t s0, const int64_t s1, const int64_t s2,  \
+                 const int64_t N);                                      \
+  extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(         \
+                 const char *a0, const char *a1, char *a2);
 
   #define CPU_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
   extern "C" void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
-                 const char *a0, const char *a1, char *a2, char *a3, int64_t N);         \
-  extern "C" void gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2##_##t3(           \
-                 const char *a0, const char *a1, char *a2, char *a3,                     \
-                 const int64_t s0, const int64_t s1, const int64_t s2, const int64_t s3, \
-                 int64_t N);                                                             \
-  extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(                   \
+                 const char *a0, const char *a1, char *a2, char *a3,           \
+                 const int64_t N);                                             \
+  extern "C" void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(         \
                  const char *a0, const char *a1, char *a2, char *a3);
 #else
   #define CPU_DEVICE_BINARY_DECL(name, t0, t1, t2) \
   void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2( \
-      const char *a0, const char *a1, char *a2, int64_t N);  \
+      const char *a0, const char *a1, char *a2,              \
+      const int64_t N);                                      \
   void gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2( \
       const char *a0, const char *a1, char *a2,              \
       const int64_t s0, const int64_t s1, const int64_t s2,  \
-      int64_t N);                                            \
+      const int64_t N);                                      \
   void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(         \
       const char *a0, const char *a1, char *a2);
 
   #define CPU_DEVICE_BINARY_MV_DECL(name, t0, t1, t2, t3) \
   void gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3( \
-      const char *a0, const char *a1, char *a2, char *a3, int64_t N); \
-  void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(           \
+      const char *a0, const char *a1, char *a2, char *a3,           \
+      const int64_t N);                                             \
+  void gm_cpu_device_0D_##name##_##t0##_##t1##_##t2##_##t3(         \
       const char *a0, const char *a1, char *a2, char *a3);
 #endif
 

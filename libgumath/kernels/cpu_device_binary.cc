@@ -46,7 +46,8 @@
 #define CPU_DEVICE_BINARY(name, func, t0, t1, t2, common) \
 extern "C" void                                                             \
 gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(                       \
-    const char *a0, const char *a1, char *a2, int64_t N)                    \
+    const char *a0, const char *a1, char *a2,                               \
+    const int64_t N)                                                        \
 {                                                                           \
     const t0##_t *x0 = (const t0##_t *)a0;                                  \
     const t1##_t *x1 = (const t1##_t *)a1;                                  \
@@ -72,7 +73,7 @@ extern "C" void                                                             \
 gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(                       \
     const char *a0, const char *a1, char *a2,                               \
     const int64_t s0, const int64_t s1, const int64_t s2,                   \
-    int64_t N)                                                              \
+    const int64_t N)                                                        \
 {                                                                           \
     const t0##_t *x0 = (const t0##_t *)a0;                                  \
     const t1##_t *x1 = (const t1##_t *)a1;                                  \

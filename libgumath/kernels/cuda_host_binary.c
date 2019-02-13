@@ -554,42 +554,94 @@ invalid_combination:
     return -1;
 }
 
-static inline enum cuda_binary
-get_step_tag(const ndt_t *t0, const ndt_t *t1)
-{
-    int64_t s0 = t0->Concrete.FixedDim.step;
-    int64_t s1 = t1->Concrete.FixedDim.step;
-
-    if (s0 == 0) {
-        return s1 == 0 ? ZeroStepIn0In1 : ZeroStepIn0;
-    }
-
-    return s1 == 0 ? ZeroStepIn1 : ZeroStepNone;
-}
 
 #define CUDA_HOST_BINARY(name, t0, t1, t2) \
 static int                                                                             \
 gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                      \
-    const char *in0 = apply_index(&stack[0]);                                          \
-    const char *in1 = apply_index(&stack[1]);                                          \
-    char *out = apply_index(&stack[2]);                                                \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                            \
-    enum cuda_binary tag = get_step_tag(stack[0].type, stack[1].type);                 \
+    const char *a0 = apply_index(&stack[0]);                                           \
+    const char *a1 = apply_index(&stack[1]);                                           \
+    char *a2 = apply_index(&stack[2]);                                                 \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                      \
     (void)ctx;                                                                         \
                                                                                        \
-    gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(in0, in1, out, N, tag);      \
+    gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
                                                                                        \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
         binary_update_bitmap1D(stack);                                                 \
     }                                                                                  \
                                                                                        \
     return 0;                                                                          \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                      \
+    const char *a0 = apply_index(&stack[0]);                                           \
+    const char *a1 = apply_index(&stack[1]);                                           \
+    char *a2 = apply_index(&stack[2]);                                                 \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                      \
+    const int64_t s0 = xnd_fixed_step(&stack[0]);                                      \
+    const int64_t s1 = xnd_fixed_step(&stack[1]);                                      \
+    const int64_t s2 = xnd_fixed_step(&stack[2]);                                      \
+    (void)ctx;                                                                         \
+                                                                                       \
+    gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap1D(stack);                                                 \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
+{                                                                                      \
+    const char *a0 = stack[0].ptr;                                                     \
+    const char *a1 = stack[1].ptr;                                                     \
+    char *a2 = stack[2].ptr;                                                           \
+    (void)ctx;                                                                         \
+                                                                                       \
+    gm_cuda_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap(stack);                                                   \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
 }
 
-#define CUDA_HOST_NOIMPL(name, t0, t1, t2) \
+
+#define CUDA_HOST_NOIMPL(name, t0, t1, t2)                                             \
 static int                                                                             \
 gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                      \
+    (void)stack;                                                                       \
+                                                                                       \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                       \
+        "implementation for " STRINGIZE(name) " : "                                    \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2)                          \
+        " currently requires double rounding");                                        \
+                                                                                       \
+    return -1;                                                                         \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                      \
+    (void)stack;                                                                       \
+                                                                                       \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                       \
+        "implementation for " STRINGIZE(name) " : "                                    \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2)                          \
+        " currently requires double rounding");                                        \
+                                                                                       \
+    return -1;                                                                         \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                      \
     (void)stack;                                                                       \
                                                                                        \
@@ -612,24 +664,57 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
         STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2));                        \
                                                                                        \
     return -1;                                                                         \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                      \
+    (void)stack;                                                                       \
+                                                                                       \
+    ndt_err_format(ctx, NDT_TypeError,                                                 \
+        "no kernel for " STRINGIZE(name) " : "                                         \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2));                        \
+                                                                                       \
+    return -1;                                                                         \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
+{                                                                                      \
+    (void)stack;                                                                       \
+                                                                                       \
+    ndt_err_format(ctx, NDT_TypeError,                                                 \
+        "no kernel for " STRINGIZE(name) " : "                                         \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2));                        \
+                                                                                       \
+    return -1;                                                                         \
 }
+
 
 #define CUDA_HOST_BINARY_INIT(func, t0, t1, t2) \
   { .name = STRINGIZE(func),                                                              \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),    \
-    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                          \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                          \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                 \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),  \
-    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                          \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                          \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                 \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),  \
-    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 },                        \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                          \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                          \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                 \
                                                                                           \
    { .name = STRINGIZE(func),                                                             \
     .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2), \
-    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2 }
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                          \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                          \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 }
 
 
 #undef bool
@@ -2304,16 +2389,15 @@ static const gm_kernel_init_t bitwise_kernels[] = {
 static int                                                                                    \
 gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                             \
-    const char *in0 = apply_index(&stack[0]);                                                 \
-    const char *in1 = apply_index(&stack[1]);                                                 \
-    char *out0 = apply_index(&stack[2]);                                                      \
-    char *out1 = apply_index(&stack[3]);                                                      \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                                   \
-    enum cuda_binary tag = get_step_tag(stack[0].type, stack[1].type);                        \
+    const char *a0 = apply_index(&stack[0]);                                                  \
+    const char *a1 = apply_index(&stack[1]);                                                  \
+    char *a2 = apply_index(&stack[2]);                                                        \
+    char *a3 = apply_index(&stack[3]);                                                        \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                             \
     (void)ctx;                                                                                \
                                                                                               \
     gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(                             \
-        in0, in1, out0, out1, N, tag);                                                        \
+        a0, a1, a2, a3, N);                                                                   \
                                                                                               \
     return 0;                                                                                 \
 }
@@ -2322,7 +2406,7 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_co
   { .name = STRINGIZE(func),                                             \
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> "        \
            "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),              \
-    .OptZ = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3 }
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CUDA_HOST_ALL_BINARY_MV(name) \
     CUDA_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)             \

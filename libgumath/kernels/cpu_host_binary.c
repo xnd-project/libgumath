@@ -567,11 +567,11 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 {                                                                                     \
     const char *a0 = apply_index(&stack[0]);                                          \
     const char *a1 = apply_index(&stack[1]);                                          \
-    char *a3 = apply_index(&stack[2]);                                                \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                           \
+    char *a2 = apply_index(&stack[2]);                                                \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                     \
     (void)ctx;                                                                        \
                                                                                       \
-    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a3, N);              \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
         binary_update_bitmap1D(stack);                                                \
@@ -586,7 +586,7 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
     const char *a0 = apply_index(&stack[0]);                                          \
     const char *a1 = apply_index(&stack[1]);                                          \
     char *a2 = apply_index(&stack[2]);                                                \
-    int64_t N = xnd_fixed_shape(&stack[0]);                                           \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                     \
     const int64_t s0 = xnd_fixed_step(&stack[0]);                                     \
     const int64_t s1 = xnd_fixed_step(&stack[1]);                                     \
     const int64_t s2 = xnd_fixed_step(&stack[2]);                                     \
@@ -617,6 +617,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
                                                                                       \
     return 0;                                                                         \
 }
+
 
 #define CPU_HOST_NOIMPL(name, t0, t1, t2) \
 static int                                                                            \
@@ -700,25 +701,25 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),          \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
     .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                             \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
                                                                                                    \
   { .name = STRINGIZE(func),                                                                       \
     .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),    \
@@ -2441,7 +2442,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2##_##t3(xnd_t stack[], ndt_context_t *
     .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> "      \
            "... * " STRINGIZE(t2) ", ... * " STRINGIZE(t3),            \
     .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2##_##t3, \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2##_##t3 }
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2##_##t3 }
 
 #define CPU_HOST_ALL_BINARY_MV(name) \
     CPU_HOST_BINARY_MV(name, uint8, uint8, uint8, uint8)             \
