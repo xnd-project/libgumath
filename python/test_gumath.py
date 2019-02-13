@@ -1170,8 +1170,7 @@ class TestSpec(unittest.TestCase):
         assert(isinstance(nd_result, xnd))
 
         x = self.mod.sin(nd_result)
-        if self.mod == fn:
-            y = self.mod.multiply(nd_result, nd_result)
+        y = self.mod.multiply(nd_result, nd_result)
 
         if isinstance(def_result, NDArray):
             aa = a = def_result.sin()
@@ -1197,7 +1196,7 @@ class TestSpec(unittest.TestCase):
 
         if self.mod == cd:
             np.testing.assert_allclose(x, aa, 1e-6)
-            # np.testing.assert_allclose(y, bb, 1e-6)
+            np.testing.assert_allclose(y, bb, 1e-6)
         else:
             self.assertEqual(x, a)
             self.assertEqual(y, b)

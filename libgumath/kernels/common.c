@@ -390,20 +390,6 @@ cuda_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1
         n = n+2;
     }
 
-    if (!ndt_is_c_contiguous(ndt_logical_dim_at(t0, t0->ndim-1))) {
-        ndt_err_format(ctx, NDT_NotImplementedError,
-            "cuda %s kernel: input must be contiguous in the last dimension",
-            f->name);
-        return NULL;
-    }
-
-    if (!ndt_is_c_contiguous(ndt_logical_dim_at(t1, t1->ndim-1))) {
-        ndt_err_format(ctx, NDT_NotImplementedError,
-            "cuda %s kernel: input must be contiguous in the last dimension",
-            f->name);
-        return NULL;
-    }
-
     const gm_kernel_set_t *set = &f->kernels[n];
 
     if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout,
