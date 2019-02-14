@@ -240,15 +240,15 @@ def gumath_extensions():
             add_runtime_library_dirs = []
         else:
             add_libraries = [":%s" % LIBNDTYPES, ":%s" % LIBXND, ":%s" % LIBSHARED]
-            if config_vars.get("HAVE_CUDA"):
-                if os.path.isdir("/usr/cuda/lib64"):
-                    add_library_dirs += ["/usr/cuda/lib64"]
-                if os.path.isdir("/usr/local/cuda/lib64"):
-                    add_library_dirs += ["/usr/local/cuda/lib64"]
-                add_libraries += ["cudart"]
-
             add_extra_link_args = []
             add_runtime_library_dirs = ["$ORIGIN"]
+
+        if config_vars.get("HAVE_CUDA"):
+            if os.path.isdir("/usr/cuda/lib64"):
+                add_library_dirs += ["/usr/cuda/lib64"]
+            if os.path.isdir("/usr/local/cuda/lib64"):
+                add_library_dirs += ["/usr/local/cuda/lib64"]
+            add_libraries += ["cudart"]
 
     def gumath_ext():
         sources = ["python/gumath/_gumath.c"]
