@@ -86,11 +86,17 @@ CXXFLAGS="$saved_cxxflags"
 AC_MSG_RESULT($have_nvcc)
 
 CUDA_CXX=
+CONFIGURE_CUDA_CXXFLAGS=
 if test "$have_nvcc" = yes; then
-    CUDA_CXX=nvcc
-    AC_DEFINE(HAVE_CUDA, 1, [Define to 1 if you have the nvcc cuda compiler.])
+    if nvcc -o tools/detect_cuda_arch tools/detect_cuda_arch.cc > /dev/null 2>&1; then
+        CUDA_CXX="nvcc"
+        CUDA_ARCH=`./tools/detect_cuda_arch`
+        CONFIGURE_CUDA_CXXFLAGS="-std=c++11 -arch=compute_$CUDA_ARCH -code=sm_$CUDA_ARCH"
+        AC_DEFINE(HAVE_CUDA, 1, [Define to 1 if you have the nvcc cuda compiler.])
+    fi
 fi
 AC_SUBST(CUDA_CXX)
+AC_SUBST(CONFIGURE_CUDA_CXXFLAGS)
 
 # Add an explicit include directory.
 AC_MSG_CHECKING(for --with-includes)

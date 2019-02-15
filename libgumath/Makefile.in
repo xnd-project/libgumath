@@ -26,11 +26,11 @@ CONFIGURE_CXXFLAGS = @CONFIGURE_CXXFLAGS@
 GM_CXXFLAGS = $(strip -I$(GM_INCLUDES) $(CONFIGURE_CXXFLAGS) $(CXXFLAGS))
 GM_CXXFLAGS_SHARED = $(GM_CXXFLAGS) -fPIC
 
-GM_CUDA_CXXFLAGS = -std=c++11 -gencode arch=compute_60,code=sm_60 -gencode arch=compute_61,code=sm_61 -gencode arch=compute_62,code=sm_62 -gencode arch=compute_70,code=sm_70 -gencode arch=compute_72,code=sm_72
-
 CONFIGURE_LDFLAGS = @CONFIGURE_LDFLAGS@
 GM_LDFLAGS = $(strip $(CONFIGURE_LDFLAGS) $(LDFLAGS))
 
+CONFIGURE_CUDA_CXXFLAGS = @CONFIGURE_CUDA_CXXFLAGS@
+GM_CUDA_CXXFLAGS = $(strip $(CONFIGURE_CUDA_CXXFLAGS) $(CUDA_CXXFLAGS))
 
 default: $(LIBSTATIC) $(LIBSHARED)
 

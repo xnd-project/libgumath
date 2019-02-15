@@ -634,6 +634,7 @@ CONFIGURE_LIBS_TEST
 CONFIGURE_LIBS
 CONFIGURE_INCLUDES_TEST
 CONFIGURE_INCLUDES
+CONFIGURE_CUDA_CXXFLAGS
 CUDA_CXX
 INSTALL
 INSTALL_DATA
@@ -3996,12 +3997,18 @@ CXXFLAGS="$saved_cxxflags"
 $as_echo "$have_nvcc" >&6; }
 
 CUDA_CXX=
+CONFIGURE_CUDA_CXXFLAGS=
 if test "$have_nvcc" = yes; then
-    CUDA_CXX=nvcc
+    if nvcc -o tools/detect_cuda_arch tools/detect_cuda_arch.cc > /dev/null 2>&1; then
+        CUDA_CXX="nvcc"
+        CUDA_ARCH=`./tools/detect_cuda_arch`
+        CONFIGURE_CUDA_CXXFLAGS="-std=c++11 -arch=compute_$CUDA_ARCH -code=sm_$CUDA_ARCH"
 
 $as_echo "#define HAVE_CUDA 1" >>confdefs.h
 
+    fi
 fi
+
 
 
 # Add an explicit include directory.
