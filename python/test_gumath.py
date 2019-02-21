@@ -1104,13 +1104,13 @@ class TestSpec(unittest.TestCase):
 
             x = nd_exception = None
             try:
-                x = gm.reduce(f, nd)
+                x = gm.reduce(f, nd, dtype=nd.dtype)
             except Exception as e:
                 nd_exception =  e
 
             y = np_exception = None
             try:
-                y = g.reduce(d)
+                y = g.reduce(d, dtype=d.dtype)
             except Exception as e:
                 np_exception =  e
 
@@ -1124,13 +1124,13 @@ class TestSpec(unittest.TestCase):
             for axes in gen_axes(d.ndim):
                 nd_exception = None
                 try:
-                    x = gm.reduce(f, nd, axes=axes)
+                    x = gm.reduce(f, nd, axes=axes, dtype=nd.dtype)
                 except Exception as e:
                     nd_exception =  e
 
                 np_exception = None
                 try:
-                    y = g.reduce(d, axis=axes)
+                    y = g.reduce(d, axis=axes, dtype=d.dtype)
                 except Exception as e:
                     np_exception =  e
 
