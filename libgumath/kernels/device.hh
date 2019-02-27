@@ -269,5 +269,19 @@ lexorder_gt(T a, U b)
     return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
 }
 
+template <class T, class U>
+static inline DEVICE bool
+lexorder_eq(T a, U b)
+{
+    return a == b;
+}
+
+template <class T, class U>
+static inline DEVICE bool
+lexorder_ne(T a, U b)
+{
+    return a != b;
+}
+
 
 #endif /* DEVICE_HH */

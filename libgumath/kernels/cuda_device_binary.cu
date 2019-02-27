@@ -984,6 +984,12 @@ CUDA_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, __hge, lexorder_ge)
 #define greater(x, y) x > y
 CUDA_DEVICE_ALL_COMPARISON(greater, greater, __hgt, lexorder_gt)
 
+#define equal(x, y) x == y
+CUDA_DEVICE_ALL_COMPARISON(equal, equal, __heq, lexorder_eq)
+
+#define not_equal(x, y) x != y
+CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, __hne, lexorder_ne)
+
 
 /*****************************************************************************/
 /*                                  Bitwise                                  */

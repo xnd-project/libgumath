@@ -940,6 +940,8 @@ CUDA_DEVICE_ALL_COMPARISON_DECL(less)
 CUDA_DEVICE_ALL_COMPARISON_DECL(less_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater_equal)
 CUDA_DEVICE_ALL_COMPARISON_DECL(greater)
+CUDA_DEVICE_ALL_COMPARISON_DECL(equal)
+CUDA_DEVICE_ALL_COMPARISON_DECL(not_equal)
 
 
 /*****************************************************************************/
