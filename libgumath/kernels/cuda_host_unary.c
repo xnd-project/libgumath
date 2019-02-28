@@ -351,7 +351,7 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) 
     gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(a0, a1, N);                  \
                                                                                 \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                            \
-        unary_update_bitmap1D(stack);                                           \
+        unary_update_bitmap_1D_S(stack);                                        \
     }                                                                           \
                                                                                 \
     return 0;                                                                   \
@@ -370,7 +370,7 @@ gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) 
     gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1(a0, a1, s0, s1, N);          \
                                                                                 \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                            \
-        unary_update_bitmap1D(stack);                                           \
+        unary_update_bitmap_1D_S(stack);                                        \
     }                                                                           \
                                                                                 \
     return 0;                                                                   \
@@ -386,7 +386,7 @@ gm_cuda_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         
     gm_cuda_device_0D_##name##_##t0##_##t1(a0, a1);                             \
                                                                                 \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                            \
-        unary_update_bitmap(stack);                                             \
+        unary_update_bitmap_0D(stack);                                          \
     }                                                                           \
                                                                                 \
     return 0;                                                                   \
@@ -446,7 +446,7 @@ gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)
     gm_cuda_device_1D_C_reduce_##name##_##t0##_##t1(a0, a1, N);                  \
                                                                                  \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                             \
-        unary_reduce_bitmap1D(stack);                                            \
+        unary_reduce_bitmap_1D_S(stack);                                         \
     }                                                                            \
                                                                                  \
     return 0;                                                                    \

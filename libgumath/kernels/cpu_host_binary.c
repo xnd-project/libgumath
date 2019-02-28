@@ -574,7 +574,7 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
     gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap1D(stack);                                                \
+        binary_update_bitmap_1D_S(stack);                                             \
     }                                                                                 \
                                                                                       \
     return 0;                                                                         \
@@ -595,7 +595,7 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
     gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap1D(stack);                                                \
+        binary_update_bitmap_1D_S(stack);                                             \
     }                                                                                 \
                                                                                       \
     return 0;                                                                         \
@@ -612,7 +612,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
     gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap(stack);                                                  \
+        binary_update_bitmap_0D(stack);                                               \
     }                                                                                 \
                                                                                       \
     return 0;                                                                         \

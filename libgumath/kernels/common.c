@@ -48,60 +48,64 @@
 /****************************************************************************/
 
 void
-unary_update_bitmap1D(xnd_t stack[])
+unary_update_bitmap_1D_S(xnd_t stack[])
 {
+    const int64_t N = xnd_fixed_shape(&stack[0]);
     const int64_t li0 = stack[0].index;
-    const int64_t liout = stack[1].index;
+    const int64_t li1 = stack[1].index;
+    const int64_t s0 = xnd_fixed_step(&stack[0]);
+    const int64_t s1 = xnd_fixed_step(&stack[1]);
     const uint8_t *b0 = get_bitmap1D(&stack[0]);
-    uint8_t *bout = get_bitmap1D(&stack[1]);
-    int64_t N = xnd_fixed_shape(&stack[0]);
-    int64_t i;
+    uint8_t *b1 = get_bitmap1D(&stack[1]);
+    int64_t i, k0, k1;
 
     assert(b0 != NULL);
-    assert(bout != NULL);
+    assert(b1 != NULL);
 
-    for (i = 0; i < N; i++) {
-        if (is_valid(b0, li0+i)) {
-            set_valid(bout, liout+i);
+    for (i=0, k0=li0, k1=li1; i<N; i++, k0+=s0, k1+=s1) {
+        if (is_valid(b0, k0)) {
+            set_valid(b1, k1);
         }
     }
 }
 
 void
-unary_reduce_bitmap1D(xnd_t stack[])
+unary_reduce_bitmap_1D_S(xnd_t stack[])
 {
+    const int64_t N = xnd_fixed_shape(&stack[0]);
     const int64_t li0 = stack[0].index;
-    const int64_t liout = stack[1].index;
+    const int64_t li1 = stack[1].index;
+    const int64_t s0 = xnd_fixed_step(&stack[0]);
+    const int64_t s1 = xnd_fixed_step(&stack[1]);
     const uint8_t *b0 = get_bitmap1D(&stack[0]);
-    uint8_t *bout = get_bitmap(&stack[1]);
-    int64_t N = xnd_fixed_shape(&stack[0]);
-    int64_t i;
+    uint8_t *b1 = get_bitmap(&stack[1]);
+    int64_t i, k0, k1;
 
     assert(b0 != NULL);
-    assert(bout != NULL);
+    assert(b1 != NULL);
 
-    set_valid(bout, liout);
+    set_valid(b1, li1);
 
-    for (i = 0; i < N; i++) {
-        if (!is_valid(b0, li0+i)) {
-            set_na(bout, liout);
+    for (i=0, k0=li0, k1=li1; i<N; i++, k0+=s0, k1+=s1) {
+        if (!is_valid(b0, k0)) {
+            set_na(b1, k1);
         }
     }
 }
 
 void
-unary_update_bitmap(xnd_t stack[])
+unary_update_bitmap_0D(xnd_t stack[])
 {
     const int64_t li0 = stack[0].index;
-    const int64_t liout = stack[1].index;
+    const int64_t li1 = stack[1].index;
     const uint8_t *b0 = get_bitmap(&stack[0]);
-    uint8_t *bout = get_bitmap(&stack[1]);
+    uint8_t *b1 = get_bitmap(&stack[1]);
 
     assert(b0 != NULL);
-    assert(bout != NULL);
+    assert(b1 != NULL);
 
     if (is_valid(b0, li0)) {
-        set_valid(bout, liout);
+        set_valid(b1, li1);
     }
 }
 
@@ -111,65 +115,68 @@ unary_update_bitmap(xnd_t stack[])
 /****************************************************************************/
 
 void
-binary_update_bitmap1D(xnd_t stack[])
+binary_update_bitmap_1D_S(xnd_t stack[])
 {
+    const int64_t N = xnd_fixed_shape(&stack[0]);
     const int64_t li0 = stack[0].index;
     const int64_t li1 = stack[1].index;
-    const int64_t liout = stack[2].index;
+    const int64_t li2 = stack[2].index;
+    const int64_t s0 = xnd_fixed_step(&stack[0]);
+    const int64_t s1 = xnd_fixed_step(&stack[1]);
+    const int64_t s2 = xnd_fixed_step(&stack[2]);
     const uint8_t *b0 = get_bitmap1D(&stack[0]);
     const uint8_t *b1 = get_bitmap1D(&stack[1]);
-    uint8_t *bout = get_bitmap1D(&stack[2]);
-    int64_t N = xnd_fixed_shape(&stack[0]);
-    int64_t i;
+    uint8_t *b2 = get_bitmap1D(&stack[2]);
+    int64_t i, k0, k1, k2;
 
     if (b0 && b1) {
-        for (i = 0; i < N; i++) {
-            if (is_valid(b0, li0+i) && is_valid(b1, li1+i)) {
-                set_valid(bout, liout+i);
+        for (i=0, k0=li0, k1=li1, k2=li2; i<N; i++, k0+=s0, k1+=s1, k2+=s2) {
+            if (is_valid(b0, k0) && is_valid(b1, k1)) {
+                set_valid(b2, k2);
             }
         }
     }
     else if (b0) {
-        for (i = 0; i < N; i++) {
-            if (is_valid(b0, li0+i)) {
-                set_valid(bout, liout+i);
+        for (i=0, k0=li0, k2=li2; i<N; i++, k0+=s0, k2+=s2) {
+            if (is_valid(b0, k0)) {
+                set_valid(b2, k2);
             }
         }
     }
     else if (b1) {
-        for (i = 0; i < N; i++) {
-            if (is_valid(b1, li1+i)) {
-                set_valid(bout, liout+i);
+        for (i=0, k1=li1, k2=li2; i<N; i++, k1+=s1, k2+=s2) {
+            if (is_valid(b1, k1)) {
+                set_valid(b2, k2);
             }
         }
     }
 }
 
 void
-binary_update_bitmap(xnd_t stack[])
+binary_update_bitmap_0D(xnd_t stack[])
 {
     const int64_t li0 = stack[0].index;
     const int64_t li1 = stack[1].index;
-    const int64_t liout = stack[2].index;
+    const int64_t li2 = stack[2].index;
     const uint8_t *b0 = get_bitmap(&stack[0]);
     const uint8_t *b1 = get_bitmap(&stack[1]);
-    uint8_t *bout = get_bitmap(&stack[2]);
+    uint8_t *b2 = get_bitmap(&stack[2]);
 
-    assert(bout != NULL);
+    assert(b2 != NULL);
 
     if (b0 && b1) {
         if (is_valid(b0, li0) && is_valid(b1, li1)) {
-            set_valid(bout, liout);
+            set_valid(b2, li2);
         }
     }
     else if (b0) {
         if (is_valid(b0, li0)) {
-            set_valid(bout, liout);
+            set_valid(b2, li2);
         }
     }
     else if (b1) {
         if (is_valid(b1, li1)) {
-            set_valid(bout, liout);
+            set_valid(b2, li2);
         }
     }
 }

@@ -115,12 +115,12 @@ linear_index1D(const xnd_t *x, const int64_t i)
 /* LOCAL SCOPE */
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_START)
 
-void unary_update_bitmap1D(xnd_t stack[]);
-void unary_reduce_bitmap1D(xnd_t stack[]);
-void unary_update_bitmap(xnd_t stack[]);
+void unary_update_bitmap_1D_S(xnd_t stack[]);
+void unary_reduce_bitmap_1D_S(xnd_t stack[]);
+void unary_update_bitmap_0D(xnd_t stack[]);
 
-void binary_update_bitmap1D(xnd_t stack[]);
-void binary_update_bitmap(xnd_t stack[]);
+void binary_update_bitmap_1D_S(xnd_t stack[]);
+void binary_update_bitmap_0D(xnd_t stack[]);
 
 const gm_kernel_set_t *cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, const ndt_t *, ndt_context_t *),
                                            ndt_apply_spec_t *spec, const gm_func_t *f, const ndt_t *types[],
