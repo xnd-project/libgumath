@@ -403,7 +403,7 @@ functions = {
   "binary": {
     "default": ["add", "subtract", "multiply", "floor_divide", "remainder"],
     "float_result": ["divide"],
-    "bool_result": ["less_equal", "less", "greater_equal", "greater"],
+    "bool_result": ["less_equal", "less", "greater_equal", "greater", "equal", "not_equal"],
     "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
   },
   "binary_mv": {
