@@ -165,7 +165,7 @@ get_item_with_error(PyObject *d, const char *key)
 
 static int
 parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_nargs,
-           PyObject *args, PyObject *kwargs)
+           ndt_t **py_dtype, PyObject *args, PyObject *kwargs)
 {
     Py_ssize_t nin;
     Py_ssize_t nout;
@@ -205,59 +205,83 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
     if (kwargs == NULL || PyDict_Size(kwargs) == 0) {
         nout = 0;
     }
-    else if (PyDict_Size(kwargs) == 1) {
+    else if (PyDict_Size(kwargs) <= 2) {
         PyObject *out = get_item_with_error(kwargs, "out");
-        if (out == NULL) {
-            if (PyErr_Occurred()) {
-                return -1;
-            }
-            PyErr_SetString(PyExc_TypeError,
-                "the only supported keyword argument is 'out'");
+        if (out == NULL && PyErr_Occurred()) {
+            return -1;
+        }
+        PyObject *dtype = get_item_with_error(kwargs, "dtype");
+        if (dtype == NULL && PyErr_Occurred()) {
             return -1;
         }
 
-        if (out == Py_None) {
+        if (out == NULL && dtype == NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                "valid keyword arguments are 'out' and 'dtype'");
+            return -1;
+        }
+        out = out == Py_None ? NULL : out;
+        dtype = dtype == Py_None ? NULL : dtype;
+
+        if (!out && !dtype) {
             nout = 0;
         }
-        else if (Xnd_Check(out)) {
-            nout = 1;
-            if (nin+nout > NDT_MAX_ARGS) {
-                PyErr_Format(PyExc_TypeError,
-                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
-                return -1;
-            }
-
-            pystack[nin] = out;
-        }
-        else if (PyTuple_Check(out)) {
-            nout = PyTuple_GET_SIZE(out);
-            if (nout > NDT_MAX_ARGS || nin+nout > NDT_MAX_ARGS) {
-                PyErr_Format(PyExc_TypeError,
-                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
-                return -1;
-            }
-
-            for (Py_ssize_t i = 0; i < nout; i++) {
-                PyObject *v = PyTuple_GET_ITEM(out, i);
-                if (!Xnd_Check(v)) {
+        else if (out && !dtype) {
+            if (Xnd_Check(out)) {
+                nout = 1;
+                if (nin+nout > NDT_MAX_ARGS) {
                     PyErr_Format(PyExc_TypeError,
-                        "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
+                        "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
+                    return -1;
+                }
+                pystack[nin] = out;
+            }
+            else if (PyTuple_Check(out)) {
+                nout = PyTuple_GET_SIZE(out);
+                if (nout > NDT_MAX_ARGS || nin+nout > NDT_MAX_ARGS) {
+                    PyErr_Format(PyExc_TypeError,
+                        "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
                     return -1;
                 }
 
-                pystack[nin+i] = v;
+                for (Py_ssize_t i = 0; i < nout; i++) {
+                    PyObject *v = PyTuple_GET_ITEM(out, i);
+                    if (!Xnd_Check(v)) {
+                        PyErr_Format(PyExc_TypeError,
+                            "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
+                        return -1;
+                    }
+
+                    pystack[nin+i] = v;
+                }
+            }
+            else {
+                PyErr_Format(PyExc_TypeError,
+                    "'out' argument must be xnd or a tuple of xnd, got '%.200s'",
+                    Py_TYPE(out)->tp_name);
+                return -1;
             }
         }
+        else if (dtype && !out) {
+            nout = 0;
+            if (!Ndt_Check(dtype)) {
+                PyErr_Format(PyExc_TypeError,
+                    "'dtype' argument must be ndt, got '%.200s'",
+                    Py_TYPE(dtype)->tp_name);
+                return -1;
+            }
+            *py_dtype = (ndt_t *)NDT(dtype);
+            ndt_incref(*py_dtype);
+        }
         else {
-            PyErr_Format(PyExc_TypeError,
-                "'out' argument must be xnd or a tuple of xnd, got '%.200s'",
-                Py_TYPE(out)->tp_name);
+            PyErr_SetString(PyExc_TypeError,
+                "the 'out' and 'dtype' arguments are mutually exclusive");
             return -1;
         }
     }
     else {
         PyErr_SetString(PyExc_TypeError,
-            "the only supported keyword argument is 'out'");
+            "the only supported keyword arguments are 'out' and 'dtype'");
         return -1;
     }
 
@@ -284,21 +308,29 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
     ndt_apply_spec_t spec = ndt_apply_spec_empty;
     gm_kernel_t kernel;
     bool have_cpu_device = false;
+    ndt_t *dtype = NULL;
     int nin, nout, nargs;
+    int k;
 
-    if (parse_args(pystack, &nin, &nout, &nargs, args, kwargs) < 0) {
+    if (parse_args(pystack, &nin, &nout, &nargs, &dtype, args, kwargs) < 0) {
         return NULL;
     }
+    assert(nout == 0 || dtype == NULL);
 
-    for (int i = 0; i < nargs; i++) {
-        const XndObject *x = (XndObject *)pystack[i];
+    for (k = 0; k < nargs; k++) {
+        const XndObject *x = (XndObject *)pystack[k];
         if (!(x->mblock->xnd->flags&XND_CUDA_MANAGED)) {
             have_cpu_device = true;
         }
 
-        stack[i] = *CONST_XND((PyObject *)x);
-        types[i] = stack[i].type;
-        li[i] = stack[i].index;
+        stack[k] = *CONST_XND((PyObject *)x);
+        types[k] = stack[k].type;
+        li[k] = stack[k].index;
+    }
+
+    if (dtype) {
+        types[k] = dtype;
+        nout = 1;
     }
 
     if (have_cpu_device) {
@@ -314,6 +346,10 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
                        nout && check_broadcast, stack, &ctx);
     if (kernel.set == NULL) {
         return seterr(&ctx);
+    }
+
+    if (dtype) {
+        nout = 0;
     }
 
     /*
