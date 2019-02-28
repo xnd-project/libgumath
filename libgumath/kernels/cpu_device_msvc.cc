@@ -270,20 +270,6 @@ lexorder_gt(T a, U b)
     return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
 }
 
-template <class T, class U>
-static inline bool
-lexorder_eq(T a, U b)
-{
-    return a == b;
-}
-
-template <class T, class U>
-static inline bool
-lexorder_ne(T a, U b)
-{
-    return a != b;
-}
-
 
 /*****************************************************************************/
 /*                         CPU device binary kernels                         */
@@ -611,7 +597,7 @@ CPU_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, greater_equal, lexorder_
 CPU_DEVICE_ALL_COMPARISON(greater, greater, greater, lexorder_gt)
 
 #define equal(x, y) x == y
-CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, lexorder_eq)
+CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, equal)
 
 #define not_equal(x, y) x != y
-CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, lexorder_ne)
+CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, not_equal)

@@ -967,10 +967,10 @@ CPU_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, greater_equal, lexorder_
 CPU_DEVICE_ALL_COMPARISON(greater, greater, greater, lexorder_gt)
 
 #define equal(x, y) x == y
-CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, lexorder_eq)
+CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, equal)
 
 #define not_equal(x, y) x != y
-CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, lexorder_ne)
+CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, not_equal)
 
 
 /*****************************************************************************/

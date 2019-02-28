@@ -985,10 +985,10 @@ CUDA_DEVICE_ALL_COMPARISON(greater_equal, greater_equal, __hge, lexorder_ge)
 CUDA_DEVICE_ALL_COMPARISON(greater, greater, __hgt, lexorder_gt)
 
 #define equal(x, y) x == y
-CUDA_DEVICE_ALL_COMPARISON(equal, equal, __heq, lexorder_eq)
+CUDA_DEVICE_ALL_COMPARISON(equal, equal, __heq, equal)
 
 #define not_equal(x, y) x != y
-CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, half_ne, lexorder_ne)
+CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, half_ne, not_equal)
 
 
 /*****************************************************************************/
