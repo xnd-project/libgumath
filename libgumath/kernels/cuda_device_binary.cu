@@ -776,7 +776,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, uint8, int32, bool, int32)                 \
     CUDA_DEVICE_BINARY(name, func, uint8, int64, bool, int64)                 \
     CUDA_DEVICE_BINARY(name, func, uint8, bfloat16, bool, bfloat16)           \
-    CUDA_DEVICE_BINARY(name, func, uint8, float16, bool, float16)             \
+    CUDA_DEVICE_BINARY(name, hfunc, uint8, float16, bool, float16)            \
     CUDA_DEVICE_BINARY(name, func, uint8, float32, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, uint8, float64, bool, float64)             \
     CUDA_DEVICE_NOIMPL(name, cfunc, uint8, complex32, bool, complex32)        \
@@ -828,7 +828,7 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, func, int8, int32, bool, int32)                  \
     CUDA_DEVICE_BINARY(name, func, int8, int64, bool, int64)                  \
     CUDA_DEVICE_BINARY(name, func, int8, bfloat16, bool, bfloat16)            \
-    CUDA_DEVICE_BINARY(name, func, int8, float16, bool, float16)              \
+    CUDA_DEVICE_BINARY(name, hfunc, int8, float16, bool, float16)             \
     CUDA_DEVICE_BINARY(name, func, int8, float32, bool, float32)              \
     CUDA_DEVICE_BINARY(name, func, int8, float64, bool, float64)              \
     CUDA_DEVICE_NOIMPL(name, cfunc, int8, complex32, bool, complex32)         \
@@ -887,14 +887,14 @@ CUDA_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, __hdiv)
     CUDA_DEVICE_BINARY(name, cfunc, bfloat16, complex64, bool, complex64)     \
     CUDA_DEVICE_BINARY(name, cfunc, bfloat16, complex128, bool, complex128)   \
                                                                               \
-    CUDA_DEVICE_BINARY(name, func, float16, uint8, bool, float16)             \
+    CUDA_DEVICE_BINARY(name, hfunc, float16, uint8, bool, float16)            \
     CUDA_DEVICE_BINARY(name, func, float16, uint16, bool, float32)            \
     CUDA_DEVICE_BINARY(name, func, float16, uint32, bool, float64)            \
-    CUDA_DEVICE_BINARY(name, func, float16, int8, bool, float16)              \
+    CUDA_DEVICE_BINARY(name, hfunc, float16, int8, bool, float16)             \
     CUDA_DEVICE_BINARY(name, func, float16, int16, bool, float32)             \
     CUDA_DEVICE_BINARY(name, func, float16, int32, bool, float64)             \
     CUDA_DEVICE_BINARY(name, func, float16, bfloat16, bool, float32)          \
-    CUDA_DEVICE_BINARY(name, func, float16, float16, bool, float16)           \
+    CUDA_DEVICE_BINARY(name, hfunc, float16, float16, bool, float16)          \
     CUDA_DEVICE_BINARY(name, func, float16, float32, bool, float32)           \
     CUDA_DEVICE_BINARY(name, func, float16, float64, bool, float64)           \
     CUDA_DEVICE_NOIMPL(name, cfunc, float16, complex32, bool, complex32)      \
@@ -988,7 +988,7 @@ CUDA_DEVICE_ALL_COMPARISON(greater, greater, __hgt, lexorder_gt)
 CUDA_DEVICE_ALL_COMPARISON(equal, equal, __heq, lexorder_eq)
 
 #define not_equal(x, y) x != y
-CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, __hne, lexorder_ne)
+CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, half_ne, lexorder_ne)
 
 
 /*****************************************************************************/

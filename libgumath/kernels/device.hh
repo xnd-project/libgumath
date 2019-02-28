@@ -41,6 +41,7 @@
 
 
 #ifdef __CUDACC__
+#include <cuda_fp16.h>
 #define DEVICE __device__
 #define ISNAN(x) (isnan(x))
 #else
@@ -282,6 +283,19 @@ lexorder_ne(T a, U b)
 {
     return a != b;
 }
+
+
+/*****************************************************************************/
+/*                                Half equality                              */
+/*****************************************************************************/
+
+#ifdef __CUDACC__
+static inline DEVICE bool
+half_ne(half a, half b)
+{
+    return !__heq(a, b);
+}
+#endif
 
 
 #endif /* DEVICE_HH */
