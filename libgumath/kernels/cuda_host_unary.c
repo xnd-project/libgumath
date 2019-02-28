@@ -434,6 +434,38 @@ gm_cuda_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         
 }
 
 
+#define CUDA_HOST_UNARY_REDUCE(name, t0, t1) \
+static int                                                                       \
+gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                \
+    const char *a0 = apply_index(&stack[0]);                                     \
+    char *a1 = stack[1].ptr;                                                     \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                \
+    (void)ctx;                                                                   \
+                                                                                 \
+    gm_cuda_device_1D_C_reduce_##name##_##t0##_##t1(a0, a1, N);                  \
+                                                                                 \
+    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                             \
+        unary_reduce_bitmap1D(stack);                                            \
+    }                                                                            \
+                                                                                 \
+    return 0;                                                                    \
+}
+
+#define CUDA_HOST_REDUCE_NOIMPL(name, t0, t1) \
+static int                                                                       \
+gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                \
+    (void)stack;                                                                 \
+                                                                                 \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                 \
+        "No cuda thrust implementation for: " STRINGIZE(name) " : "              \
+        STRINGIZE(t0) " -> " STRINGIZE(t1));                                     \
+                                                                                 \
+    return -1;                                                                   \
+}
+
+
 #define CUDA_HOST_UNARY_INIT(funcname, func, t0, t1) \
   { .name = STRINGIZE(funcname),                                \
     .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),   \
@@ -446,6 +478,16 @@ gm_cuda_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         
     .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1,       \
     .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1,       \
     .C = gm_cuda_host_0D_##func##_##t0##_##t1 }                 \
+
+
+#define CUDA_HOST_UNARY_REDUCE_INIT(funcname, func, t0, t1) \
+  { .name = "reduce_" STRINGIZE(funcname),                  \
+    .sig = "N * " STRINGIZE(t0) " -> " STRINGIZE(t1),       \
+    .C = gm_cuda_host_1D_C_reduce_##func##_##t0##_##t1 },   \
+                                                            \
+  { .name = "reduce_" STRINGIZE(funcname),                  \
+    .sig = "N * ?" STRINGIZE(t0) " -> ?" STRINGIZE(t1),     \
+    .C = gm_cuda_host_1D_C_reduce_##func##_##t0##_##t1 }
 
 
 #undef bool
@@ -679,6 +721,239 @@ CUDA_HOST_ALL_UNARY_COPY(copy)
 static const gm_kernel_init_t unary_copy[] = {
   /* COPY */
   CUDA_HOST_ALL_UNARY_COPY_INIT(copy, copy, copy),
+
+  { .name = NULL, .sig = NULL }
+};
+
+/*****************************************************************************/
+/*                                   Reduce                                  */
+/*****************************************************************************/
+
+#define CUDA_HOST_ALL_UNARY_REDUCE(name) \
+    CUDA_HOST_UNARY_REDUCE(name, bool, bool)              \
+    CUDA_HOST_UNARY_REDUCE(name, bool, uint8)             \
+    CUDA_HOST_UNARY_REDUCE(name, bool, uint16)            \
+    CUDA_HOST_UNARY_REDUCE(name, bool, uint32)            \
+    CUDA_HOST_UNARY_REDUCE(name, bool, uint64)            \
+    CUDA_HOST_UNARY_REDUCE(name, bool, int8)              \
+    CUDA_HOST_UNARY_REDUCE(name, bool, int16)             \
+    CUDA_HOST_UNARY_REDUCE(name, bool, int32)             \
+    CUDA_HOST_UNARY_REDUCE(name, bool, int64)             \
+    CUDA_HOST_REDUCE_NOIMPL(name, bool, bfloat16)         \
+    CUDA_HOST_UNARY_REDUCE(name, bool, float16)           \
+    CUDA_HOST_UNARY_REDUCE(name, bool, float32)           \
+    CUDA_HOST_UNARY_REDUCE(name, bool, float64)           \
+    CUDA_HOST_REDUCE_NOIMPL(name,bool, complex32)         \
+    CUDA_HOST_REDUCE_NOIMPL(name, bool, complex64)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, bool, complex128)       \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, uint8)            \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, uint16)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, uint32)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, uint64)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, int16)            \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, int32)            \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, int64)            \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint8, bfloat16)        \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, float16)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, float32)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint8, float64)          \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint8, complex32)       \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint8, complex64)       \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint8, complex128)      \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, uint16)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, uint32)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, uint64)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, int32)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, int64)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, float32)         \
+    CUDA_HOST_UNARY_REDUCE(name, uint16, float64)         \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint16, complex64)      \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint16, complex128)     \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, uint32, uint32)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint32, uint64)          \
+    CUDA_HOST_UNARY_REDUCE(name, uint32, int64)           \
+    CUDA_HOST_UNARY_REDUCE(name, uint32, float64)         \
+    CUDA_HOST_REDUCE_NOIMPL(name, uint32, complex128)     \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, uint64, uint64)          \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, int8, int8)              \
+    CUDA_HOST_UNARY_REDUCE(name, int8, int16)             \
+    CUDA_HOST_UNARY_REDUCE(name, int8, int32)             \
+    CUDA_HOST_UNARY_REDUCE(name, int8, int64)             \
+    CUDA_HOST_REDUCE_NOIMPL(name, int8, bfloat16)         \
+    CUDA_HOST_UNARY_REDUCE(name, int8, float16)           \
+    CUDA_HOST_UNARY_REDUCE(name, int8, float32)           \
+    CUDA_HOST_UNARY_REDUCE(name, int8, float64)           \
+    CUDA_HOST_REDUCE_NOIMPL(name, int8, complex32)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, int8, complex64)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, int8, complex128)       \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, int16, int16)            \
+    CUDA_HOST_UNARY_REDUCE(name, int16, int32)            \
+    CUDA_HOST_UNARY_REDUCE(name, int16, int64)            \
+    CUDA_HOST_UNARY_REDUCE(name, int16, float32)          \
+    CUDA_HOST_UNARY_REDUCE(name, int16, float64)          \
+    CUDA_HOST_REDUCE_NOIMPL(name, int16, complex64)       \
+    CUDA_HOST_REDUCE_NOIMPL(name, int16, complex128)      \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, int32, int32)            \
+    CUDA_HOST_UNARY_REDUCE(name, int32, int64)            \
+    CUDA_HOST_UNARY_REDUCE(name, int32, float64)          \
+    CUDA_HOST_REDUCE_NOIMPL(name, int32, complex128)      \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, int64, int64)            \
+                                                          \
+    CUDA_HOST_REDUCE_NOIMPL(name, bfloat16, bfloat16)     \
+    CUDA_HOST_REDUCE_NOIMPL(name, bfloat16, float32)      \
+    CUDA_HOST_REDUCE_NOIMPL(name, bfloat16, float64)      \
+    CUDA_HOST_REDUCE_NOIMPL(name, bfloat16, complex64)    \
+    CUDA_HOST_REDUCE_NOIMPL(name, bfloat16, complex128)   \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, float16, float16)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, float16, float32)       \
+    CUDA_HOST_REDUCE_NOIMPL(name, float16, float64)       \
+    CUDA_HOST_REDUCE_NOIMPL(name, float16, complex32)     \
+    CUDA_HOST_REDUCE_NOIMPL(name, float16, complex64)     \
+    CUDA_HOST_REDUCE_NOIMPL(name, float16, complex128)    \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, float32, float32)        \
+    CUDA_HOST_UNARY_REDUCE(name, float32, float64)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, float32, complex64)     \
+    CUDA_HOST_REDUCE_NOIMPL(name, float32, complex128)    \
+                                                          \
+    CUDA_HOST_UNARY_REDUCE(name, float64, float64)        \
+    CUDA_HOST_REDUCE_NOIMPL(name, float64, complex128)    \
+                                                          \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex32, complex32)   \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex32, complex64)   \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex32, complex128)  \
+                                                          \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex64, complex64)   \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex64, complex128)  \
+                                                          \
+    CUDA_HOST_REDUCE_NOIMPL(name, complex128, complex128)
+
+#define CUDA_HOST_ALL_UNARY_REDUCE_INIT(name, func) \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, bool),            \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, uint8),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, uint16),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, uint32),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, uint64),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, int8),            \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, int16),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, int32),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, int64),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, bfloat16),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, float16),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, float32),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, float64),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, complex32),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, complex64),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bool, complex128),      \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, uint8),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, uint16),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, uint32),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, uint64),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, int16),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, int32),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, int64),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, bfloat16),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, float16),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, float32),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, float64),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, complex32),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, complex64),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint8, complex128),     \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, uint16),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, uint32),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, uint64),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, int32),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, int64),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, float32),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, float64),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, complex64),     \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint16, complex128),    \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint32, uint32),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint32, uint64),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint32, int64),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint32, float64),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint32, complex128),    \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, uint64, uint64),        \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, int8),            \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, int16),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, int32),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, int64),           \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, bfloat16),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, float16),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, float32),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, float64),         \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, complex32),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, complex64),       \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int8, complex128),      \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, int16),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, int32),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, int64),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, float32),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, float64),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, complex64),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int16, complex128),     \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int32, int32),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int32, int64),          \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int32, float64),        \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int32, complex128),     \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, int64, int64),          \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bfloat16, bfloat16),    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bfloat16, float32),     \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bfloat16, float64),     \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bfloat16, complex64),   \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, bfloat16, complex128),  \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, float16),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, float32),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, float64),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, complex32),    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, complex64),    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float16, complex128),   \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float32, float32),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float32, float64),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float32, complex64),    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float32, complex128),   \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float64, float64),      \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, float64, complex128),   \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex32, complex32),  \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex32, complex64),  \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex32, complex128), \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex64, complex64),  \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex64, complex128), \
+                                                                    \
+    CUDA_HOST_UNARY_REDUCE_INIT(name, func, complex128, complex128)
+
+
+CUDA_HOST_ALL_UNARY_REDUCE(add)
+CUDA_HOST_ALL_UNARY_REDUCE(multiply)
+
+
+static const gm_kernel_init_t unary_reduce[] = {
+  /* REDUCE */
+  CUDA_HOST_ALL_UNARY_REDUCE_INIT(add, add),
+  CUDA_HOST_ALL_UNARY_REDUCE_INIT(multiply, multiply),
 
   { .name = NULL, .sig = NULL }
 };
@@ -1022,6 +1297,12 @@ gm_init_cuda_unary_kernels(gm_tbl_t *tbl, ndt_context_t *ctx)
 
     for (k = unary_copy; k->name != NULL; k++) {
         if (gm_add_kernel_typecheck(tbl, k, ctx, &unary_copy_typecheck) < 0) {
+             return -1;
+        }
+    }
+
+    for (k = unary_reduce; k->name != NULL; k++) {
+        if (gm_add_kernel(tbl, k, ctx) < 0) {
              return -1;
         }
     }

@@ -68,6 +68,28 @@ unary_update_bitmap1D(xnd_t stack[])
 }
 
 void
+unary_reduce_bitmap1D(xnd_t stack[])
+{
+    const int64_t li0 = stack[0].index;
+    const int64_t liout = stack[1].index;
+    const uint8_t *b0 = get_bitmap1D(&stack[0]);
+    uint8_t *bout = get_bitmap(&stack[1]);
+    int64_t N = xnd_fixed_shape(&stack[0]);
+    int64_t i;
+
+    assert(b0 != NULL);
+    assert(bout != NULL);
+
+    set_valid(bout, liout);
+
+    for (i = 0; i < N; i++) {
+        if (!is_valid(b0, li0+i)) {
+            set_na(bout, liout);
+        }
+    }
+}
+
+void
 unary_update_bitmap(xnd_t stack[])
 {
     const int64_t li0 = stack[0].index;

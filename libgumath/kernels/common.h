@@ -93,6 +93,12 @@ set_valid(uint8_t *data, int64_t n)
     data[n / 8] |= ((uint8_t)1 << (n % 8));
 }
 
+static inline void
+set_na(uint8_t *data, int64_t n)
+{
+    data[n / 8] &= ~((uint8_t)1 << (n % 8));
+}
+
 static inline int64_t
 linear_index1D(const xnd_t *x, const int64_t i)
 {
@@ -110,6 +116,7 @@ linear_index1D(const xnd_t *x, const int64_t i)
 NDT_PRAGMA(NDT_HIDE_SYMBOLS_START)
 
 void unary_update_bitmap1D(xnd_t stack[]);
+void unary_reduce_bitmap1D(xnd_t stack[]);
 void unary_update_bitmap(xnd_t stack[]);
 
 void binary_update_bitmap1D(xnd_t stack[]);

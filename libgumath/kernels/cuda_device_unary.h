@@ -67,6 +67,10 @@ typedef double float64_t;
                                                                  const int64_t s0, const int64_t s1, \
                                                                  const int64_t N);                   \
   extern "C" void gm_cuda_device_0D_##name##_##t0##_##t1(const char *a0, char *a1);
+
+  #define CUDA_DEVICE_UNARY_REDUCE_DECL(name, t0, t1) \
+  extern "C" void gm_cuda_device_1D_C_reduce_##name##_##t0##_##t1(const char *a0, char *a1, \
+                                                                  const int64_t N);
 #else
   #define CUDA_DEVICE_UNARY_DECL(name, t0, t1) \
   void gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1(const char *a0, char *a1,           \
@@ -75,6 +79,10 @@ typedef double float64_t;
                                                       const int64_t s0, const int64_t s1, \
                                                       const int64_t N);                   \
   void gm_cuda_device_0D_##name##_##t0##_##t1(const char *a0, char *a1);
+
+  #define CUDA_DEVICE_UNARY_REDUCE_DECL(name, t0, t1) \
+  void gm_cuda_device_1D_C_reduce_##name##_##t0##_##t1(const char *a0, char *a1, \
+                                                       const int64_t N);
 #endif
 
 #define CUDA_DEVICE_NOIMPL_DECL(name, t0, t1)
@@ -179,6 +187,123 @@ typedef double float64_t;
 
 
 CUDA_DEVICE_ALL_UNARY_COPY_DECL(copy)
+
+
+/*****************************************************************************/
+/*                                   Reduce                                  */
+/*****************************************************************************/
+
+#define CUDA_DEVICE_ALL_UNARY_REDUCE_DECL(name) \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, bool)          \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, uint8)         \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, uint16)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, uint32)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, uint64)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, int8)          \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, int16)         \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, int32)         \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, int64)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, bool, bfloat16)            \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, float16)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, float32)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, bool, float64)       \
+    CUDA_DEVICE_NOIMPL_DECL(name, bool, complex32)           \
+    CUDA_DEVICE_NOIMPL_DECL(name, bool, complex64)           \
+    CUDA_DEVICE_NOIMPL_DECL(name, bool, complex128)          \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, uint8)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, uint16)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, uint32)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, uint64)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, int16)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, int32)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, int64)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint8, bfloat16)           \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, float16)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, float32)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint8, float64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint8, complex32)          \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint8, complex64)          \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint8, complex128)         \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, uint16)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, uint32)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, uint64)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, int32)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, int64)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, float32)     \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint16, float64)     \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint16, complex64)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint16, complex128)        \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint32, uint32)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint32, uint64)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint32, int64)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint32, float64)     \
+    CUDA_DEVICE_NOIMPL_DECL(name, uint32, complex128)        \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, uint64, uint64)      \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, int8)          \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, int16)         \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, int32)         \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, int64)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, int8, bfloat16)            \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, float16)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, float32)       \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int8, float64)       \
+    CUDA_DEVICE_NOIMPL_DECL(name, int8, complex32)           \
+    CUDA_DEVICE_NOIMPL_DECL(name, int8, complex64)           \
+    CUDA_DEVICE_NOIMPL_DECL(name, int8, complex128)          \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int16, int16)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int16, int32)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int16, int64)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int16, float32)      \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int16, float64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, int16, complex64)          \
+    CUDA_DEVICE_NOIMPL_DECL(name, int16, complex128)         \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int32, int32)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int32, int64)        \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int32, float64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, int32, complex128)         \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, int64, int64)        \
+                                                             \
+    CUDA_DEVICE_NOIMPL_DECL(name, bfloat16, bfloat16)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, bfloat16, float32)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, bfloat16, float64)         \
+    CUDA_DEVICE_NOIMPL_DECL(name, bfloat16, complex64)       \
+    CUDA_DEVICE_NOIMPL_DECL(name, bfloat16, complex128)      \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float16, float16)    \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, float32)          \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, float64)          \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, complex32)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, complex64)        \
+    CUDA_DEVICE_NOIMPL_DECL(name, float16, complex128)       \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float32, float32)    \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float32, float64)    \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float32, complex64)  \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float32, complex128) \
+                                                             \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float64, float64)    \
+    CUDA_DEVICE_UNARY_REDUCE_DECL(name, float64, complex128) \
+                                                             \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, complex32)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, complex64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex32, complex128)     \
+                                                             \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex64, complex64)      \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex64, complex128)     \
+                                                             \
+    CUDA_DEVICE_NOIMPL_DECL(name, complex128, complex128)
+
+
+CUDA_DEVICE_ALL_UNARY_REDUCE_DECL(add)
+CUDA_DEVICE_ALL_UNARY_REDUCE_DECL(multiply)
 
 
 /*****************************************************************************/

@@ -35,6 +35,11 @@ from xnd import xnd
 from ._gumath import *
 from . import functions as _fn
 
+try:
+    from . import cuda as _cd
+except ImportError:
+    _cd = None
+
 
 # ==============================================================================
 #                              Init identity elements
@@ -81,14 +86,11 @@ def _copyto(dest, value):
     x = xnd(value, dtype=dest.dtype)
     _fn.copy(x, out=dest)
 
-def reduce(f, x, axes=0, dtype=None):
+def reduce_cpu(f, x, axes, dtype):
     """NumPy's reduce in terms of fold."""
     axes = _get_axes(axes, x.ndim)
     if not axes:
         return x
-
-    if dtype is None:
-        dtype = maxcast[x.dtype]
 
     permute = [n for n in range(x.ndim) if n not in axes]
     permute = axes + permute
@@ -111,6 +113,33 @@ def reduce(f, x, axes=0, dtype=None):
 
     return fold(f, acc, tl)
 
+def reduce_cuda(g, x, axes, dtype):
+    """Reductions in CUDA use the thrust library for speed and have limited
+       functionality."""
+    if axes != 0:
+        raise NotImplementedError("'axes' keyword is not implemented for CUDA")
+
+    return g(x, dtype=dtype)
+
+def get_cuda_reduction_func(f):
+    if f == _cd.add:
+        return _cd.reduce_add
+    elif f == _cd.multiply:
+        return _cd.reduce_multiply
+    else:
+        return None
+
+def reduce(f, x, axes=0, dtype=None):
+    if dtype is None:
+        dtype = maxcast[x.dtype]
+
+    g = get_cuda_reduction_func(f)
+    if g is not None:
+        return reduce_cuda(g, x, axes, dtype)
+
+    return reduce_cpu(f, x, axes, dtype)
+
+
 maxcast = {
   ndt("int8"): ndt("int64"),
   ndt("int16"): ndt("int64"),
@@ -119,6 +148,7 @@ maxcast = {
   ndt("uint8"): ndt("uint64"),
   ndt("uint16"): ndt("uint64"),
   ndt("uint32"): ndt("uint64"),
+  ndt("uint64"): ndt("uint64"),
   ndt("bfloat16"): ndt("float64"),
   ndt("float16"): ndt("float64"),
   ndt("float32"): ndt("float64"),
@@ -126,6 +156,22 @@ maxcast = {
   ndt("complex32"): ndt("complex128"),
   ndt("complex64"): ndt("complex128"),
   ndt("complex128"): ndt("complex128"),
+
+  ndt("?int8"): ndt("?int64"),
+  ndt("?int16"): ndt("?int64"),
+  ndt("?int32"): ndt("?int64"),
+  ndt("?int64"): ndt("?int64"),
+  ndt("?uint8"): ndt("?uint64"),
+  ndt("?uint16"): ndt("?uint64"),
+  ndt("?uint32"): ndt("?uint64"),
+  ndt("?uint64"): ndt("?uint64"),
+  ndt("?bfloat16"): ndt("?float64"),
+  ndt("?float16"): ndt("?float64"),
+  ndt("?float32"): ndt("?float64"),
+  ndt("?float64"): ndt("?float64"),
+  ndt("?complex32"): ndt("?complex128"),
+  ndt("?complex64"): ndt("?complex128"),
+  ndt("?complex128"): ndt("?complex128"),
 }
 
 
