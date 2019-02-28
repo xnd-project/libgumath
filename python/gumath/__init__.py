@@ -122,7 +122,9 @@ def reduce_cuda(g, x, axes, dtype):
     return g(x, dtype=dtype)
 
 def get_cuda_reduction_func(f):
-    if f == _cd.add:
+    if _cd is None:
+        return None
+    elif f == _cd.add:
         return _cd.reduce_add
     elif f == _cd.multiply:
         return _cd.reduce_multiply
