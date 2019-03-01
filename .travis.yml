@@ -16,13 +16,7 @@ matrix:
         - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
         - pip install numpy
       before_script:
-        - git clone https://github.com/plures/ndtypes.git
-        - git clone https://github.com/plures/xnd.git
-        - cd ndtypes
-        - python3 setup.py install --local=$PWD/../python
-        - cd ../xnd
-        - python3 setup.py install --local=$PWD/../python
-        - cd ..
+        - ./install-python.sh
       script:
         - python3 setup.py build -j2
         - python3 setup.py test
@@ -35,13 +29,8 @@ matrix:
         - python3 -m pip install numpy numba
       before_script:
         - export CC=clang
-        - git clone https://github.com/plures/ndtypes.git
-        - git clone https://github.com/plures/xnd.git
-        - cd ndtypes
-        - python3 setup.py install --local=$PWD/../python
-        - cd ../xnd
-        - python3 setup.py install --local=$PWD/../python
-        - cd ..
+        - export CXX=clang++
+        - ./install-python.sh
       script:
         - python3 setup.py build -j2
         - python3 setup.py test
