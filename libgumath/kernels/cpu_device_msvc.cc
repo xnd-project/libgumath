@@ -274,8 +274,8 @@ template <class T, class U>
 static inline bool
 lexorder_equiv(T a, U b)
 {
-    bool real_equal = a.real() == b.real() || (ISNAN(a.real()) && ISNAN(b.real()));
-    bool imag_equal = a.imag() == b.imag() || (ISNAN(a.imag()) && ISNAN(b.imag()));
+    bool real_equal = a.real() == b.real() || (std::isnan(a.real()) && std::isnan(b.real()));
+    bool imag_equal = a.imag() == b.imag() || (std::isnan(a.imag()) && std::isnan(b.imag()));
 
     return real_equal && imag_equal;
 }
