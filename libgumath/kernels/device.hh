@@ -291,6 +291,12 @@ half_ne(half a, half b)
 {
     return !__heq(a, b);
 }
+
+static inline DEVICE bool
+half_equiv(half a, half b)
+{
+    __heq(a, b) || (__hisnan(a) && __hisnan(b));
+}
 #endif
 
 
