@@ -20,5 +20,5 @@ else
 fi
 cd ..
 
-python3 setup.py build -j${getconf _NPROCESSORS_ONLN}
+python3 setup.py build -j$(getconf _NPROCESSORS_ONLN)
 
