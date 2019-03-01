@@ -271,7 +271,7 @@ lexorder_gt(T a, U b)
 }
 
 template <class T, class U>
-static inline DEVICE bool
+static inline bool
 lexorder_equiv(T a, U b)
 {
     bool real_equal = a.real() == b.real() || (ISNAN(a.real()) && ISNAN(b.real()));
