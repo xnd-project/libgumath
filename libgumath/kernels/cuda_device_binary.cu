@@ -990,6 +990,9 @@ CUDA_DEVICE_ALL_COMPARISON(equal, equal, __heq, equal)
 #define not_equal(x, y) x != y
 CUDA_DEVICE_ALL_COMPARISON(not_equal, not_equal, half_ne, not_equal)
 
+#define equivalent(x, y) (x == y || (x != x && y != y))
+CUDA_DEVICE_ALL_COMPARISON(equivalent, equivalent, __heq, lexorder_equiv)
+
 
 /*****************************************************************************/
 /*                                  Bitwise                                  */

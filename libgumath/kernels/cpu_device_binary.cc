@@ -972,6 +972,9 @@ CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, equal)
 #define not_equal(x, y) x != y
 CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, not_equal)
 
+#define equivalent(x, y) (x == y || (x != x && y != y))
+CPU_DEVICE_ALL_COMPARISON(equivalent, equivalent, equivalent, lexorder_equiv)
+
 
 /*****************************************************************************/
 /*                                  Bitwise                                  */

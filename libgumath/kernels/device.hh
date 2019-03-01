@@ -270,6 +270,16 @@ lexorder_gt(T a, U b)
     return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
 }
 
+template <class T, class U>
+static inline DEVICE bool
+lexorder_equiv(T a, U b)
+{
+    bool real_equal = a.real() == b.real() || (ISNAN(a.real()) && ISNAN(b.real()));
+    bool imag_equal = a.imag() == b.imag() || (ISNAN(a.imag()) && ISNAN(b.imag()));
+
+    return real_equal && imag_equal;
+}
+
 
 /*****************************************************************************/
 /*                                Half equality                              */
