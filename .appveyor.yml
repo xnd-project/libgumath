@@ -13,8 +13,6 @@ install:
   - "%PYTHON%\\python.exe -m pip install numpy"
 
 build_script:
-  - git clone https://github.com/plures/ndtypes.git
-  - git clone https://github.com/plures/xnd.git
   - cd ndtypes
   - "%PYTHON%\\python.exe setup.py install --local=\"%cd%\\..\\python\""
   - cd ..\xnd
