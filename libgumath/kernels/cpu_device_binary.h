@@ -943,6 +943,7 @@ CPU_DEVICE_ALL_COMPARISON_DECL(greater_equal)
 CPU_DEVICE_ALL_COMPARISON_DECL(greater)
 CPU_DEVICE_ALL_COMPARISON_DECL(equal)
 CPU_DEVICE_ALL_COMPARISON_DECL(not_equal)
+CPU_DEVICE_ALL_COMPARISON_DECL(equaln)
 
 
 /*****************************************************************************/
