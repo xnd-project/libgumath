@@ -272,7 +272,7 @@ lexorder_gt(T a, U b)
 
 template <class T, class U>
 static inline DEVICE bool
-lexorder_equiv(T a, U b)
+lexorder_eqn(T a, U b)
 {
     bool real_equal = a.real() == b.real() || (ISNAN(a.real()) && ISNAN(b.real()));
     bool imag_equal = a.imag() == b.imag() || (ISNAN(a.imag()) && ISNAN(b.imag()));
@@ -293,7 +293,7 @@ half_ne(half a, half b)
 }
 
 static inline DEVICE bool
-half_equiv(half a, half b)
+half_eqn(half a, half b)
 {
     __heq(a, b) || (__hisnan(a) && __hisnan(b));
 }

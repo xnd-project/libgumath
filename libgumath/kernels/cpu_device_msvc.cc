@@ -272,7 +272,7 @@ lexorder_gt(T a, U b)
 
 template <class T, class U>
 static inline bool
-lexorder_equiv(T a, U b)
+lexorder_eqn(T a, U b)
 {
     bool real_equal = a.real() == b.real() || (std::isnan(a.real()) && std::isnan(b.real()));
     bool imag_equal = a.imag() == b.imag() || (std::isnan(a.imag()) && std::isnan(b.imag()));
@@ -612,5 +612,5 @@ CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, equal)
 #define not_equal(x, y) x != y
 CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, not_equal)
 
-#define equivalent(x, y) (x == y || (x != x && y != y))
-CPU_DEVICE_ALL_COMPARISON(equivalent, equivalent, equivalent, lexorder_equiv)
+#define equaln(x, y) (x == y || (x != x && y != y))
+CPU_DEVICE_ALL_COMPARISON(equaln, equaln, equaln, lexorder_eqn)
