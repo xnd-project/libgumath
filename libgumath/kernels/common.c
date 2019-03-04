@@ -63,9 +63,8 @@ unary_update_bitmap_1D_S(xnd_t stack[])
     assert(b1 != NULL);
 
     for (i=0, k0=li0, k1=li1; i<N; i++, k0+=s0, k1+=s1) {
-        if (is_valid(b0, k0)) {
-            set_valid(b1, k1);
-        }
+        bool x = is_valid(b0, k0);
+        set_bit(b1, k1, x);
     }
 }
 
@@ -76,20 +75,16 @@ unary_reduce_bitmap_1D_S(xnd_t stack[])
     const int64_t li0 = stack[0].index;
     const int64_t li1 = stack[1].index;
     const int64_t s0 = xnd_fixed_step(&stack[0]);
-    const int64_t s1 = xnd_fixed_step(&stack[1]);
     const uint8_t *b0 = get_bitmap1D(&stack[0]);
     uint8_t *b1 = get_bitmap(&stack[1]);
-    int64_t i, k0, k1;
+    int64_t i, k0;
 
     assert(b0 != NULL);
     assert(b1 != NULL);
 
-    set_valid(b1, li1);
-
-    for (i=0, k0=li0, k1=li1; i<N; i++, k0+=s0, k1+=s1) {
-        if (!is_valid(b0, k0)) {
-            set_na(b1, k1);
-        }
+    for (i=0, k0=li0; i<N; i++, k0+=s0) {
+        bool x = is_valid(b0, k0) && is_valid(b1, li1);
+        set_bit(b1, li1, x);
     }
 }
 
@@ -104,9 +99,8 @@ unary_update_bitmap_0D(xnd_t stack[])
     assert(b0 != NULL);
     assert(b1 != NULL);
 
-    if (is_valid(b0, li0)) {
-        set_valid(b1, li1);
-    }
+    bool x = is_valid(b0, li0);
+    set_bit(b1, li1, x);
 }
 
 
@@ -131,23 +125,20 @@ binary_update_bitmap_1D_S(xnd_t stack[])
 
     if (b0 && b1) {
         for (i=0, k0=li0, k1=li1, k2=li2; i<N; i++, k0+=s0, k1+=s1, k2+=s2) {
-            if (is_valid(b0, k0) && is_valid(b1, k1)) {
-                set_valid(b2, k2);
-            }
+            bool x = is_valid(b0, k0) && is_valid(b1, k1);
+            set_bit(b2, k2, x);
         }
     }
     else if (b0) {
         for (i=0, k0=li0, k2=li2; i<N; i++, k0+=s0, k2+=s2) {
-            if (is_valid(b0, k0)) {
-                set_valid(b2, k2);
-            }
+            bool x = is_valid(b0, k0);
+            set_bit(b2, k2, x);
         }
     }
     else if (b1) {
         for (i=0, k1=li1, k2=li2; i<N; i++, k1+=s1, k2+=s2) {
-            if (is_valid(b1, k1)) {
-                set_valid(b2, k2);
-            }
+            bool x = is_valid(b1, k1);
+            set_bit(b2, k2, x);
         }
     }
 }
@@ -165,19 +156,16 @@ binary_update_bitmap_0D(xnd_t stack[])
     assert(b2 != NULL);
 
     if (b0 && b1) {
-        if (is_valid(b0, li0) && is_valid(b1, li1)) {
-            set_valid(b2, li2);
-        }
+        bool x = is_valid(b0, li0) && is_valid(b1, li1);
+        set_bit(b2, li2, x);
     }
     else if (b0) {
-        if (is_valid(b0, li0)) {
-            set_valid(b2, li2);
-        }
+        bool x = is_valid(b0, li0);
+        set_bit(b2, li2, x);
     }
     else if (b1) {
-        if (is_valid(b1, li1)) {
-            set_valid(b2, li2);
-        }
+        bool x = is_valid(b1, li1);
+        set_bit(b2, li2, x);
     }
 }
 

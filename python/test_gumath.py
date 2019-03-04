@@ -360,6 +360,59 @@ class TestNumba(unittest.TestCase):
         np.testing.assert_equal(z, c)
 
 
+class TestMissingValues(unittest.TestCase):
+
+    def test_unary(self):
+        a = [0, None, 2]
+        ans = xnd([math.sin(x) if x is not None else None for x in a])
+
+        x = xnd(a, dtype="?float64")
+        y = fn.sin(x)
+        self.assertEqual(y.value, ans)
+
+    def test_binary(self):
+        a = [3, None, 3]
+        b = [100, 1, None]
+        ans = xnd([t[0] * t[1] if t[0] is not None and t[1] is not None else None
+                   for t in zip(a, b)])
+
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.multiply(x, y)
+        self.assertEqual(z.value, ans)
+
+    def test_reduce(self):
+        a = [1, None, 2]
+        x = xnd(a)
+
+        y = gm.reduce(fn.add, x)
+        self.assertEqual(y, None)
+
+        y = gm.reduce(fn.multiply, x)
+        self.assertEqual(y, None)
+
+        y = gm.reduce(fn.subtract, x)
+        self.assertEqual(y, None)
+
+        x = xnd([], dtype="?int32")
+        y = gm.reduce(fn.add, x)
+        self.assertEqual(y, 0)
+
+    def test_reduce_cuda(self):
+        a = [1, None, 2]
+        x = xnd(a, device="cuda:managed")
+
+        y = gm.reduce(cd.add, x)
+        self.assertEqual(y, None)
+
+        y = gm.reduce(cd.multiply, x)
+        self.assertEqual(y, None)
+
+        x = xnd([], dtype="?int32", device="cuda:managed")
+        y = gm.reduce(fn.add, x)
+        self.assertEqual(y, 0)
+
+
 class TestOut(unittest.TestCase):
 
     def test_api_cpu(self):
@@ -1416,6 +1469,7 @@ ALL_TESTS = [
   TestPdist,
   TestNumba,
   TestOut,
+  TestMissingValues,
   TestUnaryCPU,
   TestUnaryCUDA,
   TestBinaryCPU,

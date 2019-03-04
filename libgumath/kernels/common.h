@@ -81,22 +81,25 @@ get_bitmap1D(const xnd_t *x)
     return ndt_is_optional(ndt_dtype(t)) ? x->bitmap.data : NULL;
 }
 
-static inline int
+static inline bool
 is_valid(const uint8_t *data, int64_t n)
 {
-    return data[n / 8] & ((uint8_t)1 << (n % 8));
+    int64_t pos = n / 8;
+    int64_t shift = n % 8;
+    uint8_t mask = (uint8_t)1 << shift;;
+
+    return data[pos] & mask;
 }
 
 static inline void
-set_valid(uint8_t *data, int64_t n)
+set_bit(uint8_t *data, int64_t n, bool x)
 {
-    data[n / 8] |= ((uint8_t)1 << (n % 8));
-}
+    int64_t pos = n / 8;
+    int64_t shift = n % 8;
+    uint8_t dmask = ((uint8_t)1) << shift;
+    uint8_t xmask = ((uint8_t)x) << shift;
 
-static inline void
-set_na(uint8_t *data, int64_t n)
-{
-    data[n / 8] &= ~((uint8_t)1 << (n % 8));
+    data[pos] ^= ((data[pos] & dmask) ^ xmask);
 }
 
 static inline int64_t
