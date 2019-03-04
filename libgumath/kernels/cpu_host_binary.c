@@ -2201,6 +2201,7 @@ CPU_HOST_ALL_COMPARISON(greater_equal)
 CPU_HOST_ALL_COMPARISON(greater)
 CPU_HOST_ALL_COMPARISON(equal)
 CPU_HOST_ALL_COMPARISON(not_equal)
+CPU_HOST_ALL_COMPARISON(equaln)
 
 
 static const gm_kernel_init_t binary_kernels[] = {
@@ -2216,6 +2217,7 @@ static const gm_kernel_init_t binary_kernels[] = {
   CPU_HOST_ALL_COMPARISON_INIT(greater),
   CPU_HOST_ALL_COMPARISON_INIT(equal),
   CPU_HOST_ALL_COMPARISON_INIT(not_equal),
+  CPU_HOST_ALL_COMPARISON_INIT(equaln),
 
   { .name = NULL, .sig = NULL }
 };

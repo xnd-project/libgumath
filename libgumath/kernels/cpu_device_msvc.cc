@@ -270,6 +270,16 @@ lexorder_gt(T a, U b)
     return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
 }
 
+template <class T, class U>
+static inline bool
+lexorder_eqn(T a, U b)
+{
+    bool real_equal = a.real() == b.real() || (std::isnan(a.real()) && std::isnan(b.real()));
+    bool imag_equal = a.imag() == b.imag() || (std::isnan(a.imag()) && std::isnan(b.imag()));
+
+    return real_equal && imag_equal;
+}
+
 
 /*****************************************************************************/
 /*                         CPU device binary kernels                         */
@@ -601,3 +611,6 @@ CPU_DEVICE_ALL_COMPARISON(equal, equal, equal, equal)
 
 #define not_equal(x, y) x != y
 CPU_DEVICE_ALL_COMPARISON(not_equal, not_equal, not_equal, not_equal)
+
+#define equaln(x, y) (x == y || (x != x && y != y))
+CPU_DEVICE_ALL_COMPARISON(equaln, equaln, equaln, lexorder_eqn)

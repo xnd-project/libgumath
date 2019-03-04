@@ -2180,6 +2180,7 @@ CUDA_HOST_ALL_COMPARISON(greater_equal)
 CUDA_HOST_ALL_COMPARISON(greater)
 CUDA_HOST_ALL_COMPARISON(equal)
 CUDA_HOST_ALL_COMPARISON(not_equal)
+CUDA_HOST_ALL_COMPARISON(equaln)
 
 
 static const gm_kernel_init_t binary_kernels[] = {
@@ -2195,6 +2196,7 @@ static const gm_kernel_init_t binary_kernels[] = {
   CUDA_HOST_ALL_COMPARISON_INIT(greater),
   CUDA_HOST_ALL_COMPARISON_INIT(equal),
   CUDA_HOST_ALL_COMPARISON_INIT(not_equal),
+  CUDA_HOST_ALL_COMPARISON_INIT(equaln),
 
   { .name = NULL, .sig = NULL }
 };
