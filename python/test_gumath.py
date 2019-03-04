@@ -395,9 +395,11 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(y, None)
 
         x = xnd([], dtype="?int32")
+
         y = gm.reduce(fn.add, x)
         self.assertEqual(y, 0)
 
+    @unittest.skipIf(cd is None, "test requires cuda")
     def test_reduce_cuda(self):
         a = [1, None, 2]
         x = xnd(a, device="cuda:managed")
