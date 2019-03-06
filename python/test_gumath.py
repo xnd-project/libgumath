@@ -332,6 +332,46 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(z, [False, False, True, False])
         self.assertEqual(z.dtype, ndt("bool"))
 
+        # NA eqn NA
+        a = [None]
+        b = [None]
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [True])
+
+        # !(NA eqn 0)
+        a = [None]
+        b = [0.0]
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(0 eqn NA)
+        a = [0.0]
+        b = [None]
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(NA eqn NaN)
+        a = [None]
+        b = [float("nan")]
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(NaN eqn NA)
+        a = [None]
+        b = [float("nan")]
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False])
+
     @unittest.skipIf(cd is None, "test requires cuda")
     def test_equaln_cuda(self):
         a = [1, None, 3, 5]
@@ -351,6 +391,46 @@ class TestMissingValues(unittest.TestCase):
         z = cd.equaln(x, y)
         self.assertEqual(z, [False, False, True, False])
         self.assertEqual(z.dtype, ndt("bool"))
+
+        # NA eqn NA
+        a = [None]
+        b = [None]
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [True])
+
+        # !(NA eqn 0)
+        a = [None]
+        b = [0.0]
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(0 eqn NA)
+        a = [0.0]
+        b = [None]
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(NA eqn NaN)
+        a = [None]
+        b = [float("nan")]
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False])
+
+        # !(NaN eqn NA)
+        a = [None]
+        b = [float("nan")]
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False])
 
 
 class TestEqualN(unittest.TestCase):
