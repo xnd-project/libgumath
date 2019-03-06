@@ -295,7 +295,7 @@ half_ne(half a, half b)
 static inline DEVICE bool
 half_eqn(half a, half b)
 {
-    __heq(a, b) || (__hisnan(a) && __hisnan(b));
+    return __heq(a, b) || (__hisnan(a) && __hisnan(b));
 }
 #endif
 
