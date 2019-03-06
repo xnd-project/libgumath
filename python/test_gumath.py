@@ -262,6 +262,87 @@ class TestMissingValues(unittest.TestCase):
         y = gm.reduce(fn.add, x)
         self.assertEqual(y, 0)
 
+    def test_comparisons(self):
+        a = [1, None, 3, 5]
+        b = [2, None, 3, 4]
+
+        x = xnd(a)
+        y = xnd(b)
+
+        ans = fn.equal(x, y)
+        self.assertEqual(ans.value, [False, None, True, False])
+
+        ans = fn.not_equal(x, y)
+        self.assertEqual(ans.value, [True, None, False, True])
+
+        ans = fn.less(x, y)
+        self.assertEqual(ans.value, [True, None, False, False])
+
+        ans = fn.less_equal(x, y)
+        self.assertEqual(ans.value, [True, None, True, False])
+
+        ans = fn.greater_equal(x, y)
+        self.assertEqual(ans.value, [False, None, True, True])
+
+        ans = fn.greater(x, y)
+        self.assertEqual(ans.value, [False, None, False, True])
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_comparisons_cuda(self):
+        a = [1, None, 3, 5]
+        b = [2, None, 3, 4]
+
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+
+        ans = cd.equal(x, y)
+        self.assertEqual(ans.value, [False, None, True, False])
+
+        ans = cd.not_equal(x, y)
+        self.assertEqual(ans.value, [True, None, False, True])
+
+        ans = cd.less(x, y)
+        self.assertEqual(ans.value, [True, None, False, False])
+
+        ans = cd.less_equal(x, y)
+        self.assertEqual(ans.value, [True, None, True, False])
+
+        ans = cd.greater_equal(x, y)
+        self.assertEqual(ans.value, [False, None, True, True])
+
+        ans = cd.greater(x, y)
+        self.assertEqual(ans.value, [False, None, False, True])
+
+    def test_equaln(self):
+        a = [1, None, 3, 5]
+        b = [2, None, 3, 4]
+
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False, True, True, False])
+        self.assertEqual(z.dtype, ndt("bool"))
+
+        a = [1, None, 3, 5]
+        b = [2, 0, 3, 4]
+
+        x = xnd(a)
+        y = xnd(b)
+        z = fn.equaln(x, y)
+        self.assertEqual(z, [False, False, True, False])
+        self.assertEqual(z.dtype, ndt("bool"))
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_equaln_cuda(self):
+        a = [1, None, 3, 5]
+        b = [2, None, 3, 4]
+
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False, True, True, False])
+        self.assertEqual(z.dtype, ndt("bool"))
+
 
 class TestEqualN(unittest.TestCase):
 

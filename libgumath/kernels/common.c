@@ -169,6 +169,83 @@ binary_update_bitmap_0D(xnd_t stack[])
     }
 }
 
+void
+binary_update_bitmap_1D_S_bool(xnd_t stack[])
+{
+    const int64_t N = xnd_fixed_shape(&stack[0]);
+    const int64_t li0 = stack[0].index;
+    const int64_t li1 = stack[1].index;
+    const int64_t li2 = stack[2].index;
+    const int64_t s0 = xnd_fixed_step(&stack[0]);
+    const int64_t s1 = xnd_fixed_step(&stack[1]);
+    const int64_t s2 = xnd_fixed_step(&stack[2]);
+    const uint8_t *b0 = get_bitmap1D(&stack[0]);
+    const uint8_t *b1 = get_bitmap1D(&stack[1]);
+    bool *x2 = (bool *)apply_index(&stack[2]);
+    int64_t i, k0, k1, k2;
+
+    assert(!ndt_is_optional(stack[2].type));
+
+    if (b0 && b1) {
+        for (i=0, k0=li0, k1=li1, k2=li2; i<N; i++, k0+=s0, k1+=s1, k2+=s2) {
+            bool x = is_valid(b0, k0);
+            bool y = is_valid(b1, k1);
+            bool z = x2[k2];
+            z = x && y ? z : !x && !y;
+            x2[k2] = z;
+        }
+    }
+    else if (b0) {
+        for (i=0, k0=li0, k2=li2; i<N; i++, k0+=s0, k2+=s2) {
+            bool x = is_valid(b0, k0);
+            bool z = x2[k2];
+            z = x ? z : x;
+            x2[k2] = z;
+        }
+    }
+    else if (b1) {
+        for (i=0, k1=li1, k2=li2; i<N; i++, k1+=s1, k2+=s2) {
+            bool x = is_valid(b1, k1);
+            bool z = x2[k2];
+            z = x ? z : x;
+            x2[k2] = z;
+        }
+    }
+}
+
+void
+binary_update_bitmap_0D_bool(xnd_t stack[])
+{
+    const int64_t li0 = stack[0].index;
+    const int64_t li1 = stack[1].index;
+    const int64_t li2 = stack[2].index;
+    const uint8_t *b0 = get_bitmap(&stack[0]);
+    const uint8_t *b1 = get_bitmap(&stack[1]);
+    bool *x2 = (bool *)stack[2].ptr;
+
+    assert(!ndt_is_optional(stack[2].type));
+
+    if (b0 && b1) {
+        bool x = is_valid(b0, li0);
+        bool y = is_valid(b1, li1);
+        bool z = x2[li2];
+        z = x && y ? z : !x && !y;
+        x2[li2] = z;
+    }
+    else if (b0) {
+        bool x = is_valid(b0, li0);
+        bool z = x2[li2];
+        z = x ? z : x;
+        x2[li2] = z;
+    }
+    else if (b1) {
+        bool x = is_valid(b1, li1);
+        bool z = x2[li2];
+        z = x ? z : x;
+        x2[li2] = z;
+    }
+}
+
 
 /****************************************************************************/
 /*                        Optimized unary typecheck                        */

@@ -717,6 +717,32 @@ gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  
     .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 }
 
 
+#define CUDA_HOST_EQUALN_INIT(func, t0, t1, t2) \
+  { .name = STRINGIZE(func),                                                             \
+    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),   \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                         \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                         \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                \
+                                                                                         \
+   { .name = STRINGIZE(func),                                                            \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),  \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                         \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                         \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                \
+                                                                                         \
+   { .name = STRINGIZE(func),                                                            \
+    .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2),  \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                         \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                         \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 },                                \
+                                                                                         \
+   { .name = STRINGIZE(func),                                                            \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2), \
+    .OptC = gm_cuda_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                         \
+    .OptS = gm_cuda_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                         \
+    .Xnd = gm_cuda_host_0D_##func##_##t0##_##t1##_##t2 }
+
+
 #undef bool
 #define bool_t _Bool
 
@@ -2173,6 +2199,211 @@ CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
     CUDA_HOST_BINARY_INIT(name, complex128, complex64, bool),  \
     CUDA_HOST_BINARY_INIT(name, complex128, complex128, bool)
 
+#define CUDA_HOST_ALL_EQUALN_INIT(name) \
+    CUDA_HOST_EQUALN_INIT(name, uint8, uint8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint8, uint16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint8, uint32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint8, uint64, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint8, int8, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, uint8, int16, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint8, int32, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint8, int64, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint8, bfloat16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint8, float16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint8, float32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint8, float64, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint8, complex32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, uint8, complex64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, uint8, complex128, bool),      \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, uint16, uint8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint16, uint16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint16, uint32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint16, uint64, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint16, int8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint16, int16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint16, int32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint16, int64, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint16, bfloat16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, uint16, float16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint16, float32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint16, float64, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint16, complex32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, uint16, complex64, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, uint16, complex128, bool),     \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, uint32, uint8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint32, uint16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint32, uint32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint32, uint64, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint32, int8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, uint32, int16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint32, int32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint32, int64, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint32, bfloat16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, uint32, float16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint32, float32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint32, float64, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, uint32, complex32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, uint32, complex64, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, uint32, complex128, bool),     \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, uint64, uint8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, uint64, uint16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint64, uint32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, uint64, uint64, bool),         \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, int8, uint8, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int8, uint16, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int8, uint32, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int8, int8, bool),             \
+    CUDA_HOST_EQUALN_INIT(name, int8, int16, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int8, int32, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int8, int64, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int8, bfloat16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int8, float16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int8, float32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int8, float64, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int8, complex32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, int8, complex64, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, int8, complex128, bool),       \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, int16, uint8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int16, uint16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int16, uint32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int16, int8, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int16, int16, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int16, int32, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int16, int64, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int16, bfloat16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, int16, float16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int16, float32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int16, float64, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int16, complex32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, int16, complex64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, int16, complex128, bool),      \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, int32, uint8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int32, uint16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int32, uint32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int32, int8, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int32, int16, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int32, int32, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int32, int64, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int32, bfloat16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, int32, float16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int32, float32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int32, float64, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, int32, complex32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, int32, complex64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, int32, complex128, bool),      \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, int64, uint8, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int64, uint16, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int64, uint32, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, int64, int8, bool),            \
+    CUDA_HOST_EQUALN_INIT(name, int64, int16, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int64, int32, bool),           \
+    CUDA_HOST_EQUALN_INIT(name, int64, int64, bool),           \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, uint8, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, uint16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, uint32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, int8, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, int16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, int32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, bfloat16, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, float16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, float32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, float64, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, complex32, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, complex64, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, bfloat16, complex128, bool),   \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, float16, uint8, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float16, uint16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float16, uint32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float16, int8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, float16, int16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float16, int32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float16, bfloat16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, float16, float16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float16, float32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float16, float64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float16, complex32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float16, complex64, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float16, complex128, bool),    \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, float32, uint8, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float32, uint16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float32, uint32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float32, int8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, float32, int16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float32, int32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float32, bfloat16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, float32, float16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float32, float32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float32, float64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float32, complex32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float32, complex64, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float32, complex128, bool),    \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, float64, uint8, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float64, uint16, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float64, uint32, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, float64, int8, bool),          \
+    CUDA_HOST_EQUALN_INIT(name, float64, int16, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float64, int32, bool),         \
+    CUDA_HOST_EQUALN_INIT(name, float64, bfloat16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, float64, float16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float64, float32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float64, float64, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, float64, complex32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float64, complex64, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, float64, complex128, bool),    \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, complex32, uint8, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex32, uint16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex32, uint32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex32, int8, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, complex32, int16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex32, int32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex32, bfloat16, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, complex32, float16, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex32, float32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex32, float64, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex32, complex32, bool),   \
+    CUDA_HOST_EQUALN_INIT(name, complex32, complex64, bool),   \
+    CUDA_HOST_EQUALN_INIT(name, complex32, complex128, bool),  \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, complex64, uint8, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex64, uint16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex64, uint32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex64, int8, bool),        \
+    CUDA_HOST_EQUALN_INIT(name, complex64, int16, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex64, int32, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex64, bfloat16, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, complex64, float16, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex64, float32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex64, float64, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex64, complex32, bool),   \
+    CUDA_HOST_EQUALN_INIT(name, complex64, complex64, bool),   \
+    CUDA_HOST_EQUALN_INIT(name, complex64, complex128, bool),  \
+                                                               \
+    CUDA_HOST_EQUALN_INIT(name, complex128, uint8, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex128, uint16, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex128, uint32, bool),     \
+    CUDA_HOST_EQUALN_INIT(name, complex128, int8, bool),       \
+    CUDA_HOST_EQUALN_INIT(name, complex128, int16, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex128, int32, bool),      \
+    CUDA_HOST_EQUALN_INIT(name, complex128, bfloat16, bool),   \
+    CUDA_HOST_EQUALN_INIT(name, complex128, float16, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, complex128, float32, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, complex128, float64, bool),    \
+    CUDA_HOST_EQUALN_INIT(name, complex128, complex32, bool),  \
+    CUDA_HOST_EQUALN_INIT(name, complex128, complex64, bool),  \
+    CUDA_HOST_EQUALN_INIT(name, complex128, complex128, bool)
+
 
 CUDA_HOST_ALL_COMPARISON(less)
 CUDA_HOST_ALL_COMPARISON(less_equal)
@@ -2196,7 +2427,7 @@ static const gm_kernel_init_t binary_kernels[] = {
   CUDA_HOST_ALL_COMPARISON_INIT(greater),
   CUDA_HOST_ALL_COMPARISON_INIT(equal),
   CUDA_HOST_ALL_COMPARISON_INIT(not_equal),
-  CUDA_HOST_ALL_COMPARISON_INIT(equaln),
+  CUDA_HOST_ALL_EQUALN_INIT(equaln),
 
   { .name = NULL, .sig = NULL }
 };
