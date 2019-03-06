@@ -365,8 +365,8 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(z, [False])
 
         # !(NaN eqn NA)
-        a = [None]
-        b = [float("nan")]
+        a = [float("nan")]
+        b = [None]
         x = xnd(a)
         y = xnd(b)
         z = fn.equaln(x, y)
@@ -425,8 +425,8 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(z, [False])
 
         # !(NaN eqn NA)
-        a = [None]
-        b = [float("nan")]
+        a = [float("nan")]
+        b = [None]
         x = xnd(a, device="cuda:managed")
         y = xnd(b, device="cuda:managed")
         z = cd.equaln(x, y)
