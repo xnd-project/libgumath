@@ -343,6 +343,15 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(z, [False, True, True, False])
         self.assertEqual(z.dtype, ndt("bool"))
 
+        a = [1, None, 3, 5]
+        b = [2, 0, 3, 4]
+
+        x = xnd(a, device="cuda:managed")
+        y = xnd(b, device="cuda:managed")
+        z = cd.equaln(x, y)
+        self.assertEqual(z, [False, False, True, False])
+        self.assertEqual(z.dtype, ndt("bool"))
+
 
 class TestEqualN(unittest.TestCase):
 

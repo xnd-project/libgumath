@@ -570,6 +570,12 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
         binary_update_bitmap_1D_S(stack);                                              \
     }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        if (xnd_cuda_device_synchronize(ctx) < 0) {                                    \
+            return -1;                                                                 \
+        }                                                                              \
+        binary_update_bitmap_1D_S_bool(stack);                                         \
+    }                                                                                  \
                                                                                        \
     return 0;                                                                          \
 }                                                                                      \
@@ -591,6 +597,12 @@ gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
         binary_update_bitmap_1D_S(stack);                                              \
     }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        if (xnd_cuda_device_synchronize(ctx) < 0) {                                    \
+            return -1;                                                                 \
+        }                                                                              \
+        binary_update_bitmap_1D_S_bool(stack);                                         \
+    }                                                                                  \
                                                                                        \
     return 0;                                                                          \
 }                                                                                      \
@@ -607,6 +619,12 @@ gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  
                                                                                        \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
         binary_update_bitmap_0D(stack);                                                \
+    }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        if (xnd_cuda_device_synchronize(ctx) < 0) {                                    \
+            return -1;                                                                 \
+        }                                                                              \
+        binary_update_bitmap_0D_bool(stack);                                           \
     }                                                                                  \
                                                                                        \
     return 0;                                                                          \
