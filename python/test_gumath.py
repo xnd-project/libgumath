@@ -263,6 +263,71 @@ class TestMissingValues(unittest.TestCase):
         self.assertEqual(y, 0)
 
 
+class TestEqualN(unittest.TestCase):
+
+    def test_nan_float(self):
+        for dtype in "bfloat16", "float32", "float64":
+            x = xnd([0, float("nan"), 2], dtype=dtype)
+
+            y = xnd([0, float("nan"), 2], dtype=dtype)
+            z = fn.equaln(x, y)
+            self.assertEqual(z, [True, True, True])
+
+            y = xnd([0, 1, 2], dtype=dtype)
+            z = fn.equaln(x, y)
+            self.assertEqual(z, [True, False, True])
+
+    def test_nan_complex(self):
+        for dtype in "complex64", "complex128":
+            for a, b, ans in [
+                (complex(float("nan"), 1.2), complex(float("nan"), 1.2), True),
+                (complex(float("nan"), 1.2), complex(float("nan"), 1), False),
+                (complex(float("nan"), float("nan")), complex(float("nan"), 1.2), False),
+
+                (complex(1.2, float("nan")), complex(1.2, float("nan")), True),
+                (complex(1.2, float("nan")), complex(1, float("nan")), False),
+                (complex(float("nan"), float("nan")), complex(1.2, float("nan")), False),
+
+                (complex(float("nan"), float("nan")), complex(float("nan"), float("nan")), True)]:
+
+                x = xnd([0, a, 2], dtype=dtype)
+                y = xnd([0, b, 2], dtype=dtype)
+                z = fn.equaln(x, y)
+                self.assertEqual(z, [True, ans, True])
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_nan_float_cuda(self):
+        for dtype in "bfloat16", "float16", "float32", "float64":
+            x = xnd([0, float("nan"), 2], dtype=dtype, device="cuda:managed")
+
+            y = xnd([0, float("nan"), 2], dtype=dtype, device="cuda:managed")
+            z = cd.equaln(x, y)
+            self.assertEqual(z, [True, True, True])
+
+            y = xnd([0, 1, 2], dtype=dtype, device="cuda:managed")
+            z = cd.equaln(x, y)
+            self.assertEqual(z, [True, False, True])
+
+    @unittest.skipIf(cd is None, "test requires cuda")
+    def test_nan_complex_cuda(self):
+        for dtype in "complex64", "complex128":
+            for a, b, ans in [
+                (complex(float("nan"), 1.2), complex(float("nan"), 1.2), True),
+                (complex(float("nan"), 1.2), complex(float("nan"), 1), False),
+                (complex(float("nan"), float("nan")), complex(float("nan"), 1.2), False),
+
+                (complex(1.2, float("nan")), complex(1.2, float("nan")), True),
+                (complex(1.2, float("nan")), complex(1, float("nan")), False),
+                (complex(float("nan"), float("nan")), complex(1.2, float("nan")), False),
+
+                (complex(float("nan"), float("nan")), complex(float("nan"), float("nan")), True)]:
+
+                x = xnd([0, a, 2], dtype=dtype, device="cuda:managed")
+                y = xnd([0, b, 2], dtype=dtype, device="cuda:managed")
+                z = cd.equaln(x, y)
+                self.assertEqual(z, [True, ans, True])
+
+
 class TestRaggedArrays(unittest.TestCase):
 
     def test_sin(self):
@@ -1464,6 +1529,7 @@ ALL_TESTS = [
   TestCall,
   TestRaggedArrays,
   TestMissingValues,
+  TestEqualN,
   TestGraphs,
   TestPdist,
   TestNumba,
