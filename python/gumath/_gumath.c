@@ -81,6 +81,9 @@ static gm_tbl_t *table = NULL;
 /* Xnd type */
 static PyTypeObject *xnd = NULL;
 
+/* Empty positional arguments */
+static PyObject *positional_empty = NULL;
+
 /* Maximum number of threads */
 static int64_t max_threads = 1;
 
@@ -148,24 +151,9 @@ clear_pystack(PyObject *pystack[], Py_ssize_t len)
     }
 }
 
-static PyObject *
-get_item_with_error(PyObject *d, const char *key)
-{
-    PyObject *s, *v;
-
-    s = PyUnicode_FromString(key);
-    if (s == NULL) {
-        return NULL;
-    }
-
-    v = PyDict_GetItemWithError(d, s);
-    Py_DECREF(s);
-    return v;
-}
-
 static int
 parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_nargs,
-           ndt_t **py_dtype, PyObject *args, PyObject *kwargs)
+           PyObject *args, PyObject *out)
 {
     Py_ssize_t nin;
     Py_ssize_t nout;
@@ -174,13 +162,6 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
         const char *name = args ? Py_TYPE(args)->tp_name : "NULL";
         PyErr_Format(PyExc_SystemError,
             "internal error: expected tuple, got '%.200s'", name);
-        return -1;
-    }
-
-    if (kwargs && !PyDict_Check(kwargs)) {
-        PyErr_Format(PyExc_SystemError,
-            "internal error: expected dict, got '%.200s'",
-            Py_TYPE(kwargs)->tp_name);
         return -1;
     }
 
@@ -202,87 +183,44 @@ parse_args(PyObject *pystack[NDT_MAX_ARGS], int *py_nin, int *py_nout, int *py_n
         pystack[i] = v;
     }
 
-    if (kwargs == NULL || PyDict_Size(kwargs) == 0) {
+    if (out == NULL) {
         nout = 0;
     }
-    else if (PyDict_Size(kwargs) <= 2) {
-        PyObject *out = get_item_with_error(kwargs, "out");
-        if (out == NULL && PyErr_Occurred()) {
-            return -1;
-        }
-        PyObject *dtype = get_item_with_error(kwargs, "dtype");
-        if (dtype == NULL && PyErr_Occurred()) {
-            return -1;
-        }
-
-        if (out == NULL && dtype == NULL) {
-            PyErr_SetString(PyExc_TypeError,
-                "valid keyword arguments are 'out' and 'dtype'");
-            return -1;
-        }
-        out = out == Py_None ? NULL : out;
-        dtype = dtype == Py_None ? NULL : dtype;
-
-        if (!out && !dtype) {
-            nout = 0;
-        }
-        else if (out && !dtype) {
-            if (Xnd_Check(out)) {
-                nout = 1;
-                if (nin+nout > NDT_MAX_ARGS) {
-                    PyErr_Format(PyExc_TypeError,
-                        "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
-                    return -1;
-                }
-                pystack[nin] = out;
+    else {
+        if (Xnd_Check(out)) {
+            nout = 1;
+            if (nin+nout > NDT_MAX_ARGS) {
+                PyErr_Format(PyExc_TypeError,
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
+                return -1;
             }
-            else if (PyTuple_Check(out)) {
-                nout = PyTuple_GET_SIZE(out);
-                if (nout > NDT_MAX_ARGS || nin+nout > NDT_MAX_ARGS) {
+            pystack[nin] = out;
+        }
+        else if (PyTuple_Check(out)) {
+            nout = PyTuple_GET_SIZE(out);
+            if (nout > NDT_MAX_ARGS || nin+nout > NDT_MAX_ARGS) {
+                PyErr_Format(PyExc_TypeError,
+                    "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
+                return -1;
+            }
+
+            for (Py_ssize_t i = 0; i < nout; i++) {
+                PyObject *v = PyTuple_GET_ITEM(out, i);
+                if (!Xnd_Check(v)) {
                     PyErr_Format(PyExc_TypeError,
-                        "maximum number of arguments is %d, got %n", NDT_MAX_ARGS, nin+nout);
+                        "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
                     return -1;
                 }
 
-                for (Py_ssize_t i = 0; i < nout; i++) {
-                    PyObject *v = PyTuple_GET_ITEM(out, i);
-                    if (!Xnd_Check(v)) {
-                        PyErr_Format(PyExc_TypeError,
-                            "expected xnd argument, got '%.200s'", Py_TYPE(v)->tp_name);
-                        return -1;
-                    }
-
-                    pystack[nin+i] = v;
-                }
+                pystack[nin+i] = v;
             }
-            else {
-                PyErr_Format(PyExc_TypeError,
-                    "'out' argument must be xnd or a tuple of xnd, got '%.200s'",
-                    Py_TYPE(out)->tp_name);
-                return -1;
-            }
-        }
-        else if (dtype && !out) {
-            nout = 0;
-            if (!Ndt_Check(dtype)) {
-                PyErr_Format(PyExc_TypeError,
-                    "'dtype' argument must be ndt, got '%.200s'",
-                    Py_TYPE(dtype)->tp_name);
-                return -1;
-            }
-            *py_dtype = (ndt_t *)NDT(dtype);
-            ndt_incref(*py_dtype);
         }
         else {
-            PyErr_SetString(PyExc_TypeError,
-                "the 'out' and 'dtype' arguments are mutually exclusive");
+            PyErr_Format(PyExc_TypeError,
+                "'out' argument must be xnd or a tuple of xnd, got '%.200s'",
+                Py_TYPE(out)->tp_name);
             return -1;
         }
-    }
-    else {
-        PyErr_SetString(PyExc_TypeError,
-            "the only supported keyword arguments are 'out' and 'dtype'");
-        return -1;
     }
 
     for (int i = 0; i < nin+nout; i++) {
@@ -300,6 +238,11 @@ static PyObject *
 _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
              bool enable_threads, bool check_broadcast)
 {
+    static char *kwlist[] = {"out", "dtype", "cls", NULL};
+    PyObject *out = Py_None;
+    PyObject *dt = Py_None;
+    PyObject *cls = Py_None;
+
     NDT_STATIC_CONTEXT(ctx);
     PyObject *pystack[NDT_MAX_ARGS];
     xnd_t stack[NDT_MAX_ARGS];
@@ -312,7 +255,38 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
     int nin, nout, nargs;
     int k;
 
-    if (parse_args(pystack, &nin, &nout, &nargs, &dtype, args, kwargs) < 0) {
+    if (!PyArg_ParseTupleAndKeywords(positional_empty, kwargs, "|$OOO", kwlist,
+                                     &out, &dt, &cls)) {
+        return NULL;
+    }
+
+    out = out == Py_None ? NULL : out;
+    dt = dt == Py_None ? NULL : dt;
+    cls = cls == Py_None ? (PyObject *)xnd : cls;
+
+    if (dt != NULL) {
+        if (out != NULL) {
+            PyErr_SetString(PyExc_TypeError,
+                "the 'out' and 'dtype' arguments are mutually exclusive");
+            return NULL;
+        }
+        if (!Ndt_Check(dt)) {
+            PyErr_Format(PyExc_TypeError,
+                "'dtype' argument must be ndt, got '%.200s'",
+                Py_TYPE(dt)->tp_name);
+                return NULL;
+            dtype = (ndt_t *)NDT(dtype);
+            ndt_incref(dtype);
+        }
+    }
+
+    if (!PyType_Check(cls) || !PyType_IsSubtype((PyTypeObject *)cls, xnd)) {
+        PyErr_SetString(PyExc_TypeError,
+            "the 'cls' argument must be a subtype of 'xnd'");
+        return NULL;
+    }
+
+    if (parse_args(pystack, &nin, &nout, &nargs, args, out) < 0) {
         return NULL;
     }
     assert(nout == 0 || dtype == NULL);
@@ -365,7 +339,7 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
         for (int i = 0; i < spec.nout; i++) {
             if (ndt_is_concrete(spec.types[nin+i])) {
                 uint32_t flags = self->flags == GM_CUDA_MANAGED_FUNC ? XND_CUDA_MANAGED : 0;
-                PyObject *x = Xnd_EmptyFromType(xnd, spec.types[nin+i], flags);
+                PyObject *x = Xnd_EmptyFromType((PyTypeObject *)cls, spec.types[nin+i], flags);
                 if (x == NULL) {
                     clear_pystack(pystack, nin+i);
                     ndt_apply_spec_clear(&spec);
@@ -915,6 +889,11 @@ PyInit__gumath(void)
         goto error;
     }
 
+    positional_empty = PyTuple_New(0);
+    if (positional_empty == NULL) {
+        goto error;
+    }
+
     m = PyModule_Create(&gumath_module);
     if (m == NULL) {
         goto error;
@@ -932,6 +911,7 @@ PyInit__gumath(void)
     return m;
 
 error:
+    Py_CLEAR(positional_empty);
     Py_CLEAR(xnd);
     Py_CLEAR(m);
     return NULL;

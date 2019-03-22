@@ -63,6 +63,22 @@ ARCH = platform.architecture()[0]
 
 class TestCall(unittest.TestCase):
 
+    def test_subclass(self):
+
+        class X(xnd):
+            pass
+
+        x = X([1, 2, 3])
+        y = X([1, 2, 3])
+
+        z = fn.multiply(x, y)
+        self.assertEqual(z, [1, 4, 9])
+        self.assertEqual(type(z), xnd)
+
+        z = fn.multiply(x, y, cls=X)
+        self.assertEqual(z, [1, 4, 9])
+        self.assertEqual(type(z), X)
+
     def test_sin_scalar(self):
 
         x1 = xnd(1.2, type="float64")
