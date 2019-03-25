@@ -165,6 +165,9 @@ if len(sys.argv) == 2:
         env = os.environ.copy()
         env['PYTHONPATH'] = path
         ret = subprocess.call([sys.executable, "python/test_gumath.py", "--long"], env=env)
+        if ret != 0:
+            sys.exit(ret)
+        ret = subprocess.call([sys.executable, "python/test_xndarray.py"], env=env)
         sys.exit(ret)
     elif sys.argv[1] == 'clean':
         shutil.rmtree("build", ignore_errors=True)
