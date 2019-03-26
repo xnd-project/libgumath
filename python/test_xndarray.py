@@ -35,9 +35,11 @@ from xnd import *
 import unittest
 import argparse
 import sys
+from gumath_aux import gen_fixed
 
 try:
     import numpy as np
+    np.warnings.filterwarnings('ignore')
 except ImportError:
     np = None
 
@@ -120,9 +122,38 @@ class TestOperators(unittest.TestCase):
             self.assertEqual(z.tolist(), c.tolist())
 
 
-ALL_TESTS = [
-  TestOperators,
-]
+@unittest.skipIf(np is None, "test requires numpy")
+class TestArrayUfunc(unittest.TestCase):
+
+    allfuncs = set([v for v in np.__dict__.values() if callable(v)])
+    ufuncs = set([v for v in np.__dict__.values() if isinstance(v, np.ufunc)])
+    funcs = allfuncs - ufuncs
+
+    def test_ufuncs(self):
+
+        for x in gen_fixed(3, 1, 5):
+            for y in gen_fixed(3, 1, 5):
+                xnd_x = array(x, dtype="float32")
+                xnd_y = array(y, dtype="float32")
+                np_x = np.array(x, dtype="float32")
+                np_y = np.array(y, dtype="float32")
+                for f in self.ufuncs:
+                    arity = 1
+                    try:
+                        a = f(np_x)
+                    except:
+                        arity = 2
+                        try:
+                            a = f(np_x, np_y)
+                        except:
+                            continue
+
+                    if arity == 1:
+                        b = f(xnd_x)
+                    else:
+                        b = f(xnd_x, xnd_y)
+
+                    np.testing.assert_equal(a, b)
 
 
 if __name__ == '__main__':
@@ -132,6 +163,7 @@ if __name__ == '__main__':
 
 ALL_TESTS = [
   TestOperators,
+  TestArrayUfunc,
 ]
 
 
