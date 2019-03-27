@@ -30,18 +30,21 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import sys, os
+os.environ["NUMPY_EXPERIMENTAL_ARRAY_FUNCTION"] = "1"
 
 from xnd import *
 import unittest
 import argparse
-import sys
 from gumath_aux import gen_fixed
 
 try:
     import numpy as np
+    HAVE_ARRAY_FUNCTION = hasattr(np.ndarray, '__array_function__')
     np.warnings.filterwarnings('ignore')
 except ImportError:
     np = None
+    HAVE_ARRAY_FUNCTION = False
 
 
 unary_operators = [
@@ -129,6 +132,12 @@ class TestArrayUfunc(unittest.TestCase):
     ufuncs = set([v for v in np.__dict__.values() if isinstance(v, np.ufunc)])
     funcs = allfuncs - ufuncs
 
+    def allarray(self, v):
+        return isinstance(v, array) or all(isinstance(x, array) for x in v)
+
+    def assertAllXndArray(self, v):
+        self.assertTrue(self.allarray(v))
+
     def test_ufuncs(self):
 
         for x in gen_fixed(3, 1, 5):
@@ -153,13 +162,26 @@ class TestArrayUfunc(unittest.TestCase):
                     else:
                         b = f(xnd_x, xnd_y)
 
+                    self.assertAllXndArray(b)
                     np.testing.assert_equal(a, b)
 
+    @unittest.skipIf(not HAVE_ARRAY_FUNCTION,
+                     "test requires numpy with __array_function__ support")
+    def test_array_func(self):
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-f", "--failfast", action="store_true",
-                        help="stop the test run on first error")
+        def f(x):
+            y = np.tensordot(x, x.T)
+            return np.mean(np.exp(y))
+
+        x = array([[1, 2], [3, 4]], dtype="float64")
+        y = np.array([[1, 2], [3, 4]], dtype="float64")
+
+        a = f(x)
+        b = f(y)
+
+        self.assertAllXndArray(a)
+        self.assertEqual(a.tolist(), b.tolist())
+
 
 ALL_TESTS = [
   TestOperators,
