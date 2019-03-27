@@ -275,9 +275,9 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
                 "'dtype' argument must be ndt, got '%.200s'",
                 Py_TYPE(dt)->tp_name);
                 return NULL;
-            dtype = (ndt_t *)NDT(dtype);
-            ndt_incref(dtype);
         }
+        dtype = (ndt_t *)NDT(dt);
+        ndt_incref(dtype);
     }
 
     if (!PyType_Check(cls) || !PyType_IsSubtype((PyTypeObject *)cls, xnd)) {
@@ -302,11 +302,6 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
         li[k] = stack[k].index;
     }
 
-    if (dtype) {
-        types[k] = dtype;
-        nout = 1;
-    }
-
     if (have_cpu_device) {
         if (self->flags & GM_CUDA_MANAGED_FUNC) {
             PyErr_SetString(PyExc_ValueError,
@@ -323,7 +318,31 @@ _gufunc_call(GufuncObject *self, PyObject *args, PyObject *kwargs,
     }
 
     if (dtype) {
-        nout = 0;
+        if (spec.nout != 1) {
+            ndt_err_format(&ctx, NDT_TypeError,
+                "the 'dtype' argument is only supported for a single "
+                "return value");
+            ndt_apply_spec_clear(&spec);
+            ndt_decref(dtype);
+            return seterr(&ctx);
+        }
+
+        const ndt_t *u = spec.types[spec.nin];
+        const ndt_t *v = ndt_copy_contiguous_dtype(u, dtype, 0, &ctx);
+
+        ndt_apply_spec_clear(&spec);
+        ndt_decref(dtype);
+
+        if (v == NULL) {
+            return seterr(&ctx);
+        }
+
+        types[nin] = v;
+        kernel = gm_select(&spec, self->tbl, self->name, types, li, nin, 1,
+                           1 && check_broadcast, stack, &ctx);
+        if (kernel.set == NULL) {
+            return seterr(&ctx);
+        }
     }
 
     /*

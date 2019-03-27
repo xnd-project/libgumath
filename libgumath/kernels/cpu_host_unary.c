@@ -480,7 +480,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_NOIMPL(name,bool, complex32)        \
     CPU_HOST_UNARY(name, bool, complex64)        \
     CPU_HOST_UNARY(name, bool, complex128)       \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, uint8, uint8)           \
     CPU_HOST_UNARY(name, uint8, uint16)          \
     CPU_HOST_UNARY(name, uint8, uint32)          \
@@ -495,7 +495,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_NOIMPL(name, uint8, complex32)      \
     CPU_HOST_UNARY(name, uint8, complex64)       \
     CPU_HOST_UNARY(name, uint8, complex128)      \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, uint16, uint16)         \
     CPU_HOST_UNARY(name, uint16, uint32)         \
     CPU_HOST_UNARY(name, uint16, uint64)         \
@@ -505,15 +505,15 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY(name, uint16, float64)        \
     CPU_HOST_UNARY(name, uint16, complex64)      \
     CPU_HOST_UNARY(name, uint16, complex128)     \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, uint32, uint32)         \
     CPU_HOST_UNARY(name, uint32, uint64)         \
     CPU_HOST_UNARY(name, uint32, int64)          \
     CPU_HOST_UNARY(name, uint32, float64)        \
     CPU_HOST_UNARY(name, uint32, complex128)     \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, uint64, uint64)         \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, int8, int8)             \
     CPU_HOST_UNARY(name, int8, int16)            \
     CPU_HOST_UNARY(name, int8, int32)            \
@@ -525,7 +525,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_NOIMPL(name, int8, complex32)       \
     CPU_HOST_UNARY(name, int8, complex64)        \
     CPU_HOST_UNARY(name, int8, complex128)       \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, int16, int16)           \
     CPU_HOST_UNARY(name, int16, int32)           \
     CPU_HOST_UNARY(name, int16, int64)           \
@@ -533,42 +533,42 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY(name, int16, float64)         \
     CPU_HOST_UNARY(name, int16, complex64)       \
     CPU_HOST_UNARY(name, int16, complex128)      \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, int32, int32)           \
     CPU_HOST_UNARY(name, int32, int64)           \
     CPU_HOST_UNARY(name, int32, float64)         \
     CPU_HOST_UNARY(name, int32, complex128)      \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, int64, int64)           \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, bfloat16, bfloat16)     \
     CPU_HOST_UNARY(name, bfloat16, float32)      \
     CPU_HOST_UNARY(name, bfloat16, float64)      \
     CPU_HOST_UNARY(name, bfloat16, complex64)    \
     CPU_HOST_UNARY(name, bfloat16, complex128)   \
-                                                  \
+                                                 \
     CPU_HOST_NOIMPL(name, float16, float16)      \
     CPU_HOST_NOIMPL(name, float16, float32)      \
     CPU_HOST_NOIMPL(name, float16, float64)      \
     CPU_HOST_NOIMPL(name, float16, complex32)    \
     CPU_HOST_NOIMPL(name, float16, complex64)    \
     CPU_HOST_NOIMPL(name, float16, complex128)   \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, float32, float32)       \
     CPU_HOST_UNARY(name, float32, float64)       \
     CPU_HOST_UNARY(name, float32, complex64)     \
     CPU_HOST_UNARY(name, float32, complex128)    \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, float64, float64)       \
     CPU_HOST_UNARY(name, float64, complex128)    \
-                                                  \
+                                                 \
     CPU_HOST_NOIMPL(name, complex32, complex32)  \
     CPU_HOST_NOIMPL(name, complex32, complex64)  \
     CPU_HOST_NOIMPL(name, complex32, complex128) \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, complex64, complex64)   \
     CPU_HOST_UNARY(name, complex64, complex128)  \
-                                                  \
+                                                 \
     CPU_HOST_UNARY(name, complex128, complex128)
 
 #define CPU_HOST_ALL_UNARY_COPY_INIT(name, func, hfunc) \
@@ -588,7 +588,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, bool, complex32),       \
     CPU_HOST_UNARY_INIT(name, func, bool, complex64),       \
     CPU_HOST_UNARY_INIT(name, func, bool, complex128),      \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, uint8, uint8),          \
     CPU_HOST_UNARY_INIT(name, func, uint8, uint16),         \
     CPU_HOST_UNARY_INIT(name, func, uint8, uint32),         \
@@ -603,7 +603,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, uint8, complex32),      \
     CPU_HOST_UNARY_INIT(name, func, uint8, complex64),      \
     CPU_HOST_UNARY_INIT(name, func, uint8, complex128),     \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, uint16, uint16),        \
     CPU_HOST_UNARY_INIT(name, func, uint16, uint32),        \
     CPU_HOST_UNARY_INIT(name, func, uint16, uint64),        \
@@ -613,15 +613,15 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, uint16, float64),       \
     CPU_HOST_UNARY_INIT(name, func, uint16, complex64),     \
     CPU_HOST_UNARY_INIT(name, func, uint16, complex128),    \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, uint32, uint32),        \
     CPU_HOST_UNARY_INIT(name, func, uint32, uint64),        \
     CPU_HOST_UNARY_INIT(name, func, uint32, int64),         \
     CPU_HOST_UNARY_INIT(name, func, uint32, float64),       \
     CPU_HOST_UNARY_INIT(name, func, uint32, complex128),    \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, uint64, uint64),        \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, int8, int8),            \
     CPU_HOST_UNARY_INIT(name, func, int8, int16),           \
     CPU_HOST_UNARY_INIT(name, func, int8, int32),           \
@@ -633,7 +633,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, int8, complex32),       \
     CPU_HOST_UNARY_INIT(name, func, int8, complex64),       \
     CPU_HOST_UNARY_INIT(name, func, int8, complex128),      \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, int16, int16),          \
     CPU_HOST_UNARY_INIT(name, func, int16, int32),          \
     CPU_HOST_UNARY_INIT(name, func, int16, int64),          \
@@ -641,42 +641,42 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, int16, float64),        \
     CPU_HOST_UNARY_INIT(name, func, int16, complex64),      \
     CPU_HOST_UNARY_INIT(name, func, int16, complex128),     \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, int32, int32),          \
     CPU_HOST_UNARY_INIT(name, func, int32, int64),          \
     CPU_HOST_UNARY_INIT(name, func, int32, float64),        \
     CPU_HOST_UNARY_INIT(name, func, int32, complex128),     \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, int64, int64),          \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, bfloat16, bfloat16),    \
     CPU_HOST_UNARY_INIT(name, func, bfloat16, float32),     \
     CPU_HOST_UNARY_INIT(name, func, bfloat16, float64),     \
     CPU_HOST_UNARY_INIT(name, func, bfloat16, complex64),   \
     CPU_HOST_UNARY_INIT(name, func, bfloat16, complex128),  \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, hfunc, float16, float16),     \
     CPU_HOST_UNARY_INIT(name, func, float16, float32),      \
     CPU_HOST_UNARY_INIT(name, func, float16, float64),      \
     CPU_HOST_UNARY_INIT(name, func, float16, complex32),    \
     CPU_HOST_UNARY_INIT(name, func, float16, complex64),    \
     CPU_HOST_UNARY_INIT(name, func, float16, complex128),   \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, float32, float32),      \
     CPU_HOST_UNARY_INIT(name, func, float32, float64),      \
     CPU_HOST_UNARY_INIT(name, func, float32, complex64),    \
     CPU_HOST_UNARY_INIT(name, func, float32, complex128),   \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, float64, float64),      \
     CPU_HOST_UNARY_INIT(name, func, float64, complex128),   \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, complex32, complex32),  \
     CPU_HOST_UNARY_INIT(name, func, complex32, complex64),  \
     CPU_HOST_UNARY_INIT(name, func, complex32, complex128), \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, complex64, complex64),  \
     CPU_HOST_UNARY_INIT(name, func, complex64, complex128), \
-                                                             \
+                                                            \
     CPU_HOST_UNARY_INIT(name, func, complex128, complex128)
 
 
