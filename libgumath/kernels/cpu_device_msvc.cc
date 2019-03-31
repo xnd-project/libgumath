@@ -93,7 +93,7 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *a0, char *a1)                 
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#define CPU_DEVICE_ALL_UNARY_COPY(name, func, hfunc) \
+#define CPU_DEVICE_ALL_UNARY(name, func, hfunc) \
     CPU_DEVICE_NOIMPL(name, func, bool, complex32, complex32)         \
     CPU_DEVICE_UNARYC(name, func, bool, complex64, complex64)         \
     CPU_DEVICE_UNARYC(name, func, bool, complex128, complex128)       \
@@ -139,7 +139,8 @@ gm_cpu_device_0D_##name##_##t0##_##t1(const char *a0, char *a1)                 
 
 
 #define copy(x) x
-CPU_DEVICE_ALL_UNARY_COPY(copy, copy, copy)
+CPU_DEVICE_ALL_UNARY(copy, copy, copy)
+CPU_DEVICE_ALL_UNARY(abs, std::abs, std::abs)
 
 
 /*****************************************************************************/
