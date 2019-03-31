@@ -92,7 +92,7 @@ typedef double float64_t;
 /*                                    Copy                                   */
 /*****************************************************************************/
 
-#define CUDA_DEVICE_ALL_UNARY_COPY_DECL(name) \
+#define CUDA_DEVICE_ALL_UNARY_DECL(name) \
     CUDA_DEVICE_UNARY_DECL(name, bool, bool)             \
     CUDA_DEVICE_UNARY_DECL(name, bool, uint8)            \
     CUDA_DEVICE_UNARY_DECL(name, bool, uint16)           \
@@ -186,7 +186,8 @@ typedef double float64_t;
     CUDA_DEVICE_UNARY_DECL(name, complex128, complex128)
 
 
-CUDA_DEVICE_ALL_UNARY_COPY_DECL(copy)
+CUDA_DEVICE_ALL_UNARY_DECL(copy)
+CUDA_DEVICE_ALL_UNARY_DECL(abs)
 
 
 /*****************************************************************************/

@@ -1009,7 +1009,7 @@ class TestFunctions(unittest.TestCase):
              f in functions["unary"]["complex_math_with_half"]:
             self.assertRelErrorLess(z1, z2, 1e-2, msg)
         elif isinstance(z1, complex):
-            if f in ("multiply", "divide"):
+            if f in ("multiply", "divide", "abs"):
                 self.assertRelErrorLess(z1.real, z2.real, 1e-2, msg)
                 self.assertRelErrorLess(z1.imag, z2.imag, 1e-2, msg)
             else:

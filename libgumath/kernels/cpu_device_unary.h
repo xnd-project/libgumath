@@ -81,7 +81,7 @@ typedef double float64_t;
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#define CPU_DEVICE_ALL_UNARY_COPY_DECL(name) \
+#define CPU_DEVICE_ALL_UNARY_ALL_DECL(name) \
     CPU_DEVICE_UNARY_DECL(name, bool, bool)                   \
     CPU_DEVICE_UNARY_DECL(name, bool, uint8)                  \
     CPU_DEVICE_UNARY_DECL(name, bool, uint16)                 \
@@ -175,7 +175,8 @@ typedef double float64_t;
     CPU_DEVICE_UNARY_DECL(name, complex128, complex128)
 
 
-CPU_DEVICE_ALL_UNARY_COPY_DECL(copy)
+CPU_DEVICE_ALL_UNARY_ALL_DECL(copy)
+CPU_DEVICE_ALL_UNARY_ALL_DECL(abs)
 
 
 /*****************************************************************************/

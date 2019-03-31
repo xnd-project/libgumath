@@ -216,6 +216,61 @@ _remainder(T a, T b)
 
 
 /*****************************************************************************/
+/*                                      Abs                                  */
+/*****************************************************************************/
+
+#ifdef __CUDACC__
+#define abs_unsigned(T) \
+static inline DEVICE T  \
+_abs(T x)               \
+{                       \
+    return x;           \
+}
+
+abs_unsigned(uint8_t)
+abs_unsigned(uint16_t)
+abs_unsigned(uint32_t)
+abs_unsigned(uint64_t)
+
+#define abs_signed(T) \
+static inline DEVICE T     \
+_abs(T x)                  \
+{                          \
+    return x < 0 ? -x : x; \
+}
+
+abs_signed(int8_t)
+abs_signed(int16_t)
+abs_signed(int32_t)
+abs_signed(int64_t)
+
+static inline DEVICE float32_t
+_abs(float32_t x)
+{
+    return fabsf(x);
+}
+
+static inline DEVICE float64_t
+_abs(float64_t x)
+{
+    return fabs(x);
+}
+
+static inline DEVICE complex64_t
+_abs(complex64_t x)
+{
+    return thrust::abs<float>(x);
+}
+
+static inline DEVICE complex128_t
+_abs(complex128_t x)
+{
+    return thrust::abs<double>(x);
+}
+#endif
+
+
+/*****************************************************************************/
 /*                Lexicographic comparison for complex numbers               */
 /*****************************************************************************/
 

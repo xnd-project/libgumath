@@ -390,7 +390,7 @@ def split_xnd(x, n, max_outer=None):
 
 functions = {
   "unary": {
-    "default": ["copy"],
+    "default": ["copy", "abs"],
     "arith": ["negative"],
     "complex_math_with_half": ["exp", "log", "log10", "sqrt", "sin", "cos"],
     "complex_math": ["tan", "asin", "acos", "atan", "sinh", "cosh", "tanh",

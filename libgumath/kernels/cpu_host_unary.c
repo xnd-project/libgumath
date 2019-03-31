@@ -463,7 +463,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#define CPU_HOST_ALL_UNARY_COPY(name) \
+#define CPU_HOST_ALL_UNARY(name) \
     CPU_HOST_UNARY(name, bool, bool)             \
     CPU_HOST_UNARY(name, bool, uint8)            \
     CPU_HOST_UNARY(name, bool, uint16)           \
@@ -571,7 +571,7 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
                                                  \
     CPU_HOST_UNARY(name, complex128, complex128)
 
-#define CPU_HOST_ALL_UNARY_COPY_INIT(name, func, hfunc) \
+#define CPU_HOST_ALL_UNARY_INIT(name, func, hfunc) \
     CPU_HOST_UNARY_INIT(name, func, bool, bool),            \
     CPU_HOST_UNARY_INIT(name, func, bool, uint8),           \
     CPU_HOST_UNARY_INIT(name, func, bool, uint16),          \
@@ -680,12 +680,14 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
     CPU_HOST_UNARY_INIT(name, func, complex128, complex128)
 
 
-CPU_HOST_ALL_UNARY_COPY(copy)
+CPU_HOST_ALL_UNARY(copy)
+CPU_HOST_ALL_UNARY(abs)
 
 
 static const gm_kernel_init_t unary_copy[] = {
   /* COPY */
-  CPU_HOST_ALL_UNARY_COPY_INIT(copy, copy, copy),
+  CPU_HOST_ALL_UNARY_INIT(copy, copy, copy),
+  CPU_HOST_ALL_UNARY_INIT(abs, abs, abs),
 
   { .name = NULL, .sig = NULL }
 };

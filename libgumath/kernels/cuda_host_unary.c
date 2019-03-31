@@ -498,7 +498,7 @@ gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)
 /*                                   Copy                                    */
 /*****************************************************************************/
 
-#define CUDA_HOST_ALL_UNARY_COPY(name) \
+#define CUDA_HOST_ALL_UNARY(name) \
     CUDA_HOST_UNARY(name, bool, bool)             \
     CUDA_HOST_UNARY(name, bool, uint8)            \
     CUDA_HOST_UNARY(name, bool, uint16)           \
@@ -606,7 +606,7 @@ gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)
                                                   \
     CUDA_HOST_UNARY(name, complex128, complex128)
 
-#define CUDA_HOST_ALL_UNARY_COPY_INIT(name, func, hfunc) \
+#define CUDA_HOST_ALL_UNARY_INIT(name, func, hfunc) \
     CUDA_HOST_UNARY_INIT(name, func, bool, bool),            \
     CUDA_HOST_UNARY_INIT(name, func, bool, uint8),           \
     CUDA_HOST_UNARY_INIT(name, func, bool, uint16),          \
@@ -715,12 +715,14 @@ gm_cuda_host_1D_C_reduce_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)
     CUDA_HOST_UNARY_INIT(name, func, complex128, complex128)
 
 
-CUDA_HOST_ALL_UNARY_COPY(copy)
+CUDA_HOST_ALL_UNARY(copy)
+CUDA_HOST_ALL_UNARY(abs)
 
 
 static const gm_kernel_init_t unary_copy[] = {
   /* COPY */
-  CUDA_HOST_ALL_UNARY_COPY_INIT(copy, copy, copy),
+  CUDA_HOST_ALL_UNARY_INIT(copy, copy, copy),
+  CUDA_HOST_ALL_UNARY_INIT(abs, abs, abs),
 
   { .name = NULL, .sig = NULL }
 };
