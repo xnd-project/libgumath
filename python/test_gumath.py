@@ -61,6 +61,15 @@ SKIP_BRUTE_FORCE = True
 ARCH = platform.architecture()[0]
 
 
+class TestAPI(unittest.TestCase):
+
+    def test_api(self):
+
+        self.assertIsInstance(fn.add, gm.gufunc)
+        self.assertRaises(TypeError, gm.gufunc.__new__)
+        self.assertRaises(TypeError, gm.gufunc.__new__, 1)
+
+
 class TestCall(unittest.TestCase):
 
     def test_subclass(self):
@@ -1712,6 +1721,7 @@ class LongIndexSliceTest(unittest.TestCase):
 
 
 ALL_TESTS = [
+  TestAPI,
   TestCall,
   TestRaggedArrays,
   TestMissingValues,

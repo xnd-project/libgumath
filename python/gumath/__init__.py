@@ -41,7 +41,7 @@ except ImportError:
     _cd = None
 
 
-__all__ = ['cuda', 'fold', 'functions', 'get_max_threads', 'reduce',
+__all__ = ['cuda', 'fold', 'functions', 'get_max_threads', 'gufunc', 'reduce',
            'set_max_threads', 'unsafe_add_kernel', 'vfold', 'xndvectorize']
 
 

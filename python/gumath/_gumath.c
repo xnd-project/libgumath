@@ -919,6 +919,11 @@ PyInit__gumath(void)
         goto error;
     }
 
+    Py_INCREF(&Gufunc_Type);
+    if (PyModule_AddObject(m, "gufunc", (PyObject *)&Gufunc_Type) < 0) {
+        goto error;
+    }
+
     Py_INCREF(capsule);
     if (PyModule_AddObject(m, "_API", capsule) < 0) {
         goto error;
