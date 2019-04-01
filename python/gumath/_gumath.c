@@ -659,13 +659,8 @@ gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
     Py_ssize_t size, i;
     int ret;
 
-    tuple = PyTuple_New(0);
-    if (tuple == NULL) {
-        return NULL;
-    }
-
-    ret = PyArg_ParseTupleAndKeywords(tuple, kwargs, "|$OO", kwlist, &func, &acc);
-    Py_DECREF(tuple);
+    ret = PyArg_ParseTupleAndKeywords(positional_empty, kwargs, "|$OO", kwlist,
+                                      &func, &acc);
     if (ret < 0) {
         return NULL;
     }
@@ -678,7 +673,7 @@ gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
 
     if (!Xnd_Check(acc)) {
         PyErr_Format(PyExc_TypeError,
-            "vfold: expected xnd object, got '%.200s'", Py_TYPE(acc));
+            "vfold: expected xnd instance, got '%.200s'", Py_TYPE(acc));
         return NULL;
     }
 
@@ -704,6 +699,12 @@ gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
         return NULL;
     }
     if (PyDict_SetItemString(dict, "out", acc) < 0) {
+        Py_DECREF(dict);
+        Py_DECREF(tuple);
+        return NULL;
+    }
+    if (PyDict_SetItemString(dict, "cls", Py_TYPE(acc)) < 0) {
+        Py_DECREF(dict);
         Py_DECREF(tuple);
         return NULL;
     }

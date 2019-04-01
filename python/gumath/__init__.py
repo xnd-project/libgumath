@@ -99,7 +99,7 @@ def reduce_cpu(f, x, axes, dtype):
 
     N = len(axes)
     t = T.type.at(N, dtype=dtype)
-    acc = xnd.empty(t, device=x.device)
+    acc = x.empty(t, device=x.device)
 
     if f.identity is not None:
         _copyto(acc, f.identity)
