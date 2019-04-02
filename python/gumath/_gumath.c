@@ -703,7 +703,7 @@ gufunc_vfold(PyObject *m GM_UNUSED, PyObject *args, PyObject *kwargs)
         Py_DECREF(tuple);
         return NULL;
     }
-    if (PyDict_SetItemString(dict, "cls", Py_TYPE(acc)) < 0) {
+    if (PyDict_SetItemString(dict, "cls", (PyObject *)(Py_TYPE(acc))) < 0) {
         Py_DECREF(dict);
         Py_DECREF(tuple);
         return NULL;

@@ -55,6 +55,7 @@
 /*                                   Divmod                                  */
 /*****************************************************************************/
 
+#ifndef _MSC_VER
 /* Python: floatobject.c */
 static inline DEVICE void
 _divmod(double *q, double *r, double vx, double wx)
@@ -214,6 +215,7 @@ _remainder(T a, T b)
 
     return r;
 }
+#endif
 
 
 /*****************************************************************************/
@@ -289,7 +291,7 @@ name(T base, T exp)                  \
         exp >>= 1;                   \
     }                                \
                                      \
-    return r;                        \
+    return (T)r;                     \
 }
 
 pow_unsigned(_pow, uint8_t, UINT8_MAX)
@@ -307,11 +309,11 @@ static inline DEVICE T                  \
 _pow(T ibase, T exp)                    \
 {                                       \
     U base;                             \
-    U r;                                \
+    T r;                                \
                                         \
     if (ibase < 0) {                    \
         base = (U)(-ibase);             \
-        r = _pow_##T(base, exp);        \
+        r = (T)_pow_##T(base, exp);     \
         return (exp % 2 == 0) ? r : -r; \
     }                                   \
     else {                              \
