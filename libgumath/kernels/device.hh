@@ -494,7 +494,7 @@ c_powi(Complex<T> x, int64_t n)
     }
     else {
         Complex<T> one{1, 0};
-        return c_quot(one, c_powu(x, (T)(-n)));
+        return c_quot(one, c_powu(x, (uint64_t)(-n)));
     }
 }
 
