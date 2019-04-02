@@ -997,7 +997,7 @@ class TestFunctions(unittest.TestCase):
             return
         elif cmath.isinf(calc) or cmath.isinf(expected):
             return
-        elif abs(expected) < 1e-6 and abs(calc) < 1e-6:
+        elif abs(expected) < 1e-5 and abs(calc) < 1e-5:
             return
         else:
             err = abs((calc-expected) / expected)
@@ -1009,21 +1009,36 @@ class TestFunctions(unittest.TestCase):
         else:
             self.assertEqual(calc, expected, msg)
 
-    def assert_equal(self, f, z1, z2, w, msg):
+    def assert_equal(self, f, z1, z2, w, msg, a=None, b=None):
         if w.type == "bfloat16":
             self.assertRelErrorLess(z1, z2, 1e-2, msg)
-        elif f in functions["unary"]["real_math"] or \
-             f in functions["unary"]["real_math_with_half"] or \
-             f in functions["unary"]["complex_math"] or \
-             f in functions["unary"]["complex_math_with_half"]:
-            self.assertRelErrorLess(z1, z2, 1e-2, msg)
+        elif f == "power" and w.type in ("int8", "int16", "int32", "int64"):
+            pass # equal mod INTN_MAX
+        elif f == "power" and isinstance(z1, complex):
+            # multivalued function, compare against Python
+            try:
+                ans = complex(a) ** complex(b)
+            except ZeroDivisionError:
+                pass
+            except OverflowError:
+                pass
+            else:
+                msg = "%s ans=%s" % (msg, ans)
+                self.assertRelErrorLess(z1.real, ans.real, 1e-2, msg)
+                self.assertRelErrorLess(z1.imag, ans.imag, 1e-2, msg)
         elif isinstance(z1, complex):
-            if f in ("multiply", "divide", "abs"):
+            if f not in ("add", "subtract"):
                 self.assertRelErrorLess(z1.real, z2.real, 1e-2, msg)
                 self.assertRelErrorLess(z1.imag, z2.imag, 1e-2, msg)
             else:
                 self.equal(z1.real, z2.real, msg) and \
                 self.equal(z1.imag, z2.imag, msg)
+        elif f in functions["unary"]["real_math"] or \
+             f in functions["unary"]["real_math_with_half"] or \
+             f in functions["unary"]["complex_math"] or \
+             f in functions["unary"]["complex_math_with_half"] or \
+             f == "power":
+            self.assertRelErrorLess(z1, z2, 1e-2, msg)
         elif f == "divide" and w.type in ("float16", "float32"):
             self.assertRelErrorLess(z1, z2, 1e-2, msg)
         else:
@@ -1113,9 +1128,13 @@ class TestFunctions(unittest.TestCase):
         if y1 is None:
             return
 
-        z1 = getattr(mod, f)(x1, y1)
-        self.assertEqual(str(z1[0].type), w.type)
-        v1 = z1[0].value
+        xnd_exc = z1 = None
+        try:
+            z1 = getattr(mod, f)(x1, y1)
+            self.assertEqual(str(z1[0].type), w.type)
+            v1 = z1[0].value
+        except Exception as e:
+            xnd_exc = e.__class__
 
         dtype1 = "float32" if t.type == "bfloat16" else t.type
         dtype2 = "float32" if u.type == "bfloat16" else u.type
@@ -1124,12 +1143,21 @@ class TestFunctions(unittest.TestCase):
 
         x2 = np.array([value1], dtype=dtype1)
         y2 = np.array([value2], dtype=dtype2)
-        z2 = getattr(np, f)(x2, y2)
-        v2 = z2[0]
 
-        msg = "%s(%s : %s, %s : %s) -> %s    xnd: %s    np: %s" % \
-              (f, a, t, b, u, w, z1, z2)
-        self.assert_equal(f, v1, v2, w, msg)
+        np_exc = z2 = None
+        try:
+            z2 = getattr(np, f)(x2, y2)
+            v2 = z2[0]
+        except Exception as e:
+            np_exc = e.__class__
+
+        if xnd_exc or np_exc:
+            if xnd_exc != NotImplementedError:
+                self.assertEqual(xnd_exc, np_exc)
+        else:
+            msg = "%s(%s : %s, %s : %s) -> %s    xnd: %s    np: %s" % \
+                  (f, a, t, b, u, w, z1, z2)
+            self.assert_equal(f, v1, v2, w, msg, a=x1[0].value, b=y1[0].value)
 
     def check_binary_mv(self, f, a, t, b, u, v, w, mod=fn, dev=None):
 
@@ -1265,7 +1293,7 @@ class TestFunctions(unittest.TestCase):
 
         print("\n", flush=True)
 
-        for pattern in "float_result", "bool_result":
+        for pattern in "default", "float_result", "bool_result":
             for f in functions["binary"][pattern]:
                 print("testing %s ..." % f, flush=True)
 

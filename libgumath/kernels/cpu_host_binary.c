@@ -561,6 +561,51 @@ invalid_combination:
 }
 
 
+#define CPU_CHECK_POWER_EXP(t1) \
+static inline int                                                     \
+check_power_exp_##t1(const char *a1, ndt_context_t *ctx)              \
+{                                                                     \
+    const t1##_t exp = *(const t1##_t *)a1;                           \
+    if (exp < 0) {                                                    \
+        ndt_err_format(ctx, NDT_ValueError,                           \
+            "negative exponents are not allowed for integer powers"); \
+        return -1;                                                    \
+    }                                                                 \
+                                                                      \
+    return 0;                                                         \
+}
+
+#define CPU_CHECK_POWER_EXP_SUCCESS(t1) \
+static inline int                                        \
+check_power_exp_##t1(const char *a1, ndt_context_t *ctx) \
+{                                                        \
+    (void)a1;                                            \
+    (void)ctx;                                           \
+                                                         \
+    return 0;                                            \
+}
+
+
+CPU_CHECK_POWER_EXP(int8)
+CPU_CHECK_POWER_EXP(int16)
+CPU_CHECK_POWER_EXP(int32)
+CPU_CHECK_POWER_EXP(int64)
+
+CPU_CHECK_POWER_EXP_SUCCESS(bool)
+
+CPU_CHECK_POWER_EXP_SUCCESS(uint8)
+CPU_CHECK_POWER_EXP_SUCCESS(uint16)
+CPU_CHECK_POWER_EXP_SUCCESS(uint32)
+CPU_CHECK_POWER_EXP_SUCCESS(uint64)
+
+CPU_CHECK_POWER_EXP_SUCCESS(bfloat16)
+CPU_CHECK_POWER_EXP_SUCCESS(float32)
+CPU_CHECK_POWER_EXP_SUCCESS(float64)
+
+CPU_CHECK_POWER_EXP_SUCCESS(complex64)
+CPU_CHECK_POWER_EXP_SUCCESS(complex128)
+
+
 #define CPU_HOST_BINARY(name, t0, t1, t2) \
 static int                                                                            \
 gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
@@ -570,6 +615,12 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
     char *a2 = apply_index(&stack[2]);                                                \
     const int64_t N = xnd_fixed_shape(&stack[0]);                                     \
     (void)ctx;                                                                        \
+                                                                                      \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
+            return -1;                                                                \
+        }                                                                             \
+    }                                                                                 \
                                                                                       \
     gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
                                                                                       \
@@ -595,6 +646,12 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
     const int64_t s2 = xnd_fixed_step(&stack[2]);                                     \
     (void)ctx;                                                                        \
                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
+            return -1;                                                                \
+        }                                                                             \
+    }                                                                                 \
+                                                                                      \
     gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
                                                                                       \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
@@ -614,6 +671,12 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
     const char *a1 = stack[1].ptr;                                                    \
     char *a2 = stack[2].ptr;                                                          \
     (void)ctx;                                                                        \
+                                                                                      \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
+            return -1;                                                                \
+        }                                                                             \
+    }                                                                                 \
                                                                                       \
     gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
                                                                                       \
@@ -1830,6 +1893,7 @@ CPU_HOST_ALL_ARITHMETIC(multiply)
 CPU_HOST_ALL_ARITHMETIC_NO_COMPLEX(floor_divide)
 CPU_HOST_ALL_ARITHMETIC_NO_COMPLEX(remainder)
 CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
+CPU_HOST_ALL_ARITHMETIC(power)
 
 
 /*****************************************************************************/
@@ -2468,6 +2532,7 @@ static const gm_kernel_init_t binary_kernels[] = {
   CPU_HOST_ALL_ARITHMETIC_INIT(floor_divide),
   CPU_HOST_ALL_ARITHMETIC_INIT(remainder),
   CPU_HOST_ALL_ARITHMETIC_FLOAT_RETURN_INIT(divide),
+  CPU_HOST_ALL_ARITHMETIC_INIT(power),
   CPU_HOST_ALL_COMPARISON_INIT(less),
   CPU_HOST_ALL_COMPARISON_INIT(less_equal),
   CPU_HOST_ALL_COMPARISON_INIT(greater_equal),

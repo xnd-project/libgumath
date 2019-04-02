@@ -555,6 +555,52 @@ invalid_combination:
 }
 
 
+#define CUDA_CHECK_POWER_EXP(t1) \
+static inline int                                                     \
+check_power_exp_##t1(const char *a1, ndt_context_t *ctx)              \
+{                                                                     \
+    const t1##_t exp = *(const t1##_t *)a1;                           \
+    if (exp < 0) {                                                    \
+        ndt_err_format(ctx, NDT_ValueError,                           \
+            "negative exponents are not allowed for integer powers"); \
+        return -1;                                                    \
+    }                                                                 \
+                                                                      \
+    return 0;                                                         \
+}
+
+#define CUDA_CHECK_POWER_EXP_SUCCESS(t1) \
+static inline int                                        \
+check_power_exp_##t1(const char *a1, ndt_context_t *ctx) \
+{                                                        \
+    (void)a1;                                            \
+    (void)ctx;                                           \
+                                                         \
+    return 0;                                            \
+}
+
+CUDA_CHECK_POWER_EXP(int8)
+CUDA_CHECK_POWER_EXP(int16)
+CUDA_CHECK_POWER_EXP(int32)
+CUDA_CHECK_POWER_EXP(int64)
+
+CUDA_CHECK_POWER_EXP_SUCCESS(bool)
+
+CUDA_CHECK_POWER_EXP_SUCCESS(uint8)
+CUDA_CHECK_POWER_EXP_SUCCESS(uint16)
+CUDA_CHECK_POWER_EXP_SUCCESS(uint32)
+CUDA_CHECK_POWER_EXP_SUCCESS(uint64)
+
+CUDA_CHECK_POWER_EXP_SUCCESS(bfloat16)
+CUDA_CHECK_POWER_EXP_SUCCESS(float16)
+CUDA_CHECK_POWER_EXP_SUCCESS(float32)
+CUDA_CHECK_POWER_EXP_SUCCESS(float64)
+
+CUDA_CHECK_POWER_EXP_SUCCESS(complex64)
+CUDA_CHECK_POWER_EXP_SUCCESS(complex128)
+
+
+
 #define CUDA_HOST_BINARY(name, t0, t1, t2) \
 static int                                                                             \
 gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
@@ -564,6 +610,12 @@ gm_cuda_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
     char *a2 = apply_index(&stack[2]);                                                 \
     const int64_t N = xnd_fixed_shape(&stack[0]);                                      \
     (void)ctx;                                                                         \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
                                                                                        \
     gm_cuda_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
                                                                                        \
@@ -592,6 +644,12 @@ gm_cuda_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t
     const int64_t s2 = xnd_fixed_step(&stack[2]);                                      \
     (void)ctx;                                                                         \
                                                                                        \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
+                                                                                       \
     gm_cuda_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
                                                                                        \
     if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
@@ -614,6 +672,12 @@ gm_cuda_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  
     const char *a1 = stack[1].ptr;                                                     \
     char *a2 = stack[2].ptr;                                                           \
     (void)ctx;                                                                         \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
                                                                                        \
     gm_cuda_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
                                                                                        \
@@ -1801,6 +1865,7 @@ CUDA_HOST_ALL_ARITHMETIC(multiply)
 CUDA_HOST_ALL_ARITHMETIC_NO_COMPLEX(floor_divide)
 CUDA_HOST_ALL_ARITHMETIC_NO_COMPLEX(remainder)
 CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN(divide)
+CUDA_HOST_ALL_ARITHMETIC(power)
 
 
 /*****************************************************************************/
@@ -2439,6 +2504,7 @@ static const gm_kernel_init_t binary_kernels[] = {
   CUDA_HOST_ALL_ARITHMETIC_INIT(floor_divide),
   CUDA_HOST_ALL_ARITHMETIC_INIT(remainder),
   CUDA_HOST_ALL_ARITHMETIC_FLOAT_RETURN_INIT(divide),
+  CUDA_HOST_ALL_ARITHMETIC_INIT(power),
   CUDA_HOST_ALL_COMPARISON_INIT(less),
   CUDA_HOST_ALL_COMPARISON_INIT(less_equal),
   CUDA_HOST_ALL_COMPARISON_INIT(greater_equal),

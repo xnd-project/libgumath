@@ -743,6 +743,8 @@ CPU_DEVICE_ALL_BINARY_NO_COMPLEX(remainder, _remainder, _remainder)
 #define divide(x, y) x / y
 CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, divide)
 
+CPU_DEVICE_ALL_BINARY(power, _pow, _pow)
+
 
 /*****************************************************************************/
 /*                                 Comparison                                */

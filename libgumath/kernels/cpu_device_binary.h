@@ -725,6 +725,7 @@ CPU_DEVICE_BINARY_ARITHMETIC_DECL(multiply)
 CPU_DEVICE_BINARY_ARITHMETIC_NO_COMPLEX_DECL(floor_divide)
 CPU_DEVICE_BINARY_ARITHMETIC_NO_COMPLEX_DECL(remainder)
 CPU_DEVICE_BINARY_ARITHMETIC_FLOAT_RETURN_DECL(divide)
+CPU_DEVICE_BINARY_ARITHMETIC_DECL(power)
 
 
 /*****************************************************************************/

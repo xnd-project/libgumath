@@ -37,6 +37,7 @@
 
 #include <cstdint>
 #include <cinttypes>
+#include <complex>
 #include "contrib/bfloat16.h"
 
 
@@ -259,15 +260,268 @@ _abs(float64_t x)
 static inline DEVICE complex64_t
 _abs(complex64_t x)
 {
-    return thrust::abs<float>(x);
+    return thrust::abs(x);
 }
 
 static inline DEVICE complex128_t
 _abs(complex128_t x)
 {
-    return thrust::abs<double>(x);
+    return thrust::abs(x);
 }
 #endif
+
+
+/*****************************************************************************/
+/*                                    Pow                                    */
+/*****************************************************************************/
+
+#define pow_unsigned(name, T, mask) \
+static inline DEVICE T               \
+name(T base, T exp)                  \
+{                                    \
+    uint64_t r = 1;                  \
+                                     \
+    while (exp > 0) {                \
+        if (exp & 1) {               \
+            r = (r * base) & mask;   \
+        }                            \
+        base = (base * base) & mask; \
+        exp >>= 1;                   \
+    }                                \
+                                     \
+    return r;                        \
+}
+
+pow_unsigned(_pow, uint8_t, UINT8_MAX)
+pow_unsigned(_pow, uint16_t, UINT16_MAX)
+pow_unsigned(_pow, uint32_t, UINT32_MAX)
+pow_unsigned(_pow, uint64_t, UINT64_MAX)
+
+pow_unsigned(_pow_int8_t, uint8_t, INT8_MAX)
+pow_unsigned(_pow_int16_t, uint16_t, INT16_MAX)
+pow_unsigned(_pow_int32_t, uint32_t, INT32_MAX)
+pow_unsigned(_pow_int64_t, uint64_t, INT64_MAX)
+
+#define pow_signed(T, U, MIN, MAX)      \
+static inline DEVICE T                  \
+_pow(T ibase, T exp)                    \
+{                                       \
+    U base;                             \
+    U r;                                \
+                                        \
+    if (ibase < 0) {                    \
+        base = (U)(-ibase);             \
+        r = _pow_##T(base, exp);        \
+        return (exp % 2 == 0) ? r : -r; \
+    }                                   \
+    else {                              \
+        base = (U)ibase;                \
+        return _pow_##T(base, exp);     \
+    }                                   \
+}
+
+pow_signed(int8_t, uint8_t, INT8_MIN, INT8_MAX)
+pow_signed(int16_t, uint16_t, INT16_MIN, INT16_MAX)
+pow_signed(int32_t, uint32_t, INT32_MIN, INT32_MAX)
+pow_signed(int64_t, uint64_t, INT64_MIN, INT64_MAX)
+
+static inline DEVICE bfloat16_t
+_pow(bfloat16_t x, bfloat16_t y)
+{
+    return (bfloat16_t)powf((float)x, (float)y);
+}
+
+static inline DEVICE float32_t
+_pow(float32_t x, float32_t y)
+{
+    return powf(x, y);
+}
+
+static inline DEVICE float64_t
+_pow(float64_t x, float64_t y)
+{
+    return pow(x, y);
+}
+
+#ifdef __CUDACC__
+static inline DEVICE half
+_pow(half x, half y)
+{
+    return __float2half(pow(__half2float(x), __half2float(y)));
+}
+#endif
+
+
+/*****************************************************************************/
+/*                                 Complex pow                               */
+/*****************************************************************************/
+
+#ifdef __CUDACC__
+template <class T>
+using Complex = thrust::complex<T>;
+
+template <class T>
+static inline DEVICE Complex<T>
+_cpow(Complex<T> x, Complex<T> y)
+{
+    return thrust::pow<T>(x, y);
+}
+#else
+template <class T>
+using Complex = std::complex<T>;
+
+template <class T>
+static inline DEVICE Complex<T>
+_cpow(Complex<T> x, Complex<T> y)
+{
+    return std::pow<T>(x, y);
+}
+#endif
+
+static inline DEVICE double xhypot(double x, double y) { return hypot(x, y); }
+static inline DEVICE double xpow(double x, double y) { return pow(x, y); }
+static inline DEVICE double xatan2(double x, double y) { return atan2(x, y); }
+static inline DEVICE double xexp(double x) { return exp(x); }
+static inline DEVICE double xlog(double x) { return log(x); }
+static inline DEVICE float xhypot(float x, float y) { return hypotf(x, y); }
+static inline DEVICE float xpow(float x, float y) { return powf(x, y); }
+static inline DEVICE float xatan2(float x, float y) { return atan2f(x, y); }
+static inline DEVICE float xexp(float x) { return expf(x); }
+static inline DEVICE float xlog(float x) { return logf(x); }
+
+
+/* Python: complexobject.c */
+template <class T>
+static inline DEVICE Complex<T>
+c_quot(const Complex<T> a, const Complex<T> b)
+{
+    /* This algorithm is better, and is pretty obvious:  first divide the
+     * numerators and denominator by whichever of {b.real, b.imag} has
+     * larger magnitude.  The earliest reference I found was to CACM
+     * Algorithm 116 (Complex Division, Robert L. Smith, Stanford
+     * University).  As usual, though, we're still ignoring all IEEE
+     * endcases.
+     */
+    const T abs_breal = b.real() < 0 ? -b.real() : b.real();
+    const T abs_bimag = b.imag() < 0 ? -b.imag() : b.imag();
+    T real, imag;
+
+    if (abs_breal >= abs_bimag) {
+        /* divide tops and bottom by b.real */
+        if (abs_breal == 0.0) {
+            // errno = EDOM;
+            real = imag = 0.0;
+        }
+        else {
+            const T ratio = b.imag() / b.real();
+            const T denom = b.real() + b.imag() * ratio;
+            real = (a.real() + a.imag() * ratio) / denom;
+            imag = (a.imag() - a.real() * ratio) / denom;
+        }
+    }
+    else if (abs_bimag >= abs_breal) {
+        /* divide tops and bottom by b.imag */
+        const T ratio = b.real() / b.imag();
+        const T denom = b.real() * ratio + b.imag();
+        real = (a.real() * ratio + a.imag()) / denom;
+        imag = (a.imag() * ratio - a.real()) / denom;
+    }
+    else {
+        /* At least one of b.real or b.imag is a NaN */
+        real = imag = NAN;
+    }
+
+    return Complex<T>{real, imag};
+}
+
+template <class T>
+static inline DEVICE Complex<T>
+c_pow(const Complex<T> a, const Complex<T> b)
+{
+    if (b.real() == 0 && b.imag() == 0) {
+        return Complex<T>{1, 0};
+    }
+    else if (a.real() == 0 && a.imag() == 0) {
+        // if (b.imag() != 0 || b.real() < 0)
+        //    errno = EDOM;
+        return Complex<T>{0, 0};
+    }
+    else {
+        T vabs = xhypot(a.real(), a.imag());
+        T len = xpow(vabs, b.real());
+        T at = xatan2(a.imag(), a.real());
+        T phase = at * b.real();
+
+        if (b.imag() != 0) {
+            len /= xexp(at * b.imag());
+            phase += b.imag() * xlog(vabs);
+        }
+
+        T real = len*cos(phase);
+        T imag = len*sin(phase);
+
+        return Complex<T>{real, imag};
+    }
+}
+
+template <class T>
+static inline DEVICE Complex<T>
+c_powu(Complex<T> base, uint64_t exp)
+{
+    Complex<T> r{1, 0};
+
+    while (exp > 0) {
+        if (exp & 1) {
+            r = r * base;
+        }
+        base = base * base;
+        exp >>= 1;
+    }
+
+    return r;
+}
+
+template <class T>
+static inline DEVICE Complex<T>
+c_powi(Complex<T> x, int64_t n)
+{
+    if (n > 99 || n < -99) {
+        Complex<T> y{(T)n, 0};
+        return c_pow(x, y);
+    }
+    else if (n > 0) {
+        return c_powu(x, (uint64_t)n);
+    }
+    else {
+        Complex<T> one{1, 0};
+        return c_quot(one, c_powu(x, (T)(-n)));
+    }
+}
+
+template <class T>
+static inline DEVICE Complex<T>
+complex_pow(Complex<T> a, Complex<T> exponent)
+{
+    int64_t int_exponent;
+
+    int_exponent = (int64_t)exponent.real();
+    if (exponent.imag() == 0 && exponent.real() == int_exponent) {
+        return c_powi(a, int_exponent);
+    }
+    else {
+        return c_pow(a, exponent);
+    }
+}
+
+template <class T>
+static inline DEVICE Complex<T>
+_pow(Complex<T> x, Complex<T> y)
+{
+    Complex<double> a = x;
+    Complex<double> b = y;
+    Complex<double> r = complex_pow(a, b);
+    return (Complex<T>)r;
+}
 
 
 /*****************************************************************************/

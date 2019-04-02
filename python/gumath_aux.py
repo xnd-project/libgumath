@@ -401,7 +401,7 @@ functions = {
     "bitwise": ["invert"],
   },
   "binary": {
-    "default": ["add", "subtract", "multiply", "floor_divide", "remainder"],
+    "default": ["add", "subtract", "multiply", "floor_divide", "remainder", "power"],
     "float_result": ["divide"],
     "bool_result": ["less_equal", "less", "greater_equal", "greater", "equal", "not_equal"],
     "bitwise": ["bitwise_and", "bitwise_or", "bitwise_xor"]
