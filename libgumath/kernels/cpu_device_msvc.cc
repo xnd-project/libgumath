@@ -35,6 +35,7 @@
 #include <cmath>
 #include <complex>
 #include "cpu_device_unary.h"
+#include "device.hh"
 
 
 /*
@@ -512,6 +513,8 @@ CPU_DEVICE_ALL_BINARY(multiply, multiply, multiply)
 
 #define divide(x, y) x / y
 CPU_DEVICE_ALL_BINARY_FLOAT_RETURN(divide, divide, divide)
+
+CPU_DEVICE_ALL_BINARY(power, _pow, _pow)
 
 
 /*****************************************************************************/
