@@ -215,77 +215,12 @@ CPU_DEVICE_UNARY_ALL_COMPLEX_MATH(atanh)
 
 
 /*****************************************************************************/
-/*                Lexicographic comparison for complex numbers               */
+/*                         CPU device binary kernels                         */
 /*****************************************************************************/
 
 #undef CPU_DEVICE_NOIMPL
 #include "cpu_device_binary.h"
 
-template <class T>
-static inline bool
-_isnan(T a)
-{
-    return std::isnan(a.real()) || std::isnan(a.imag());
-}
-
-template <class T, class U>
-static inline bool
-lexorder_le(T a, U b)
-{
-    if (_isnan(a) || _isnan(b)) {
-        return false;
-    }
-
-    return a.real() < b.real() || (a.real() == b.real() && a.imag() <= b.imag());
-}
-
-template <class T, class U>
-static inline bool
-lexorder_lt(T a, U b)
-{
-    if (_isnan(a) || _isnan(b)) {
-        return false;
-    }
-
-    return a.real() < b.real() || (a.real() == b.real() && a.imag() < b.imag());
-}
-
-template <class T, class U>
-static inline bool
-lexorder_ge(T a, U b)
-{
-    if (_isnan(a) || _isnan(b)) {
-        return false;
-    }
-
-    return a.real() > b.real() || (a.real() == b.real() && a.imag() >= b.imag());
-}
-
-template <class T, class U>
-static inline bool
-lexorder_gt(T a, U b)
-{
-    if (_isnan(a) || _isnan(b)) {
-        return false;
-    }
-
-    return a.real() > b.real() || (a.real() == b.real() && a.imag() > b.imag());
-}
-
-template <class T, class U>
-static inline bool
-lexorder_eqn(T a, U b)
-{
-    bool real_equal = a.real() == b.real() || (std::isnan(a.real()) && std::isnan(b.real()));
-    bool imag_equal = a.imag() == b.imag() || (std::isnan(a.imag()) && std::isnan(b.imag()));
-
-    return real_equal && imag_equal;
-}
-
-
-/*****************************************************************************/
-/*                         CPU device binary kernels                         */
-/*****************************************************************************/
 
 #define CPU_DEVICE_BINARY(name, func, t0, t1, t2, common) \
 extern "C" void                                                          \

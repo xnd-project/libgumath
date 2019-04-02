@@ -528,7 +528,6 @@ _pow(Complex<T> x, Complex<T> y)
 /*                Lexicographic comparison for complex numbers               */
 /*****************************************************************************/
 
-#ifndef _MSC_VER
 template <class T>
 static inline DEVICE bool
 _isnan(T a)
@@ -589,7 +588,6 @@ lexorder_eqn(T a, U b)
 
     return real_equal && imag_equal;
 }
-#endif
 
 
 /*****************************************************************************/
