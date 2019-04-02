@@ -228,6 +228,8 @@ _abs(T x)               \
     return x;           \
 }
 
+abs_unsigned(bool)
+
 abs_unsigned(uint8_t)
 abs_unsigned(uint16_t)
 abs_unsigned(uint32_t)
