@@ -1565,6 +1565,30 @@ class TestSpec(unittest.TestCase):
                 if isinstance(next_d, list): # possibly None or scalar
                     check(next_nd, next_d, value, depth+1)
 
+        def check_buffer(nd, d, value, depth):
+            if depth > 3: # adjust for longer tests
+                return
+            if not isinstance(nd, xnd) or nd.device == "cuda:managed" or \
+               not isinstance(d, np.ndarray):
+                return
+
+            nd = xnd.from_buffer(d)
+            d = np.array(nd, copy=False)
+
+            g = self.indices_generator(*self.indices_generator_args)
+
+            for indices in g:
+                self.indices_stack[depth] = indices
+
+                try:
+                    next_nd, next_d = self.run_single(nd, d, indices)
+                except Exception as e:
+                    self.log_err(value, depth)
+                    raise e
+
+                if isinstance(next_d, list): # possibly None or scalar
+                    check_buffer(next_nd, next_d, value, depth+1)
+
         for value in self.values:
             dtype = "?int32" if have_none(value) else "int32"
             if self.constr == xnd:
@@ -1587,6 +1611,7 @@ class TestSpec(unittest.TestCase):
                         # See above.
                         d = self.ndarray(value, dtype="int32")
                         check(nd, d, value, 0)
+                        check_buffer(nd, d, value, 0)
 
 
 class LongIndexSliceTest(unittest.TestCase):
@@ -1732,6 +1757,20 @@ class LongIndexSliceTest(unittest.TestCase):
                      value_generator=gen_var,
                      indices_generator=genslices_ndim,
                      indices_generator_args=(3, [3,3,3]))
+        t.run()
+
+    @unittest.skipIf(np is None, "numpy not found")
+    def test_fixed_mixed_indices_slices_np(self):
+        # Multidimensional indexing and slicing, mixed
+        skip_if(SKIP_LONG, "use --long argument to enable these tests")
+
+        t = TestSpec(constr=xnd,
+                     ndarray=np.array,
+                     mod=fn,
+                     values=SUBSCRIPT_FIXED_TEST_CASES,
+                     value_generator=gen_fixed,
+                     indices_generator=mixed_indices,
+                     indices_generator_args=(3,))
         t.run()
 
     @unittest.skipIf(np is None, "numpy not found")
