@@ -150,7 +150,10 @@ class TestArrayUfunc(unittest.TestCase):
 
     def test_unary(self):
         for name in self.unary:
-            f = getattr(np, name)
+            try:
+                f = getattr(np, name)
+            except AttributeError:
+                continue
             for lst in gen_fixed(3, 1, 5):
                 a = np.array(lst, dtype="float32")
 
@@ -176,7 +179,10 @@ class TestArrayUfunc(unittest.TestCase):
 
     def test_binary(self):
         for name in self.binary:
-            f = getattr(np, name)
+            try:
+                f = getattr(np, name)
+            except AttributeError:
+                continue
             for lst1 in gen_fixed(3, 1, 5):
                 for lst2 in gen_fixed(3, 1, 5):
                     a = np.array(lst1, dtype="float32")
