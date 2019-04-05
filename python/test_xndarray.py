@@ -50,7 +50,7 @@ except ImportError:
 
 
 unary_operators = [
-  # '__abs__',
+  '__abs__',
   # '__bool__',
   '__invert__',
   '__neg__',
@@ -79,6 +79,7 @@ binary_operators = [
   '__mul__',
   '__ne__',
   '__or__',
+  '__pow__',
   '__sub__',
   '__xor__'
 ]
