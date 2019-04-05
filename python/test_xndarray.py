@@ -34,9 +34,11 @@ import sys, os
 os.environ["NUMPY_EXPERIMENTAL_ARRAY_FUNCTION"] = "1"
 
 from xnd import *
-import unittest
+import io
 import argparse
+import unittest
 from gumath_aux import gen_fixed
+from random import randrange
 
 try:
     import numpy as np
@@ -125,18 +127,14 @@ class TestOperators(unittest.TestCase):
             self.assertEqual(z.tolist(), c.tolist())
 
 
+
 @unittest.skipIf(np is None, "test requires numpy")
 class TestArrayUfunc(unittest.TestCase):
 
-    allfuncs = set([v for v in np.__dict__.values() if callable(v)])
-    ufuncs = set([v for v in np.__dict__.values() if isinstance(v, np.ufunc)])
-    funcs = allfuncs - ufuncs
-
-    def allarray(self, v):
-        return isinstance(v, array) or all(isinstance(x, array) for x in v)
-
-    def assertAllXndArray(self, v):
-        self.assertTrue(self.allarray(v))
+    ufuncs =[v for v in np.__dict__.values() if isinstance(v, np.ufunc)]
+    # funcs = [v for v in np.__dict__.values() if callable(v) and hasattr(v, '__wrapped__')]
+    binary_plus_axis = { "tensordot": (np.ndarray, np.ndarray, int), }
+    binary = { "dot": (np.ndarray, np.ndarray), }
 
     def test_ufuncs(self):
 
@@ -162,25 +160,206 @@ class TestArrayUfunc(unittest.TestCase):
                     else:
                         b = f(xnd_x, xnd_y)
 
-                    self.assertAllXndArray(b)
                     np.testing.assert_equal(a, b)
 
     @unittest.skipIf(not HAVE_ARRAY_FUNCTION,
                      "test requires numpy with __array_function__ support")
-    def test_array_func(self):
+    def test_tensordot(self):
 
         def f(x):
             y = np.tensordot(x, x.T)
             return np.mean(np.exp(y))
 
         x = array([[1, 2], [3, 4]], dtype="float64")
-        y = np.array([[1, 2], [3, 4]], dtype="float64")
+        ans = f(x)
+        self.assertEqual(ans, 3931334297144.042)
 
-        a = f(x)
-        b = f(y)
+    def test_einsum(self):
+        # Use the examples from the numpy docs.
+        npa = np.arange(25).reshape(5,5)
+        npb = np.arange(5)
+        npc = np.arange(6).reshape(2,3)
 
-        self.assertAllXndArray(a)
-        self.assertEqual(a.tolist(), b.tolist())
+        a = array.from_buffer(npa)
+        b = array.from_buffer(npb)
+        c = array.from_buffer(npc)
+
+        ans = np.einsum('ii', a)
+        self.assertEqual(ans, 60)
+
+        ans = np.einsum('ii->i', a)
+        self.assertTrue(np.all(ans == (array([0, 6, 12, 18, 24]))))
+
+        ans = np.einsum(a, [0,0], [0])
+        self.assertTrue(np.all(ans == (array([0, 6, 12, 18, 24]))))
+
+        ans = np.diag(a)
+        self.assertTrue(np.all(ans == (array([0, 6, 12, 18, 24]))))
+
+        ans = np.einsum('ij,j', a, b)
+        self.assertTrue(np.all(ans == (array([ 30,  80, 130, 180, 230]))))
+
+        ans = np.einsum(a, [0,1], b, [1])
+        self.assertTrue(np.all(ans == (array([ 30,  80, 130, 180, 230]))))
+
+        ans = np.dot(a, b)
+        self.assertTrue(np.all(ans == (array([ 30,  80, 130, 180, 230]))))
+
+        ans = np.einsum('...j,j', a, b)
+        self.assertTrue(np.all(ans == (array([ 30,  80, 130, 180, 230]))))
+
+        ans = np.einsum('ji', c)
+        self.assertTrue(np.all(ans == (array([[0, 3], [1, 4], [2, 5]]))))
+
+        ans = np.einsum(c, [1,0])
+        self.assertTrue(np.all(ans == (array([[0, 3], [1, 4], [2, 5]]))))
+
+        ans = c.T
+        self.assertTrue(np.all(ans == (array([[0, 3], [1, 4], [2, 5]]))))
+
+        ans = np.einsum('..., ...', 3, c)
+        self.assertTrue(np.all(ans == (array([[ 0,  3,  6], [ 9, 12, 15]]))))
+
+        ans = np.einsum(',ij', 3, c)
+        self.assertTrue(np.all(ans == (array([[ 0,  3,  6], [ 9, 12, 15]]))))
+
+        ans = np.einsum(3, [Ellipsis], c, [Ellipsis])
+        self.assertTrue(np.all(ans == (array([[ 0,  3,  6], [ 9, 12, 15]]))))
+
+        ans = 3 * c
+        self.assertTrue(np.all(ans == (array([[ 0,  3,  6], [ 9, 12, 15]]))))
+
+        ans = np.einsum('i,i', b, b)
+        self.assertEqual(ans, 30)
+
+        ans = np.einsum(b, [0], b, [0])
+        self.assertEqual(ans, 30)
+
+        ans = np.inner(b, b)
+        self.assertEqual(ans, 30)
+
+        ans = np.einsum('i,j', np.arange(2)+1, b)
+        self.assertTrue(np.all(ans == (array([[0, 1, 2, 3, 4], [0, 2, 4, 6, 8]]))))
+
+        ans = np.einsum(np.arange(2)+1, [0], b, [1])
+        self.assertTrue(np.all(ans == (array([[0, 1, 2, 3, 4], [0, 2, 4, 6, 8]]))))
+
+        ans = np.outer(np.arange(2)+1, b)
+        self.assertTrue(np.all(ans == (array([[0, 1, 2, 3, 4], [0, 2, 4, 6, 8]]))))
+
+        ans = np.einsum('i...->...', a)
+        self.assertTrue(np.all(ans == (array([50, 55, 60, 65, 70]))))
+
+        ans = np.einsum(a, [0,Ellipsis], [Ellipsis])
+        self.assertTrue(np.all(ans == (array([50, 55, 60, 65, 70]))))
+
+        ans = np.sum(a, axis=0)
+        self.assertTrue(np.all(ans == (array([50, 55, 60, 65, 70]))))
+
+
+        npa = np.arange(60.).reshape(3,4,5)
+        npb = b = np.arange(24.).reshape(4,3,2)
+
+        a = array.from_buffer(npa)
+        b = array.from_buffer(npb)
+
+        expected = array([[ 4400.,  4730.], [ 4532.,  4874.], [ 4664.,  5018.], [ 4796.,  5162.], [ 4928.,  5306.]])
+        ans = np.einsum('ijk,jil->kl', a, b)
+        self.assertTrue(np.all(ans == expected))
+
+        ans = np.einsum(a, [0,1,2], b, [1,0,3], [2,3])
+        self.assertTrue(np.all(ans == expected))
+
+        ans = np.tensordot(a,b, axes=([1,0],[0,1]))
+        self.assertTrue(np.all(ans == expected))
+
+
+        npa = np.arange(6).reshape((3,2))
+        npb = np.arange(12).reshape((4,3))
+
+        a = array.from_buffer(npa)
+        b = array.from_buffer(npb)
+
+        expected = array([[10, 28, 46, 64], [13, 40, 67, 94]])
+        ans = np.einsum('ki,...k->i...', a, b)
+        self.assertTrue(np.all(ans == expected))
+
+        ans = np.einsum('ki,...k->i...', a, b)
+        self.assertTrue(np.all(ans == expected))
+
+        ans = np.einsum('k...,jk', a, b)
+        self.assertTrue(np.all(ans == expected))
+
+
+        npa = np.zeros((3, 3))
+        a = array.from_buffer(npa)
+
+        # expected = array([[ 1.,  0.,  0.], [ 0.,  1.,  0.], [ 0.,  0.,  1.]])
+        # np.einsum('ii->i', a)[:] = 1
+        # self.assertTrue(np.all(ans == expected))
+
+    @unittest.skipIf(not HAVE_ARRAY_FUNCTION,
+                     "test requires numpy with __array_function__ support")
+    def test_array_funcs(self):
+
+        for name in self.binary:
+            f = getattr(np, name)
+            for lst1 in gen_fixed(3, 1, 5):
+                for lst2 in gen_fixed(3, 1, 5):
+                    a = np.array(lst1, dtype="float32")
+                    b = np.array(lst2, dtype="float32")
+                    n = min(a.ndim, b.ndim)
+
+                    np_exc = None
+                    try:
+                        c = f(a, b)
+                    except Exception as e:
+                        np_exc = e.__class__
+
+                    x = array(lst1, dtype="float32")
+                    y = array(lst2, dtype="float32")
+
+                    xnd_exc = None
+                    try:
+                        z = f(x, y)
+                    except Exception as e:
+                        xnd_exc = e.__class__
+
+                    if np_exc or xnd_exc:
+                        self.assertEqual(xnd_exc, np_exc)
+                        continue
+
+                    self.assertTrue(np.all(z == c))
+
+        for name in self.binary_plus_axis:
+            f = getattr(np, name)
+            for lst1 in gen_fixed(3, 1, 5):
+                for lst2 in gen_fixed(3, 1, 5):
+                    a = np.array(lst1, dtype="float32")
+                    b = np.array(lst2, dtype="float32")
+                    n = min(a.ndim, b.ndim)
+                    axis = randrange(n)
+
+                    np_exc = None
+                    try:
+                        c = f(a, b, axis=axis)
+                    except Exception as e:
+                        np_exc = e.__class__
+
+                    x = array(lst1, dtype="float32")
+                    y = array(lst2, dtype="float32")
+
+                    xnd_exc = None
+                    try:
+                        z = f(x, y, axis=axis)
+                    except Exception as e:
+                        xnd_exc = e.__class__
+
+                    if np_exc or xnd_exc:
+                        self.assertEqual(xnd_exc, np_exc)
+                        continue
+
+                    self.assertTrue(np.all(z == c))
 
 
 ALL_TESTS = [
