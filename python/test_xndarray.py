@@ -204,15 +204,14 @@ class TestArrayUfunc(unittest.TestCase):
                     np.testing.assert_equal(z, c)
 
 
-@unittest.skipIf(np is None, "test requires numpy")
+@unittest.skipIf(not HAVE_ARRAY_FUNCTION,
+                 "test requires numpy with __array_function__ support")
 class TestArrayFunc(unittest.TestCase):
 
     # funcs = [v for v in np.__dict__.values() if callable(v) and hasattr(v, '__wrapped__')]
     binary_plus_axis = { 'tensordot': (np.ndarray, np.ndarray, int), }
     binary = { "dot": (np.ndarray, np.ndarray), }
 
-    @unittest.skipIf(not HAVE_ARRAY_FUNCTION,
-                     "test requires numpy with __array_function__ support")
     def test_tensordot(self):
 
         def f(x):
@@ -347,8 +346,19 @@ class TestArrayFunc(unittest.TestCase):
         # np.einsum('ii->i', a)[:] = 1
         # self.assertTrue(np.all(ans == expected))
 
-    @unittest.skipIf(not HAVE_ARRAY_FUNCTION,
-                     "test requires numpy with __array_function__ support")
+    def test_einsum_path(self):
+        # Use the examples from the numpy docs.
+        npa = np.random.rand(2, 2)
+        npb = np.random.rand(2, 5)
+        npc = np.random.rand(5, 2)
+
+        a = array.from_buffer(npa)
+        b = array.from_buffer(npb)
+        c = array.from_buffer(npc)
+
+        path_info = np.einsum_path('ij,jk,kl->il', a, b, c, optimize='greedy')
+        self.assertEqual(path_info[0], ['einsum_path', (1, 2), (0, 1)])
+
     def test_binary(self):
 
         for name in self.binary:
