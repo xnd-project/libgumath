@@ -365,6 +365,14 @@ class TestArrayFunc(unittest.TestCase):
         path_info = np.einsum_path('ij,jk,kl->il', a, b, c, optimize='greedy')
         self.assertEqual(path_info[0], ['einsum_path', (1, 2), (0, 1)])
 
+    def test_bartlett(self):
+        # Use the examples from the numpy docs.
+        expected = np.bartlett(np.array(12, dtype="int32"))
+        x = array(12, dtype="int32")
+        ans = np.bartlett(x)
+        self.assertIsInstance(ans, array)
+        np.testing.assert_equal(ans, expected)
+
     def test_binary(self):
 
         for name in self.binary:
@@ -394,7 +402,7 @@ class TestArrayFunc(unittest.TestCase):
                         self.assertEqual(xnd_exc, np_exc)
                         continue
 
-                    self.assertTrue(np.all(z == c))
+                    np.testing.assert_equal(z, c)
 
         for name in self.binary_plus_axis:
             f = getattr(np, name)
@@ -424,7 +432,7 @@ class TestArrayFunc(unittest.TestCase):
                         self.assertEqual(xnd_exc, np_exc)
                         continue
 
-                    self.assertTrue(np.all(z == c))
+                    np.testing.assert_equal(z, c)
 
 
 ALL_TESTS = [
