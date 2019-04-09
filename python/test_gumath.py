@@ -997,8 +997,9 @@ class TestFunctions(unittest.TestCase):
             return
         elif cmath.isinf(calc) or cmath.isinf(expected):
             return
-        elif abs(expected) < 1e-5 and abs(calc) < 1e-5:
-            return
+        elif abs(expected) < 1e-5 or abs(calc) < 1e-5:
+            self.assertLess(abs(calc), 1e-5, msg)
+            self.assertLess(abs(expected), 1e-5, msg)
         else:
             err = abs((calc-expected) / expected)
             self.assertLess(err, maxerr, msg)
