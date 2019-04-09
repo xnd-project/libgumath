@@ -76,7 +76,7 @@ extern "C" {
 #endif
 
 
-#define GM_MAX_KERNELS 2048
+#define GM_MAX_KERNELS 8192
 #define GM_THREAD_CUTOFF 1000000
 
 typedef float float32_t;
