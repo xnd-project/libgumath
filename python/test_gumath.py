@@ -868,8 +868,8 @@ class TestBinaryCPU(unittest.TestCase):
 
             x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t.type)
             y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u.type)
-            z = fn.subtract(x, y)
-            self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
+            z = fn.multiply(x, y)
+            self.assertEqual(z, [2, 6, 12, 20, 30, 42, 56, 72])
 
 
 @unittest.skipIf(cd is None, "test requires cuda")
@@ -920,8 +920,8 @@ class TestBinaryCUDA(unittest.TestCase):
 
             x = xnd([2, 3, 4, 5, 6, 7, 8, 9], dtype=t.type, device="cuda:managed")
             y = xnd([1, 2, 3, 4, 5, 6, 7, 8], dtype=u.type, device="cuda:managed")
-            z = cd.subtract(x, y)
-            self.assertEqual(z, [1, 1, 1, 1, 1, 1, 1, 1])
+            z = cd.multiply(x, y)
+            self.assertEqual(z, [2, 6, 12, 20, 30, 42, 56, 72])
 
 
 class TestBitwiseCPU(unittest.TestCase):
