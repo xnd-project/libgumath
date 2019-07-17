@@ -310,6 +310,15 @@ cpu_unary_typecheck(int (*kernel_location)(const ndt_t *, const ndt_t *, ndt_con
         return set;
     }
 
+    if (t->tag == Array) {
+        const gm_kernel_set_t *set = &f->kernels[n+4];
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
+                          check_broadcast, NULL, NULL, ctx) < 0) {
+            return NULL;
+        }
+        return set;
+    }
+
     const gm_kernel_set_t *set = &f->kernels[n];
 
     if (ndt_fast_unary_fixed_typecheck(spec, set->sig, types, nin, nout,

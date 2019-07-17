@@ -55,186 +55,186 @@ copy_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
     case Bool: {
         switch (u->tag) {
         case Bool: return 0;
-        case Uint8: return 4;
-        case Uint16: return 8;
-        case Uint32: return 12;
-        case Uint64: return 16;
-        case Int8: return 20;
-        case Int16: return 24;
-        case Int32: return 28;
-        case Int64: return 32;
-        case BFloat16: return 36;
-        case Float16: return 40;
-        case Float32: return 44;
-        case Float64: return 48;
-        case Complex32: return 52;
-        case Complex64: return 56;
-        case Complex128: return 60;
+        case Uint8: return 6;
+        case Uint16: return 12;
+        case Uint32: return 18;
+        case Uint64: return 24;
+        case Int8: return 30;
+        case Int16: return 36;
+        case Int32: return 42;
+        case Int64: return 48;
+        case BFloat16: return 54;
+        case Float16: return 60;
+        case Float32: return 66;
+        case Float64: return 72;
+        case Complex32: return 78;
+        case Complex64: return 84;
+        case Complex128: return 90;
         default: goto invalid_combination;
         }
     }
 
     case Uint8: {
         switch (u->tag) {
-        case Uint8: return 64;
-        case Uint16: return 68;
-        case Uint32: return 72;
-        case Uint64: return 76;
-        case Int16: return 80;
-        case Int32: return 84;
-        case Int64: return 88;
-        case BFloat16: return 92;
-        case Float16: return 96;
-        case Float32: return 100;
-        case Float64: return 104;
-        case Complex32: return 108;
-        case Complex64: return 112;
-        case Complex128: return 116;
+        case Uint8: return 96;
+        case Uint16: return 102;
+        case Uint32: return 108;
+        case Uint64: return 114;
+        case Int16: return 120;
+        case Int32: return 126;
+        case Int64: return 132;
+        case BFloat16: return 138;
+        case Float16: return 144;
+        case Float32: return 150;
+        case Float64: return 156;
+        case Complex32: return 162;
+        case Complex64: return 168;
+        case Complex128: return 174;
         default: goto invalid_combination;
         }
     }
 
     case Uint16: {
         switch (u->tag) {
-        case Uint16: return 120;
-        case Uint32: return 124;
-        case Uint64: return 128;
-        case Int32: return 132;
-        case Int64: return 136;
-        case Float32: return 140;
-        case Float64: return 144;
-        case Complex64: return 148;
-        case Complex128: return 152;
+        case Uint16: return 180;
+        case Uint32: return 186;
+        case Uint64: return 192;
+        case Int32: return 198;
+        case Int64: return 204;
+        case Float32: return 210;
+        case Float64: return 216;
+        case Complex64: return 222;
+        case Complex128: return 228;
         default: goto invalid_combination;
         }
     }
 
     case Uint32: {
         switch (u->tag) {
-        case Uint32: return 156;
-        case Uint64: return 160;
-        case Int64: return 164;
-        case Float64: return 168;
-        case Complex128: return 172;
+        case Uint32: return 234;
+        case Uint64: return 240;
+        case Int64: return 246;
+        case Float64: return 252;
+        case Complex128: return 258;
         default: goto invalid_combination;
         }
     }
 
     case Uint64: {
         switch (u->tag) {
-        case Uint64: return 176;
+        case Uint64: return 264;
         default: goto invalid_combination;
         }
     }
 
     case Int8: {
         switch (u->tag) {
-        case Int8: return 180;
-        case Int16: return 184;
-        case Int32: return 188;
-        case Int64: return 192;
-        case BFloat16: return 196;
-        case Float16: return 200;
-        case Float32: return 204;
-        case Float64: return 208;
-        case Complex32: return 212;
-        case Complex64: return 216;
-        case Complex128: return 220;
+        case Int8: return 270;
+        case Int16: return 276;
+        case Int32: return 282;
+        case Int64: return 288;
+        case BFloat16: return 294;
+        case Float16: return 300;
+        case Float32: return 306;
+        case Float64: return 312;
+        case Complex32: return 318;
+        case Complex64: return 324;
+        case Complex128: return 330;
         default: goto invalid_combination;
         }
     }
 
     case Int16: {
         switch (u->tag) {
-        case Int16: return 224;
-        case Int32: return 228;
-        case Int64: return 232;
-        case Float32: return 236;
-        case Float64: return 240;
-        case Complex64: return 244;
-        case Complex128: return 248;
+        case Int16: return 336;
+        case Int32: return 342;
+        case Int64: return 348;
+        case Float32: return 354;
+        case Float64: return 360;
+        case Complex64: return 366;
+        case Complex128: return 372;
         default: goto invalid_combination;
         }
     }
 
     case Int32: {
         switch (u->tag) {
-        case Int32: return 252;
-        case Int64: return 256;
-        case Float64: return 260;
-        case Complex128: return 264;
+        case Int32: return 378;
+        case Int64: return 384;
+        case Float64: return 390;
+        case Complex128: return 396;
         default: goto invalid_combination;
         }
     }
 
     case Int64: {
         switch (u->tag) {
-        case Int64: return 268;
+        case Int64: return 402;
         default: goto invalid_combination;
         }
     }
 
     case BFloat16: {
         switch (u->tag) {
-        case BFloat16: return 272;
-        case Float32: return 276;
-        case Float64: return 280;
-        case Complex64: return 284;
-        case Complex128: return 288;
+        case BFloat16: return 408;
+        case Float32: return 414;
+        case Float64: return 420;
+        case Complex64: return 426;
+        case Complex128: return 432;
         default: goto invalid_combination;
         }
     }
 
     case Float16: {
         switch (u->tag) {
-        case Float16: return 292;
-        case Float32: return 296;
-        case Float64: return 300;
-        case Complex32: return 304;
-        case Complex64: return 308;
-        case Complex128: return 312;
+        case Float16: return 438;
+        case Float32: return 444;
+        case Float64: return 450;
+        case Complex32: return 456;
+        case Complex64: return 462;
+        case Complex128: return 468;
         default: goto invalid_combination;
         }
     }
 
     case Float32: {
         switch (u->tag) {
-        case Float32: return 316;
-        case Float64: return 320;
-        case Complex64: return 324;
-        case Complex128: return 328;
+        case Float32: return 474;
+        case Float64: return 480;
+        case Complex64: return 486;
+        case Complex128: return 492;
         default: goto invalid_combination;
         }
     }
 
     case Float64: {
         switch (u->tag) {
-        case Float64: return 332;
-        case Complex128: return 336;
+        case Float64: return 498;
+        case Complex128: return 504;
         default: goto invalid_combination;
         }
     }
 
     case Complex32: {
         switch (u->tag) {
-        case Complex32: return 340;
-        case Complex64: return 344;
-        case Complex128: return 348;
+        case Complex32: return 510;
+        case Complex64: return 516;
+        case Complex128: return 522;
         default: goto invalid_combination;
         }
     }
 
     case Complex64: {
         switch (u->tag) {
-        case Complex64: return 352;
-        case Complex128: return 356;
+        case Complex64: return 528;
+        case Complex128: return 534;
         default: goto invalid_combination;
         }
     }
 
     case Complex128: {
         switch (u->tag) {
-        case Complex128: return 360;
+        case Complex128: return 540;
         default: goto invalid_combination;
         }
     }
@@ -256,15 +256,15 @@ invert_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
     switch (t->tag) {
     case Bool: return 0;
 
-    case Uint8: return 4;
-    case Uint16: return 8;
-    case Uint32: return 12;
-    case Uint64: return 16;
+    case Uint8: return 6;
+    case Uint16: return 12;
+    case Uint32: return 18;
+    case Uint64: return 24;
 
-    case Int8: return 20;
-    case Int16: return 24;
-    case Int32: return 28;
-    case Int64: return 32;
+    case Int8: return 30;
+    case Int16: return 36;
+    case Int32: return 42;
+    case Int64: return 48;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -280,22 +280,22 @@ negative_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 
     switch (t->tag) {
     case Uint8: return 0;
-    case Uint16: return 4;
-    case Uint32: return 8;
+    case Uint16: return 6;
+    case Uint32: return 12;
 
-    case Int8: return 12;
-    case Int16: return 16;
-    case Int32: return 20;
-    case Int64: return 24;
+    case Int8: return 18;
+    case Int16: return 24;
+    case Int32: return 30;
+    case Int64: return 36;
 
-    case BFloat16: return 28;
-    case Float16: return 32;
-    case Float32: return 36;
-    case Float64: return 40;
+    case BFloat16: return 42;
+    case Float16: return 48;
+    case Float32: return 54;
+    case Float64: return 60;
 
-    case Complex32: return 44;
-    case Complex64: return 48;
-    case Complex128: return 52;
+    case Complex32: return 66;
+    case Complex64: return 72;
+    case Complex128: return 78;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -311,22 +311,22 @@ math_kernel_location(const ndt_t *in, const ndt_t *out, ndt_context_t *ctx)
 
     switch (t->tag) {
     case Uint8: return 0;
-    case Int8: return 4;
-    case Float16: return 8;
+    case Int8: return 6;
+    case Float16: return 12;
 
-    case BFloat16: return 12;
+    case BFloat16: return 18;
 
-    case Uint16: return 16;
-    case Int16: return 20;
-    case Float32: return 24;
+    case Uint16: return 24;
+    case Int16: return 30;
+    case Float32: return 36;
 
-    case Uint32: return 28;
-    case Int32: return 32;
-    case Float64: return 36;
+    case Uint32: return 42;
+    case Int32: return 48;
+    case Float64: return 54;
 
-    case Complex32: return 40;
-    case Complex64: return 44;
-    case Complex128: return 48;
+    case Complex32: return 60;
+    case Complex64: return 66;
+    case Complex128: return 72;
 
     default:
         ndt_err_format(ctx, NDT_ValueError, "invalid dtype");
@@ -368,6 +368,27 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
     (void)ctx;                                                                 \
                                                                                \
     gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1(a0, a1, s0, s1, N);          \
+                                                                               \
+    if (ndt_is_optional(ndt_dtype(stack[1].type))) {                           \
+        unary_update_bitmap_1D_S(stack);                                       \
+    }                                                                          \
+                                                                               \
+    return 0;                                                                  \
+}                                                                              \
+                                                                               \
+static int                                                                     \
+gm_cpu_host_array_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                              \
+    const char *a0 = XND_ARRAY_DATA(stack[0].ptr);                             \
+    const int64_t N = XND_ARRAY_SHAPE(stack[0].ptr);                           \
+    (void)ctx;                                                                 \
+                                                                               \
+    if (array_shape_check(&stack[1], N, ctx) < 0) {                            \
+        return -1;                                                             \
+    }                                                                          \
+    char *a1 = XND_ARRAY_DATA(stack[1].ptr);                                   \
+                                                                               \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1(a0, a1, N);                  \
                                                                                \
     if (ndt_is_optional(ndt_dtype(stack[1].type))) {                           \
         unary_update_bitmap_1D_S(stack);                                       \
@@ -430,29 +451,52 @@ gm_cpu_host_0D_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx)         \
         " currently requires double rounding");                                \
                                                                                \
     return -1;                                                                 \
+}                                                                              \
+                                                                               \
+static int                                                                     \
+gm_cpu_host_array_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                              \
+    (void)stack;                                                               \
+                                                                               \
+    ndt_err_format(ctx, NDT_NotImplementedError,                               \
+        "implementation for " STRINGIZE(name) " : "                            \
+        STRINGIZE(t0) " -> " STRINGIZE(t1)                                     \
+        " currently requires double rounding");                                \
+                                                                               \
+    return -1;                                                                 \
 }
 
 
 #define CPU_HOST_UNARY_INIT(funcname, func, t0, t1) \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),         \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,              \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1,              \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                       \
-                                                                      \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),       \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,              \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1,              \
-    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                       \
-                                                                      \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),   \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 },                     \
-                                                                      \
-  { .name = STRINGIZE(funcname),                                      \
-    .sig = "var... * ?" STRINGIZE(t0) " -> var... * ?" STRINGIZE(t1), \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 }
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "... * " STRINGIZE(t0) " -> ... * " STRINGIZE(t1),               \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1,                    \
+    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                             \
+                                                                            \
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "... * ?" STRINGIZE(t0) " -> ... * ?" STRINGIZE(t1),             \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1,                    \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1,                    \
+    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                             \
+                                                                            \
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "var... * " STRINGIZE(t0) " -> var... * " STRINGIZE(t1),         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 },                           \
+                                                                            \
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "var... * ?" STRINGIZE(t0) " -> var... * ?" STRINGIZE(t1),       \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 },                           \
+                                                                            \
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "array... of " STRINGIZE(t0) " -> array... of " STRINGIZE(t1),   \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1,                    \
+    .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                             \
+                                                                            \
+  { .name = STRINGIZE(funcname),                                            \
+    .sig = "array... of ?" STRINGIZE(t0) " -> array... of ?" STRINGIZE(t1), \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1,                    \
+    .C = gm_cpu_host_0D_##func##_##t0##_##t1 }
 
 
 #undef bool

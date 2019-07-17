@@ -38,10 +38,52 @@
 #include "ndtypes.h"
 #include "xnd.h"
 #include "gumath.h"
+#include "overflow.h"
 
 
 static int _gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
                        const int outer_dims, ndt_context_t *ctx);
+
+int
+array_shape_check(xnd_t *x, const int64_t shape, ndt_context_t *ctx)
+{
+    const ndt_t *t = x->type;
+
+    if (t->tag != Array) {
+        ndt_err_format(ctx, NDT_RuntimeError,
+            "type mismatch in outer dimensions");
+        return -1;
+    }
+
+    if (XND_ARRAY_DATA(x->ptr) == NULL) {
+        bool overflow = false;
+        const int64_t size = MULi64(shape, t->Array.itemsize, &overflow);
+        if (overflow) {
+            ndt_err_format(ctx, NDT_ValueError,
+                "datasize of flexible array is too large");
+            return -1;
+        }
+
+        char *data = ndt_aligned_calloc(t->align, size);
+        if (data == NULL) {
+            ndt_err_format(ctx, NDT_MemoryError, "out of memory");
+            return -1;
+        }
+
+        XND_ARRAY_SHAPE(x->ptr) = shape;
+        XND_ARRAY_DATA(x->ptr) = data;
+
+        return 0;
+    }
+    else if (XND_ARRAY_SHAPE(x->ptr) != shape) {
+        ndt_err_format(ctx, NDT_RuntimeError,
+            "shape mismatch in outer dimensions");
+        return -1;
+    }
+    else {
+        return 0;
+    }
+}
 
 static inline bool
 any_stored_index(xnd_t stack[], const int nargs)
@@ -159,6 +201,28 @@ _gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
         for (int64_t i = 0; i < shape; i++) {
             for (int k = 0; k < nargs; k++) {
                 next[k] = xnd_var_dim_next(&stack[k], start[k], step[k], i);
+            }
+
+            if (gm_xnd_map(f, next, nargs, outer_dims-1, ctx) < 0) {
+                return -1;
+            }
+        }
+
+        return 0;
+    }
+
+    case Array: {
+        const int64_t shape = XND_ARRAY_SHAPE(stack[0].ptr);
+
+        for (int k = 1; k < nargs; k++) {
+            if (array_shape_check(&stack[k], shape, ctx) < 0) {
+                return -1;
+            }
+        }
+
+        for (int64_t i = 0; i < shape; i++) {
+            for (int k = 0; k < nargs; k++) {
+                next[k] = xnd_array_next(&stack[k], i);
             }
 
             if (gm_xnd_map(f, next, nargs, outer_dims-1, ctx) < 0) {

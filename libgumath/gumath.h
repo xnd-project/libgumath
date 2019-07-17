@@ -202,6 +202,7 @@ GM_API int gm_np_map(const gm_strided_kernel_t f,
 /*                                  Xnd loops                                 */
 /******************************************************************************/
 
+GM_API int array_shape_check(xnd_t *x, const int64_t shape, ndt_context_t *ctx);
 GM_API int gm_xnd_map(const gm_xnd_kernel_t f, xnd_t stack[], const int nargs,
                       const int outer_dims, ndt_context_t *ctx);
 

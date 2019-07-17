@@ -546,6 +546,29 @@ class TestRaggedArrays(unittest.TestCase):
         self.assertEqual(y.value, ans)
 
 
+class TestFlexibleArrays(unittest.TestCase):
+
+    def test_sin_var_compatible(self):
+        s = math.sin
+        lst = [[[1.0],
+                [2.0, 3.0],
+                [4.0, 5.0, 6.0]],
+               [[7.0],
+                [8.0, 9.0],
+                [10.0, 11.0, 12.0]]]
+
+        ans = [[[s(1.0)],
+                [s(2.0), s(3.0)],
+                [s(4.0), s(5.0), s(6.0)]],
+               [[s(7.0)],
+                [s(8.0), s(9.0)],
+                [s(10.0), s(11.0), s(12.0)]]]
+
+        x = xnd(lst, type="array of array of array of float64")
+        y = fn.sin(x)
+        self.assertEqual(y.value, ans)
+
+
 class TestGraphs(unittest.TestCase):
 
     @unittest.skipIf(True, "abstract return types are temporarily disabled")
@@ -1792,6 +1815,7 @@ ALL_TESTS = [
   TestAPI,
   TestCall,
   TestRaggedArrays,
+  TestFlexibleArrays,
   TestMissingValues,
   TestEqualN,
   TestGraphs,
