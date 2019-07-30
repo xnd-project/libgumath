@@ -564,7 +564,7 @@ class TestFlexibleArrays(unittest.TestCase):
                 [s(8.0), s(9.0)],
                 [s(10.0), s(11.0), s(12.0)]]]
 
-        x = xnd(lst, type="array of array of array of float64")
+        x = xnd(lst, type="array * array * array * float64")
         y = fn.sin(x)
         self.assertEqual(y.value, ans)
 

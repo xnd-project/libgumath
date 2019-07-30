@@ -489,12 +489,12 @@ gm_cpu_host_array_1D_C_##name##_##t0##_##t1(xnd_t stack[], ndt_context_t *ctx) \
     .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1 },                           \
                                                                             \
   { .name = STRINGIZE(funcname),                                            \
-    .sig = "array... of " STRINGIZE(t0) " -> array... of " STRINGIZE(t1),   \
+    .sig = "array... * " STRINGIZE(t0) " -> array... * " STRINGIZE(t1),     \
     .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1,                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1 },                             \
                                                                             \
   { .name = STRINGIZE(funcname),                                            \
-    .sig = "array... of ?" STRINGIZE(t0) " -> array... of ?" STRINGIZE(t1), \
+    .sig = "array... * ?" STRINGIZE(t0) " -> array... * ?" STRINGIZE(t1),   \
     .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1,                    \
     .C = gm_cpu_host_0D_##func##_##t0##_##t1 }
 
