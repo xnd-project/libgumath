@@ -568,6 +568,33 @@ class TestFlexibleArrays(unittest.TestCase):
         y = fn.sin(x)
         self.assertEqual(y.value, ans)
 
+    def test_add(self):
+        a = [[[1.0],
+              [2.0, 3.0],
+              [4.0, 5.0, 6.0]],
+             [[7.0],
+              [8.0, 9.0],
+              [10.0, 11.0, 12.0]]]
+
+        b = [[[2.0],
+              [3.0, 4.0],
+              [5.0, 6.0, 7.0]],
+            [[-8.0],
+             [-9.0, -10.0],
+             [111.1, 121.2, 25.3]]]
+
+        ans = [[[1.0+2.0],
+                [2.0+3.0, 3.0+4.0],
+                [4.0+5.0, 5.0+6.0, 6.0+7.0]],
+               [[7.0-8.0],
+                [8.0-9.0, 9.0-10.0],
+                [10.0+111.1, 11.0+121.2, 12.0+25.3]]]
+
+        x = xnd(a, type="array * array * array * float64")
+        y = xnd(b, type="array * array * array * float64")
+        z = fn.add(x, y)
+        self.assertEqual(z.value, ans)
+
 
 class TestGraphs(unittest.TestCase):
 

@@ -56,23 +56,23 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
     case Uint8: {
         switch (t1->tag) {
         case Uint8: return 0;
-        case Uint16: return 8;
-        case Uint32: return 16;
-        case Uint64: return 24;
+        case Uint16: return 12;
+        case Uint32: return 24;
+        case Uint64: return 36;
 
-        case Int8: return 32;
-        case Int16: return 40;
-        case Int32: return 48;
-        case Int64: return 56;
+        case Int8: return 48;
+        case Int16: return 60;
+        case Int32: return 72;
+        case Int64: return 84;
 
-        case BFloat16: return 64;
-        case Float16: return 72;
-        case Float32: return 80;
-        case Float64: return 88;
+        case BFloat16: return 96;
+        case Float16: return 108;
+        case Float32: return 120;
+        case Float64: return 132;
 
-        case Complex32: return 96;
-        case Complex64: return 104;
-        case Complex128: return 112;
+        case Complex32: return 144;
+        case Complex64: return 156;
+        case Complex128: return 168;
 
         default: goto invalid_combination;
         }
@@ -80,24 +80,24 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint16: {
         switch (t1->tag) {
-        case Uint8: return 120;
-        case Uint16: return 128;
-        case Uint32: return 136;
-        case Uint64: return 144;
+        case Uint8: return 180;
+        case Uint16: return 192;
+        case Uint32: return 204;
+        case Uint64: return 216;
 
-        case Int8: return 152;
-        case Int16: return 160;
-        case Int32: return 168;
-        case Int64: return 176;
+        case Int8: return 228;
+        case Int16: return 240;
+        case Int32: return 252;
+        case Int64: return 264;
 
-        case BFloat16: return 184;
-        case Float16: return 192;
-        case Float32: return 200;
-        case Float64: return 208;
+        case BFloat16: return 276;
+        case Float16: return 288;
+        case Float32: return 300;
+        case Float64: return 312;
 
-        case Complex32: return 216;
-        case Complex64: return 224;
-        case Complex128: return 232;
+        case Complex32: return 324;
+        case Complex64: return 336;
+        case Complex128: return 348;
 
         default: goto invalid_combination;
         }
@@ -105,24 +105,24 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint32: {
         switch (t1->tag) {
-        case Uint8: return 240;
-        case Uint16: return 248;
-        case Uint32: return 256;
-        case Uint64: return 264;
+        case Uint8: return 360;
+        case Uint16: return 372;
+        case Uint32: return 384;
+        case Uint64: return 396;
 
-        case Int8: return 272;
-        case Int16: return 280;
-        case Int32: return 288;
-        case Int64: return 296;
+        case Int8: return 408;
+        case Int16: return 420;
+        case Int32: return 432;
+        case Int64: return 444;
 
-        case BFloat16: return 304;
-        case Float16: return 312;
-        case Float32: return 320;
-        case Float64: return 328;
+        case BFloat16: return 456;
+        case Float16: return 468;
+        case Float32: return 480;
+        case Float64: return 492;
 
-        case Complex32: return 336;
-        case Complex64: return 344;
-        case Complex128: return 352;
+        case Complex32: return 504;
+        case Complex64: return 516;
+        case Complex128: return 528;
 
         default: goto invalid_combination;
         }
@@ -130,10 +130,10 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint64: {
         switch (t1->tag) {
-        case Uint8: return 360;
-        case Uint16: return 368;
-        case Uint32: return 376;
-        case Uint64: return 384;
+        case Uint8: return 540;
+        case Uint16: return 552;
+        case Uint32: return 564;
+        case Uint64: return 576;
 
         default: goto invalid_combination;
         }
@@ -141,23 +141,23 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int8: {
         switch (t1->tag) {
-        case Uint8: return 392;
-        case Uint16: return 400;
-        case Uint32: return 408;
+        case Uint8: return 588;
+        case Uint16: return 600;
+        case Uint32: return 612;
 
-        case Int8: return 416;
-        case Int16: return 424;
-        case Int32: return 432;
-        case Int64: return 440;
+        case Int8: return 624;
+        case Int16: return 636;
+        case Int32: return 648;
+        case Int64: return 660;
 
-        case BFloat16: return 448;
-        case Float16: return 456;
-        case Float32: return 464;
-        case Float64: return 472;
+        case BFloat16: return 672;
+        case Float16: return 684;
+        case Float32: return 696;
+        case Float64: return 708;
 
-        case Complex32: return 480;
-        case Complex64: return 488;
-        case Complex128: return 496;
+        case Complex32: return 720;
+        case Complex64: return 732;
+        case Complex128: return 744;
 
         default: goto invalid_combination;
         }
@@ -165,23 +165,23 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int16: {
         switch (t1->tag) {
-        case Uint8: return 504;
-        case Uint16: return 512;
-        case Uint32: return 520;
+        case Uint8: return 756;
+        case Uint16: return 768;
+        case Uint32: return 780;
 
-        case Int8: return 528;
-        case Int16: return 536;
-        case Int32: return 544;
-        case Int64: return 552;
+        case Int8: return 792;
+        case Int16: return 804;
+        case Int32: return 816;
+        case Int64: return 828;
 
-        case BFloat16: return 560;
-        case Float16: return 568;
-        case Float32: return 576;
-        case Float64: return 584;
+        case BFloat16: return 840;
+        case Float16: return 852;
+        case Float32: return 864;
+        case Float64: return 876;
 
-        case Complex32: return 592;
-        case Complex64: return 600;
-        case Complex128: return 608;
+        case Complex32: return 888;
+        case Complex64: return 900;
+        case Complex128: return 912;
 
         default: goto invalid_combination;
         }
@@ -189,23 +189,23 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int32: {
         switch (t1->tag) {
-        case Uint8: return 616;
-        case Uint16: return 624;
-        case Uint32: return 632;
+        case Uint8: return 924;
+        case Uint16: return 936;
+        case Uint32: return 948;
 
-        case Int8: return 640;
-        case Int16: return 648;
-        case Int32: return 656;
-        case Int64: return 664;
+        case Int8: return 960;
+        case Int16: return 972;
+        case Int32: return 984;
+        case Int64: return 996;
 
-        case BFloat16: return 672;
-        case Float16: return 680;
-        case Float32: return 688;
-        case Float64: return 696;
+        case BFloat16: return 1008;
+        case Float16: return 1020;
+        case Float32: return 1032;
+        case Float64: return 1044;
 
-        case Complex32: return 704;
-        case Complex64: return 712;
-        case Complex128: return 720;
+        case Complex32: return 1056;
+        case Complex64: return 1068;
+        case Complex128: return 1080;
 
         default: goto invalid_combination;
         }
@@ -213,14 +213,14 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int64: {
         switch (t1->tag) {
-        case Uint8: return 728;
-        case Uint16: return 736;
-        case Uint32: return 744;
+        case Uint8: return 1092;
+        case Uint16: return 1104;
+        case Uint32: return 1116;
 
-        case Int8: return 752;
-        case Int16: return 760;
-        case Int32: return 768;
-        case Int64: return 776;
+        case Int8: return 1128;
+        case Int16: return 1140;
+        case Int32: return 1152;
+        case Int64: return 1164;
 
         default: goto invalid_combination;
         }
@@ -228,22 +228,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case BFloat16: {
         switch (t1->tag) {
-        case Uint8: return 784;
-        case Uint16: return 792;
-        case Uint32: return 800;
+        case Uint8: return 1176;
+        case Uint16: return 1188;
+        case Uint32: return 1200;
 
-        case Int8: return 808;
-        case Int16: return 816;
-        case Int32: return 824;
+        case Int8: return 1212;
+        case Int16: return 1224;
+        case Int32: return 1236;
 
-        case BFloat16: return 832;
-        case Float16: return 840;
-        case Float32: return 848;
-        case Float64: return 856;
+        case BFloat16: return 1248;
+        case Float16: return 1260;
+        case Float32: return 1272;
+        case Float64: return 1284;
 
-        case Complex32: return 864;
-        case Complex64: return 872;
-        case Complex128: return 880;
+        case Complex32: return 1296;
+        case Complex64: return 1308;
+        case Complex128: return 1320;
 
         default: goto invalid_combination;
         }
@@ -251,22 +251,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float16: {
         switch (t1->tag) {
-        case Uint8: return 888;
-        case Uint16: return 896;
-        case Uint32: return 904;
+        case Uint8: return 1332;
+        case Uint16: return 1344;
+        case Uint32: return 1356;
 
-        case Int8: return 912;
-        case Int16: return 920;
-        case Int32: return 928;
+        case Int8: return 1368;
+        case Int16: return 1380;
+        case Int32: return 1392;
 
-        case BFloat16: return 936;
-        case Float16: return 944;
-        case Float32: return 952;
-        case Float64: return 960;
+        case BFloat16: return 1404;
+        case Float16: return 1416;
+        case Float32: return 1428;
+        case Float64: return 1440;
 
-        case Complex32: return 968;
-        case Complex64: return 976;
-        case Complex128: return 984;
+        case Complex32: return 1452;
+        case Complex64: return 1464;
+        case Complex128: return 1476;
 
         default: goto invalid_combination;
         }
@@ -274,22 +274,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float32: {
         switch (t1->tag) {
-        case Uint8: return 992;
-        case Uint16: return 1000;
-        case Uint32: return 1008;
+        case Uint8: return 1488;
+        case Uint16: return 1500;
+        case Uint32: return 1512;
 
-        case Int8: return 1016;
-        case Int16: return 1024;
-        case Int32: return 1032;
+        case Int8: return 1524;
+        case Int16: return 1536;
+        case Int32: return 1548;
 
-        case BFloat16: return 1040;
-        case Float16: return 1048;
-        case Float32: return 1056;
-        case Float64: return 1064;
+        case BFloat16: return 1560;
+        case Float16: return 1572;
+        case Float32: return 1584;
+        case Float64: return 1596;
 
-        case Complex32: return 1072;
-        case Complex64: return 1080;
-        case Complex128: return 1088;
+        case Complex32: return 1608;
+        case Complex64: return 1620;
+        case Complex128: return 1632;
 
         default: goto invalid_combination;
         }
@@ -297,22 +297,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Float64: {
         switch (t1->tag) {
-        case Uint8: return 1096;
-        case Uint16: return 1104;
-        case Uint32: return 1112;
+        case Uint8: return 1644;
+        case Uint16: return 1656;
+        case Uint32: return 1668;
 
-        case Int8: return 1120;
-        case Int16: return 1128;
-        case Int32: return 1136;
+        case Int8: return 1680;
+        case Int16: return 1692;
+        case Int32: return 1704;
 
-        case BFloat16: return 1144;
-        case Float16: return 1152;
-        case Float32: return 1160;
-        case Float64: return 1168;
+        case BFloat16: return 1716;
+        case Float16: return 1728;
+        case Float32: return 1740;
+        case Float64: return 1752;
 
-        case Complex32: return 1176;
-        case Complex64: return 1184;
-        case Complex128: return 1192;
+        case Complex32: return 1764;
+        case Complex64: return 1776;
+        case Complex128: return 1788;
 
         default: goto invalid_combination;
         }
@@ -320,22 +320,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex32: {
         switch (t1->tag) {
-        case Uint8: return 1200;
-        case Uint16: return 1208;
-        case Uint32: return 1216;
+        case Uint8: return 1800;
+        case Uint16: return 1812;
+        case Uint32: return 1824;
 
-        case Int8: return 1224;
-        case Int16: return 1232;
-        case Int32: return 1240;
+        case Int8: return 1836;
+        case Int16: return 1848;
+        case Int32: return 1860;
 
-        case BFloat16: return 1248;
-        case Float16: return 1256;
-        case Float32: return 1264;
-        case Float64: return 1272;
+        case BFloat16: return 1872;
+        case Float16: return 1884;
+        case Float32: return 1896;
+        case Float64: return 1908;
 
-        case Complex32: return 1280;
-        case Complex64: return 1288;
-        case Complex128: return 1296;
+        case Complex32: return 1920;
+        case Complex64: return 1932;
+        case Complex128: return 1944;
 
         default: goto invalid_combination;
         }
@@ -343,22 +343,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex64: {
         switch (t1->tag) {
-        case Uint8: return 1304;
-        case Uint16: return 1312;
-        case Uint32: return 1320;
+        case Uint8: return 1956;
+        case Uint16: return 1968;
+        case Uint32: return 1980;
 
-        case Int8: return 1328;
-        case Int16: return 1336;
-        case Int32: return 1344;
+        case Int8: return 1992;
+        case Int16: return 2004;
+        case Int32: return 2016;
 
-        case BFloat16: return 1352;
-        case Float16: return 1360;
-        case Float32: return 1368;
-        case Float64: return 1376;
+        case BFloat16: return 2028;
+        case Float16: return 2040;
+        case Float32: return 2052;
+        case Float64: return 2064;
 
-        case Complex32: return 1384;
-        case Complex64: return 1392;
-        case Complex128: return 1400;
+        case Complex32: return 2076;
+        case Complex64: return 2088;
+        case Complex128: return 2100;
 
         default: goto invalid_combination;
         }
@@ -366,22 +366,22 @@ binary_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Complex128: {
         switch (t1->tag) {
-        case Uint8: return 1408;
-        case Uint16: return 1416;
-        case Uint32: return 1424;
+        case Uint8: return 2112;
+        case Uint16: return 2124;
+        case Uint32: return 2136;
 
-        case Int8: return 1432;
-        case Int16: return 1440;
-        case Int32: return 1448;
+        case Int8: return 2148;
+        case Int16: return 2160;
+        case Int32: return 2172;
 
-        case BFloat16: return 1456;
-        case Float16: return 1464;
-        case Float32: return 1472;
-        case Float64: return 1480;
+        case BFloat16: return 2184;
+        case Float16: return 2196;
+        case Float32: return 2208;
+        case Float64: return 2220;
 
-        case Complex32: return 1488;
-        case Complex64: return 1496;
-        case Complex128: return 1504;
+        case Complex32: return 2232;
+        case Complex64: return 2244;
+        case Complex128: return 2256;
 
         default: goto invalid_combination;
         }
@@ -407,15 +407,15 @@ bitwise_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
         switch (t1->tag) {
         case Bool: return 0;
 
-        case Uint8: return 8;
-        case Uint16: return 16;
-        case Uint32: return 24;
-        case Uint64: return 32;
+        case Uint8: return 12;
+        case Uint16: return 24;
+        case Uint32: return 36;
+        case Uint64: return 48;
 
-        case Int8: return 40;
-        case Int16: return 48;
-        case Int32: return 56;
-        case Int64: return 64;
+        case Int8: return 60;
+        case Int16: return 72;
+        case Int32: return 84;
+        case Int64: return 96;
 
         default: goto invalid_combination;
         }
@@ -423,63 +423,63 @@ bitwise_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Uint8: {
         switch (t1->tag) {
-        case Bool: return 72;
+        case Bool: return 108;
 
-        case Uint8: return 80;
-        case Uint16: return 88;
-        case Uint32: return 96;
-        case Uint64: return 104;
+        case Uint8: return 120;
+        case Uint16: return 132;
+        case Uint32: return 144;
+        case Uint64: return 156;
 
-        case Int8: return 112;
-        case Int16: return 120;
-        case Int32: return 128;
-        case Int64: return 136;
+        case Int8: return 168;
+        case Int16: return 180;
+        case Int32: return 192;
+        case Int64: return 204;
 
         default: goto invalid_combination;
         }
     }
     case Uint16: {
         switch (t1->tag) {
-        case Bool: return 144;
+        case Bool: return 216;
 
-        case Int8: return 152;
-        case Int16: return 160;
-        case Int32: return 168;
-        case Int64: return 176;
+        case Int8: return 228;
+        case Int16: return 240;
+        case Int32: return 252;
+        case Int64: return 264;
 
-        case Uint8: return 184;
-        case Uint16: return 192;
-        case Uint32: return 200;
-        case Uint64: return 208;
+        case Uint8: return 276;
+        case Uint16: return 288;
+        case Uint32: return 300;
+        case Uint64: return 312;
 
         default: goto invalid_combination;
         }
     }
     case Uint32: {
         switch (t1->tag) {
-        case Bool: return 216;
+        case Bool: return 324;
 
-        case Uint8: return 224;
-        case Uint16: return 232;
-        case Uint32: return 240;
-        case Uint64: return 248;
+        case Uint8: return 336;
+        case Uint16: return 348;
+        case Uint32: return 360;
+        case Uint64: return 372;
 
-        case Int8: return 256;
-        case Int16: return 264;
-        case Int32: return 272;
-        case Int64: return 280;
+        case Int8: return 384;
+        case Int16: return 396;
+        case Int32: return 408;
+        case Int64: return 420;
 
         default: goto invalid_combination;
         }
     }
     case Uint64: {
         switch (t1->tag) {
-        case Bool: return 288;
+        case Bool: return 432;
 
-        case Uint8: return 296;
-        case Uint16: return 304;
-        case Uint32: return 312;
-        case Uint64: return 320;
+        case Uint8: return 444;
+        case Uint16: return 456;
+        case Uint32: return 468;
+        case Uint64: return 480;
 
         default: goto invalid_combination;
         }
@@ -487,48 +487,48 @@ bitwise_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int8: {
         switch (t1->tag) {
-        case Bool: return 328;
+        case Bool: return 492;
 
-        case Uint8: return 336;
-        case Uint16: return 344;
-        case Uint32: return 352;
+        case Uint8: return 504;
+        case Uint16: return 516;
+        case Uint32: return 528;
 
-        case Int8: return 360;
-        case Int16: return 368;
-        case Int32: return 376;
-        case Int64: return 384;
+        case Int8: return 540;
+        case Int16: return 552;
+        case Int32: return 564;
+        case Int64: return 576;
 
         default: goto invalid_combination;
         }
     }
     case Int16: {
         switch (t1->tag) {
-        case Bool: return 392;
+        case Bool: return 588;
 
-        case Uint8: return 400;
-        case Uint16: return 408;
-        case Uint32: return 416;
+        case Uint8: return 600;
+        case Uint16: return 612;
+        case Uint32: return 624;
 
-        case Int8: return 424;
-        case Int16: return 432;
-        case Int32: return 440;
-        case Int64: return 448;
+        case Int8: return 636;
+        case Int16: return 648;
+        case Int32: return 660;
+        case Int64: return 672;
 
         default: goto invalid_combination;
         }
     }
     case Int32: {
         switch (t1->tag) {
-        case Bool: return 456;
+        case Bool: return 684;
 
-        case Uint8: return 464;
-        case Uint16: return 472;
-        case Uint32: return 480;
+        case Uint8: return 696;
+        case Uint16: return 708;
+        case Uint32: return 720;
 
-        case Int8: return 488;
-        case Int16: return 496;
-        case Int32: return 504;
-        case Int64: return 512;
+        case Int8: return 732;
+        case Int16: return 744;
+        case Int32: return 756;
+        case Int64: return 768;
 
         default: goto invalid_combination;
         }
@@ -536,16 +536,16 @@ bitwise_kernel_location(const ndt_t *in0, const ndt_t *in1, ndt_context_t *ctx)
 
     case Int64: {
         switch (t1->tag) {
-        case Bool: return 520;
+        case Bool: return 780;
 
-        case Uint8: return 528;
-        case Uint16: return 536;
-        case Uint32: return 544;
+        case Uint8: return 792;
+        case Uint16: return 804;
+        case Uint32: return 816;
 
-        case Int8: return 552;
-        case Int16: return 560;
-        case Int32: return 568;
-        case Int64: return 576;
+        case Int8: return 828;
+        case Int16: return 840;
+        case Int32: return 852;
+        case Int64: return 864;
 
         default: goto invalid_combination;
         }
@@ -607,87 +607,122 @@ CPU_CHECK_POWER_EXP_SUCCESS(complex128)
 
 
 #define CPU_HOST_BINARY(name, t0, t1, t2) \
-static int                                                                            \
-gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
-{                                                                                     \
-    const char *a0 = apply_index(&stack[0]);                                          \
-    const char *a1 = apply_index(&stack[1]);                                          \
-    char *a2 = apply_index(&stack[2]);                                                \
-    const int64_t N = xnd_fixed_shape(&stack[0]);                                     \
-    (void)ctx;                                                                        \
-                                                                                      \
-    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
-        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
-            return -1;                                                                \
-        }                                                                             \
-    }                                                                                 \
-                                                                                      \
-    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);              \
-                                                                                      \
-    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap_1D_S(stack);                                             \
-    }                                                                                 \
-    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                \
-        binary_update_bitmap_1D_S_bool(stack);                                        \
-    }                                                                                 \
-                                                                                      \
-    return 0;                                                                         \
-}                                                                                     \
-                                                                                      \
-static int                                                                            \
-gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
-{                                                                                     \
-    const char *a0 = apply_index(&stack[0]);                                          \
-    const char *a1 = apply_index(&stack[1]);                                          \
-    char *a2 = apply_index(&stack[2]);                                                \
-    const int64_t N = xnd_fixed_shape(&stack[0]);                                     \
-    const int64_t s0 = xnd_fixed_step(&stack[0]);                                     \
-    const int64_t s1 = xnd_fixed_step(&stack[1]);                                     \
-    const int64_t s2 = xnd_fixed_step(&stack[2]);                                     \
-    (void)ctx;                                                                        \
-                                                                                      \
-    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
-        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
-            return -1;                                                                \
-        }                                                                             \
-    }                                                                                 \
-                                                                                      \
-    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);  \
-                                                                                      \
-    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap_1D_S(stack);                                             \
-    }                                                                                 \
-    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                \
-        binary_update_bitmap_1D_S_bool(stack);                                        \
-    }                                                                                 \
-                                                                                      \
-    return 0;                                                                         \
-}                                                                                     \
-                                                                                      \
-static int                                                                            \
-gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
-{                                                                                     \
-    const char *a0 = stack[0].ptr;                                                    \
-    const char *a1 = stack[1].ptr;                                                    \
-    char *a2 = stack[2].ptr;                                                          \
-    (void)ctx;                                                                        \
-                                                                                      \
-    if (strcmp(STRINGIZE(name), "power") == 0) {                                      \
-        if (check_power_exp_##t1(a1, ctx) < 0) {                                      \
-            return -1;                                                                \
-        }                                                                             \
-    }                                                                                 \
-                                                                                      \
-    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                         \
-                                                                                      \
-    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                  \
-        binary_update_bitmap_0D(stack);                                               \
-    }                                                                                 \
-    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                \
-        binary_update_bitmap_0D_bool(stack);                                          \
-    }                                                                                 \
-                                                                                      \
-    return 0;                                                                         \
+static int                                                                             \
+gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  \
+{                                                                                      \
+    const char *a0 = apply_index(&stack[0]);                                           \
+    const char *a1 = apply_index(&stack[1]);                                           \
+    char *a2 = apply_index(&stack[2]);                                                 \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                      \
+    (void)ctx;                                                                         \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
+                                                                                       \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);               \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap_1D_S(stack);                                              \
+    }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        binary_update_bitmap_1D_S_bool(stack);                                         \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  \
+{                                                                                      \
+    const char *a0 = apply_index(&stack[0]);                                           \
+    const char *a1 = apply_index(&stack[1]);                                           \
+    char *a2 = apply_index(&stack[2]);                                                 \
+    const int64_t N = xnd_fixed_shape(&stack[0]);                                      \
+    const int64_t s0 = xnd_fixed_step(&stack[0]);                                      \
+    const int64_t s1 = xnd_fixed_step(&stack[1]);                                      \
+    const int64_t s2 = xnd_fixed_step(&stack[2]);                                      \
+    (void)ctx;                                                                         \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
+                                                                                       \
+    gm_cpu_device_fixed_1D_S_##name##_##t0##_##t1##_##t2(a0, a1, a2, s0, s1, s2, N);   \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap_1D_S(stack);                                              \
+    }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        binary_update_bitmap_1D_S_bool(stack);                                         \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cpu_host_array_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)  \
+{                                                                                      \
+    const char *a0 = XND_ARRAY_DATA(stack[0].ptr);                                     \
+    const int64_t N = XND_ARRAY_SHAPE(stack[0].ptr);                                   \
+    (void)ctx;                                                                         \
+                                                                                       \
+    if (array_shape_check(&stack[1], N, ctx) < 0) {                                    \
+        return -1;                                                                     \
+    }                                                                                  \
+    const char *a1 = XND_ARRAY_DATA(stack[1].ptr);                                     \
+                                                                                       \
+    if (array_shape_check(&stack[2], N, ctx) < 0) {                                    \
+        return -1;                                                                     \
+    }                                                                                  \
+    char *a2 = XND_ARRAY_DATA(stack[2].ptr);                                           \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
+                                                                                       \
+    gm_cpu_device_fixed_1D_C_##name##_##t0##_##t1##_##t2(a0, a1, a2, N);               \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap_1D_S(stack);                                              \
+    }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        binary_update_bitmap_1D_S_bool(stack);                                         \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
+}                                                                                      \
+                                                                                       \
+static int                                                                             \
+gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)          \
+{                                                                                      \
+    const char *a0 = stack[0].ptr;                                                     \
+    const char *a1 = stack[1].ptr;                                                     \
+    char *a2 = stack[2].ptr;                                                           \
+    (void)ctx;                                                                         \
+                                                                                       \
+    if (strcmp(STRINGIZE(name), "power") == 0) {                                       \
+        if (check_power_exp_##t1(a1, ctx) < 0) {                                       \
+            return -1;                                                                 \
+        }                                                                              \
+    }                                                                                  \
+                                                                                       \
+    gm_cpu_device_0D_##name##_##t0##_##t1##_##t2(a0, a1, a2);                          \
+                                                                                       \
+    if (ndt_is_optional(ndt_dtype(stack[2].type))) {                                   \
+        binary_update_bitmap_0D(stack);                                                \
+    }                                                                                  \
+    else if (strcmp(STRINGIZE(name), "equaln") == 0) {                                 \
+        binary_update_bitmap_0D_bool(stack);                                           \
+    }                                                                                  \
+                                                                                       \
+    return 0;                                                                          \
 }
 
 
@@ -707,6 +742,19 @@ gm_cpu_host_fixed_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
                                                                                       \
 static int                                                                            \
 gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                     \
+    (void)stack;                                                                      \
+                                                                                      \
+    ndt_err_format(ctx, NDT_NotImplementedError,                                      \
+        "implementation for " STRINGIZE(name) " : "                                   \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2)                         \
+        " currently requires double rounding");                                       \
+                                                                                      \
+    return -1;                                                                        \
+}                                                                                     \
+                                                                                      \
+static int                                                                            \
+gm_cpu_host_array_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
 {                                                                                     \
     (void)stack;                                                                      \
                                                                                       \
@@ -757,6 +805,18 @@ gm_cpu_host_fixed_1D_S_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t 
 }                                                                                     \
                                                                                       \
 static int                                                                            \
+gm_cpu_host_array_1D_C_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx) \
+{                                                                                     \
+    (void)stack;                                                                      \
+                                                                                      \
+    ndt_err_format(ctx, NDT_TypeError,                                                \
+        "no kernel for " STRINGIZE(name) " : "                                        \
+        STRINGIZE(t0) ", " STRINGIZE(t1) " -> " STRINGIZE(t2));                       \
+                                                                                      \
+    return -1;                                                                        \
+}                                                                                     \
+                                                                                      \
+static int                                                                            \
 gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)         \
 {                                                                                     \
     (void)stack;                                                                      \
@@ -770,87 +830,119 @@ gm_cpu_host_0D_##name##_##t0##_##t1##_##t2(xnd_t stack[], ndt_context_t *ctx)   
 
 
 #define CPU_HOST_BINARY_INIT(func, t0, t1, t2) \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),           \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),          \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * ?" STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),  \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * " STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),  \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * ?" STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2), \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 }
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),                   \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                          \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                          \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),                 \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                          \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                          \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),                 \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                          \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                          \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * ?" STRINGIZE(t2),                \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                          \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                          \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),          \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "var... * ?" STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),        \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "var... * " STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),        \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "var... * ?" STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * ?" STRINGIZE(t2),       \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                 \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "array... * " STRINGIZE(t0) ", array... * " STRINGIZE(t1) " -> array... * " STRINGIZE(t2),    \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                        \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "array... * ?" STRINGIZE(t0) ", array... * " STRINGIZE(t1) " -> array... * ?" STRINGIZE(t2),  \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                        \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "array... * " STRINGIZE(t0) ", array... * ?" STRINGIZE(t1) " -> array... * ?" STRINGIZE(t2),  \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                        \
+                                                                                                         \
+  { .name = STRINGIZE(func),                                                                             \
+    .sig = "array... * ?" STRINGIZE(t0) ", array... * ?" STRINGIZE(t1) " -> array... * ?" STRINGIZE(t2), \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 }
 
 
 #define CPU_HOST_EQUALN_INIT(func, t0, t1, t2) \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),             \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),            \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2),            \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2),           \
-    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                    \
-    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),    \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * ?" STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),   \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * " STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * " STRINGIZE(t2),   \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                           \
-                                                                                                   \
-  { .name = STRINGIZE(func),                                                                       \
-    .sig = "var... * ?" STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * " STRINGIZE(t2),  \
-    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 }
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "... * " STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),                  \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                         \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * " STRINGIZE(t1) " -> ... * " STRINGIZE(t2),                 \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                         \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "... * " STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2),                 \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                         \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "... * ?" STRINGIZE(t0) ", ... * ?" STRINGIZE(t1) " -> ... * " STRINGIZE(t2),                \
+    .OptC = gm_cpu_host_fixed_1D_C_##func##_##t0##_##t1##_##t2,                                         \
+    .OptS = gm_cpu_host_fixed_1D_S_##func##_##t0##_##t1##_##t2,                                         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "var... * " STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),         \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "var... * ?" STRINGIZE(t0) ", var... * " STRINGIZE(t1) " -> var... * " STRINGIZE(t2),        \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "var... * " STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * " STRINGIZE(t2),        \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "var... * ?" STRINGIZE(t0) ", var... * ?" STRINGIZE(t1) " -> var... * " STRINGIZE(t2),       \
+    .Xnd = gm_cpu_host_0D_##func##_##t0##_##t1##_##t2 },                                                \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "array... * " STRINGIZE(t0) ", array... * " STRINGIZE(t1) " -> array... * " STRINGIZE(t2),   \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                       \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "array... * ?" STRINGIZE(t0) ", array... * " STRINGIZE(t1) " -> array... * " STRINGIZE(t2),  \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                       \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "array... * " STRINGIZE(t0) ", array... * ?" STRINGIZE(t1) " -> array... * " STRINGIZE(t2),  \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 },                                       \
+                                                                                                        \
+  { .name = STRINGIZE(func),                                                                            \
+    .sig = "array... * ?" STRINGIZE(t0) ", array... * ?" STRINGIZE(t1) " -> array... * " STRINGIZE(t2), \
+    .OptC = gm_cpu_host_array_1D_C_##func##_##t0##_##t1##_##t2 }
 
 
 #undef bool

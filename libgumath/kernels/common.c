@@ -443,6 +443,15 @@ cpu_binary_typecheck(int (* kernel_location)(const ndt_t *in0, const ndt_t *in1,
         return set;
     }
 
+    if (t0->tag == Array || t1->tag == Array) {
+        const gm_kernel_set_t *set = &f->kernels[n+8];
+        if (ndt_typecheck(spec, set->sig, types, li, nin, nout,
+                          check_broadcast, NULL, NULL, ctx) < 0) {
+            return NULL;
+        }
+        return set;
+    }
+
     const gm_kernel_set_t *set = &f->kernels[n];
 
     if (ndt_fast_binary_fixed_typecheck(spec, set->sig, types, nin, nout,
