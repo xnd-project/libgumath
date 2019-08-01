@@ -82,7 +82,7 @@ pdist(xnd_t stack[], ndt_context_t *ctx)
  * Validate N, M and compute unknown output dimension P.
  *
  * shape[0] = N
- * shape[1] = N
+ * shape[1] = M
  * shape[2] = P
  *
  * 'args' is unused here.  Other functions may inspect the incoming xnd
