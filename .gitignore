@@ -16,3 +16,8 @@ build/
 doc/build/
 *.egg-info
 __pycache__
+
+# Ruby generated build files
+ruby/Gemfile.lock
+*.gem
+ruby/tmp/
