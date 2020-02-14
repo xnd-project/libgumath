@@ -39,4 +39,28 @@ cd python/
 The modules are now importable from this directory.
 
 
+Alternative install with conda (for developing)
+-----------------------------------------------
+
+# Install the gumath package into a local directory.
+
+# Create and activate a new conda environment:
+conda create --name gumath python=3
+conda activate gumath
+
+# Use conda to install numpy and numba
+conda install numpy numba
+
+# Use conda to install ndtype and xnd (if you want to work also on the
+# ndtype and xnd libraries, please check the project repositories:
+# https://github.com/plures/ndtypes and https://github.com/plures/xnd)
+conda install -c xnd/label/dev ndtypes xnd
+
+# Use conda to build libgumath and gumath:
+conda build .conda/libgumath -c xnd/label/dev
+conda build .conda/gumath -c xnd/label/dev
+
+# Use conda to install the local version of the library and the
+# Python module:
+conda install --use-local gumath
 
