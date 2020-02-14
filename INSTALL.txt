@@ -3,12 +3,9 @@
 Minimal install instructions for development
 --------------------------------------------
 
-git clone https://github.com/plures/gumath
+git clone https://github.com/plures/gumath --recursive
 cd gumath
-
-git clone https://github.com/plures/ndtypes
-git clone https://github.com/plures/xnd
-
+./install-python.sh
 
 Install ndtypes locally
 -----------------------
