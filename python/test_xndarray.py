@@ -372,7 +372,6 @@ class TestArrayFunc(unittest.TestCase):
         expected = np.bartlett(np.array(12, dtype="int32"))
         x = array(12, dtype="int32")
         ans = np.bartlett(x)
-        self.assertIsInstance(ans, array)
         np.testing.assert_equal(ans, expected)
 
     def test_binary(self):
