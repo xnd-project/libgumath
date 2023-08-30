@@ -43,7 +43,9 @@ from random import randrange
 try:
     import numpy as np
     HAVE_ARRAY_FUNCTION = hasattr(np.ndarray, '__array_function__')
-    np.warnings.filterwarnings('ignore')
+
+    import warnings
+    warnings.filterwarnings('ignore')
 except ImportError:
     np = None
     HAVE_ARRAY_FUNCTION = False

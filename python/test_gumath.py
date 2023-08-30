@@ -51,7 +51,9 @@ except ImportError:
 
 try:
     import numpy as np
-    np.warnings.filterwarnings('ignore')
+
+    import warnings
+    warnings.filterwarnings('ignore')
 except ImportError:
     np = None
 
